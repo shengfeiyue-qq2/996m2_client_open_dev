@@ -1,0 +1,108 @@
+local ui = {}
+function ui.init(parent)
+	-- Create Scene
+	local Scene = GUI:Node_Create(parent, "Scene", 0.00, 0.00)
+	GUI:setAnchorPoint(Scene, 0.50, 0.50)
+	GUI:setTag(Scene, -1)
+
+	-- Create Panel_1
+	local Panel_1 = GUI:Layout_Create(Scene, "Panel_1", 654.00, 166.00, 305.00, 428.00, false)
+	GUI:setTouchEnabled(Panel_1, false)
+	GUI:setTag(Panel_1, 125)
+
+	-- Create Image_bg
+	local Image_bg = GUI:Image_Create(Panel_1, "Image_bg", 152.00, 214.00, "res/private/player_main_layer_ui/player_main_layer_ui_win32/1900015000.png")
+	GUI:setAnchorPoint(Image_bg, 0.50, 0.50)
+	GUI:setTouchEnabled(Image_bg, false)
+	GUI:setTag(Image_bg, 131)
+
+	-- Create Text_Name
+	local Text_Name = GUI:Text_Create(Panel_1, "Text_Name", 150.00, 392.00, 18, "#ffe400", [[]])
+	GUI:setAnchorPoint(Text_Name, 0.50, 0.50)
+	GUI:setTouchEnabled(Text_Name, false)
+	GUI:setTag(Text_Name, 132)
+	GUI:Text_enableOutline(Text_Name, "#0e0e0e", 1)
+
+	-- Create ButtonClose
+	local ButtonClose = GUI:Button_Create(Panel_1, "ButtonClose", 312.00, 364.00, "res/public_win32/btn_02.png")
+	GUI:Button_loadTextureDisabled(ButtonClose, "Default/Button_Disable.png")
+	GUI:Button_setTitleText(ButtonClose, "")
+	GUI:Button_setTitleColor(ButtonClose, "#414146")
+	GUI:Button_setTitleFontSize(ButtonClose, 14)
+	GUI:Button_titleDisableOutLine(ButtonClose)
+	GUI:setAnchorPoint(ButtonClose, 0.50, 0.50)
+	GUI:setTouchEnabled(ButtonClose, true)
+	GUI:setTag(ButtonClose, 133)
+
+	-- Create Node_panel
+	local Node_panel = GUI:Node_Create(Panel_1, "Node_panel", 16.00, 14.00)
+	GUI:setAnchorPoint(Node_panel, 0.50, 0.50)
+	GUI:setTag(Node_panel, 134)
+
+	-- Create Panel_btnList
+	local Panel_btnList = GUI:Layout_Create(Panel_1, "Panel_btnList", 304.00, 348.00, 24.00, 340.00, false)
+	GUI:setAnchorPoint(Panel_btnList, 0.00, 1.00)
+	GUI:setTouchEnabled(Panel_btnList, false)
+	GUI:setTag(Panel_btnList, 130)
+
+	-- Create Button_1
+	local Button_1 = GUI:Button_Create(Panel_btnList, "Button_1", 0.00, 340.00, "res/private/player_main_layer_ui/player_main_layer_ui_win32/1900015011.png")
+	GUI:Button_loadTexturePressed(Button_1, "res/private/player_main_layer_ui/player_main_layer_ui_win32/1900015011.png")
+	GUI:Button_loadTextureDisabled(Button_1, "res/private/player_main_layer_ui/player_main_layer_ui_win32/1900015010.png")
+	GUI:Button_setTitleText(Button_1, "")
+	GUI:Button_setTitleColor(Button_1, "#414146")
+	GUI:Button_setTitleFontSize(Button_1, 14)
+	GUI:Button_titleDisableOutLine(Button_1)
+	GUI:setAnchorPoint(Button_1, 0.00, 1.00)
+	GUI:setTouchEnabled(Button_1, true)
+	GUI:setTag(Button_1, 127)
+
+	-- Create Text_name
+	local Text_name = GUI:Text_Create(Button_1, "Text_name", 11.00, 62.00, 13, "#807256", [[装
+备]])
+	GUI:setAnchorPoint(Text_name, 0.50, 1.00)
+	GUI:setTouchEnabled(Text_name, false)
+	GUI:setTag(Text_name, 128)
+	GUI:Text_enableOutline(Text_name, "#111111", 2)
+
+	-- Create Button_6
+	local Button_6 = GUI:Button_Create(Panel_btnList, "Button_6", 0.00, 283.00, "res/private/player_main_layer_ui/player_main_layer_ui_win32/1900015011.png")
+	GUI:Button_loadTexturePressed(Button_6, "res/private/player_main_layer_ui/player_main_layer_ui_win32/1900015010.png")
+	GUI:Button_loadTextureDisabled(Button_6, "res/private/player_main_layer_ui/player_main_layer_ui_win32/1900015010.png")
+	GUI:Button_setTitleText(Button_6, "")
+	GUI:Button_setTitleColor(Button_6, "#414146")
+	GUI:Button_setTitleFontSize(Button_6, 14)
+	GUI:Button_titleDisableOutLine(Button_6)
+	GUI:setAnchorPoint(Button_6, 0.00, 1.00)
+	GUI:setTouchEnabled(Button_6, true)
+	GUI:setTag(Button_6, 127)
+
+	-- Create Text_name
+	local Text_name = GUI:Text_Create(Button_6, "Text_name", 11.00, 62.00, 13, "#807256", [[称
+号]])
+	GUI:setAnchorPoint(Text_name, 0.50, 1.00)
+	GUI:setTouchEnabled(Text_name, false)
+	GUI:setTag(Text_name, 128)
+	GUI:Text_enableOutline(Text_name, "#111111", 2)
+
+	-- Create Button_11
+	local Button_11 = GUI:Button_Create(Panel_btnList, "Button_11", 0.00, 226.00, "res/private/player_main_layer_ui/player_main_layer_ui_win32/1900015011.png")
+	GUI:Button_loadTexturePressed(Button_11, "res/private/player_main_layer_ui/player_main_layer_ui_win32/1900015010.png")
+	GUI:Button_loadTextureDisabled(Button_11, "res/private/player_main_layer_ui/player_main_layer_ui_win32/1900015010.png")
+	GUI:Button_setTitleText(Button_11, "")
+	GUI:Button_setTitleColor(Button_11, "#414146")
+	GUI:Button_setTitleFontSize(Button_11, 14)
+	GUI:Button_titleDisableOutLine(Button_11)
+	GUI:setAnchorPoint(Button_11, 0.00, 1.00)
+	GUI:setTouchEnabled(Button_11, true)
+	GUI:setTag(Button_11, 127)
+
+	-- Create Text_name
+	local Text_name = GUI:Text_Create(Button_11, "Text_name", 11.00, 62.00, 13, "#807256", [[时
+装]])
+	GUI:setAnchorPoint(Text_name, 0.50, 1.00)
+	GUI:setTouchEnabled(Text_name, false)
+	GUI:setTag(Text_name, 128)
+	GUI:Text_enableOutline(Text_name, "#111111", 2)
+end
+return ui
