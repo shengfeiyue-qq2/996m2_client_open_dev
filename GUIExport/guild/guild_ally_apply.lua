@@ -1,0 +1,69 @@
+local ui = {}
+function ui.init(parent)
+	-- Create CloseLayout
+	local CloseLayout = GUI:Layout_Create(parent, "CloseLayout", 0.00, 0.00, 1136.00, 640.00, false)
+	GUI:Layout_setBackGroundColorType(CloseLayout, 1)
+	GUI:Layout_setBackGroundColor(CloseLayout, "#000000")
+	GUI:Layout_setBackGroundColorOpacity(CloseLayout, 150)
+	GUI:setTouchEnabled(CloseLayout, true)
+	GUI:setTag(CloseLayout, -1)
+
+	-- Create FrameLayout
+	local FrameLayout = GUI:Layout_Create(parent, "FrameLayout", 568.00, 320.00, 680.00, 400.00, false)
+	GUI:setAnchorPoint(FrameLayout, 0.50, 0.50)
+	GUI:setTouchEnabled(FrameLayout, true)
+	GUI:setTag(FrameLayout, -1)
+
+	-- Create FrameBG
+	local FrameBG = GUI:Image_Create(FrameLayout, "FrameBG", 0.00, 0.00, "res/public/1900000675.jpg")
+	GUI:setTouchEnabled(FrameBG, false)
+	GUI:setTag(FrameBG, -1)
+
+	-- Create line_bg
+	local line_bg = GUI:Image_Create(FrameLayout, "line_bg", 340.00, 350.00, "res/public/bg_yyxsz_01.png")
+	GUI:setContentSize(line_bg, 660, 2)
+	GUI:setIgnoreContentAdaptWithSize(line_bg, false)
+	GUI:setAnchorPoint(line_bg, 0.50, 0.50)
+	GUI:setTouchEnabled(line_bg, false)
+	GUI:setTag(line_bg, -1)
+
+	-- Create line1
+	local line1 = GUI:Image_Create(line_bg, "line1", 450.00, 20.00, "res/public/bg_yyxsz_02.png")
+	GUI:setContentSize(line1, 2, 40)
+	GUI:setIgnoreContentAdaptWithSize(line1, false)
+	GUI:setAnchorPoint(line1, 0.50, 0.50)
+	GUI:setTouchEnabled(line1, false)
+	GUI:setTag(line1, -1)
+
+	-- Create Title1
+	local Title1 = GUI:Text_Create(FrameLayout, "Title1", 235.00, 370.00, 16, "#f2e7cf", [[申请详情]])
+	GUI:setAnchorPoint(Title1, 0.50, 0.50)
+	GUI:setTouchEnabled(Title1, false)
+	GUI:setTag(Title1, -1)
+	GUI:Text_enableOutline(Title1, "#000000", 1)
+
+	-- Create Title2
+	local Title2 = GUI:Text_Create(FrameLayout, "Title2", 565.00, 370.00, 16, "#f2e7cf", [[操作]])
+	GUI:setAnchorPoint(Title2, 0.50, 0.50)
+	GUI:setTouchEnabled(Title2, false)
+	GUI:setTag(Title2, -1)
+	GUI:Text_enableOutline(Title2, "#000000", 1)
+
+	-- Create CloseButton
+	local CloseButton = GUI:Button_Create(FrameLayout, "CloseButton", 680.00, 400.00, "res/public/1900000510.png")
+	GUI:Button_loadTexturePressed(CloseButton, "res/public/1900000511.png")
+	GUI:Button_setTitleText(CloseButton, "")
+	GUI:Button_setTitleColor(CloseButton, "#ffffff")
+	GUI:Button_setTitleFontSize(CloseButton, 10)
+	GUI:Button_titleEnableOutline(CloseButton, "#000000", 1)
+	GUI:setAnchorPoint(CloseButton, 0.00, 1.00)
+	GUI:setTouchEnabled(CloseButton, true)
+	GUI:setTag(CloseButton, -1)
+
+	-- Create List
+	local List = GUI:ListView_Create(FrameLayout, "List", 13.00, 13.00, 653.00, 333.00, 1)
+	GUI:ListView_setGravity(List, 5)
+	GUI:setTouchEnabled(List, true)
+	GUI:setTag(List, -1)
+end
+return ui
