@@ -1,0 +1,1 @@
+<Image id="ImageBg" type="around" image="res/public/1900000677.png,9,12" x=0 y=0 w=400 h=300 ax=0.5 ay=0.5 revmsg=true />
