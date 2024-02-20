@@ -202,7 +202,7 @@ function MainMiniMap.ChangeShowState(state)
 end
 
 -- 更新相关显示
-function MainMiniMap.UpdatePortal()
+function MainMiniMap.UpdatePortal(isUpdateMap)
     if not MainMiniMap._protalRange then
         return
     end
@@ -215,6 +215,9 @@ function MainMiniMap.UpdatePortal()
     end
 
     MainMiniMap._portals = SL:GetMetaValue("MAP_GET_PORTALS") or {}
+    if isUpdateMap then
+        MainMiniMap._markPortalIdx = nil
+    end
 
     local function squLen(x, y)
         local maxV = math.max(math.abs(x), math.abs(y))
