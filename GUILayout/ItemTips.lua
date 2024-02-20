@@ -2690,6 +2690,7 @@ function ItemTips.CreateEquipPanel(data, itemData, isWear, panelInsertIndex)
     end
 
     ResetDescParam()
+    ItemTips.itemCount = 0
 
     if not ItemTips._PList then
         ItemTips._PList = GUI:Layout_Create(ItemTips._PMainUI, "PList", data.pos.x, data.pos.y, 0, 0)

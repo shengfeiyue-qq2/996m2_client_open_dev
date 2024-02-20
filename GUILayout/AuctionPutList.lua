@@ -96,7 +96,8 @@ function AuctionPutList.CreatePutCell(parent, index)
         local function callback()
             local status, remaining = SL:GetMetaValue("AUCTION_ITEM_STATE", item)
             local timeData = SL:SecondToHMS(remaining)
-            local timeStr  = string.format("%02d:%02d:%02d", timeData.h, timeData.m, timeData.s)
+            local hour = timeData.h + 24 * timeData.d
+            local timeStr  = string.format("%02d:%02d:%02d", hour, timeData.m, timeData.s)
 
             if status == 0 then
                 GUI:Text_setString(ui.Text_status, "-")
@@ -314,6 +315,9 @@ function AuctionPutList.CreateBagCell(parent, i)
         GUI:ItemShow_addPressEvent(item, function()
             local data = SL:GetMetaValue("ITEM_DATA_BY_MAKEINDEX", itemData.MakeIndex)
             if not data then
+                data = SL:GetMetaValue("QUICKUSE_DATA_BY_MAKEINDEX", itemData.MakeIndex)
+            end
+            if not data then
                 SL:ShowSystemTips("道具不存在")
                 return
             end
@@ -321,6 +325,9 @@ function AuctionPutList.CreateBagCell(parent, i)
         end)
         GUI:ItemShow_addReplaceClickEvent(item, function()
             local data = SL:GetMetaValue("ITEM_DATA_BY_MAKEINDEX", itemData.MakeIndex)
+            if not data then
+                data = SL:GetMetaValue("QUICKUSE_DATA_BY_MAKEINDEX", itemData.MakeIndex)
+            end
             if not data then
                 SL:ShowSystemTips("道具不存在")
                 return

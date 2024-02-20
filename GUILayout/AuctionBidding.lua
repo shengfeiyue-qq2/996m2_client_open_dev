@@ -57,7 +57,8 @@ function AuctionBidding.CreateItemCell(parent, data)
         local status, remaining = SL:GetMetaValue("AUCTION_ITEM_STATE", data)
 
         local timeData = SL:SecondToHMS(remaining)
-        local timeStr  = string.format("%02d:%02d:%02d", timeData.h, timeData.m, timeData.s)
+        local hour = timeData.h + 24 * timeData.d
+        local timeStr  = string.format("%02d:%02d:%02d", hour, timeData.m, timeData.s)
         GUI:Text_setString(ui.Text_remaining, timeStr)
 
         if status == 0 or status == 3 then
