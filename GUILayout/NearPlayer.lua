@@ -74,7 +74,7 @@ function NearPlayer.RefreshList()
     for i = 1, nPlayer do
         local player = nearPlayer[i]
         -- 排除人形怪、有队伍的玩家
-        if not SL:GetMetaValue("ACTOR_IS_HUMAN", player) and SL:GetMetaValue("ACTOR_NEAR_SHOW", v) then
+        if not SL:GetMetaValue("ACTOR_IS_HUMAN", player) and SL:GetMetaValue("ACTOR_NEAR_SHOW", player) then
             local item = {}
             item.job = SL:GetMetaValue("ACTOR_JOB_ID", player)
             item.sex = SL:GetMetaValue("ACTOR_SEX", player)
