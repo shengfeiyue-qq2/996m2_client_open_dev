@@ -123,6 +123,7 @@ function PlayerBuff_Look.OnFillContent()
 
     PlayerBuff_Look._showBuffData = {}
     PlayerBuff_Look._showBuffCount = 0
+    PlayerBuff_Look._qCells = {}
     for i = 1, #items do
         local v = items[i]
         if v.icon and string.len(v.icon) > 0 and v.other_look == 1 then

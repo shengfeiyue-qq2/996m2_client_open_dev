@@ -594,8 +594,10 @@ local function getAddShow(id, value)
 end
 
 local function checkNeedCombineExAdd()
-    local needCombineEx = SL:GetMetaValue("GAME_DATA", "TipsCombineExAddShow") == 1
-    return needCombineEx
+    local value = SL:GetMetaValue("GAME_DATA", "TipsCombineExAddShow")
+    local needCombineEx = (value == 1 or value == 2)
+    local showBracketValue = value == 1
+    return needCombineEx, showBracketValue
 end
 
 function ItemTips.GetAttStr(itemData, diff)
@@ -640,12 +642,15 @@ function ItemTips.GetAttStr(itemData, diff)
     -- 附加属性 
     local exAddAttr = nil
     local exAddAttrShow = nil
-    if checkNeedCombineExAdd() then
+    local needCombineEx, showExAdd = checkNeedCombineExAdd()
+    if needCombineEx then
         local abilexStr = itemData.ExAbil and itemData.ExAbil.abilex
         exAddAttr = ItemTips.ParseExAddAttr(abilexStr, true)
-        exAddAttrShow = GUIFunction:GetAttDataShow(exAddAttr, nil, true)
         if exAddAttr and next(exAddAttr) then
             attList = GUIFunction:CombineAttList(attList, exAddAttr)
+        end
+        if showExAdd then
+            exAddAttrShow = GUIFunction:GetAttDataShow(exAddAttr, nil, true)
         end
     end
 

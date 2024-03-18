@@ -535,6 +535,8 @@ function CompoundItem.CreateMenuType(index)
     end 
 
     local layout = GUI:getChildByName(parent, "Panel_1")
+    GUI:removeFromParent(parent)
+    GUI:removeFromParent(layout)
 
 
     local btnType = GUI:getChildByName(layout, "Button_type")
@@ -543,8 +545,6 @@ function CompoundItem.CreateMenuType(index)
     local pageName = SL:GetMetaValue("COMPOUND_PAGE_NAME", index)
     GUI:Button_setTitleText(btnType, pageName)
 
-    GUI:removeFromParent(parent)
-    GUI:removeFromParent(layout)
     return {
         layout = layout,
         btnType = btnType,
@@ -563,12 +563,13 @@ function CompoundItem.CreateMenuCellLevel1(index)
     end 
 
     local layout = GUI:getChildByName(parent, "Panel_1")
-    local btn_type = GUI:getChildByName(layout, "Button_type2")
-    local image_red = GUI:getChildByName(layout, "Image_red")
-    local image_opened = GUI:getChildByName(layout, "Image_opened")
 
     GUI:removeFromParent(parent)
     GUI:removeFromParent(layout)
+
+    local btn_type = GUI:getChildByName(layout, "Button_type2")
+    local image_red = GUI:getChildByName(layout, "Image_red")
+    local image_opened = GUI:getChildByName(layout, "Image_opened")
 
     local cell = {
         layout = layout,
@@ -590,13 +591,14 @@ function CompoundItem.CreateMenuCellLevel2(index)
     end 
 
     local layout = GUI:getChildByName(parent, "Panel_1")
+
+    GUI:removeFromParent(parent)
+    GUI:removeFromParent(layout)
+
     local image_bg  = GUI:getChildByName(layout, "Image_bg")
     local text_name = GUI:getChildByName(layout, "Text_name")
     local image_tag = GUI:getChildByName(layout, "Image_tag")
     local image_red = GUI:getChildByName(layout, "Image_red")
-
-    GUI:removeFromParent(parent)
-    GUI:removeFromParent(layout)
 
     local cell = {
         layout = layout,
@@ -616,8 +618,9 @@ function CompoundItem.CreateItemIcon(data)
     
     local icon = GUI:getChildByName(widget, "Panel_icon")
 
+    GUI:removeFromParent(icon)
+    
     if not data or next(data) == nil then 
-        GUI:removeFromParent(icon)
         return icon
     end 
 
@@ -661,7 +664,6 @@ function CompoundItem.CreateItemIcon(data)
         GUI:setPositionX(ui_have, iconW - needW - 2)
     end 
 
-    GUI:removeFromParent(icon)
     return icon
 end
 
@@ -671,6 +673,8 @@ function CompoundItem.CreateCostCell(data)
     GUI:LoadExport(widget, file)
 
     local item = GUI:getChildByName(widget, "item_money")
+
+    GUI:removeFromParent(item)
 
     local node_cost = GUI:getChildByName(item, "Node_cost")
     local ui_num = GUI:getChildByName(item, "Text_num")
@@ -699,8 +703,6 @@ function CompoundItem.CreateCostCell(data)
     needNum = SL:GetSimpleNumber(needNum)
     GUI:Text_setTextColor(ui_num, color)
     GUI:Text_setString(ui_num, haveNum.."/"..needNum)
-
-    GUI:removeFromParent(item)
 
     return item
 end

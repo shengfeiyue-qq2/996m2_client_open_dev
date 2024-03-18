@@ -118,6 +118,7 @@ function PlayerBuff.OnFillContent()
 
     PlayerBuff._showBuffData = {}
     PlayerBuff._showBuffCount = 0
+    PlayerBuff._qCells = {}
     for i = 1, #items do
         local v = items[i]
         if v.icon and string.len(v.icon) > 0 then
