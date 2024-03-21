@@ -1281,10 +1281,6 @@ function ItemTips.GetCustomShow(parent, data, isPetItem)
                 if (attConfig and attConfig.type == 2) or a.type == 2 then --万分比除100
                     value = string.format("%.1f", value / 100) * 10 / 10
                 end
-                if a.type then
-                    customDesc = nil
-                    customIcon = nil
-                end
                 if customDesc then
                     local desc = value .. (a.percent > 0 and "%%" or "")
                     customDesc = string.gsub(customDesc, "%%s", desc, 1)

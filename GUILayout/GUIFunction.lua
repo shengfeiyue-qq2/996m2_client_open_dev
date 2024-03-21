@@ -2326,6 +2326,13 @@ function GUIFunction:OnCheckAllowLaunchSkillBefore(skillID)
     -- 是否继续释放技能
     return true
 end
+
+-- 判断能否自动拾取该物品 [内部判断可自动拾取后的额外判断] 
+-- 参数: itemIndex 道具Index 返回值: boolean
+function GUIFunction:CheckAutoPickItemEnable_Extra(itemIndex)
+
+    return true
+end
 -------------------------------------------------------------------------
 
 ------------------------------ PC快捷键触发方法 ---------------------------
