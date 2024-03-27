@@ -1824,7 +1824,7 @@ function ItemTips.GetNewSuitPanel(suit, itemData)
         for cfgIdx, suitConfig in ipairs(suitConfigs) do
             if suitConfig and next(suitConfig) then
                 local suitCount = suitConfig.num
-                if suitCount ~= 1 then  -- 单件套装不显示
+                if suitConfig.desc and suitConfig.desc ~= "" then  -- 套装无描述不显示
                     local meetCount = 0
                     local equopshowArray = string.split(suitConfig.equopshow or "", "|")
                     local equipShowColorStr = ""
