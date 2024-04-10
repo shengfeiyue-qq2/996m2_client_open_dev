@@ -92,7 +92,11 @@ function PlayerHeroFrame_Look_TradingBank.InitPageChangeBtn()
             if PlayerHeroFrame_Look_TradingBank._pageid == id then
                 return
             end
-            
+
+            if PlayerHeroFrame_Look_TradingBank.doTrack then 
+                PlayerHeroFrame_Look_TradingBank.doTrack(id, PlayerHeroFrame_Look_TradingBank._ishero)
+            end
+
             if id == SLDefine.PlayerPage.MAIN_PLAYER_LAYER_BAG or id == SLDefine.PlayerPage.MAIN_PLAYER_LAYER_STORAGE then 
                 PlayerHeroFrame_Look_TradingBank._curIdx = SLDefine.PlayerPage.MAIN_PLAYER_LAYER_BAG == id and 2 or 3
                 PlayerHeroFrame_Look_TradingBank.ChangePage({index = id })

@@ -523,7 +523,9 @@ function GUIFunction:CheckTargetDigAble(targetID)
         if DIG_RACE_SERVER_LST[raceServer] == nil then
             return false
         end
+    end
 
+    if SL:GetMetaValue("ACTOR_IS_MONSTER", targetID) or SL:GetMetaValue("ACTOR_IS_HUMAN", targetID) then
         -- 配置不可以挖
         local typeIndex = SL:GetMetaValue("ACTOR_TYPE_INDEX", targetID)
         local data      = SL:GetMetaValue("GAME_DATA", "noDigMonsters")
