@@ -17,6 +17,7 @@ function PurchasePutIn.main()
     PurchasePutIn._itemSizeHei  = SL:GetMetaValue("WINPLAYMODE") and 32 or 42
     PurchasePutIn._currencyList = SL:GetMetaValue("PURCHASE_CURRENCIES")
     PurchasePutIn._limitMinPrice = {}   -- 不同货币限制最小值
+    PurchasePutIn._itemTblView = nil
 
     -- 显示适配
     local screenW = SL:GetMetaValue("SCREEN_WIDTH")
