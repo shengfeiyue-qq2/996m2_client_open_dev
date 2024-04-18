@@ -295,7 +295,8 @@ local function GetAttScaleType(id)
     local list = {
         [AttTypeTable.Anti_Posion]      = 1,
         [AttTypeTable.Health_Recover]   = 1,
-        [AttTypeTable.Spell_Recover]    = 1
+        [AttTypeTable.Spell_Recover]    = 1,
+        [AttTypeTable.Posion_Recover]   = 1,
     }
 
     if id == AttTypeTable.Anti_Magic and not SL:GetMetaValue("SERVER_OPTION", "NewMagicMissType") then
