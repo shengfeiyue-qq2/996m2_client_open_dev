@@ -1,0 +1,30 @@
+local ui = {}
+function ui.init(parent)
+	-- Create Node
+	local Node = GUI:Node_Create(parent, "Node", 0.00, 0.00)
+	GUI:setAnchorPoint(Node, 0.50, 0.50)
+	GUI:setTag(Node, -1)
+
+	-- Create Panel_bg
+	local Panel_bg = GUI:Layout_Create(Node, "Panel_bg", 0.00, 0.00, 60.00, 20.00, false)
+	GUI:setAnchorPoint(Panel_bg, 1.00, 0.50)
+	GUI:setTouchEnabled(Panel_bg, false)
+	GUI:setTag(Panel_bg, 49)
+
+	-- Create Node_item
+	local Node_item = GUI:Layout_Create(Panel_bg, "Node_item", 15.00, 10.00, 0.00, 0.00, false)
+	GUI:Layout_setBackGroundColorType(Node_item, 1)
+	GUI:Layout_setBackGroundColor(Node_item, "#96c8ff")
+	GUI:Layout_setBackGroundColorOpacity(Node_item, 102)
+	GUI:setAnchorPoint(Node_item, 0.50, 0.50)
+	GUI:setTouchEnabled(Node_item, true)
+	GUI:setTag(Node_item, 236)
+
+	-- Create Text_count
+	local Text_count = GUI:Text_Create(Panel_bg, "Text_count", 37.00, 10.00, 12, "#ffffff", [[666666]])
+	GUI:setAnchorPoint(Text_count, 0.50, 0.50)
+	GUI:setTouchEnabled(Text_count, false)
+	GUI:setTag(Text_count, 53)
+	GUI:Text_enableOutline(Text_count, "#111111", 1)
+end
+return ui
