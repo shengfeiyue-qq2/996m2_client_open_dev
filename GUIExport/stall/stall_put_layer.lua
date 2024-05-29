@@ -1,0 +1,153 @@
+local ui = {}
+function ui.init(parent)
+	-- Create Scene
+	local Scene = GUI:Node_Create(parent, "Scene", 0.00, 0.00)
+	GUI:setChineseName(Scene, "摆摊放置场景")
+	GUI:setAnchorPoint(Scene, 0.50, 0.50)
+	GUI:setTag(Scene, -1)
+
+	-- Create PMainUI
+	local PMainUI = GUI:Layout_Create(Scene, "PMainUI", 568.00, 320.00, 441.00, 259.00, false)
+	GUI:setChineseName(PMainUI, "摆摊放置组合")
+	GUI:setAnchorPoint(PMainUI, 0.50, 0.50)
+	GUI:setTouchEnabled(PMainUI, true)
+	GUI:setTag(PMainUI, 56)
+
+	-- Create Image_1
+	local Image_1 = GUI:Image_Create(PMainUI, "Image_1", 200.00, 128.00, "res/private/baitan_ui/baitan_ui_mobile/bg_baitanzy02.jpg")
+	GUI:setChineseName(Image_1, "摆摊放置_背景图")
+	GUI:setAnchorPoint(Image_1, 0.50, 0.50)
+	GUI:setTouchEnabled(Image_1, false)
+	GUI:setTag(Image_1, 58)
+
+	-- Create Image_4
+	local Image_4 = GUI:Image_Create(PMainUI, "Image_4", 92.00, 210.00, "res/private/baitan_ui/baitan_ui_mobile/word_baitanzy01.png")
+	GUI:setChineseName(Image_4, "摆摊放置_价格文字_图片")
+	GUI:setAnchorPoint(Image_4, 0.50, 0.50)
+	GUI:setTouchEnabled(Image_4, false)
+	GUI:setTag(Image_4, 65)
+
+	-- Create Image_5
+	local Image_5 = GUI:Image_Create(PMainUI, "Image_5", 258.00, 210.00, "res/public/1900000668.png")
+	GUI:setContentSize(Image_5, 188, 31)
+	GUI:setIgnoreContentAdaptWithSize(Image_5, false)
+	GUI:setChineseName(Image_5, "摆摊放置_出售价格_输入框")
+	GUI:setAnchorPoint(Image_5, 0.50, 0.50)
+	GUI:setTouchEnabled(Image_5, false)
+	GUI:setTag(Image_5, 66)
+
+	-- Create TextField_price
+	local TextField_price = GUI:TextInput_Create(PMainUI, "TextField_price", 258.00, 210.00, 188.00, 31.00, 20)
+	GUI:TextInput_setString(TextField_price, "1")
+	GUI:TextInput_setPlaceHolder(TextField_price, "1")
+	GUI:TextInput_setFontColor(TextField_price, "#ffffff")
+	GUI:TextInput_setMaxLength(TextField_price, 10)
+	GUI:setChineseName(TextField_price, "摆摊放置_输入内容_文本")
+	GUI:setAnchorPoint(TextField_price, 0.50, 0.50)
+	GUI:setTouchEnabled(TextField_price, true)
+	GUI:setTag(TextField_price, 67)
+
+	-- Create Button_cancel
+	local Button_cancel = GUI:Button_Create(PMainUI, "Button_cancel", 112.00, 53.00, "res/public/btn_sifud_02.png")
+	GUI:Button_setScale9Slice(Button_cancel, 15, 15, 12, 10)
+	GUI:setContentSize(Button_cancel, 139, 59)
+	GUI:setIgnoreContentAdaptWithSize(Button_cancel, false)
+	GUI:Button_setTitleText(Button_cancel, "取消")
+	GUI:Button_setTitleColor(Button_cancel, "#f8e6c6")
+	GUI:Button_setTitleFontSize(Button_cancel, 18)
+	GUI:Button_titleEnableOutline(Button_cancel, "#111111", 2)
+	GUI:setChineseName(Button_cancel, "摆摊放置_取消_按钮")
+	GUI:setAnchorPoint(Button_cancel, 0.50, 0.50)
+	GUI:setTouchEnabled(Button_cancel, true)
+	GUI:setTag(Button_cancel, 60)
+
+	-- Create Button_sell
+	local Button_sell = GUI:Button_Create(PMainUI, "Button_sell", 291.00, 53.00, "res/public/btn_sifud_02.png")
+	GUI:Button_setScale9Slice(Button_sell, 15, 15, 12, 10)
+	GUI:setContentSize(Button_sell, 139, 59)
+	GUI:setIgnoreContentAdaptWithSize(Button_sell, false)
+	GUI:Button_setTitleText(Button_sell, "确定")
+	GUI:Button_setTitleColor(Button_sell, "#f8e6c6")
+	GUI:Button_setTitleFontSize(Button_sell, 18)
+	GUI:Button_titleEnableOutline(Button_sell, "#111111", 2)
+	GUI:setChineseName(Button_sell, "摆摊放置_确定_按钮")
+	GUI:setAnchorPoint(Button_sell, 0.50, 0.50)
+	GUI:setTouchEnabled(Button_sell, true)
+	GUI:setTag(Button_sell, 59)
+
+	-- Create Button_close
+	local Button_close = GUI:Button_Create(PMainUI, "Button_close", 415.00, 238.00, "res/public/btn_sifud_01.png")
+	GUI:Button_setScale9Slice(Button_close, 15, 15, 12, 10)
+	GUI:setContentSize(Button_close, 66, 62)
+	GUI:setIgnoreContentAdaptWithSize(Button_close, false)
+	GUI:Button_setTitleText(Button_close, "")
+	GUI:Button_setTitleColor(Button_close, "#414146")
+	GUI:Button_setTitleFontSize(Button_close, 14)
+	GUI:Button_titleDisableOutLine(Button_close)
+	GUI:setChineseName(Button_close, "摆摊放置_关闭_按钮")
+	GUI:setAnchorPoint(Button_close, 0.50, 0.50)
+	GUI:setTouchEnabled(Button_close, true)
+	GUI:setTag(Button_close, 57)
+
+	-- Create Text_currency
+	local Text_currency = GUI:Text_Create(PMainUI, "Text_currency", 223.00, 155.00, 16, "#ffffff", [[]])
+	GUI:setChineseName(Text_currency, "摆摊放置_货币类型_文本")
+	GUI:setAnchorPoint(Text_currency, 1.00, 0.50)
+	GUI:setTouchEnabled(Text_currency, false)
+	GUI:setTag(Text_currency, 83)
+	GUI:Text_enableOutline(Text_currency, "#000000", 1)
+
+	-- Create Text_currency_item
+	local Text_currency_item = GUI:Text_Create(PMainUI, "Text_currency_item", 34.00, 41.00, 16, "#ffffff", [[]])
+	GUI:setChineseName(Text_currency_item, "摆摊放置_货币名称_文本")
+	GUI:setAnchorPoint(Text_currency_item, 0.50, 0.50)
+	GUI:setTouchEnabled(Text_currency_item, false)
+	GUI:setTag(Text_currency_item, 84)
+	GUI:setVisible(Text_currency_item, false)
+	GUI:Text_enableOutline(Text_currency_item, "#000000", 1)
+
+	-- Create ListView_currency
+	local ListView_currency = GUI:ListView_Create(PMainUI, "ListView_currency", 197.00, 142.00, 68.00, 41.00, 1)
+	GUI:ListView_setGravity(ListView_currency, 2)
+	GUI:setChineseName(ListView_currency, "摆摊放置_货币_列表")
+	GUI:setAnchorPoint(ListView_currency, 0.50, 1.00)
+	GUI:setTouchEnabled(ListView_currency, true)
+	GUI:setTag(ListView_currency, 64)
+	GUI:setVisible(ListView_currency, false)
+
+	-- Create Button_currency_open
+	local Button_currency_open = GUI:Button_Create(PMainUI, "Button_currency_open", 238.00, 155.00, "res/public/1900000624_1.png")
+	GUI:Button_loadTexturePressed(Button_currency_open, "res/public/1900000624.png")
+	GUI:Button_setScale9Slice(Button_currency_open, 7, 7, 11, 11)
+	GUI:setContentSize(Button_currency_open, 22, 26)
+	GUI:setIgnoreContentAdaptWithSize(Button_currency_open, false)
+	GUI:Button_setTitleText(Button_currency_open, "")
+	GUI:Button_setTitleColor(Button_currency_open, "#414146")
+	GUI:Button_setTitleFontSize(Button_currency_open, 14)
+	GUI:Button_titleDisableOutLine(Button_currency_open)
+	GUI:setChineseName(Button_currency_open, "摆摊放置_展开_按钮")
+	GUI:setAnchorPoint(Button_currency_open, 0.50, 0.50)
+	GUI:setTouchEnabled(Button_currency_open, true)
+	GUI:setTag(Button_currency_open, 65)
+	GUI:setVisible(Button_currency_open, false)
+
+	-- Create Button_currency_close
+	local Button_currency_close = GUI:Button_Create(PMainUI, "Button_currency_close", 238.00, 155.00, "res/public/1900000624_1.png")
+	GUI:Button_loadTexturePressed(Button_currency_close, "res/public/1900000624.png")
+	GUI:Button_setScale9Slice(Button_currency_close, 7, 7, 11, 11)
+	GUI:setContentSize(Button_currency_close, 22, 26)
+	GUI:setIgnoreContentAdaptWithSize(Button_currency_close, false)
+	GUI:Button_setTitleText(Button_currency_close, "")
+	GUI:Button_setTitleColor(Button_currency_close, "#414146")
+	GUI:Button_setTitleFontSize(Button_currency_close, 14)
+	GUI:Button_titleDisableOutLine(Button_currency_close)
+	GUI:setChineseName(Button_currency_close, "摆摊放置_收起_按钮")
+	GUI:setAnchorPoint(Button_currency_close, 0.50, 0.50)
+	GUI:setRotation(Button_currency_close, 180.00)
+	GUI:setRotationSkewX(Button_currency_close, 180.00)
+	GUI:setRotationSkewY(Button_currency_close, 180.00)
+	GUI:setTouchEnabled(Button_currency_close, true)
+	GUI:setTag(Button_currency_close, 66)
+	GUI:setVisible(Button_currency_close, false)
+end
+return ui
