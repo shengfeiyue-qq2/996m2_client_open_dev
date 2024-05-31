@@ -175,7 +175,7 @@ end
 
 -- 获取对应战力最小装备位、战力、是否穿戴，通过StdMode
 -- checkPosData：指定部位数据战力对比({[1]={data = data, pos = pos}})
-function GUIFunction:GetMinPowerPosByStdMode(stdMode, param, checkPosData, isHero)
+function GUIFunction:GetMinPowerPosByStdMode(stdMode, param, checkPosData, isHero, excludePos)
     local stdMode = stdMode or 0
     local onEquipMinPower = 0
     local minPowerPos = -1
@@ -197,6 +197,13 @@ function GUIFunction:GetMinPowerPosByStdMode(stdMode, param, checkPosData, isHer
 
     local isCheckPosData = checkPosData and true or false
 
+    if excludePos then
+        for i, v in ipairs(pos) do
+            if (isCheckPosData and v.pos == excludePos) or (not isCheckPosData and v == excludePos) then
+                table.remove(pos, i)
+            end
+        end
+    end 
     for k, v in ipairs(pos) do
         local equipData = isCheckPosData and v.data
         if not equipData then
@@ -224,6 +231,24 @@ function GUIFunction:GetMinPowerPosByStdMode(stdMode, param, checkPosData, isHer
     return minPowerPos, onEquipMinPower, hasEquip
 end
 
+-- 检查装备禁止装戴位置
+function GUIFunction:CheckEquipExcludePos(item)
+    if not item.Article or item.Article == "" then
+        return nil
+    end
+
+    local itemArticle = nil
+    local parseArticle = string.split(item.Article, "|")
+    for k, v in pairs(parseArticle) do
+        local articleV = tonumber(v)
+        if articleV == SL:GetMetaValue("ITEM_ARTICLE_ENUM").TAKE_TAKE_ARMRINGL then
+            return GUIDefine.EquipPosUI.Equip_Type_ArmRingL
+        end
+    end
+
+    return nil
+end
+
 -- 检测显示自动使用Tips
 -- checkItem: 检测装备数据     pos: 要穿戴的装备位置    playerType: 人物类型(1: 人物; 2: 英雄)
 function GUIFunction:CheckAutoUseTips(checkItem, pos, playerType)
@@ -239,7 +264,8 @@ function GUIFunction:CheckAutoUseTips(checkItem, pos, playerType)
             myPower, powerSortIndex = GUIFunction:GetEquipPower(item, {jobPower = true}, isHero)
 
             local param = {jobPower = true, power = myPower, comparison = comparison, powerSortIndex = powerSortIndex}
-            local minPowerPos, onEquipMinPower, hasEquip = GUIFunction:GetMinPowerPosByStdMode(item.StdMode, param, checkPosData, isHero)
+            local excludePos = GUIFunction:CheckEquipExcludePos(item)
+            local minPowerPos, onEquipMinPower, hasEquip = GUIFunction:GetMinPowerPosByStdMode(item.StdMode, param, checkPosData, isHero, excludePos)
             local equipIntoPos = -1
 
             if minPowerPos >= 0 and (not hasEquip or onEquipMinPower < myPower) then
@@ -254,32 +280,35 @@ function GUIFunction:CheckAutoUseTips(checkItem, pos, playerType)
 
         local posList = SL:GetMetaValue("EQUIP_POSLIST_BY_STDMODE", checkItem.StdMode)
         local isBreak = true
-        for k, equipPos in pairs(posList) do
+        for k, equipPos in ipairs(posList) do
             isBreak = true
-            -- 已有自动使用装备
-            local tipsMakeIndex = SL:GetMetaValue("AUTOUSE_MAKEINDEX_BY_POS", playerType, equipPos)
-            if tipsMakeIndex then
-                local equipData = SL:GetMetaValue("ITEM_DATA_BY_MAKEINDEX", tipsMakeIndex, isHero)
-                if not equipData and isHero then
-                    equipData = SL:GetMetaValue("ITEM_DATA_BY_MAKEINDEX", tipsMakeIndex)
-                end
-                checkEquipIntoPos = checkMinPower(checkItem, {{data = equipData, pos = equipPos}})
-            else
-                local equipData = nil
-                if isHero then
-                    equipData = SL:GetMetaValue("H.EQUIP_DATA", equipPos)
-                else
-                    equipData = SL:GetMetaValue("EQUIP_DATA", equipPos)
-                end
-                if not equipData then
-                    checkEquipIntoPos = equipPos
-                else
+            local excludePos = GUIFunction:CheckEquipExcludePos(checkItem)
+            if not excludePos or excludePos ~= equipPos then
+                -- 已有自动使用装备
+                local tipsMakeIndex = SL:GetMetaValue("AUTOUSE_MAKEINDEX_BY_POS", playerType, equipPos)
+                if tipsMakeIndex then
+                    local equipData = SL:GetMetaValue("ITEM_DATA_BY_MAKEINDEX", tipsMakeIndex, isHero)
+                    if not equipData and isHero then
+                        equipData = SL:GetMetaValue("ITEM_DATA_BY_MAKEINDEX", tipsMakeIndex)
+                    end
                     checkEquipIntoPos = checkMinPower(checkItem, {{data = equipData, pos = equipPos}})
+                else
+                    local equipData = nil
+                    if isHero then
+                        equipData = SL:GetMetaValue("H.EQUIP_DATA", equipPos)
+                    else
+                        equipData = SL:GetMetaValue("EQUIP_DATA", equipPos)
+                    end
+                    if not equipData then
+                        checkEquipIntoPos = equipPos
+                    else
+                        checkEquipIntoPos = checkMinPower(checkItem, {{data = equipData, pos = equipPos}})
+                    end
                 end
-            end
 
-            if isBreak and checkEquipIntoPos >= 0 then
-                break
+                if isBreak and checkEquipIntoPos >= 0 then
+                    break
+                end
             end
         end
     end
@@ -356,7 +385,8 @@ function GUIFunction:OnAutoUseCheckItem(item)
             local myPower, powerSortIndex = GUIFunction:GetEquipPower(item, myParam)
             local param = {jobPower = true, power = myPower, comparison = comparison, powerSortIndex = powerSortIndex}
             -- 最小战力装备位
-            local minPowerPos, onEquipMinPower, hasEquip = GUIFunction:GetMinPowerPosByStdMode(item.StdMode, param)
+            local excludePos = GUIFunction:CheckEquipExcludePos(item)
+            local minPowerPos, onEquipMinPower, hasEquip = GUIFunction:GetMinPowerPosByStdMode(item.StdMode, param, nil, false, excludePos)
 
             equipIntoPos = -1
             
@@ -456,7 +486,8 @@ function GUIFunction:OnAutoUseCheckItem_Hero(item)
             local myPower, powerSortIndex = GUIFunction:GetEquipPower(item, myParam, true)
             local param = {jobPower = true, power = myPower, comparison = comparison, powerSortIndex = powerSortIndex}
             -- 最小战力装备位
-            local minPowerPos, onEquipMinPower, hasEquip = GUIFunction:GetMinPowerPosByStdMode(item.StdMode, param, nil, true)
+            local excludePos = GUIFunction:CheckEquipExcludePos(item)
+            local minPowerPos, onEquipMinPower, hasEquip = GUIFunction:GetMinPowerPosByStdMode(item.StdMode, param, nil, true, excludePos)
 
             equipIntoPos = -1
             
