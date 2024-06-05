@@ -34,11 +34,6 @@ function HeroEquip.main(data)
     -- 职业
     HeroEquip.playerJob = SL:GetMetaValue("H.JOB")
 
-    HeroEquip.InitSamePosDiff()
-    HeroEquip.InitEquipEvent()
-    HeroEquip.InitEquipUI()
-    HeroEquip.UpdatePlayerView(nil, true)
-
     -- 首饰盒
     local ringBoxShow = SL:GetMetaValue("SERVER_OPTION", SW_KEY_SNDAITEMBOX) == 1 -- 首饰盒功能是否开启
     GUI:setVisible(HeroEquip._ui.Best_ringBox, ringBoxShow)
@@ -73,7 +68,7 @@ function HeroEquip.InitHideNodePos()
     end
 end
 
-function HeroEquip.InitSamePosDiff()
+function HeroEquip.InitSamePosDiff(isAfterF10Load)
     HeroEquip._pos13Visible = GUI:getVisible(HeroEquip._ui.Panel_pos13)
     if  HeroEquip._pos13Visible then
         table.insert(HeroEquip.posSetting, 13)
@@ -85,6 +80,11 @@ function HeroEquip.InitSamePosDiff()
     end
     GUI:setVisible(HeroEquip._ui.Panel_pos55, HeroEquip._pos13Visible)
     GUI:setVisible(HeroEquip._ui.Node_55, HeroEquip._pos13Visible)
+    if isAfterF10Load then
+        HeroEquip.InitEquipEvent()
+        HeroEquip.InitEquipUI()
+        HeroEquip.UpdatePlayerView(nil, true)
+    end
 end
 
 function HeroEquip.InitEquipEvent()

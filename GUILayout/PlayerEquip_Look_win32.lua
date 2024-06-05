@@ -44,11 +44,6 @@ function PlayerEquip_Look.main(data)
     PlayerEquip_Look.playerHairID = SL:GetMetaValue("L.M.HAIR")
     -- 职业
     PlayerEquip_Look.playerJob = SL:GetMetaValue("L.M.JOB")
-    
-    PlayerEquip_Look.InitSamePosDiff()
-    PlayerEquip_Look.InitEquipEvent()
-    PlayerEquip_Look.InitEquipUI()
-    PlayerEquip_Look.UpdatePlayerView()
 
     -- 首饰盒
     local ringBoxShow = SL:GetMetaValue("SERVER_OPTION", SW_KEY_SNDAITEMBOX) == 1 -- 首饰盒功能是否开启
@@ -88,7 +83,7 @@ function PlayerEquip_Look.InitHideNodePos()
     end
 end
 
-function PlayerEquip_Look.InitSamePosDiff()
+function PlayerEquip_Look.InitSamePosDiff(isAfterF10Load)
     PlayerEquip_Look._pos13Visible = GUI:getVisible(PlayerEquip_Look._ui.Panel_pos13)
     if  PlayerEquip_Look._pos13Visible then
         table.insert(PlayerEquip_Look.posSetting, 13)
@@ -100,6 +95,11 @@ function PlayerEquip_Look.InitSamePosDiff()
     end
     GUI:setVisible(PlayerEquip_Look._ui.Panel_pos55, PlayerEquip_Look._pos13Visible)
     GUI:setVisible(PlayerEquip_Look._ui.Node_55, PlayerEquip_Look._pos13Visible)
+    if isAfterF10Load then
+        PlayerEquip_Look.InitEquipEvent()
+        PlayerEquip_Look.InitEquipUI()
+        PlayerEquip_Look.UpdatePlayerView()
+    end
 end
 
 function PlayerEquip_Look.InitEquipEvent()
@@ -159,7 +159,7 @@ function PlayerEquip_Look.InitPanelMouseEvent(equipPanel, pos)
         data.itemData2 = itemData[#itemData - 1]
         data.itemData3 = itemData[#itemData - 2]
         data.pos = panelPos
-        data.lookPlayer = false
+        data.lookPlayer = true
         data.from = SL:GetMetaValue("ITEMFROMUI_ENUM").PALYER_EQUIP
         SL:OpenItemTips(data)
         CleanupTimer()

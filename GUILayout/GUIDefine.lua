@@ -111,6 +111,8 @@ local attTypeTable = {
     Internal_DZValue            = 105,-- 斗转星移值
     Min_Prick                   = 106,-- 刺术下限
     Max_Prick                   = 107,-- 刺术上限
+    All_Du_ADD                  = 130,-- 全毒增加
+    All_Du_Less                 = 131,-- 全毒减弱
     -- 108 - 129 自定义职业(5-15)新增对应属性
     Min_CustJobAttr_5           = 108,
     Max_CustJobAttr_5           = 109,

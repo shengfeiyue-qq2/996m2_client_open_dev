@@ -47,11 +47,6 @@ function PlayerEquip.main(data)
     -- 职业
     PlayerEquip.playerJob = SL:GetMetaValue("JOB")
 
-    PlayerEquip.InitSamePosDiff()
-    PlayerEquip.InitEquipEvent()
-    PlayerEquip.InitEquipUI()
-    PlayerEquip.UpdatePlayerView(nil, true)
-
     -- 首饰盒
     local ringBoxShow = SL:GetMetaValue("SERVER_OPTION", SW_KEY_SNDAITEMBOX) == 1 -- 首饰盒功能是否开启
     GUI:setVisible(PlayerEquip._ui.Best_ringBox, ringBoxShow)
@@ -84,8 +79,7 @@ function PlayerEquip.InitHideNodePos()
     end
 end
 
-
-function PlayerEquip.InitSamePosDiff()
+function PlayerEquip.InitSamePosDiff(isAfterF10Load)
     PlayerEquip._pos13Visible = GUI:getVisible(PlayerEquip._ui.Panel_pos13)
     if  PlayerEquip._pos13Visible then
         table.insert(PlayerEquip.posSetting, 13)
@@ -97,6 +91,11 @@ function PlayerEquip.InitSamePosDiff()
     end
     GUI:setVisible(PlayerEquip._ui.Panel_pos55, PlayerEquip._pos13Visible)
     GUI:setVisible(PlayerEquip._ui.Node_55, PlayerEquip._pos13Visible)
+    if isAfterF10Load then
+        PlayerEquip.InitEquipEvent()
+        PlayerEquip.InitEquipUI()
+        PlayerEquip.UpdatePlayerView(nil, true)
+    end
 end
 
 function PlayerEquip.InitEquipEvent()
