@@ -188,12 +188,19 @@ function PlayerEquip.InitPanelMoveEvent(equipPanel, pos)
 
     local clickTimes = 0
     local delayTimer = nil
+
+    local function clearTimes()
+        clickTimes = 0
+        delayTimer = nil
+    end
+
     local function clickCallBack(sender)
         clickTimes = clickTimes + 1
         if not delayTimer then
             delayTimer = SL:scheduleOnce(equipPanel, function()
                 if clickTimes == 2 then
                     if sender._movingState then --在道具移动中
+                        clearTimes()
                         return
                     end
                     -- 双击
@@ -209,6 +216,7 @@ function PlayerEquip.InitPanelMoveEvent(equipPanel, pos)
                     -- 单击  
                     local itemData = GetEquipDataByPos(equipPos, true)
                     if not itemData or sender._movingState then
+                        clearTimes()
                         return
                     end
                     local panelPos = GUI:getWorldPosition(equipPanel)
@@ -221,8 +229,7 @@ function PlayerEquip.InitPanelMoveEvent(equipPanel, pos)
                     data.from = SL:GetMetaValue("ITEMFROMUI_ENUM").PALYER_EQUIP
                     SL:OpenItemTips(data)
                 end
-                clickTimes = 0
-                delayTimer = nil
+                clearTimes()
             end, 0.3)
         end
     end
