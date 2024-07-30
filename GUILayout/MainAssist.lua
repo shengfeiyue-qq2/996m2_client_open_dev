@@ -232,6 +232,10 @@ function MainAssist.UpdateMissionCellsOrder()
         local cell = table.remove(cells, index)
         GUI:ListView_pushBackCustomItem(ListView_mission, cell.quickUI.nativeUI)
         GUI:decRef(cell.quickUI.nativeUI)
+        if cell.sfx then
+            GUI:Effect_stop(cell.sfx)
+            GUI:Effect_play(cell.sfx, 0, 0, true)
+        end
     end
 
     for _, v in ipairs(cells) do

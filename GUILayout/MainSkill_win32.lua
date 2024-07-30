@@ -37,6 +37,10 @@ function MainSkill_win32.AddSkillToUI(data)
 		return
 	end
 
+	if MainSkill_win32._skill_cells[data.skill] then
+		return
+	end
+
 	local skillPos = data.pos or {x=0, y=0}
 	local skillID  = data.skill
 	
