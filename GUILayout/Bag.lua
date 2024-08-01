@@ -197,6 +197,16 @@ function Bag.OnUpdateGold(data)
     end
 end
 
+-- 是否可单击  这里可以拦截背包单击事件
+function Bag.IsCanSingle(data)
+    return true
+end
+
+-- 是否可以双击  这里可以拦截背包双击事件
+function Bag.IsCanDouble(data)
+    return true
+end
+
 -- 关闭事件
 function Bag.OnClose(winID)
     if winID and winID == "BagLayerGUI" then
