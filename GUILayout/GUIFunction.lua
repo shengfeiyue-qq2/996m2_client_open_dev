@@ -1,0 +1,2660 @@
+GUIFunction = {}
+
+local AttTypeTable = GUIDefine.AttTypeTable
+local ExAttType = GUIDefine.ExAttType
+
+-- 获取基础属性
+function GUIFunction:PShowAttType()
+    return AttTypeTable
+end
+
+function GUIFunction:GetExAttType()
+    return ExAttType
+end
+
+-- 获取职业名
+function GUIFunction:GetJobNameByID(jobID)
+    if not jobID then return "" end
+    if jobID == 4 then
+        return SL:GetValue("I18N_STRING", 1100)
+    elseif jobID >= 5 and jobID <= 15 then
+        local jobData   = SL:GetValue("GAME_DATA", "MultipleJobSetMap")[jobID]
+        local isOpen    = jobData and jobData.isOpen
+        local str       = isOpen and jobData.name or string.format("%s%s", SL:GetValue("I18N_STRING", 1101), jobID)
+        return str
+    end
+    return SL:GetValue("I18N_STRING", 1067+jobID)
+end
+
+-- 触发 与身上装备比较 [背包提升箭头使用]
+function GUIFunction:CompareEquipOnBody(equipData, from)
+    -- 装备数据
+    if not equipData then 
+        return false
+    end 
+
+    if not from then 
+        from = GUIDefine.ItemFrom.BAG
+    end 
+
+    -- M2开关自动穿戴
+    local autoDress = SL:GetValue("SERVER_OPTION", SW_KEY_AUTO_DRESS)
+    if not autoDress or autoDress == 0 then 
+        return false
+    end 
+
+    -- equip表 配置对比参数 -1不进行比较(非穿戴物品)  
+    local myComparison, myJob = SL:GetValue("EQUIP_COMPARISON", equipData.Index)
+    if myComparison then 
+        if tonumber(myComparison) == -1 then 
+            return false
+        elseif tonumber(equipData.comparison) == -2 and from == GUIDefine.ItemFrom.BAG then
+            return false
+        elseif tonumber(equipData.comparison) == -3 and from == GUIDefine.ItemFrom.HERO_BAG then
+            return false
+        end
+    end   
+
+    local isHero = from == GUIDefine.ItemFrom.HERO_BAG
+    -- 职业判断
+    local job = isHero and SL:GetValue("H.JOB") or SL:GetValue("JOB")
+    if myJob and myJob ~= 3 and myJob ~= job then 
+        return false
+    end
+
+    -- 通过stdmode 获取装备位
+    local pos = GUIDefine.EquipPosByStdMode[equipData.StdMode]
+    if not pos or next(pos) == nil then 
+        return false
+    end 
+
+    -- 是否是该性别装备
+    local sexOk = SL:GetValue("IS_SAMESEX_EQUIP", equipData) 
+    if not sexOk then 
+        return false
+    end 
+
+    -- 药粉 护身符 不对比
+    if equipData.StdMode == 25 then 
+        return false
+    end
+
+    local myParam = {jobPower = true}
+    local myPower, powerSortIndex = GUIFunction:GetEquipPower(equipData, myParam, isHero) -- 当前装备战力
+
+    -- 比较身上装备
+    local targetInfo = nil
+    local targetParam = {jobPower = true, power = myPower, comparison = myComparison, powerSortIndex = powerSortIndex}
+    local targetMinPower = 0 -- 身上穿戴最小战力
+    for i, pos in ipairs(pos) do
+        if isHero then
+            targetInfo = SL:GetValue("H.EQUIP_DATA", pos)
+        else
+            targetInfo = SL:GetValue("EQUIP_DATA", pos)
+        end
+        if not targetInfo then
+            return true
+        end
+
+        local targetPower = GUIFunction:GetEquipPower(targetInfo, targetParam, isHero) -- 身上装备战力
+        if targetMinPower == 0 or targetPower < targetMinPower then -- 拿到身上穿戴最小战力
+            targetMinPower = targetPower
+        end
+    end
+
+    if targetMinPower < myPower then 
+        return true
+    end 
+
+    return false
+end 
+
+-- 获取战力
+function GUIFunction:GetEquipPower(item, param, isHero)
+    if not item or next(item) == nil then
+        return 0
+    end
+
+    local param = param or {}
+
+    -- 基础属性 对比
+    local itemCfg = SL:GetValue("ITEM_DATA", item.Index)
+    if not itemCfg or not itemCfg.Attribute then 
+        return 0
+    end 
+
+    local attList = {} -- 属性列表
+    local tAttribute = string.split(itemCfg.Attribute or "", "|")
+    for i, v in ipairs(tAttribute) do 
+        if v and v ~= "" and string.len(v) > 0 then
+            local tAttribute2 = string.split(v or "", "#")
+            table.insert(attList, {id = tonumber(tAttribute2[2]) or 3, value = tonumber(tAttribute2[3]) or 0})
+        end
+    end 
+
+    local powerValue, powerSortIndex = GUIFunction:CalculateAttPower(attList, param.jobPower, param.powerSortIndex, isHero) 
+    local comparisonValue = SL:GetValue("EQUIP_COMPARISON", item.Index)
+
+    local targetPower = param.power or 0 -- 选中装备 属性战力
+    local targetComparison = param.comparison or comparisonValue -- 选中装备 优先级
+    if comparisonValue > targetComparison or (param.powerSortIndex and param.powerSortIndex < powerSortIndex) then 
+        powerValue = math.abs(powerValue) + targetPower + 1 -- 比选中装备战力高 
+    elseif comparisonValue < targetComparison then 
+        powerValue = math.min(math.abs(powerValue), targetPower - 1) -- 比选中装备战力低 
+    end 
+
+    return powerValue, powerSortIndex
+end
+
+-- 计算战力 
+-- attList: 属性   isJobPower：对比本职业   sortIndex：对比的属性下标(先比较职业属性  再比较物防  最后比较魔防  都是上限属性)
+function GUIFunction:CalculateAttPower(attList, isJobPower, sortIndex, isHero)
+    local power = -1
+    local myJob = isHero and SL:GetValue("H.JOB") or SL:GetValue("JOB")
+    local jobPowerAttIds = {
+        [AttTypeTable.Max_DEF] = 2,
+        [AttTypeTable.Max_MDF] = 1
+    }
+
+    if isJobPower then
+        if myJob == 0 then --战士
+            jobPowerAttIds[AttTypeTable.Max_ATK] = 3
+        elseif myJob == 1 then --法师
+            jobPowerAttIds[AttTypeTable.Max_MAT] = 3
+        elseif myJob == 2 then --道士
+            jobPowerAttIds[AttTypeTable.Max_Daoshu] = 3
+        end
+    end
+
+    local powers = {}
+    local powerSortIndex = 0
+
+    for k, v in pairs(attList) do
+        if jobPowerAttIds[v.id] then
+            local score = v.value
+            powers[jobPowerAttIds[v.id]] = score
+            if jobPowerAttIds[v.id] > powerSortIndex and score > 0 then        
+                powerSortIndex = jobPowerAttIds[v.id]
+            end
+        end
+    end
+
+    if sortIndex and powerSortIndex <= sortIndex then
+        powerSortIndex = sortIndex
+    end
+
+    power = powers[powerSortIndex] or -1
+    return power, powerSortIndex
+end
+
+-- 获取对应战力最小装备位、战力、是否穿戴，通过StdMode
+-- checkPosData：指定部位数据战力对比({[1]={data = data, pos = pos}})
+function GUIFunction:GetMinPowerPosByStdMode(stdMode, param, checkPosData, isHero, excludePos)
+    local stdMode = stdMode or 0
+    local onEquipMinPower = 0
+    local minPowerPos = -1
+    local hasEquip = true
+    local pos = checkPosData or GUIDefine.EquipPosByStdMode[stdMode]
+    if not pos or next(pos) == nil then
+        SL:Print("this StdMode is not a equip")
+        return minPowerPos, onEquipMinPower, false
+    end
+
+    if param.checkPos then
+        local index = table.indexof(pos, param.checkPos)
+        if index then
+            local firstPos = pos[1]
+            pos[1] = param.checkPos
+            pos[index] = firstPos
+        end
+    end
+
+    local isCheckPosData = checkPosData and true or false
+
+    if excludePos then
+        for i, v in ipairs(pos) do
+            if (isCheckPosData and v.pos == excludePos) or (not isCheckPosData and v == excludePos) then
+                table.remove(pos, i)
+            end
+        end
+    end
+    for k, v in ipairs(pos) do
+        local equipData = isCheckPosData and v.data
+        if not equipData then
+            if isHero then
+                equipData = SL:GetValue("H.EQUIP_DATA", v)
+            else
+                equipData = SL:GetValue("EQUIP_DATA", v)
+            end
+        end
+        if not equipData then
+            minPowerPos = isCheckPosData and v.pos or v
+            onEquipMinPower = 0
+            hasEquip = false
+            break
+        end
+        local equipPower = GUIFunction:GetEquipPower(equipData, param, isHero)
+        if onEquipMinPower == 0 or equipPower < onEquipMinPower then
+            onEquipMinPower = equipPower
+            minPowerPos = isCheckPosData and v.pos or v
+            if stdMode == 25 then
+                break
+            end
+        end
+    end
+    return minPowerPos, onEquipMinPower, hasEquip
+end
+
+-- 检查装备禁止装戴位置
+function GUIFunction:CheckEquipExcludePos(item)
+    if not item.Article or item.Article == "" then
+        return nil
+    end
+
+    local itemArticle = nil
+    local parseArticle = string.split(item.Article, "|")
+    for k, v in pairs(parseArticle) do
+        local articleV = tonumber(v)
+        if articleV == GUIDefine.ItemArticleType.TYPE_TAKE_ARMRINGL then
+            return GUIDefine.EquipPosUI.Equip_Type_ArmRingL
+        end
+    end
+
+    return nil
+end
+
+-- 检测显示自动使用Tips
+-- checkItem: 检测装备数据     pos: 要穿戴的装备位置    playerType: 人物类型(1: 人物; 2: 英雄)
+function GUIFunction:CheckAutoUseTips(checkItem, pos, playerType)
+    playerType = playerType or 1
+    local checkEquipIntoPos = pos
+    local isHero = playerType == 2
+    if checkItem and checkItem.StdMode then
+        local function checkMinPower(item, checkPosData)
+            local comparison = SL:GetValue("EQUIP_COMPARISON", item.Index)
+            -- 是否有找到合适的位置 战力对比
+            local myPower = 0
+            local powerSortIndex = nil
+            myPower, powerSortIndex = GUIFunction:GetEquipPower(item, {jobPower = true}, isHero)
+
+            local param = {jobPower = true, power = myPower, comparison = comparison, powerSortIndex = powerSortIndex}
+            local excludePos = GUIFunction:CheckEquipExcludePos(item)
+            local minPowerPos, onEquipMinPower, hasEquip = GUIFunction:GetMinPowerPosByStdMode(item.StdMode, param, checkPosData, isHero, excludePos)
+            local equipIntoPos = -1
+
+            if minPowerPos >= 0 and (not hasEquip or onEquipMinPower < myPower) then
+                equipIntoPos = minPowerPos
+            end
+
+            if equipIntoPos < 0 then
+                return -1
+            end
+            return equipIntoPos
+        end
+
+        local posList = GUIDefine.EquipPosByStdMode[checkItem.StdMode]
+        local isBreak = true
+        for k, equipPos in ipairs(posList) do
+            isBreak = true
+            local excludePos = GUIFunction:CheckEquipExcludePos(checkItem)
+            if not excludePos or excludePos ~= equipPos then
+                -- 已有自动使用装备
+                local tipsMakeIndex = AutoUseItemData.GetMakeIndexByPos(playerType, equipPos)
+                if tipsMakeIndex then
+
+                    local equipData = nil
+                    if isHero then
+                        equipData = HeroBagData.GetItemDataByMakeIndex(tipsMakeIndex) or BagData.GetItemDataByMakeIndex(tipsMakeIndex)
+                    else
+                        equipData = BagData.GetItemDataByMakeIndex(tipsMakeIndex)
+                    end
+                    checkEquipIntoPos = checkMinPower(checkItem, {{data = equipData, pos = equipPos}})
+                else
+                    local equipData = nil
+                    if isHero then
+                        equipData = SL:GetValue("H.EQUIP_DATA", equipPos)
+                    else
+                        equipData = SL:GetValue("EQUIP_DATA", equipPos)
+                    end
+                    if not equipData then
+                        checkEquipIntoPos = equipPos
+                    else
+                        checkEquipIntoPos = checkMinPower(checkItem, {{data = equipData, pos = equipPos}})
+                    end
+                end
+
+                if isBreak and checkEquipIntoPos >= 0 then
+                    break
+                end
+            end
+        end
+    end
+    return checkEquipIntoPos
+end
+
+-- 自动使用比对物品 （人物）
+function GUIFunction:OnAutoUseCheckItem(item)
+    if not item then
+        return
+    end
+
+    -- 配置对比参数 -1、-2不进行比较
+    if item.comparison and (tonumber(item.comparison) == -1 or tonumber(item.comparison) == -2) then
+        return
+    end
+
+    -- 服务端自动使用开关
+    local autoDress = SL:GetValue("SERVER_OPTION", SW_KEY_AUTO_DRESS)
+    if not autoDress or autoDress ~= 1 then
+        return
+    end
+
+    -- 禁止使用物品buff
+    local ret, buffID = SL:GetValue("CHECK_USE_ITEM_BUFF", item.Index)
+    if not ret then
+        if buffID then
+            local config = SL:GetValue("BUFF_CONFIG", buffID)
+            if config and config.bufftitle then
+                SL:ShowSystemTips(config.bufftitle)
+            end
+        end
+        return
+    end
+
+    local isCanAutoUse = SL:GetValue("ITEM_CAN_AUTOUSE", item)
+    local isSkillBook = SL:GetValue("ITEMTYPE", item) == SL:GetValue("ITEMTYPE_ENUM").SkillBook
+    local pos = GUIDefine.EquipPosByStdMode[item.StdMode]
+    if not isCanAutoUse and not isSkillBook and (not pos or not next(pos)) then
+        return
+    end
+
+    local type = 1 -- 人物
+    local isOk = false
+    repeat
+        -- 穿戴条件是否满足
+        local canUse = SL:CheckItemUseNeed(item).canUse
+        if not canUse then
+            break
+        end
+
+        local equipIntoPos = nil
+        -- 技能书
+        if isSkillBook then
+            if not SL:GetValue("SKILLBOOK_CAN_USE", item.Name) then
+                break
+            end
+        -- 装备
+        elseif pos and next(pos) then
+            -- 性别判断
+            if not SL:GetValue("IS_SAMESEX_EQUIP", item) and SL:GetValue("PLAYER_INITED") then
+                break
+            end
+
+            -- 职业判断
+            local comparison, job = SL:GetValue("EQUIP_COMPARISON", item.Index)
+            if job and job ~= 3 and job ~= SL:GetValue("JOB") then
+                break
+            end
+
+            -- 战力对比
+            local myParam = {jobPower = true}
+            -- 当前装备战力
+            local myPower, powerSortIndex = GUIFunction:GetEquipPower(item, myParam)
+            local param = {jobPower = true, power = myPower, comparison = comparison, powerSortIndex = powerSortIndex}
+            -- 最小战力装备位
+            local excludePos = GUIFunction:CheckEquipExcludePos(item)
+            local minPowerPos, onEquipMinPower, hasEquip = GUIFunction:GetMinPowerPosByStdMode(item.StdMode, param, nil, false, excludePos)
+
+            equipIntoPos = -1
+            
+            if minPowerPos >= 0 and (not hasEquip or onEquipMinPower < myPower) then
+                equipIntoPos = minPowerPos
+            end
+
+            if equipIntoPos < 0 then
+                break
+            else
+                -- 检测显示Tips 
+                equipIntoPos = GUIFunction:CheckAutoUseTips(item, equipIntoPos, type)
+                if not equipIntoPos or equipIntoPos < 0 then
+                    break
+                end
+            end
+        end
+        if equipIntoPos then
+            -- 已有自动使用装备
+            local tipsMakeIndex = AutoUseItemData.GetMakeIndexByPos(type, equipIntoPos)
+            UIOperator:CloseAutoUsePopUI(tipsMakeIndex)
+            AutoUseItemData.SetMakeIndexByPos(type, equipIntoPos, item.MakeIndex)
+        end
+
+        isOk = true
+
+        UIOperator:OpenAutoUsePopUI({item = item, targetPos = equipIntoPos, isSkillBook = isSkillBook})
+    
+    until true
+
+    return isOk
+end
+
+-- 自动使用比对物品 （英雄）
+function GUIFunction:OnAutoUseCheckItem_Hero(item)
+    if not item then
+        return
+    end
+
+    -- 配置对比参数 -1、-3不进行比较
+    if item.comparison and (tonumber(item.comparison) == -1 or tonumber(item.comparison) == -3) then
+        return
+    end
+
+    -- 英雄是否召唤
+    if not SL:GetValue("HERO_IS_ALIVE") then
+        return
+    end
+
+    -- 服务端自动使用开关
+    local autoDress = SL:GetValue("SERVER_OPTION", SW_KEY_AUTO_DRESS)
+    if not autoDress or autoDress ~= 1 then
+        return
+    end
+
+    local isCanAutoUse = SL:GetValue("ITEM_CAN_AUTOUSE", item)
+    local isSkillBook = SL:GetValue("ITEMTYPE", item) == SL:GetValue("ITEMTYPE_ENUM").SkillBook
+    local pos = GUIDefine.EquipPosByStdMode[item.StdMode]
+    if not isCanAutoUse and not isSkillBook and (not pos or not next(pos)) then
+        return
+    end
+
+    local type = 2 -- 英雄
+    local isOk = false
+    repeat
+        -- 穿戴条件是否满足
+        local canUse = SL:CheckItemUseNeed_Hero(item).canUse
+        if not canUse then
+            break
+        end
+
+        local equipIntoPos = nil
+        -- 技能书
+        if isSkillBook then
+            local isFromHero = SL:GetValue("ITEM_BELONG_BY_MAKEINDEX", item.MakeIndex) == GUIDefine.ItemBelong.HEROBAG
+            if not isFromHero then
+                break
+            end
+            if not SL:GetValue("SKILLBOOK_CAN_USE", item.Name, true) then
+                break
+            end
+        -- 装备
+        elseif pos and next(pos) then
+            -- 性别判断
+            if not SL:GetValue("IS_SAMESEX_EQUIP", item, true) and SL:GetValue("HERO_INITED") then
+                break
+            end
+
+            -- 职业判断
+            local comparison, job = SL:GetValue("EQUIP_COMPARISON", item.Index)
+            if job and job ~= 3 and job ~= SL:GetValue("H.JOB") then
+                break
+            end
+
+            -- 战力对比
+            local myParam = {jobPower = true}
+            -- 当前装备战力
+            local myPower, powerSortIndex = GUIFunction:GetEquipPower(item, myParam, true)
+            local param = {jobPower = true, power = myPower, comparison = comparison, powerSortIndex = powerSortIndex}
+            -- 最小战力装备位
+            local excludePos = GUIFunction:CheckEquipExcludePos(item)
+            local minPowerPos, onEquipMinPower, hasEquip = GUIFunction:GetMinPowerPosByStdMode(item.StdMode, param, nil, true, excludePos)
+
+            equipIntoPos = -1
+            
+            if minPowerPos >= 0 and (not hasEquip or onEquipMinPower < myPower) then
+                equipIntoPos = minPowerPos
+            end
+
+            if equipIntoPos < 0 then
+                break
+            else
+                -- 检测显示Tips 
+                equipIntoPos = GUIFunction:CheckAutoUseTips(item, equipIntoPos, type)
+                if not equipIntoPos or equipIntoPos < 0 then
+                    break
+                end
+            end
+        end
+        if equipIntoPos then
+            -- 已有自动使用装备
+            local tipsMakeIndex = AutoUseItemData.GetMakeIndexByPos(type, equipIntoPos)
+            UIOperator:CloseAutoUsePopUI(tipsMakeIndex, nil, true)
+            AutoUseItemData.SetMakeIndexByPos(type, equipIntoPos, item.MakeIndex)
+        end
+
+        isOk = true
+        
+        UIOperator:OpenAutoUsePopUI({item = item, targetPos = equipIntoPos, isSkillBook = isSkillBook, isHero = true})
+    
+    until true
+
+    return isOk
+end
+
+-- 是否能挖肉
+-- Race 51 52 53 90 105 106 82 84 85 可以挖的
+local DIG_RACE_SERVER_LST = {
+    [51] = 1,
+    [52] = 1,
+    [53] = 1,
+    [82] = 1,
+    [84] = 1,
+    [85] = 1,
+    [90] = 1,
+    [105] = 1,
+    [106] = 1,
+}
+function GUIFunction:CheckTargetDigAble(targetID)
+    -- 必须是死亡的
+    if not SL:GetValue("ACTOR_IS_DIE", targetID) then
+        return false
+    end
+
+    -- 怪物和人形怪才可以挖
+    if not SL:GetValue("ACTOR_IS_MONSTER", targetID) and not SL:GetValue("ACTOR_IS_HUMAN", targetID) then
+        return false
+    end
+
+    -- 是人形怪，但是有主人，可能是分身
+    if SL:GetValue("ACTOR_IS_HUMAN", targetID) and SL:GetValue("ACTOR_HAVE_MASTER", targetID) then
+        return false
+    end
+
+    if SL:GetValue("ACTOR_IS_MONSTER", targetID) then
+        local raceServer = SL:GetValue("ACTOR_RACE_SERVER", targetID)
+        if DIG_RACE_SERVER_LST[raceServer] == nil then
+            return false
+        end
+    end
+
+    if SL:GetMetaValue("ACTOR_IS_MONSTER", targetID) or SL:GetMetaValue("ACTOR_IS_HUMAN", targetID) then
+        -- 配置不可以挖
+        local typeIndex = SL:GetValue("ACTOR_TYPE_INDEX", targetID)
+        if GUIDefineEx.NoDigMonsterTypeMap and GUIDefineEx.NoDigMonsterTypeMap[typeIndex] then
+            return false
+        end
+    end
+
+    return true
+end
+
+-- ItemTips 相关
+local function MergeAtts(list)
+    local newList = {}
+    -- 组合属性ID
+    local function GetMergeAttID(min, max)
+        if min and max then
+            return min * 10000 + max
+        else
+            return min or max or 0
+        end
+    end
+    for i, v in pairs(list) do
+        local merges = GUIDefine.MergeAttrConfig[v.id]
+        if merges then
+            local mergedId = GetMergeAttID(merges[1], merges[2])
+            if not newList[mergedId] then
+                newList[mergedId] = {
+                    id = mergedId,
+                    min = 0,
+                    max = 0,
+                }
+                if merges[1] and merges[1] >= GUIFunction:PShowAttType().Min_CustJobAttr_5 and merges[1] <= GUIFunction:PShowAttType().Max_CustJobAttr_15 then
+                    newList[mergedId].maxID = merges[2]
+                end
+            end
+
+            if v.id == merges[2] then
+                newList[mergedId].max = v.value or 0
+            else
+                newList[mergedId].min = v.value or 0
+            end
+        else
+            table.insert(newList, v)
+        end
+    end
+    return newList
+end
+
+-- 获取属性展示方式
+local function GetAttValueShowType(id, maxID)
+    local list = {
+        [30004] = 2,
+        [50006] = 2,
+        [70008] = 2,
+        [90010] = 2,
+        [110012] = 2,
+        [940095] = 3,
+        [960097] = 3,
+        [980099] = 3
+    }
+    if maxID and maxID >= GUIFunction:PShowAttType().Min_CustJobAttr_5 and maxID <= GUIFunction:PShowAttType().Max_CustJobAttr_15 then
+        return 2
+    end
+    return list[id] or 1
+end
+
+-- 获取特殊属性名
+local function GetSpecialAttrName(id)
+    local strList = {
+        [100000092] = "强度",
+        [100000093] = "诅咒",
+        [100030004] = "攻击",
+        [100050006] = "魔法",
+        [100070008] = "道术",
+        [100090010] = "防御",
+        [100110012] = "魔防",
+        [100940095] = "背包负重",
+        [100960097] = "装备负重",
+        [100980099] = "手持负重"
+    }
+    return strList[id]
+end
+
+local function GetAttScaleType(id)
+    local list = {
+        [AttTypeTable.Anti_Posion]      = 1,
+        [AttTypeTable.Health_Recover]   = 1,
+        [AttTypeTable.Spell_Recover]    = 1
+    }
+
+    if id == AttTypeTable.Anti_Magic and not SL:GetValue("SERVER_OPTION", SW_KEY_MAGIC_MISS_TYPE) then
+        return 1
+    end
+
+    return list[id]
+end
+
+-- Tips获取不同装备对比
+function GUIFunction:GetDiffEquip(itemData, isHero)
+    local posList = itemData and SL:GetValue("TIP_POSLIST_BY_STDMODE", itemData.StdMode, isHero)
+    local equipList = {}
+    if posList then
+        local myPower = nil
+        for _, pos in pairs(posList) do
+            local equip = nil
+            if isHero then
+                equip = SL:GetValue("H.EQUIP_DATA", pos)
+            else
+                equip = SL:GetValue("EQUIP_DATA", pos)
+            end
+            if equip and next(equip) then
+                table.insert(equipList, equip)
+            end
+        end
+    end
+    return equipList
+end
+
+-- Tips获取属性数据显示
+function GUIFunction:GetAttDataShow(att, stars, tipsShow)
+    if not att or not next(att) then
+        return {}
+    end
+    local attList = {}
+    if att.id then -- 单条
+        table.insert(attList, att)
+    else
+        attList = att
+    end
+
+    local function GetAttNumShow(id, min, max, maxID)
+        local name = ""
+        local valueStr = ""
+        min = tonumber(min) or 0
+        max = tonumber(max) or 0
+        if id > 10000 then
+            name = GetSpecialAttrName(100000000 + id)
+            if maxID then
+                local config = SL:GetValue("ATTR_CONFIG", maxID) or {}
+                name = config.name or ""
+            end
+            local type = GetAttValueShowType(id, maxID)
+            local strWay = type == 2 and "%s-%s" or "%s/%s"
+            valueStr = string.format(strWay, SL:HPUnit(min), SL:HPUnit(max))
+            if stars then
+                valueStr = min > 0 and valueStr or "+" .. SL:HPUnit(max)
+            end
+        else
+            local config = SL:GetValue("ATTR_CONFIG", id) or {}
+            local attNumType = config.type or 1
+            --[[
+                type == 1 正常值 == 2 万分比 == 3 百分比
+                目前服务器发送过来的万分比的数值 基本是 10% 中的 10/10
+            ]]
+            local changeName = nil
+            local custMap = SL:GetValue("CUST_ABIL_MAP")
+            if custMap[id] and next(custMap[id]) then
+                local typeMap = {[0] = 1, [1] = 3, [2] = 2}
+                local type = custMap[id].type or 0
+                if custMap[id].showCustomName then
+                    changeName = config.name
+                end
+                id = custMap[id].id
+                config = SL:GetValue("ATTR_CONFIG", id) or {}
+                attNumType = typeMap[type] or 1
+            end
+
+            if id == AttTypeTable.Lucky then
+                if min < 0 then
+                    changeName = GetSpecialAttrName(100000000 + AttTypeTable.Curse)
+                    min = math.abs(min)
+                end
+            end
+            valueStr = min .. ""
+            valueStr = stars and "+" .. valueStr or valueStr
+
+            if attNumType == 2 or attNumType == 3 then
+                local percent = attNumType == 2 and 100 or 1
+                local showValue = min / percent
+                if GetAttScaleType(id) then
+                    showValue = showValue * 10
+                end
+                if attNumType == 2 then --万分比都支持小数点后两位
+                    showValue = string.format("%.2f", showValue) * 100 / 100
+                    valueStr = string.format("%s%%", showValue)
+                else
+                    valueStr = string.format("%d%%", showValue)
+                end
+            else
+                if GUIDefine.HPUnitAttrs[id] then
+                    valueStr = SL:HPUnit(min) .. ""
+                    if stars then
+                        valueStr = "+" .. valueStr
+                    end
+                end
+            end
+
+            local showName = config.name
+            if changeName then
+                name = changeName
+            elseif id == AttTypeTable.Strength or id == AttTypeTable.Curse then
+                name = GetSpecialAttrName(100000000 + id)
+            else
+                name = showName
+            end
+        end
+
+        name = name or ""
+        local lens = string.len(name)
+        if lens == 6 then
+            local addStr = "　　"
+            local str1 = string.sub(name, 1, 3)
+            local str2 = string.sub(name, 4, 6)
+            local newStr = str1 .. addStr .. str2
+            name = newStr
+        elseif lens == 9 then
+            local addStr = SL:GetValue("IS_PC_OPER_MODE") and " " or "  "
+            local addStr2 = SL:GetValue("IS_PC_OPER_MODE") and " " or "  "
+            local str1 = string.sub(name, 1, 3)
+            local str2 = string.sub(name, 4, 6)
+            local str3 = string.sub(name, 7, 9)
+            local newStr = str1 .. addStr .. str2 .. addStr2 .. str3
+            name = newStr
+        end
+
+        name = name .. "："
+        return name, valueStr
+    end
+
+    attList = MergeAtts(attList)
+
+    local attStrs = {}
+
+    for k, v in pairs(attList) do
+        local attId = v.id
+        local custMap = SL:GetValue("CUST_ABIL_MAP")
+        if custMap[attId] and next(custMap[attId]) then
+            attId = custMap[attId].id or attId
+        end
+        local config = SL:GetValue("ATTR_CONFIG", attId)
+        local configShow = config
+        if tipsShow and configShow then
+            configShow = config.noshowtips ~= 1
+        end
+        if v.id > 10000 or configShow then
+            local name, value = GetAttNumShow(v.id, v.min or v.value, v.max, v.maxID)
+            attStrs[v.id] = {
+                name = name,
+                value = value,
+                id = v.id,
+                color = config and config.color or nil
+            }
+        end
+    end
+
+    return attStrs
+end
+
+function GUIFunction:GetAttShowOrder(att, stars, tipsShow)
+    local showList = GUIFunction:GetAttDataShow(att, stars, tipsShow)
+    if not att or next(att) == nil then
+        return {}
+    end
+    local orederList = {}
+    for k, v in pairs(showList) do
+        table.insert(orederList, v)
+    end
+
+    table.sort(
+        orederList,
+        function(a, b)
+            if a.id <= AttTypeTable.Speed_Point and b.id <= AttTypeTable.Speed_Point then
+                return a.id < b.id
+            elseif a.id > 10000 and b.id > 10000 then
+                return a.id < b.id
+            elseif a.id > 10000 and b.id <= AttTypeTable.Speed_Point then
+                return false
+            elseif a.id <= AttTypeTable.Speed_Point and b.id > 10000 then
+                return true
+            elseif a.id > 10000 then
+                return true
+            elseif b.id > 10000 then
+                return false
+            else
+                return a.id < b.id
+            end
+        end
+    )
+    return orederList
+end
+
+function GUIFunction:GetDuraStr(dura, maxdura, one)
+    local txt
+    if not one then
+        txt = string.format("%s/%s", math.round(dura / 1000), math.round(maxdura / 1000))
+    else
+        txt = tostring(math.round(dura / 1000))
+    end
+    return txt
+end
+
+function GUIFunction:GetDura100Str(dura, maxdura, one)
+    local txt
+    if not one then
+        txt = string.format("%s/%s", math.round(dura), math.round(maxdura))
+    else
+        txt = tostring(math.round(dura))
+    end
+    return txt
+end
+
+function GUIFunction:ItemUseConditionColor(bEnable)
+    if bEnable then
+        return "#ffffff"
+    end
+    return "#ff0000"
+end
+
+-- 装备基础属性
+function GUIFunction:ParseItemBaseAtt(att, job)
+    local attList = {}
+    if not att or att == "" or att == "0" or att == 0 then
+        return attList
+    end
+    local attArray = string.split(att, "|")
+    local myJob = job or SL:GetValue("JOB")
+    for k, v in ipairs(attArray) do
+        local attData = string.split(v, "#")
+        local needJob = tonumber(attData[1])
+        local attId = tonumber(attData[2])
+        local attValue = tonumber(attData[3])
+        if (myJob == 3 or needJob == 3 or needJob == myJob) then
+            table.insert(
+                attList,
+                {
+                    id = attId,
+                    value = attValue
+                }
+            )
+        end
+    end
+    return attList
+end
+
+-- 装备极品属性
+function GUIFunction:GetItemQualityAttr(itemData)
+    local attList = {}
+    if not itemData or not itemData.Quality or not next(itemData.Quality) then
+        return attList
+    end
+    for _, att in ipairs(itemData.Quality) do
+        if att.Idx and att.Idx > 0 and att.Value and att.Value > 0 then
+            table.insert(attList, {
+                id = att.Idx,
+                value = att.Value
+            })
+        end
+    end
+    return attList
+end
+
+-- 装备自定义属性
+function GUIFunction:GetItemDiyAttr(itemData)
+    local attList = {}
+    if not itemData or not itemData.DiyAdv or not next(itemData.DiyAdv) then
+        return attList
+    end
+    for _, att in ipairs(itemData.DiyAdv) do
+        if att.Idx and att.Idx > 0 and att.Value and att.Value > 0 and att.Type then
+            if not attList[att.Type] then
+                attList[att.Type] = {}
+            end
+            table.insert(attList[att.Type], {
+                id = att.Idx,
+                value = att.Value
+            })
+        end
+    end
+    return attList
+end
+
+function GUIFunction:CombineAttList(list1, list2)
+    local newList = {}
+    local attList = {}
+    for k, v in pairs(list1) do
+        if not newList[v.id] then
+            newList[v.id] = v.value
+        else
+            newList[v.id] = newList[v.id] + v.value
+        end
+    end
+    for k, v in pairs(list2) do
+        if not newList[v.id] then
+            newList[v.id] = v.value
+        else
+            newList[v.id] = newList[v.id] + v.value
+        end
+    end
+    for k, v in pairs(newList) do
+        table.insert(
+            attList,
+            {
+                id = k,
+                value = v or 0
+            }
+        )
+    end
+    return attList
+end
+
+-- 道具属性描述
+function GUIFunction:GetItemAttDesc(item)
+    local sFormat = string.format
+    local equipMap = GUIDefine.EquipMapByStdMode
+    local showLasting = SL:GetValue("EX_SHOWLAST_MAP")
+    local line1 = {}
+    local line2 = {}
+    local line3 = {}
+    if item.Name ~= "" and item.StdMode then
+        -- 显示重量
+        if item.Weight and item.Weight > 0 then
+            table.insert(line1, sFormat("重量：%s", item.Weight))
+        end
+        if equipMap[item.StdMode] or showLasting[item.StdMode] then
+            table.insert(line1, sFormat("持久：%s", GUIFunction:GetDuraStr(item.Dura, item.DuraMax)))
+        elseif item.StdMode == 25 then --护身符及毒药
+            line2 = {}
+            table.insert(line2, sFormat("数量:%s", GUIFunction:GetDura100Str(item.Dura / 100, item.DuraMax / 100)))
+        elseif item.StdMode == 40 then --肉
+            table.insert(line1, sFormat("品质：%s", GUIFunction:GetDuraStr(item.Dura, item.DuraMax)))
+        elseif item.StdMode == 43 then --矿石
+            table.insert(line1, sFormat("纯度：%s", math.round(item.Dura / 1000)))
+        elseif item.StdMode == 2 and item.Dura > 0 then --使用次数
+            table.insert(line1, sFormat("使用次数：%s", GUIFunction:GetDura100Str(item.Dura / 1000, item.DuraMax / 1000)))
+        elseif item.StdMode == 49 then --聚灵珠经验
+            if item.Dura >= item.DuraMax then
+                table.insert(line1, sFormat("经验值已储蓄满(%s)万 双击释放", math.round(item.DuraMax / 10000)))
+            else
+                table.insert(line1, sFormat("积累经验：%s万", GUIFunction:GetDura100Str(item.Dura / 10000, item.DuraMax / 10000)))
+            end
+        end
+        local pos =  GUIFunction:GetEmptyPosByStdMode(item.StdMode)
+        if pos then
+            -- 基础属性
+            local attList = GUIFunction:ParseItemBaseAtt(item.Attribute)
+
+            -- 极品属性
+            local qualityAttrs = GUIFunction:GetItemQualityAttr(item)
+            -- 合并极品属性
+            if qualityAttrs and next(qualityAttrs) then
+                attList = GUIFunction:CombineAttList(attList, qualityAttrs)
+            end
+
+            -- 属性显示队列
+            local stringAtt = GUIFunction:GetAttDataShow(attList)
+            -- 重新排序
+            local ipairList = {}
+            for k, v in pairs(stringAtt) do
+                v.id = k
+                local attOne = v
+                attOne.id = k
+                table.insert(ipairList, attOne)
+            end
+
+            table.sort(
+                ipairList,
+                function(a, b)
+                    local aid = a.id or 0
+                    local bid = b.id or 0
+                    if (aid > 10000 and bid > 10000) or (aid < 10000 and bid < 10000) then
+                        return a.id < b.id
+                    elseif aid > 10000 then
+                        return true
+                    elseif bid > 10000 then
+                        return false
+                    end
+                end
+            )
+            -- 按序加入队列
+            for k, v in ipairs(ipairList) do
+                table.insert(line2, v.name .. v.value)
+            end
+        end
+
+        local strList = SL:CheckItemUseNeed(item).conditionStr
+
+        if strList and next(strList) then
+            for i, v in ipairs(strList) do
+                if not v.can then
+                    local color = GUIFunction:ItemUseConditionColor(v.can)
+                    local conditionStr = string.format("<font color = '%s'>%s</font>", color, v.str)
+                    table.insert(line3, conditionStr)
+                end
+            end
+        end
+
+        local strTable = {}
+        table.insert(strTable, line1)
+        table.insert(strTable, line2)
+        table.insert(strTable, line3)
+        return strTable
+    end
+    return nil
+end
+
+function GUIFunction:OldParseItemDescType(str)
+    if str and string.len(str) > 0 then
+        local pareses = {}
+        local textIndex = nil --文字不换行, 记录pareses的文字类型下标
+        local function checkParese(pareseStr)
+            if pareseStr and string.len(pareseStr) > 0 then
+                local parese   = {}
+                local descType = 1 --文字
+
+                local newPareseArray = string.split(pareseStr, "&")
+                pareseStr = newPareseArray[1] or ""
+                local sfind, efind = string.find(pareseStr, "#")
+                local descContent = nil
+                local pareseArray = {}
+                if sfind and efind then
+                    descContent = string.sub(pareseStr, 1, efind - 1)
+
+                    local paramStr = string.sub(pareseStr, efind + 1, -1)
+                    pareseArray = string.split(paramStr or "", "|")
+                else
+                    descContent = pareseStr
+                end
+
+                parese.tag = tonumber(newPareseArray[2]) or 0 -- 0: 中间   1: 顶部   2: 底部  3: 外框顶部  4：外框底部
+                parese.frameOrder = tonumber(newPareseArray[3]) or 1 -- 0: 下层 1: 上层
+                local fStar, fEnd = string.find(pareseStr, "IMG:")
+                if fStar and fEnd then
+                    descType = 2
+                    descContent = string.sub(descContent, fEnd + 1)
+                    parese.res = string.gsub(descContent, "\\", "/")
+                end
+
+                if descType == 1 then
+                    fStar, fEnd = string.find(descContent, "TEXIAO:")
+                    if fStar and fEnd then
+                        descType = 3
+                        descContent = string.sub(descContent, fEnd + 1)
+                        parese.res = tonumber(descContent) or nil
+                        parese.isSFX = true
+                    end
+                end
+
+                if descType == 1 then
+                    if descContent == "-" then
+                        parese.newLine = true
+                    else
+                        descContent = string.gsub(descContent, "TXT:", "")
+                        parese.text = descContent
+                        local starChar = string.sub(descContent or "", 1, 1)
+                        local endChar = string.sub(descContent or "", -1, -1)
+                        if starChar ~= "<" and endChar ~= ">" then
+                            local cStart, cEnd = string.find(parese.text, "/FCOLOR")
+                            if cStart and cEnd then
+                                parese.text = "<" .. descContent .. ">"
+                            end
+                        end
+
+                        if not textIndex then
+                            textIndex = #pareses + 1
+                        end
+                    end
+                end
+
+                if descType == 1 and textIndex and pareses[textIndex] then
+                    pareses[textIndex].text = pareses[textIndex].text .. parese.text
+                else
+                    local mobileParam = string.split(pareseArray[1] or "", "#")
+                    local pcParam = string.split(pareseArray[2] or "", "#")
+                    parese.x = tonumber(mobileParam[1]) or 0
+                    parese.y = tonumber(mobileParam[2]) or 0
+                    parese.width = tonumber(mobileParam[3]) or 0
+                    parese.height = tonumber(mobileParam[4]) or 0
+
+                    if SL:GetValue("IS_PC_OPER_MODE") then
+                        parese.x = tonumber(pcParam[1]) or parese.x
+                        parese.y = tonumber(pcParam[2]) or parese.y
+                        parese.width = tonumber(pcParam[3]) or parese.width
+                        parese.height = tonumber(pcParam[4]) or parese.height
+                    end
+
+                    table.insert(pareses, parese)
+                end
+            end
+        end
+
+        local fStar, fEnd = nil, nil
+        while str do
+            fStar, fEnd = string.find(str, "%b<>")
+            if fStar and fEnd then
+                local newDes = string.sub(str, fStar + 1, fEnd - 1)
+                checkParese(newDes)
+                str = string.sub(str, fEnd + 1, -1)
+            else
+                checkParese(str)
+            end
+
+            if not fStar or not fEnd then
+                break
+            end
+        end
+
+        return pareses
+    end
+    return nil
+end
+
+function GUIFunction:ParseItemDecsType(signStr)
+    if signStr and string.len(signStr) > 0 then
+        local pareses = {}
+        local parese = {}
+        local isParese = false
+        local fStar, fEnd = string.find(signStr, "<ID")
+
+        if fStar and fEnd then
+            isParese = true
+            signStr = string.gsub(signStr, "^<*(.-)>*$", "%1")
+        end
+
+        local descContent = nil
+        local contentArray = {}
+        local descContentArray = {}
+        if isParese then
+            local sfind, efind = string.find(signStr, "|")
+            local id = 0
+            if sfind and efind then
+                id = string.sub(signStr, 1, efind)
+                id = tonumber(string.match(id or "", "%d+"))
+                signStr = string.sub(signStr, efind + 1, -1)
+            end
+            parese.id = id or 0
+            contentArray = string.split(signStr or "", "&")
+            signStr = contentArray[1] or ""
+            sfind, efind = string.find(signStr, "#")
+            if sfind and efind then
+                descContent = string.sub(signStr, 1, efind - 1)
+
+                local paramStr = string.sub(signStr, efind + 1, -1)
+                descContentArray = string.split(paramStr or "", "|")
+            else
+                descContent = signStr
+            end
+        else
+            descContent = signStr
+        end
+
+        parese.tag = tonumber(contentArray[2]) or 0 -- 0: 中间   1: 顶部   2: 底部  3: 外框顶部  4：外框底部
+        parese.frameOrder = tonumber(contentArray[3]) or 1 -- 0: 下层 1: 上层
+        if descContent and descContent ~= "" then
+            local descType = 1 --文字
+            fStar, fEnd = string.find(descContent, "IMG:")
+            if fStar and fEnd then
+                descType = 2
+                descContent = string.sub(descContent, fEnd + 1)
+                parese.res = string.gsub(descContent, "\\", "/")
+            end
+
+            if descType == 1 then
+                fStar, fEnd = string.find(descContent, "TEXIAO:")
+                if fStar and fEnd then
+                    descType = 3
+                    descContent = string.sub(descContent, fEnd + 1)
+                    parese.res = tonumber(descContent) or nil
+                    parese.isSFX = true
+                end
+            end
+
+            --EX
+            if descType == 1 then
+                fStar, fEnd = string.find(descContent, "IMGEX:")
+                if fStar and fEnd then
+                    descType = 4
+                    descContent = string.sub(descContent, fEnd + 1)
+                    parese.res = string.gsub(descContent, "\\", "/")
+                end
+            end
+
+            if descType == 1 then
+                fStar, fEnd = string.find(descContent, "TEXIAOEX:")
+                if fStar and fEnd then
+                    descType = 5
+                    descContent = string.sub(descContent, fEnd + 1)
+                    parese.res = tonumber(descContent) or nil
+                    parese.isSFX = true
+                end
+            end
+
+            if descType == 1 then
+                fStar, fEnd = string.find(descContent, "TXTEX:")
+                if fStar and fEnd then
+                    descType = 6
+                    descContent = string.gsub(descContent, "TXTEX:", "")
+                    parese.text = descContent
+                    local starChar = string.sub(descContent or "", 1, 1)
+                    local endChar = string.sub(descContent or "", -1, -1)
+                    if starChar ~= "<" and endChar ~= ">" then
+                        local cStart, cEnd = string.find(parese.text, "/FCOLOR")
+                        if cStart and cEnd then
+                            parese.text = "<" .. descContent .. ">"
+                        end
+                    end
+                end
+            end
+            ---
+
+            if descType == 1 then
+                if descContent == "-" then
+                    parese.newLine = true
+                else
+                    descContent = string.gsub(descContent, "TXT:", "")
+                    parese.text = descContent
+                    local starChar = string.sub(descContent or "", 1, 1)
+                    local endChar = string.sub(descContent or "", -1, -1)
+                    if starChar ~= "<" and endChar ~= ">" then
+                        local cStart, cEnd = string.find(parese.text, "/FCOLOR")
+                        if cStart and cEnd then
+                            parese.text = "<" .. descContent .. ">"
+                        end
+                    end
+                end
+            end
+
+            local mobileParam = string.split(descContentArray[1] or "", "#")
+            local pcParam = string.split(descContentArray[2] or "", "#")
+            parese.x = tonumber(mobileParam[1]) or 0
+            parese.y = tonumber(mobileParam[2]) or 0
+            if descType < 4 then
+                parese.width = tonumber(mobileParam[3]) or 0
+                parese.height = tonumber(mobileParam[4]) or 0
+            else
+                parese.width = 0
+                parese.height = 0
+            end
+
+            if (descType == 4 or descType == 5) then
+                parese.scale = tonumber(mobileParam[3]) or 0
+            elseif descType == 6 then
+                parese.fontsize = tonumber(mobileParam[3]) or 0
+            end
+
+            if SL:GetValue("IS_PC_OPER_MODE") then
+                parese.x = tonumber(pcParam[1]) or parese.x
+                parese.y = tonumber(pcParam[2]) or parese.y
+                if descType < 4 then
+                    parese.width = tonumber(pcParam[3]) or parese.width
+                    parese.height = tonumber(pcParam[4]) or parese.height
+                end
+                if (descType == 4 or descType == 5) then
+                    parese.scale = tonumber(pcParam[3]) or 0
+                elseif descType == 6 then
+                    parese.fontsize = tonumber(pcParam[3]) or 0
+                end
+            end
+
+            table.insert(pareses, parese)
+        end
+        return pareses
+    end
+    return nil
+end
+
+function GUIFunction:GetParseItemDesc(desc)
+    local descs = {}
+    if desc and string.len(desc) > 0 then
+        local fStar, fEnd = nil, nil
+        local lineDesc = ""
+        while true do
+            local parseData = nil
+            fStar, fEnd = string.find(desc, "%b<>", 1)
+            local isUnfixParam = false
+            if fStar and fStar ~= 1 then
+                isUnfixParam = true
+                local paramStr = string.sub(desc, 1, fStar - 1)
+                desc = string.sub(desc, fStar, -1)
+                if string.len(paramStr) > 0 then
+                    parseData = GUIFunction:ParseItemDecsType(paramStr)
+                end
+            end
+
+            if not isUnfixParam and fStar and fEnd then
+                lineDesc = lineDesc .. string.sub(desc, fStar, fEnd)
+                desc = string.sub(desc, fEnd + 1, -1)
+
+                local isNewParse = false
+                if string.sub(lineDesc, 1, 3) == "<ID" then
+                    isNewParse = true
+                else
+                    local font_fStar, font_fEnd = string.find(lineDesc, "<font^*(.-)>*$", 1)
+                    if font_fStar and font_fEnd then
+                        isNewParse = true
+                        lineDesc = lineDesc .. desc
+                        desc = ""
+                    end
+                end
+
+                if isNewParse then
+                    parseData = GUIFunction:ParseItemDecsType(lineDesc)
+                    lineDesc = ""
+                else
+                    if string.sub(desc, 1, 1) == "\\" or string.len(desc or "") == 0 then
+                        desc = string.sub(desc, 2, -1)
+                        parseData = GUIFunction:OldParseItemDescType(lineDesc)
+                        lineDesc = ""
+                    end
+                end
+            else
+                if not isUnfixParam and desc and string.len(desc) > 0 then
+                    parseData = GUIFunction:ParseItemDecsType(desc)
+                end
+            end
+
+            if parseData then
+                for i, parseStr in ipairs(parseData) do
+                    -- 0: 中间   1: 顶部   2: 底部  3: 外框顶部  4：外框底部
+                    if parseStr.tag == 0 then
+                        if not descs.desc then
+                            descs.desc = {}
+                        end
+                        table.insert(descs.desc, parseStr)
+                    elseif parseStr.tag == 1 then
+                        if not descs.top_desc then
+                            descs.top_desc = {}
+                        end
+                        table.insert(descs.top_desc, parseStr)
+                    elseif parseStr.tag == 2 then
+                        if not descs.bottom_desc then
+                            descs.bottom_desc = {}
+                        end
+                        table.insert(descs.bottom_desc, parseStr)
+                    elseif parseStr.tag == 3 then
+                        if not descs.frame_top_desc then
+                            descs.frame_top_desc = {}
+                        end
+                        table.insert(descs.frame_top_desc, parseStr)
+                    elseif parseStr.tag == 4 then
+                        if not descs.frame_bottom_desc then
+                            descs.frame_bottom_desc = {}
+                        end
+                        table.insert(descs.frame_bottom_desc, parseStr)
+                    end
+                end
+            end
+
+            if not fStar or not fEnd then
+                break
+            end
+        end
+    end
+    return descs
+end
+
+-- 物品是否显示拍卖行物品栏
+function GUIFunction:CheckItemIsShowAuction(itemData)
+    return true
+end
+
+
+--------------------------- 聊天解析  begin-------------------------------
+-- check 是否私聊频道
+local function checkIsPrivateChannel(channelId)
+    return channelId == GUIDefine.ChatChannel.PRIVATE
+end
+
+-- fix chat Name
+-- 处理发送者名字
+function GUIFunction:ChatFixName(data)
+    local sendName = data.SendName or ""
+    local receiveName = data.ReceiveName or ""
+    local name = sendName
+    -- 私聊处理
+    if checkIsPrivateChannel(data.ChannelId) then
+        if data.SendId and SL:GetValue("ACTOR_IS_MAINPLAYER", data.SendId) then
+            name = "你对" .. "[" .. receiveName .. "]" .. "说"
+        else
+            if SL:GetValue("IS_PC_OPER_MODE") then
+                local levelStr = string.format(data.Suffix or "", data.Level or "")
+                name = string.format("[%s]%s", sendName, levelStr) .. "对你说"
+            else
+                name = "[" .. sendName .. "]" .. "对你说" 
+            end
+        end
+    end
+    
+    if name and string.len(name) > 0 then
+        return name .. ":"
+    end
+    return name
+end
+
+-- fix chat private time
+-- 私聊时间格式化
+function GUIFunction:ChatFixPrivateTime(data)
+    if checkIsPrivateChannel(data.ChannelId) then
+        if data.SendTime then
+            local date = os.date("*t", data.SendTime)
+            return string.format("%d-%02d-%02d %02d:%02d:%02d", date.year, date.month, date.day, date.hour, date.min, date.sec)
+        end
+    end
+    return ""
+end
+
+-- fix chat msg
+-- 使用类型：系统通知消息，需使用特定的富文本解析; 行会通知
+function GUIFunction:ChatFixMsg(data, isPrivateTime)
+    local prefix = data.Prefix or ""
+    local name  = self:ChatFixName(data)
+    local str   = string.format("<outline size='0'>%s%s%s</outline>", prefix, name, data.Msg or "")
+    if isPrivateTime then
+        return string.format("<outline size='0'>%s%s</outline>", self:ChatFixPrivateTime(data), str)
+    end
+    return str
+end
+
+-- fix chat msg outline
+-- 使用类型：系统通知消息，需使用FColor富文本解析; 系统通知消息，需使用SRText富文本解析
+function GUIFunction:ChatFixMsgWithoutOutline(data, isPrivateTime)
+    local prefix = data.Prefix or ""
+    local name  = self:ChatFixName(data)
+    local str   = string.format("%s%s%s", prefix, name, data.Msg or "")
+    if isPrivateTime then
+        return string.format("%s%s", self:ChatFixPrivateTime(data), str)
+    end
+    return str
+end
+
+-- chat width
+--- 获取单条聊天item宽度
+---@param isMini boolean 是否是主界面的聊天item
+---@param miniChatWidth integer 主界面的聊天item宽度
+---@param isPCPrivate boolean 是否PC私聊页的聊天item
+function GUIFunction:ChatGetWidth(isMini, miniChatWidth, isPCPrivate)
+    if isMini then
+        if SL:GetValue("IS_PC_OPER_MODE") then
+            return miniChatWidth or 722
+        else
+            return miniChatWidth or 310
+        end
+    elseif isPCPrivate then
+        return 345
+    end
+    return 310
+end
+
+-- 获取聊天的通知类型的字体配置 -- isMini:是否主界面
+function GUIFunction:ChatGetNoticeMsgFont(isMini, data)
+    local color         = nil   -- 字体颜色  0-255
+    local fontPath      = nil   -- 字体文件路径
+    local fontSize      = nil   -- 字体大小
+    return {color = color, fontPath = fontPath, fontSize = fontSize}
+end
+
+-- 查找表情
+local emojiFindParam = {
+    replaceStr      = nil,    --表情字符串
+    findReplaceLen  = {}     --表情字符串的长度
+}
+-- 查找表情的数据解析
+local function GetEmojiFindParam()
+    if not emojiFindParam.replaceStr then
+        emojiFindParam.replaceStr = ""
+        local emojiConfig = ChatData.GetEmoji()
+        for _, v in pairs(emojiConfig) do
+            emojiFindParam.replaceStr = emojiFindParam.replaceStr .. string.format("<%s&%d>", v.replace, v.ID)
+            if not emojiFindParam.findReplaceLen[string.len(v.replace)] then
+                emojiFindParam.findReplaceLen[string.len(v.replace)] = true
+            end
+        end
+    end
+    return emojiFindParam.replaceStr, emojiFindParam.findReplaceLen
+end
+
+-- chat parse
+-- 解析普通类型的聊天数据
+function GUIFunction:ChatParseNormal(msg)
+    msg = string.gsub(msg or "", "\n", " ")
+    local emojiConfig = ChatData.GetEmoji()
+
+    local color         = nil   -- 字体颜色  0-255
+    local opacity       = nil   -- 不透明度
+    local fontPath      = nil   -- 字体文件路径
+    local fontSize      = nil   -- 字体大小
+    local outColor      = nil   -- 字体描边颜色
+    local outlineSize   = nil   -- 字体描边大小
+
+    local chatParseT = {}
+    while string.len(msg) > 0 do
+        local fStar,fEnd = string.find(msg, "#")
+        if not fStar and not fEnd then
+            table.insert(chatParseT, {
+                text        = msg,
+                color       = color,
+                opacity     = opacity,
+                fontPath    = fontPath,
+                fontSize    = fontSize,
+                outColor    = outColor,
+                outlineSize = outlineSize
+            })
+            break
+        end
+        
+        if fStar > 1 then
+            local prefixEmoJi = string.sub(msg, 1, fStar - 1) --截取表情前部分
+            msg               = string.sub(msg, fStar)
+            table.insert(chatParseT, {
+                text        = prefixEmoJi,
+                color       = color,
+                opacity     = opacity,
+                fontPath    = fontPath,
+                fontSize    = fontSize,
+                outColor    = outColor,
+                outlineSize = outlineSize
+            })
+        end
+        
+        -- 查找表情
+        local findEmoji = nil
+        local str, finLen = GetEmojiFindParam()
+        for _len, v in pairs(finLen) do
+            local emojiStr  = string.sub(msg, 1, _len)
+            local regexS    = string.format("(<%s&%%d+>)", emojiStr)
+            local matchS    = string.match(str, regexS)
+            if emojiStr and matchS then
+                msg                 = string.sub(msg, _len + 1)
+                local mathcArray    = string.split(matchS, "&")
+                local emojiID       = tonumber(string.sub(mathcArray[2] or "", 1, -2))
+                if emojiID and emojiConfig[emojiID] then
+                    findEmoji = emojiStr
+                    table.insert(chatParseT, {sfxID = emojiConfig[emojiID].sfxid})
+                end
+                break
+            end
+        end
+
+        -- 没找到表情, 截取出"#"
+        if not findEmoji then
+            msg = string.sub(msg, fStar + 1)
+            table.insert(chatParseT, {
+                text        = "#",
+                color       = color,
+                opacity     = opacity,
+                fontPath    = fontPath,
+                fontSize    = fontSize,
+                outColor    = outColor,
+                outlineSize = outlineSize
+            })
+        end
+    end
+    
+    return chatParseT
+end
+
+-- 解析坐标类型聊天数据
+function GUIFunction:ChatParseEPosition(jsonData)
+    if nil == jsonData then
+        return {}
+    end
+    
+    local color         = nil   -- 字体颜色  0-255
+    local opacity       = nil   -- 不透明度
+    local fontPath      = nil   -- 字体文件路径
+    local fontSize      = nil   -- 字体大小
+    local outColor      = nil   -- 字体描边颜色
+    local outlineSize   = nil   -- 字体描边大小
+
+    local str       = string.format("[%s %s,%s]", jsonData.mapName, jsonData.mapX, jsonData.mapY)
+    local posLink   = string.format("position#%s#%s#%s", jsonData.mapID, jsonData.mapX, jsonData.mapY)
+    local data      = {}
+    table.insert(data, {
+        text        = str,
+        link        = posLink,
+        color       = color,
+        opacity     = opacity,
+        fontPath    = fontPath,
+        fontSize    = fontSize,
+        outColor    = outColor,
+        outlineSize = outlineSize
+    })
+    return data
+end
+
+-- 解析装备类型聊天数据
+function GUIFunction:ChatParseEItem(jsonData)
+    if nil == jsonData then
+        return {}
+    end
+    local color         = nil   -- 字体颜色  0-255
+    local opacity       = nil   -- 不透明度
+    -- 支持添加文本
+
+    local chatParseT = {}
+    table.insert(chatParseT, {equip = jsonData, color = color, opacity = opacity})
+    return chatParseT
+end
+
+-- 获取聊天富文本默认大小
+function GUIFunction:GetChatRichFontSize()
+    return SL:GetValue("GAME_DATA", "DEFAULT_FONT_SIZE")
+end
+
+-- 触发私聊
+function GUIFunction:PrivateChat(data, richText)
+    if data.SendId and data.SendName  then
+        local mainPlayerID = SL:GetValue("USER_ID")
+        if data.SendId == mainPlayerID then 
+            return 
+        end
+        
+        SL:onLUAEvent(LUA_EVENT_CHAT_PRIVATE_TARGET, {name = data.SendName, uid = data.SendId})
+    end 
+end
+
+-- 聊天item添加右键点击事件
+function GUIFunction:ChatItemOnMouseRightEvent(data, richText)
+    local mainPlayerID = SL:GetValue("USER_ID")
+    local targetID = data.SendId
+    if SL:GetValue("IS_PC_OPER_MODE") and targetID and targetID ~= mainPlayerID then
+        local function OpenFuncDock(touchPos)
+            if not SL:GetValue("ACTOR_IS_VALID", targetID) then
+                return 0
+            end
+    
+            local dockType = FuncDockData.FuncDockType
+            if SL:GetValue("ACTOR_IS_PLAYER", targetID) and GUI:isClippingParentContainsPoint(richText, touchPos) then
+                UIOperator:OpenFuncDockTips({
+                    type        = SL:GetValue("ACTOR_IS_HUMAN", targetID) and dockType.Func_Monster_Head or dockType.Func_Player_Head,
+                    targetId    = targetID,
+                    targetName  = SL:GetValue("ACTOR_NAME", targetID) or "",
+                    pos         = {x = touchPos.x + 15, y = touchPos.y}
+                })
+                return
+            end
+            return 0
+        end
+        GUI:addMouseButtonEvent(richText, {
+            onRightDownFunc = OpenFuncDock,
+            needTouchPos = true,
+        })
+    end
+end
+
+-- 生成主界面聊天item
+function GUIFunction:GenerateChatMiniItem(data)
+    local CHANNEL   = GUIDefine.ChatChannel
+    local MSG_TYPE  = GUIDefine.ChatTextType
+    local isWinMode = SL:GetValue("IS_PC_OPER_MODE")
+
+    local FColorHEX = SL:GetHexColorByStyleId(data.FColor)
+    local BColorEnable = data.BColor ~= -1
+    local BColorHEX = SL:GetHexColorByStyleId(data.BColor)
+
+    -- 默认字体字号
+    local defaultSize       = GUIFunction:GetChatRichFontSize()
+    local defaultfontPath   = GUIDefineEx.ChatRichFontPath
+
+    local miniWid   = MainProperty and MainProperty.GetChatWidth()
+    local width     = math.max(GUIFunction:ChatGetWidth(true, miniWid), 20)
+    local richText  = nil
+
+    local cell      = GUI:Widget_Create(-1, "cell", 0, 0, 0, 0)
+
+    local msgFont   = GUIFunction:ChatGetNoticeMsgFont(true, data) or {}
+    local fontSize  = msgFont.fontSize or defaultSize
+    local fontColor = msgFont.color and SL:GetHexColorByStyleId(msgFont.color) or FColorHEX
+    local fontPath  = msgFont.fontPath or defaultfontPath
+    local space     = GUIDefineEx.ChatContentInterval.richVspace
+
+    if (data.textType and data.textType == MSG_TYPE.SYSTEMTIPS) or (data.ChannelId == CHANNEL.GUILDTIPS) then
+        local str = GUIFunction:ChatFixMsg(data)
+        local hexColor = msgFont.color and SL:GetHexColorByStyleId(msgFont.color)
+        richText = GUI:RichText_Create(cell, "RichText", 0, 0, str, width, fontSize, fontColor, space, nil, fontPath)
+        
+    elseif data.textType and data.textType == MSG_TYPE.FCTEXT then
+        local str = GUIFunction:ChatFixMsgWithoutOutline(data)
+        richText = GUI:RichTextFCOLOR_Create(cell, "RichText", 0, 0, str, width, fontSize, fontColor, space, nil, fontPath, {outlineSize = 0})
+
+    elseif data.textType and data.textType == MSG_TYPE.SRTEXT then
+        local str = GUIFunction:ChatFixMsgWithoutOutline(data)
+        richText = GUI:RichTextSR_Create(cell, "RichText", 0, 0, str, width, fontSize, fontColor, space, nil, fontPath)
+
+    else
+        local elements  = {}
+
+        -- prefix
+        if data.Prefix and data.Prefix ~= "" then
+            local element   = GUI:RichTextCombineCell_Create(-1, "prefix_show", 0, 0, "TEXT", {
+                str         = data.Prefix,
+                color       = FColorHEX,
+                fontPath    = defaultfontPath,
+                fontSize    = defaultSize
+            })
+            table.insert(elements, element)
+        end
+
+        -- vip label
+        if data.viplabel and data.viplabel ~= "" and data.vipcolor then
+            local element   = GUI:RichTextCombineCell_Create(-1, "vip_show", 0, 0, "TEXT", {
+                str         = data.viplabel,
+                color       = SL:GetHexColorByStyleId(data.vipcolor),
+                fontPath    = defaultfontPath,
+                fontSize    = defaultSize
+            })
+            table.insert(elements, element)
+        end
+
+        -- name
+        local str       = GUIFunction:ChatFixName(data)
+        local element   = GUI:RichTextCombineCell_Create(-1, "name_show", 0, 0, "TEXT", {
+            str         = str,
+            color       = FColorHEX,
+            fontPath    = defaultfontPath,
+            fontSize    = defaultSize
+        })
+        table.insert(elements, element)
+
+        -- msg
+        local telements = GUIFunction:CreateChatRichElements(data)
+        for _, v in ipairs(telements) do
+            table.insert(elements, v)
+        end
+
+        -- 填充
+        richText = GUI:RichTextCombine_Create(cell, "RichText", 0, 0, width, space)
+        GUI:RichTextCombine_pushBackElements(richText, elements)
+
+        -- 
+        GUI:RichText_setOpenUrlEvent(richText, function(sender, str)
+            local slices  = string.split(str, "#")
+            local command = slices[1]
+            if command == "position" then
+                local originScale = GUI:getScale(sender)
+                GUI:setScale(sender, originScale + 0.2)
+                local function reback()
+                    GUI:setScale(sender, originScale)
+                end
+                SL:scheduleOnce(sender, reback, 0.03)
+                
+                -- find position
+                local mapID   = slices[2]
+                local x       = tonumber(slices[3])
+                local y       = tonumber(slices[4])
+                local moveType = GUIDefine.AutoMoveType.CHAT
+                SL:SetValue("BATTLE_MOVE_BEGIN", mapID, x, y, nil, moveType)
+
+                return nil
+            end
+        end)
+
+        GUI:RichTextCombine_format(richText)
+    end
+    if BColorEnable then 
+        GUI:RichText_setBackgroundColor(richText, BColorHEX)
+    end
+
+    -- 与发送者私聊
+    if isWinMode then
+        local needFillInput = data.mt == MSG_TYPE.NORMAL
+        GUI:setTouchEnabled(richText, true)
+        GUI:setSwallowTouches(richText, false)
+        GUI:addOnClickEvent(richText, function()
+            local mainPlayerID = SL:GetValue("USER_ID")
+            if data.SendId and data.SendName and data.SendId ~= mainPlayerID then
+                GUIFunction:PrivateChat(data, richText)
+            elseif needFillInput then
+                SL:onLUAEvent(LUA_EVENT_PC_FILL_CHAT_INPUT, data.Msg)
+            end
+        end)
+    end
+
+    local richSize = GUI:getContentSize(richText)
+    GUI:setContentSize(cell, width, richSize.height)
+    -- 右键展示功能栏
+    if isWinMode then
+        if data.SendId and data.SendName then
+            GUIFunction:ChatItemOnMouseRightEvent(data, cell)
+        end
+    end
+
+    return cell
+end
+
+-- 生成聊天页聊天item
+function GUIFunction:GenerateChatItem(data)
+    local CHANNEL   = GUIDefine.ChatChannel
+    local MSG_TYPE  = GUIDefine.ChatTextType
+
+    data.FColor     = data.FColor or 0
+    data.BColor     = data.BColor or 255
+    local FColorHEX = SL:GetHexColorByStyleId(data.FColor)
+    local BColorEnable = data.BColor ~= -1
+    local BColorHEX = SL:GetHexColorByStyleId(data.BColor)
+
+    -- 默认字体字号
+    local defaultSize       = GUIFunction:GetChatRichFontSize()
+    local defaultfontPath   = GUIDefineEx.ChatRichFontPath
+
+    local width     = GUIFunction:ChatGetWidth(false)
+    local richText  = nil
+
+    local cell      = GUI:Widget_Create(-1, "cell", 0, 0, 0, 0)
+
+    local msgFont   = GUIFunction:ChatGetNoticeMsgFont(false, data) or {}
+    local fontSize  = msgFont.fontSize or defaultSize
+    local fontColor = msgFont.color and SL:GetHexColorByStyleId(msgFont.color) or FColorHEX
+    local fontPath  = msgFont.fontPath or defaultfontPath
+    local space     = GUIDefineEx.ChatContentInterval.richVspace
+
+    if (data.textType and data.textType == MSG_TYPE.SYSTEMTIPS) or (data.ChannelId == CHANNEL.GUILDTIPS) then
+        local str = GUIFunction:ChatFixMsg(data)
+        local hexColor = msgFont.color and SL:GetHexColorByStyleId(msgFont.color)
+        richText = GUI:RichText_Create(cell, "RichText", 0, 0, str, width, fontSize, fontColor, space, nil, fontPath)
+        
+    elseif data.textType and data.textType == MSG_TYPE.FCTEXT then
+        local str = GUIFunction:ChatFixMsgWithoutOutline(data)
+        richText = GUI:RichTextFCOLOR_Create(cell, "RichText", 0, 0, str, width, fontSize, fontColor, space, nil, fontPath, {outlineSize = 0})
+
+    elseif data.textType and data.textType == MSG_TYPE.SRTEXT then
+        local str = GUIFunction:ChatFixMsgWithoutOutline(data)
+        richText = GUI:RichTextSR_Create(cell, "RichText", 0, 0, str, width, fontSize, fontColor, space, nil, fontPath)
+
+    else
+        local elements  = {}
+
+        -- prefix
+        if data.Prefix and data.Prefix ~= "" then
+            local element   = GUI:RichTextCombineCell_Create(-1, "prefix_show", 0, 0, "TEXT", {
+                str         = data.Prefix,
+                color       = FColorHEX,
+                fontPath    = defaultfontPath,
+                fontSize    = defaultSize
+            })
+            table.insert(elements, element)
+        end
+
+        -- vip label
+        if data.viplabel and data.viplabel ~= "" and data.vipcolor then
+            local element   = GUI:RichTextCombineCell_Create(-1, "vip_show", 0, 0, "TEXT", {
+                str         = data.viplabel,
+                color       = SL:GetHexColorByStyleId(data.vipcolor),
+                fontPath    = defaultfontPath,
+                fontSize    = defaultSize
+            })
+            table.insert(elements, element)
+        end
+
+        -- name
+        local str       = GUIFunction:ChatFixName(data)
+        local element   = GUI:RichTextCombineCell_Create(-1, "name_show", 0, 0, "TEXT", {
+            str         = str,
+            color       = FColorHEX,
+            fontPath    = defaultfontPath,
+            fontSize    = defaultSize
+        })
+        table.insert(elements, element)
+
+        -- msg
+        local telements = GUIFunction:CreateChatRichElements(data)
+        for _, v in ipairs(telements) do
+            table.insert(elements, v)
+        end
+
+        -- 填充
+        richText = GUI:RichTextCombine_Create(cell, "RichText", 0, 0, width, space)
+        GUI:RichTextCombine_pushBackElements(richText, elements)
+
+        -- 
+        GUI:RichText_setOpenUrlEvent(richText, function(sender, str)
+            local slices  = string.split(str, "#")
+            local command = slices[1]
+            if command == "position" then
+                local originScale = GUI:getScale(sender)
+                GUI:setScale(sender, originScale + 0.2)
+                local function reback()
+                    GUI:setScale(sender, originScale)
+                end
+                SL:scheduleOnce(sender, reback, 0.03)
+                
+                -- find position
+                local mapID   = slices[2]
+                local x       = tonumber(slices[3])
+                local y       = tonumber(slices[4])
+                local moveType = GUIDefine.AutoMoveType.CHAT
+                SL:SetValue("BATTLE_MOVE_BEGIN", mapID, x, y, nil, moveType)
+
+                return nil
+            end
+        end)
+
+        GUI:RichTextCombine_format(richText)
+    end
+    if BColorEnable then 
+        GUI:RichText_setBackgroundColor(richText, BColorHEX)
+    end
+
+    -- 与发送者私聊
+    GUI:setTouchEnabled(richText, true)
+    GUI:setSwallowTouches(richText, false)
+    GUI:addOnClickEvent(richText, function()
+        local mainPlayerID = SL:GetValue("USER_ID")
+        if data.SendId and data.SendName and data.SendId ~= mainPlayerID then
+            GUIFunction:PrivateChat(data, richText)
+        end
+    end)
+
+    local richSize = GUI:getContentSize(richText)
+    GUI:setAnchorPoint(richText, 0, 1)
+    GUI:setPosition(richText, 0, richSize.height)
+
+    GUI:setContentSize(cell, width, richSize.height)
+    GUI:setAnchorPoint(cell, 0, 0)
+    GUI:setPosition(cell, 40, 0)
+
+    if cell then
+        SL:onLUAEvent(LUA_EVENT_CHAT_ITEM_ADD, {item = cell, channel = data.ChannelId})
+    end
+
+    return cell
+end
+
+-- 生成PC私聊页聊天item
+function GUIFunction:GenerateChatPCPrivateItem(data)
+    local CHANNEL   = GUIDefine.ChatChannel
+    local MSG_TYPE  = GUIDefine.ChatTextType
+    local isWinMode = SL:GetValue("IS_PC_OPER_MODE")
+
+    data.FColor     = data.FColor or 0
+    data.BColor     = data.BColor or 255
+    local FColorHEX = SL:GetHexColorByStyleId(data.FColor)
+    local BColorEnable = data.BColor ~= -1
+    local BColorHEX = SL:GetHexColorByStyleId(data.BColor)
+
+    -- 默认字体字号
+    local defaultSize       = GUIFunction:GetChatRichFontSize()
+    local defaultfontPath   = GUIDefineEx.ChatRichFontPath
+
+    local width     = GUIFunction:ChatGetWidth(false, nil, true)
+    local richText  = nil
+
+    local cell      = GUI:Widget_Create(-1, "cell", 0, 0, 0, 0)
+
+    local msgFont   = GUIFunction:ChatGetNoticeMsgFont() or {}
+    local fontSize  = msgFont.fontSize or defaultSize
+    local fontColor = msgFont.color and SL:GetHexColorByStyleId(msgFont.color) or FColorHEX
+    local fontPath  = msgFont.fontPath or defaultfontPath
+    local space     = GUIDefineEx.ChatContentInterval.richVspace
+
+    if (data.textType and data.textType == MSG_TYPE.SYSTEMTIPS) or (data.ChannelId == CHANNEL.GUILDTIPS) then
+        local str = GUIFunction:ChatFixMsg(data, true)
+        local hexColor = msgFont.color and SL:GetHexColorByStyleId(msgFont.color)
+        richText = GUI:RichText_Create(cell, "RichText", 0, 0, str, width, fontSize, fontColor, space, nil, fontPath)
+        
+    elseif data.textType and data.textType == MSG_TYPE.FCTEXT then
+        local str = GUIFunction:ChatFixMsgWithoutOutline(data, true)
+        richText = GUI:RichTextFCOLOR_Create(cell, "RichText", 0, 0, str, width, fontSize, fontColor, space, nil, fontPath, {outlineSize = 0})
+
+    elseif data.textType and data.textType == MSG_TYPE.SRTEXT then
+        local str = GUIFunction:ChatFixMsgWithoutOutline(data, true)
+        richText = GUI:RichTextSR_Create(cell, "RichText", 0, 0, str, width, fontSize, fontColor, space, nil, fontPath)
+
+    else
+        local elements  = {}
+
+        -- 时间
+        local timeStr = GUIFunction:ChatFixPrivateTime(data)
+        if timeStr and timeStr ~= "" then
+            local element   = GUI:RichTextCombineCell_Create(-1, "private_time", 0, 0, "TEXT", {
+                str         = timeStr,
+                color       = FColorHEX,
+                fontPath    = defaultfontPath,
+                fontSize    = defaultSize
+            })
+            table.insert(elements, element)
+        end
+
+        -- prefix
+        if data.Prefix and data.Prefix ~= "" then
+            local element   = GUI:RichTextCombineCell_Create(-1, "prefix_show", 0, 0, "TEXT", {
+                str         = data.Prefix,
+                color       = FColorHEX,
+                fontPath    = defaultfontPath,
+                fontSize    = defaultSize
+            })
+            table.insert(elements, element)
+        end
+
+        -- vip label
+        if data.viplabel and data.viplabel ~= "" and data.vipcolor then
+            local element   = GUI:RichTextCombineCell_Create(-1, "vip_show", 0, 0, "TEXT", {
+                str         = data.viplabel,
+                color       = SL:GetHexColorByStyleId(data.vipcolor),
+                fontPath    = defaultfontPath,
+                fontSize    = defaultSize
+            })
+            table.insert(elements, element)
+        end
+
+        -- name
+        local str       = GUIFunction:ChatFixName(data)
+        local element   = GUI:RichTextCombineCell_Create(-1, "name_show", 0, 0, "TEXT", {
+            str         = str,
+            color       = FColorHEX,
+            fontPath    = defaultfontPath,
+            fontSize    = defaultSize
+        })
+        table.insert(elements, element)
+
+        -- msg
+        local telements = GUIFunction:CreateChatRichElements(data)
+        for _, v in ipairs(telements) do
+            table.insert(elements, v)
+        end
+
+        -- 填充
+        richText = GUI:RichTextCombine_Create(cell, "RichText", 0, 0, width, space)
+        GUI:RichTextCombine_pushBackElements(richText, elements)
+
+        -- 
+        GUI:RichText_setOpenUrlEvent(richText, function(sender, str)
+            local slices  = string.split(str, "#")
+            local command = slices[1]
+            if command == "position" then
+                local originScale = GUI:getScale(sender)
+                GUI:setScale(sender, originScale + 0.2)
+                local function reback()
+                    GUI:setScale(sender, originScale)
+                end
+                SL:scheduleOnce(sender, reback, 0.03)
+                
+                -- find position
+                local mapID   = slices[2]
+                local x       = tonumber(slices[3])
+                local y       = tonumber(slices[4])
+                local moveType = GUIDefine.AutoMoveType.CHAT
+                SL:SetValue("BATTLE_MOVE_BEGIN", mapID, x, y, nil, moveType)
+
+                return nil
+            end
+        end)
+
+        GUI:RichTextCombine_format(richText)
+    end
+    if BColorEnable then 
+        GUI:RichText_setBackgroundColor(richText, BColorHEX)
+    end
+
+    -- 与发送者私聊
+    if isWinMode then
+        GUI:setTouchEnabled(richText, true)
+        GUI:setSwallowTouches(richText, false)
+        GUI:addOnClickEvent(richText, function()
+            local mainPlayerID = SL:GetValue("USER_ID")
+            if data.SendId and data.SendName and data.SendId ~= mainPlayerID then
+                GUIFunction:PrivateChat(data, richText)
+            end
+        end)
+    end
+
+    local richSize = GUI:getContentSize(richText)
+    GUI:setAnchorPoint(richText, 0, 1)
+    GUI:setPosition(richText, 0, richSize.height)
+
+    GUI:setContentSize(cell, width, richSize.height)
+    GUI:setAnchorPoint(cell, 0, 0)
+    GUI:setPosition(cell, 40, 0)
+    -- 右键展示功能栏
+    if isWinMode then
+        if data.SendId and data.SendName then
+            GUIFunction:ChatItemOnMouseRightEvent(data, cell)
+        end
+    end
+
+    return cell
+end
+
+-- 创建不同类型聊天富文本元素
+function GUIFunction:CreateChatRichElements(data)
+    data.FColor     = data.FColor or 0
+    data.BColor     = data.BColor or 255
+    local FColorHEX = SL:GetHexColorByStyleId(data.FColor)
+    local BColorHEX = SL:GetHexColorByStyleId(data.BColor)
+
+    -- 默认字体字号
+    local defaultSize       = GUIFunction:GetChatRichFontSize()
+    local defaultfontPath   = GUIDefineEx.ChatRichFontPath
+
+    local mt        = tonumber(data.MT) or 0
+    local msg       = data.Msg
+
+    -- 普通
+    local function createNormalElements()
+        local elements  = {}
+        local parseT = GUIFunction:ChatParseNormal(msg)
+        for i, v in ipairs(parseT) do
+            if v.text then
+                local element = GUI:RichTextCombineCell_Create(-1, "normal_text", 0, 0, "TEXT", {
+                    str             = v.text,
+                    color           = v.color and SL:GetHexColorByStyleId(v.color) or FColorHEX,
+                    opacity         = v.opacity,
+                    fontPath        = v.fontPath or defaultfontPath,
+                    fontSize        = v.fontSize or defaultSize,
+                    outlineColor    = v.outColor and SL:GetHexColorByStyleId(v.outColor) or "#000000",
+                    outlineSize     = v.outlineSize or 0
+                })
+                table.insert(elements, element)
+            elseif v.sfxID then
+                -- 创建一个表情
+                local layout = GUI:Layout_Create(-1, "emoji_panel", 0, 0, 35, 35)
+                GUI:addStateEvent(layout, function(state)
+                    if state == "enter" then
+                        GUI:removeAllChildren(layout)
+                        local size = GUI:getContentSize(layout)
+                        local emojiSfx = GUI:Effect_Create(layout, "emoji_sfx", size.width / 2, size.height / 2, 0, v.sfxID)
+                        GUI:setScale(emojiSfx, 0.7)
+                    end
+                end)
+                local element = GUI:RichTextCombineCell_Create(-1, "emoji_element", 0, 0, "NODE", {node = layout})
+                table.insert(elements, element)
+            end
+        end
+        return elements
+    end
+
+    -- 坐标
+    local function parseEPosition()
+        local elements  = {}
+        local jsonData  = SL:JsonDecode(msg)
+        local parseT    = GUIFunction:ChatParseEPosition(jsonData)
+        local color     = "#00cb52"         -- 默认色值
+        for i, v in ipairs(parseT) do
+            if v.text then  
+                local element = GUI:RichTextCombineCell_Create(-1, "position_text", 0, 0, "TEXT", {
+                    str             = v.text,
+                    color           = v.color and SL:GetHexColorByStyleId(v.color) or color,
+                    opacity         = v.opacity,
+                    fontPath        = v.fontPath or defaultfontPath,
+                    fontSize        = v.fontSize or defaultSize,
+                    link            = v.link or "",
+                    outlineColor    = v.outColor and SL:GetHexColorByStyleId(v.outColor) or "#000000",
+                    outlineSize     = v.outlineSize or 0
+                })
+                table.insert(elements, element)
+            end
+        end
+        return elements
+    end
+
+    -- 装备
+    local function parseEItem()
+        local jsonData = SL:JsonDecode(msg)
+        if type(jsonData.ExtendInfo) == "string" then
+            jsonData.ExtendInfo = SL:JsonDecode(jsonData.ExtendInfo)
+        end
+        jsonData = SL:TransItemDataIntoChatShow(jsonData)
+
+        local elements = {}
+        local parseT = GUIFunction:ChatParseEItem(jsonData)
+        local isPc = SL:GetValue("IS_PC_OPER_MODE")
+        local size = isPc and {width = 40, height = 40} or {width = 66, height = 66}
+        for i, v in ipairs(parseT) do
+            if v.text then
+                local element = GUI:RichTextCombineCell_Create(-1, "equip_text", 0, 0, "TEXT", {
+                    str             = v.text,
+                    color           = v.color and SL:GetHexColorByStyleId(v.color) or FColorHEX,
+                    opacity         = v.opacity,
+                    fontPath        = v.fontPath or defaultfontPath,
+                    fontSize        = v.fontSize or defaultSize,
+                    link            = v.link or "",
+                    outlineColor    = v.outColor and SL:GetHexColorByStyleId(v.outColor) or "#000000",
+                    outlineSize     = v.outlineSize or 0
+                })
+                table.insert(elements, element)
+            elseif v.equip then
+                -- 创建道具item
+                local layout = GUI:Layout_Create(-1, "item_panel", 0, 0, size.width, size.height)
+                GUI:addStateEvent(layout, function(state)
+                    if state == "enter" then
+                        GUI:removeAllChildren(layout)
+                        local item = GUI:ItemShow_Create(layout, "item", size.width / 2, size.height / 2, {
+                            index       = v.equip.Index,
+                            itemData    = v.equip,
+                            look        = true,
+                            bgVisible   = true,
+                            checkPower  = true
+                        })
+                        GUI:setAnchorPoint(item, 0.5, 0.5)
+                    end
+                end)
+                local element = GUI:RichTextCombineCell_Create(-1, "equip_element", 0, 0, "NODE", {
+                    node    = layout,
+                    color   = v.color and SL:GetHexColorByStyleId(v.color) or "#FFFFFF",
+                    opacity = v.opacity or 255
+                })
+                table.insert(elements, element)
+            end
+        end
+        return elements
+    end
+
+    if mt == GUIDefine.ChatMsgType.POSITION then
+        return parseEPosition()
+        
+    elseif mt == GUIDefine.ChatMsgType.EQUIP then
+        return parseEItem()
+    end
+
+    return createNormalElements()
+end
+
+-- 处理私聊名字后接空格状况
+function GUIFunction:FixPrivateChatMsgWithSpace(findInfo)
+    local name = string.trim(findInfo[3]) or ""
+    local fStar, fEnd = string.find(name, " ")
+    local content = ""
+    if fStar and fEnd then
+        content = string.sub(name, fEnd + 1, -1)
+        name = string.sub(name, 1, fStar - 1)
+    end
+    content = content .. (findInfo[4] or "")
+    return name, content
+end
+
+-- 根据聊天消息内容获取对应频道
+function GUIFunction:GetChannelByChatMsg(msg)
+    local channel = nil
+    local content = msg
+    for _, v in ipairs(GUIDefine.ChatChannelPrefix) do
+        local pattern = v.pattern or "^" .. v.prefix .. "(.+)"
+        local findInfo = {string.find(msg, pattern)}
+        if findInfo[1] and findInfo[2] then
+            channel = v.channel
+            local rContent = findInfo[3]
+            if channel == GUIDefine.ChatChannel.PRIVATE then
+                local fName, fContent = GUIFunction:FixPrivateChatMsgWithSpace(findInfo)
+                rContent = fContent
+            end
+            content = rContent
+            break
+        end
+    end
+
+    if not channel then  -- 新增 /名字 直接私聊
+        local findInfo = {string.find(msg, "^/.+")}
+        if findInfo[1] and findInfo[2] then
+            channel = GUIDefine.ChatChannel.PRIVATE
+            content = " "
+        end
+    end
+
+    return channel, content
+end
+
+-- 根据聊天消息内容获取聊天对象
+function GUIFunction:FindTargetByChatMsg(msg)
+    local data = GUIDefine.ChatChannelPrefix[GUIDefine.ChatChannel.PRIVATE]
+    local pattern = data and data.pattern
+    local res = nil
+    
+    if not pattern then
+        return res
+    else
+        local findInfo = {string.find(msg, pattern)}
+        if findInfo[1] and findInfo[2] then
+            local rName, rContent = GUIFunction:FixPrivateChatMsgWithSpace(findInfo)
+            res = rName
+        end
+        if not res then
+            findInfo = {string.find(msg, "^/(.+)")}
+            if findInfo[1] and findInfo[2] then
+                res = string.gsub(findInfo[3], " ", "")
+            end
+        end
+    end
+
+    return res
+end
+
+-- 检查频道能否发送聊天
+function GUIFunction:CheckAbleToSayByChannel(channel)
+    if GUIDefine.ChatChannel.PRIVATE == channel then
+        -- 私聊
+        local targets = ChatData.GetTargets()
+        if not targets or not targets[1] then
+            SL:ShowSystemTips("没有可以发送的目标")
+            return false
+        end
+
+    elseif GUIDefine.ChatChannel.SYSTEM == channel then
+        -- 系统
+        SL:ShowSystemTips("系统频道无法发言")
+        return false
+    end
+
+    -- cding
+    if ChatData.GetCDTime(channel) > 0 then
+        SL:ShowSystemTips(string.format("您还需等待%s秒才能发言", ChatData.GetCDTime(channel)))
+        return false
+    end
+
+    local ret, buffID = SL:GetValue("BUFF_CHECK_CHAT_ENABLE")
+    if not ret then
+        if buffID then
+            local config = SL:GetValue("BUFF_CONFIG", buffID) or {}
+            if config.bufftitle then
+                SL:ShowSystemTips(config.bufftitle)
+            end
+        end
+        return false
+    end
+
+    return true
+end
+
+-- 处理聊天消息长度限制
+function GUIFunction:HandleLimitChatMsg(data)
+    if data and type(data.Msg) == "string" then
+        if data and string.utf8len(data.Msg or "") > GUIDefine.ChatConfig.MSG_LIMIT_COUNT then
+            data.Msg = SL:GetUTF8SubString(data.Msg, 1, GUIDefine.ChatConfig.MSG_LIMIT_COUNT)
+        end
+    end
+    return data
+end
+
+-- 获取聊天频道默认CD
+function GUIFunction:GetChatCDParam(channel)
+    if not GUIDefine.ChatCDTime then
+        GUIDefine.ChatCDTime = {}
+    end
+
+    if not next(GUIDefine.ChatCDTime) then
+        local chatCDs = SL:GetValue("GAME_DATA", "CHATCDS")
+        if chatCDs and chatCDs ~= "" then
+            local cdvec = string.split(chatCDs, "|")
+            GUIDefine.ChatCDTime = {
+                [GUIDefine.ChatChannel.PRIVATE]  = tonumber(cdvec[GUIDefine.ChatChannel.PRIVATE]),            -- 私聊
+                [GUIDefine.ChatChannel.NEAR]     = tonumber(cdvec[GUIDefine.ChatChannel.NEAR]),               -- 附近
+                [GUIDefine.ChatChannel.SHOUT]    = tonumber(cdvec[GUIDefine.ChatChannel.SHOUT]),              -- 世界
+                [GUIDefine.ChatChannel.TEAM]     = tonumber(cdvec[GUIDefine.ChatChannel.TEAM]),               -- 组队
+                [GUIDefine.ChatChannel.GUILD]    = tonumber(cdvec[GUIDefine.ChatChannel.GUILD]),              -- 行会
+                [GUIDefine.ChatChannel.UNION]    = tonumber(cdvec[GUIDefine.ChatChannel.UNION]),              -- 联盟
+                [GUIDefine.ChatChannel.WORLD]    = tonumber(cdvec[GUIDefine.ChatChannel.WORLD]),              -- 传音
+                [GUIDefine.ChatChannel.NATION]   = tonumber(cdvec[GUIDefine.ChatChannel.NATION]),             -- 国家
+                [GUIDefine.ChatChannel.SYSTEM]   = tonumber(cdvec[GUIDefine.ChatChannel.SYSTEM]) or 0,        -- 系统
+                [GUIDefine.ChatChannel.CROSS]    = tonumber(cdvec[GUIDefine.ChatChannel.CROSS]),              -- 跨服
+            }
+        end
+    end
+
+    return GUIDefine.ChatCDTime[channel] or 1
+end
+
+-- 发送聊天消息
+function GUIFunction:SendChatMsg(data)
+    local CHANNEL = GUIDefine.ChatChannel
+    local isPCMode = SL:GetValue("IS_PC_OPER_MODE")
+
+    if SL:GetValue("M2_FORBID_SAY") then
+        -- exclude gm
+        if not (type(data.msg) == "string" and string.find(data.msg, "^@.-")) then
+            SL:ShowSystemChat("本地图禁止说话聊天", 255, 249)
+            return
+        end
+    end
+
+    if not data or not data.msg then
+        SL:Print("error: function GUIFunction:SendChatMsg(data) 1")
+        return nil
+    end
+
+    data.textType  = data.textType or GUIDefine.ChatTextType.NORMAL
+    data.msg       = data.msg
+    data.originMsg = data.msg
+
+    -- PC端指定频道, 但内容为私聊则发送私聊
+    if isPCMode and data.channel and type(data.msg) == "string" then
+        local channel, content = GUIFunction:GetChannelByChatMsg(data.msg)
+        if channel and channel == CHANNEL.PRIVATE then
+            data.msg     = content
+            data.channel = channel
+
+            local targetName = GUIFunction:FindTargetByChatMsg(data.originMsg)
+            if targetName then
+                ChatData.AddTarget({name = targetName})
+            end
+        end
+    end
+
+    -- PC端不指定频道，由内容决定
+    if isPCMode and nil == data.channel and type(data.msg) == "string" then
+        local channel, content = GUIFunction:GetChannelByChatMsg(data.msg)
+        channel      = channel or CHANNEL.NEAR
+        data.msg     = content
+        data.channel = channel
+
+        if data.channel == CHANNEL.PRIVATE then
+            local targetName = GUIFunction:FindTargetByChatMsg(data.originMsg)
+            if targetName then
+                ChatData.AddTarget({name = targetName})
+            end
+        end
+    end
+
+    -- 兼容PC端前缀
+    if not isPCMode and type(data.msg) == "string" then
+        local channel, content = GUIFunction:GetChannelByChatMsg(data.msg)
+        if channel and channel ~= CHANNEL.PRIVATE then
+            data.msg     = content
+            data.channel = channel
+        end
+    end
+
+    -- 手机端添加 任何频道都能私聊的功能
+    if not isPCMode and type(data.msg) == "string" then
+        local channel, content = GUIFunction:GetChannelByChatMsg(data.msg)
+        if channel and channel == CHANNEL.PRIVATE then
+            data.msg     = content
+            data.channel = channel
+            local targetName = GUIFunction:FindTargetByChatMsg(data.originMsg)
+            if targetName then
+                ChatData.AddTarget({name = targetName})
+            end
+        end
+    end
+
+    if not data.channel then
+        SL:Print("error: function GUIFunction:OnSendChatMsg(data) 2")
+        return nil
+    end
+
+    -- 是否可发送
+    if not GUIFunction:CheckAbleToSayByChannel(data.channel) then
+        local checkMsg = data.originMsg or data.msg or ""
+        if not (type(checkMsg) == "string" and string.sub(checkMsg, 1, 1) == "@") then -- 如果是@开头的GM命令，要进行发送
+            return nil
+        end
+    end
+
+    -- 消息结构
+    local item      = {}
+    item.MT         = data.mt
+    item.Msg        = data.msg
+    item.Type       = data.channel
+
+    -- 行会
+    if data.channel == CHANNEL.GUILD then
+        if not SL:GetValue("GUILD_IS_JOINED") then
+            SL:ShowSystemTips("当前无行会，无法发送行会消息，请加入行会")
+            return nil
+        end
+    end
+    -- 队伍
+    if data.channel == CHANNEL.TEAM then
+        if not SL:GetValue("TEAM_IS_MEMBER") then
+            SL:ShowSystemTips("当前无队伍，无法发送组队消息")
+            return nil
+        end
+    end
+    -- 私聊
+    if data.channel == CHANNEL.PRIVATE then
+        local target = ChatData.GetTargets()[1]
+        if not target then
+            SL:ShowSystemTips("请选择私聊对象")
+            return nil
+        end
+        -- 黑名单
+        if SL:GetValue("SOCIAL_IS_BLICKLIST", target.name) then
+            SL:ShowSystemTips("对方在你的黑名单，无法向其发送信息")
+            return nil
+        end
+
+        item.Target     = target.uid
+        item.TargetName = target.name
+    end
+
+    if data.channel == CHANNEL.NATION then
+        if not SL:GetValue("NATION_IS_JOINED") then
+            SL:ShowSystemTips("当前无国家，无法发送国家消息，请加入国家")
+            return
+        end
+    end
+
+    -- 风险等级
+    item.risk = data.risk
+
+    -- send...
+    item = GUIFunction:HandleLimitChatMsg(item)
+    SL:RequestSendChatMsg(item)
+
+    -- cd... exclude gm
+    if not (type(data.msg) == "string" and string.find(data.msg, "^@.-")) then
+        local cd = GUIFunction:GetChatCDParam(data.channel)
+        ChatData.SetCDTime(data.channel, cd)
+    end
+end
+
+--------------------------- 聊天解析    end-------------------------------
+
+--------------------------- 拍卖行相关 -------------------------------
+-- 拍卖行价格显示 格式
+function GUIFunction:FixAuctionPrice(price, unit)
+    if unit then
+        if price >= 100000000 then
+            return string.format("%.1f%s", price / 100000000, "亿")
+        end
+        if price >= 10000 then
+            return string.format("%.1f%s", price / 10000, "万")
+        end
+        return tostring(price)
+    end
+    return tostring(price)
+end
+
+-- 检查寄售cell是否显示在视图内
+function GUIFunction:CheckAuctionCellShowInView(cell, view)
+    local posY = GUI:getPositionY(cell)
+    local cellH = GUI:getContentSize(cell).height
+    local anchorY = GUI:getAnchorPoint(cell).y
+    local sizeH = GUI:getContentSize(view).height
+    local innerPosY = GUI:ScrollView_getInnerContainerPosition(view).y
+    local isShow = (posY + (1 - anchorY) * cellH) >= -innerPosY and posY <= (-innerPosY + sizeH)
+    return isShow
+end
+---------------------------------------------------------------------
+-------------------------------------------------------------------------
+-- 客户端释放技能前是否允许执行
+function GUIFunction:OnCheckAllowLaunchSkillBefore(skillID)
+
+    -- 是否继续释放技能
+    return true
+end
+-------------------------------------------------------------------------
+
+--是否英雄人物面板合并
+function GUIFunction:IsPlayerHeroMergeMode()
+    if not SL:GetValue("IS_PC_OPER_MODE") and tostring(SL:GetValue("GAME_DATA","playerInfoMode")) == "1" and tostring(SL:GetValue("GAME_DATA","syshero")) == "1" then 
+        return true 
+    end
+    return false
+end
+
+-- 是否是自己
+function GUIFunction:IsMe(actorID)
+    return actorID == SL:GetValue("USERID")
+end
+
+function GUIFunction:KeyMapXY(x, y)
+    return y * 65536 + x
+end
+
+local MOVE_ACTIONS = {
+    [GUIDefine.Action.WALK]     = true,        -- 走
+    [GUIDefine.Action.RUN]      = true,        -- 跑
+    [GUIDefine.Action.RIDE_RUN] = true,        -- 坐骑跑
+    [GUIDefine.Action.DASH]     = true,        -- 野蛮
+    [GUIDefine.Action.ONPUSH]   = true,        -- 被野蛮/被推开
+    [GUIDefine.Action.TELEPORT] = true,        -- 瞬移
+    [GUIDefine.Action.ZXC]      = true,        -- 追心刺
+    [GUIDefine.Action.SBYS]     = true,        -- 十步一杀
+    [GUIDefine.Action.ASSASSIN_SNEAK] = true   -- 潜行
+}
+    
+-- actor移动
+function GUIFunction:IsMoveAction(act)
+    return MOVE_ACTIONS[act]
+end
+
+-- 是否是战士
+function GUIFunction:IsFighter(job)
+    return GUIDefine.Job.FIGHTER == job
+end
+
+-- 是否是法师
+function GUIFunction:IsWizzard(job)
+    return GUIDefine.Job.WIZZARD == job 
+end
+
+-- 是否是道士
+function GUIFunction:IsTaoist(job)
+    return GUIDefine.Job.TAOIST == job
+end

@@ -1,0 +1,88 @@
+local ui = {}
+function ui.init(parent)
+	-- Create Node
+	local Node = GUI:Node_Create(parent, "Node", 0.00, 0.00)
+	GUI:setChineseName(Node, "玩家技能节点")
+	GUI:setAnchorPoint(Node, 0.50, 0.50)
+	GUI:setTag(Node, -1.0)
+
+	-- Create Panel_skill_cell
+	local Panel_skill_cell = GUI:Layout_Create(Node, "Panel_skill_cell", 0.00, 0.00, 272.00, 50.00, false)
+	GUI:setChineseName(Panel_skill_cell, "玩家技能_组合")
+	GUI:setTouchEnabled(Panel_skill_cell, true)
+	GUI:setTag(Panel_skill_cell, 14.0)
+
+	-- Create Image_3
+	local Image_3 = GUI:Image_Create(Panel_skill_cell, "Image_3", 56.00, 24.00, "res/private/player_skill-win32/1900015023.png")
+	GUI:Image_setScale9Slice(Image_3, 19, 19.0, 9, 9.0)
+	GUI:setContentSize(Image_3, 210.0, 44.0)
+	GUI:setIgnoreContentAdaptWithSize(Image_3, false)
+	GUI:setChineseName(Image_3, "玩家技能_背景图")
+	GUI:setAnchorPoint(Image_3, 0.00, 0.50)
+	GUI:setTouchEnabled(Image_3, false)
+	GUI:setTag(Image_3, 16.0)
+
+	-- Create Image_icon
+	local Image_icon = GUI:Image_Create(Panel_skill_cell, "Image_icon", 26.00, 25.00, "res/private/player_skill-win32/1900015022.png")
+	GUI:setChineseName(Image_icon, "玩家技能_技能图标")
+	GUI:setAnchorPoint(Image_icon, 0.50, 0.50)
+	GUI:setTouchEnabled(Image_icon, false)
+	GUI:setTag(Image_icon, 14.0)
+
+	-- Create Image_1
+	local Image_1 = GUI:Image_Create(Panel_skill_cell, "Image_1", 136.00, 35.00, "res/private/player_skill-win32/1900015021.png")
+	GUI:setChineseName(Image_1, "玩家技能_Lv图片")
+	GUI:setAnchorPoint(Image_1, 0.00, 0.50)
+	GUI:setTouchEnabled(Image_1, false)
+	GUI:setTag(Image_1, 16.0)
+
+	-- Create Image_2
+	local Image_2 = GUI:Image_Create(Panel_skill_cell, "Image_2", 61.00, 15.00, "res/private/player_skill-win32/1900015020.png")
+	GUI:setChineseName(Image_2, "玩家技能_Exp图片")
+	GUI:setAnchorPoint(Image_2, 0.00, 0.50)
+	GUI:setTouchEnabled(Image_2, false)
+	GUI:setTag(Image_2, 17.0)
+
+	-- Create Text_skillName
+	local Text_skillName = GUI:Text_Create(Panel_skill_cell, "Text_skillName", 61.00, 35.00, 12.0, "#ffffff", [[技能名称]])
+	GUI:setChineseName(Text_skillName, "玩家技能_技能名称_文本")
+	GUI:setAnchorPoint(Text_skillName, 0.00, 0.50)
+	GUI:setTouchEnabled(Text_skillName, false)
+	GUI:setTag(Text_skillName, 18.0)
+	GUI:Text_enableOutline(Text_skillName, "#111111", 1.0)
+
+	-- Create Text_skillLevel
+	local Text_skillLevel = GUI:Text_Create(Panel_skill_cell, "Text_skillLevel", 161.00, 35.00, 12.0, "#ffff0f", [[-]])
+	GUI:setChineseName(Text_skillLevel, "玩家技能_技能等级")
+	GUI:setAnchorPoint(Text_skillLevel, 0.00, 0.50)
+	GUI:setTouchEnabled(Text_skillLevel, false)
+	GUI:setTag(Text_skillLevel, 19.0)
+	GUI:Text_enableOutline(Text_skillLevel, "#111111", 1.0)
+
+	-- Create Text_skillTrain
+	local Text_skillTrain = GUI:Text_Create(Panel_skill_cell, "Text_skillTrain", 96.00, 15.00, 12.0, "#ffffff", [[-]])
+	GUI:setChineseName(Text_skillTrain, "玩家技能_技能经验_文本")
+	GUI:setAnchorPoint(Text_skillTrain, 0.00, 0.50)
+	GUI:setTouchEnabled(Text_skillTrain, false)
+	GUI:setTag(Text_skillTrain, 20.0)
+	GUI:Text_enableOutline(Text_skillTrain, "#000000", 1.0)
+
+	-- Create Text_levelup
+	local Text_levelup = GUI:Text_Create(Panel_skill_cell, "Text_levelup", 61.00, 15.00, 12.0, "#ffffff", [[强化-重]])
+	GUI:setChineseName(Text_levelup, "玩家技能_强化等级")
+	GUI:setAnchorPoint(Text_levelup, 0.00, 0.50)
+	GUI:setTouchEnabled(Text_levelup, false)
+	GUI:setTag(Text_levelup, 15.0)
+	GUI:Text_enableOutline(Text_levelup, "#111111", 1.0)
+
+	-- Create btnOffon
+	local btnOffon = GUI:Button_Create(Panel_skill_cell, "btnOffon", 229.00, 25.00, "res/private/player_hero/btn_on.png")
+	GUI:Button_setTitleText(btnOffon, "")
+	GUI:Button_setTitleColor(btnOffon, "#ffffff")
+	GUI:Button_setTitleFontSize(btnOffon, 14.0)
+	GUI:Button_titleEnableOutline(btnOffon, "#000000", 1.0)
+	GUI:setAnchorPoint(btnOffon, 0.50, 0.50)
+	GUI:setTouchEnabled(btnOffon, true)
+	GUI:setTag(btnOffon, -1.0)
+end
+return ui
