@@ -174,7 +174,7 @@ function PlayerSuperEquip_Look_TradingBank.SetSamePosEquip()
     end
     
     local Is = false
-    for belongPos,v in pairs(GUIDefine.EquipPosMapping or {}) do
+    for belongPos,v in pairs(GUIDefine.EquipPosMappingEx or {}) do
         for k,pos in ipairs(v) do
             local equipPanel = PlayerSuperEquip_Look_TradingBank.GetEquipPosPanel(pos)
             if equipPanel then

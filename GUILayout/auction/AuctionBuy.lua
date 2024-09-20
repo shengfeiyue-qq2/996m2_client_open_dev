@@ -73,7 +73,7 @@ function AuctionBuy.main()
 end
 
 function AuctionBuy.Close()
-    UIOperator:CloseAuctionBidUI()
+    UIOperator:CloseAuctionBuyUI()
 end
 
 function AuctionBuy.OnClose(UID)

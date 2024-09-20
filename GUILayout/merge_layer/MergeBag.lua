@@ -599,9 +599,9 @@ function MergeBag.CreateBagItem(data)
                                 return
                             end
                             if MergeBag.IsHumBag() then 
-                                SL:RequestSplitItem(data.MakeIndex, num)
+                                SL:RequestSplitItem(data, num)
                             else
-                                SL:RequestSplitHeroItem(data.MakeIndex, num)
+                                SL:RequestSplitHeroItem(data, num)
                             end
                         end
                     end

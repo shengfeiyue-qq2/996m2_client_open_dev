@@ -195,13 +195,13 @@ UIConst.LUAFile =
     LUA_FILE_COMMON_SELECT_LIST                 = "common/CommonSelectList",                                                -- 选择下拉栏
     LUA_FILE_COMMON_REDDOT                      = "common/RedDot",                                                          -- 红点
 
-    LUA_FILE_ITEM_SPLIT_LAYER                   = "item/SplitLayer",                                                        -- 道具拆分弹窗层
-    LUA_FILE_ITEM_SPLIT_POP                     = "GUILayout/item/ItemSplitPop",                                            -- 道具拆分弹窗
+    LUA_FILE_ITEM_SPLIT_POP                     = "item/ItemSplitPop",                                            -- 道具拆分弹窗
 
     LUA_FILE_TREASURE_BOX                       = "treasure_box/TreasureBox",                                               -- 宝箱道具
     LUA_FILE_GOLD_BOX                           = "treasure_box/GoldBox",                                                   -- 宝箱
 
     LUA_FILE_ITEM_TIPS                          = "item/ItemTips",                                                          -- 道具tips
+    LUA_FILE_ITEM_TIPS_TXT                      = "item/ItemTips_txt",                                                      -- 道具tips  读配置
 
     LUA_FILE_CHAT                               = "chat/Chat",                                                              -- 聊天
     LUA_FILE_CHAT_EXTEND                        = "chat/ChatExtend",                                                        -- 聊天拓展框

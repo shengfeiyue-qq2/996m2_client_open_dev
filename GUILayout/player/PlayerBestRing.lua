@@ -89,9 +89,6 @@ function PlayerBestRing.UpdateEquipPanelState(data)
     end
     
     local pos = itemData.Where
-    local dePos = GUIFunction:GetEquipMappingConfig(pos)
-    pos = dePos and dePos or pos
-
     local equipPanel = PlayerBestRing.GetPanel(pos)
     if not equipPanel then
         return false
@@ -121,9 +118,6 @@ function PlayerBestRing.UpdateEquipLayer(data)
     local makeIndex = data.MakeIndex
 
     local pos = data.Where
-    local dePos = GUIFunction:GetEquipMappingConfig(pos)
-    pos = dePos and dePos or pos
-
     local equipPanel = PlayerBestRing.GetPanel(pos)
     if not equipPanel then
         return false
@@ -190,7 +184,7 @@ function PlayerBestRing.RegisterMouseEvent()
     end
 
     local addItemIntoEquip = function (touchPos)
-        local isMoving = SL:GetValue("ITEM_IS_MOVING")
+        local isMoving = SL:GetValue("ITEM_MOVE_STATE")
         if not isMoving then
             return -1
         end
@@ -246,7 +240,7 @@ end
 
 function PlayerBestRing.OnDoubleEvent(pos)
     -- 道具是否处于移动中
-    local isMoving = SL:GetValue("ITEM_IS_MOVING")
+    local isMoving = SL:GetValue("ITEM_MOVE_STATE")
     if isMoving then
         return false
     end

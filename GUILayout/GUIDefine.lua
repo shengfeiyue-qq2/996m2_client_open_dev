@@ -383,13 +383,18 @@ local Helmets = {
 local SuperHelmets = {
     EquipPosUI.Equip_Type_Super_Helmet, EquipPosUI.Equip_Type_Super_Veil, EquipPosUI.Equip_Type_Super_Cap
 }
-GUIDefine.EquipPosMapping = {
+GUIDefine.EquipPosMappingEx = {
     [EquipPosUI.Equip_Type_Cap]          = Helmets,
     [EquipPosUI.Equip_Type_Veil]         = Helmets,
     [EquipPosUI.Equip_Type_Helmet]       = Helmets,
     
     [EquipPosUI.Equip_Type_Super_Cap]    = SuperHelmets,
     [EquipPosUI.Equip_Type_Super_Veil]   = SuperHelmets,
+    [EquipPosUI.Equip_Type_Super_Helmet] = SuperHelmets
+}
+
+GUIDefine.EquipPosMapping = {
+    [EquipPosUI.Equip_Type_Helmet]       = Helmets,
     [EquipPosUI.Equip_Type_Super_Helmet] = SuperHelmets
 }
 

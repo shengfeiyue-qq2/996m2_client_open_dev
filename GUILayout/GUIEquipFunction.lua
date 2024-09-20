@@ -20,7 +20,7 @@ function GUIFunction:GetDeEquipMappingConfig(pos)
     if not pos then
         return nil
     end
-    for belongPos, v in pairs(GUIDefine.EquipPosMapping) do
+    for belongPos, v in pairs(GUIDefine.EquipPosMappingEx) do
         for k, _pos in pairs(v) do
             if _pos == pos then
                 return belongPos
@@ -376,7 +376,7 @@ end
 
 -- 获取当前位置的装备位
 function GUIFunction:GetEquipMappingConfig(pos)
-    return GUIDefine.EquipPosMapping[pos]
+    return GUIDefine.EquipPosMappingEx[pos]
 end
 
 --------------------------------------------------------装备面板装备操作---------------------------------------------------------------------------

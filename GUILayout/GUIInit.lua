@@ -1104,7 +1104,7 @@ SL:RegisterLUAEvent(LUA_EVENT_ENTER_WORLD, "GUIInit_KeyBoard", function()
 
     -- CTRL+H 切换攻击模式
     local PKType = GUIDefine.PKModeType
-    local pkModeTB = {PKType.HAM_ALL, PKType.HAM_PEACE, PKType.HAM_GROUP, PKType.HAM_GUILD, PKType.HAM_SHANE, PKType.HAM_NATION}
+    local pkModeTB = {PKType.HAM_ALL, PKType.HAM_PEACE, PKType.HAM_GROUP, PKType.HAM_GUILD, PKType.HAM_SHANE, PKType.HAM_NATION, PKType.HAM_CAMP}
     -- 自定义攻击模式
     if next(SL:GetValue("RELATION_TYPE_LIST")) then
         for _, modeId in ipairs(SL:GetValue("RELATION_TYPE_LIST")) do

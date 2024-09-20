@@ -1,7 +1,16 @@
 ItemSplitPop = {}
 
-function ItemSplitPop.main(data)
-    local parent = GUI:Attach_Parent()
+function ItemSplitPop.main()
+    ItemSplitPop._data = GUI:GetLayerOpenParam()
+    GUI:SetLayerOpenParam(nil)
+    if not ItemSplitPop._data or not next(ItemSplitPop._data) then
+        return
+    end
+
+    if GUI:GetWindow(nil, UIConst.LAYERID.CommonTipsSplitGUI) then
+        return
+    end
+    local parent = GUI:Win_Create(UIConst.LAYERID.CommonTipsSplitGUI, 0, 0, 0, 0, false, false, true, true, false, false, GUIDefine.UIZ.TOBOX)
     GUI:LoadExport(parent, "item/item_split")
 
     local isWinMode = SL:GetValue("IS_PC_OPER_MODE")
@@ -13,12 +22,11 @@ function ItemSplitPop.main(data)
     GUI:setContentSize(ItemSplitPop._ui.Panel_touch, screenW, screenH)
     GUI:setPosition(ItemSplitPop._ui.Panel_1, screenW / 2, isWinMode and SL:GetValue("PC_POS_Y") or screenH / 2)
 
-    ItemSplitPop._itemData  = data.itemData
-    ItemSplitPop._closeCB   = data.closeCB
+    ItemSplitPop._itemData  = ItemSplitPop._data.itemData
+    ItemSplitPop._closeCB   = ItemSplitPop._data.closeCB
     ItemSplitPop._count     = 1
 
     ItemSplitPop.InitUI()
-
 end
 
 function ItemSplitPop.InitUI()
@@ -81,3 +89,5 @@ end
 function ItemSplitPop.RefreshCount()
     GUI:TextInput_setString(ItemSplitPop._inputText, ItemSplitPop._count)
 end
+
+ItemSplitPop.main()

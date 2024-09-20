@@ -325,15 +325,15 @@ function PlayerSuperEquip.SetSamePosEquip()
     if not PlayerSuperEquip._SamePos then
         return false
     end
-    
-    local Is = false
+
     for belongPos,v in pairs(GUIDefine.EquipPosMapping or {}) do
-        for k,pos in ipairs(v) do
+        for k, pos in ipairs(v) do
             local equipPanel = PlayerSuperEquip.GetEquipPosPanel(pos)
             if equipPanel then
-                if Is == false and GUIFunction:GetEquipDataByPos(pos, nil, EDType) then
+                local equipData = EquipData.FindEquipDataByPos(pos)
+                if equipData then
                     GUI:setVisible(equipPanel, true)
-                    Is = true
+                    GUI:setTouchEnabled(equipPanel, true)
                 else
                     GUI:setVisible(equipPanel, false)
                 end
@@ -520,18 +520,11 @@ function PlayerSuperEquip.UpdateEquipLayer(data)
     local makeIndex = data.MakeIndex
 
     local pos = data.Where
-    if PlayerSuperEquip.IsNaikan(pos) then
-        local dePos = GUIFunction:GetDeEquipMappingConfig(pos)
-        pos = dePos and dePos or pos
-    end
-    
     local equipPanel = PlayerSuperEquip.GetEquipPosPanel(pos)
     if not equipPanel then
         return false
     end
     equipPanel._movingState = false
-
-    PlayerSuperEquip.SetSamePosEquip()
 
     local function onRefEquipNaikan()
         if GUIDefine.OprateType.ADD == optType or GUIDefine.OprateType.DEL == optType or GUIDefine.OprateType.CHANGE == optType then
@@ -579,6 +572,8 @@ function PlayerSuperEquip.UpdateEquipLayer(data)
     else
         onRefEquipIcon()
     end
+
+    PlayerSuperEquip.SetSamePosEquip()
 end
 
 -- 装备状态改变时刷新
@@ -594,11 +589,6 @@ function PlayerSuperEquip.UpdateEquipPanelState(data)
     end
     
     local pos = itemData.Where
-    if PlayerSuperEquip.IsNaikan(pos) then
-        local dePos = GUIFunction:GetDeEquipMappingConfig(pos)
-        pos = dePos and dePos or pos
-    end
-
     local equipPanel = PlayerSuperEquip.GetEquipPosPanel(pos)
     if not equipPanel then
         return false
@@ -606,8 +596,6 @@ function PlayerSuperEquip.UpdateEquipPanelState(data)
 
     local state = data.state and data.state >= 1
     equipPanel._movingState = not state
-    
-    PlayerSuperEquip.SetSamePosEquip()
 
     local function onRefEquipNaikan()
         PlayerSuperEquip.UpdateModelFeatureData()
@@ -635,6 +623,8 @@ function PlayerSuperEquip.UpdateEquipPanelState(data)
     else
         onRefEquipIcon()
     end
+
+    PlayerSuperEquip.SetSamePosEquip()
 end
 
 -- 界面关闭回调

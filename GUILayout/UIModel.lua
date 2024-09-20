@@ -258,7 +258,7 @@ function UIModel.CreateModel(node, id, effect, name, order)
             if anim then
                 local scale = v.scale or 1
                 GUI:setScale(anim,  GUI:getScale(anim) * scale)
-                GUI:setLocalZOrder(anim, v.order == 0 and order + 1 or order - 1)
+                GUI:setLocalZOrder(anim, v.zOrder == 0 and order + 1 or order - 1)
             end
         end
     end

@@ -30,7 +30,7 @@ local CHANNEL_NAME = {
 }
 
 local PKType = GUIDefine.PKModeType
-MainProperty._showPKTab = {PKType.HAM_ALL, PKType.HAM_PEACE, PKType.HAM_GROUP, PKType.HAM_GUILD, PKType.HAM_SHANE, PKType.HAM_NATION}
+MainProperty._showPKTab = {PKType.HAM_ALL, PKType.HAM_PEACE, PKType.HAM_GROUP, PKType.HAM_GUILD, PKType.HAM_SHANE, PKType.HAM_NATION, PKType.HAM_CAMP}
 MainProperty._pkModeStrList = {
     [PKType.HAM_ALL]    = "[全体攻击模式]",
     [PKType.HAM_PEACE]  = "[和平攻击模式]",
@@ -160,17 +160,17 @@ function MainProperty.InitCustomPKMode()
 end
 
 function MainProperty.InitAdapet()
+    local screenW = SL:GetValue("SCREEN_WIDTH")
+    local screenH = SL:GetValue("SCREEN_HEIGHT")
+
+    GUI:setPositionX(MainProperty._root, screenW / 2)
+    
     local notAdapet = tonumber(SL:GetValue("GAME_DATA", "PCPropertyNotAdapet")) == 1
     local contentWidth = GUI:getContentSize(MainProperty._ui["Panel_chat"]).width
     if notAdapet then
         MainProperty._ChatItemWidth = GUI:getContentSize(MainProperty._ui["ListView_chat"]).width
         return
     end
-
-    local screenW = SL:GetValue("SCREEN_WIDTH")
-    local screenH = SL:GetValue("SCREEN_HEIGHT")
-
-    GUI:setPositionX(MainProperty._root, screenW / 2)
     
     GUI:setContentSize(MainProperty._ui["Panel_bg"], screenW, screenH)
     GUI:setContentSize(MainProperty._ui["Panel_hide_drop"], screenW, screenH)

@@ -267,7 +267,7 @@ function HeroBag.CreateBagItem(data)
                                     SL:ShowSystemTips("请输入正确数量!")
                                     return
                                 end
-                                SL:RequestSplitHeroItem(data.MakeIndex, num)
+                                SL:RequestSplitHeroItem(data, num)
                             end
                         end
                     end
@@ -387,12 +387,6 @@ function HeroBag.ItemDataChange(data)
             local thisItemData = HeroBagData.GetItemDataByMakeIndex(v.MakeIndex)
             if item and thisItemData then
                 GUI:ItemShow_updateItemCount(item, thisItemData)
-                GUI:setVisible(item, false)
-                SL:scheduleOnce(item, function()
-                    if item and not GUI.Widget_IsNull(item) then
-                        GUI:setVisible(item, true)
-                    end
-                end, 0.15)
             end
         end
     end

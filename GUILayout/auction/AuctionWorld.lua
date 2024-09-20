@@ -476,15 +476,15 @@ function AuctionWorld.OnPullItemList(items)
 end
 
 function AuctionWorld.OnAuctionItemDel(item)
-    if not item or not item.MakeIndex then
+    if not item or not item.item.MakeIndex then
         return
     end
 
-    if nil == AuctionWorld._qCells[item.MakeIndex] then
+    if nil == AuctionWorld._qCells[item.item.MakeIndex] then
         return
     end
 
-    local cell = AuctionWorld._qCells[item.MakeIndex]
+    local cell = AuctionWorld._qCells[item.item.MakeIndex]
     local innerPos = GUI:ListView_getInnerContainerPosition(AuctionWorld._ui.ListView_items)
     local index = GUI:ListView_getItemIndex(AuctionWorld._ui.ListView_items, cell)
     GUI:ListView_removeItemByIndex(AuctionWorld._ui.ListView_items, index)
@@ -493,26 +493,26 @@ function AuctionWorld.OnAuctionItemDel(item)
     innerPos.y = math.min(0, innerPos.y)
     GUI:ListView_setInnerContainerPosition(AuctionWorld._ui.ListView_items, innerPos)
 
-    AuctionWorld._qCells[item.MakeIndex] = nil
-    AuctionWorld._items[item.MakeIndex] = nil
+    AuctionWorld._qCells[item.item.MakeIndex] = nil
+    AuctionWorld._items[item.item.MakeIndex] = nil
 
     AuctionWorld._ui.Image_empty:setVisible(next(AuctionWorld._qCells) == nil)
 end
 
 function AuctionWorld.OnAuctionItemChange(item)
-    if not item or not item.MakeIndex then
+    if not item or not item.item.MakeIndex then
         return
     end
 
-    if nil == AuctionWorld._qCells[item.MakeIndex] then
+    if nil == AuctionWorld._qCells[item.item.MakeIndex] then
         return
     end
 
     -- 流拍/拍卖成功需要删除
     if checkItemShowble(item) then
-        AuctionWorld._items[item.MakeIndex] = item
-        GUI:QuickCell_Exit(AuctionWorld._qCells[item.MakeIndex])
-        GUI:QuickCell_Refresh(AuctionWorld._qCells[item.MakeIndex])
+        AuctionWorld._items[item.item.MakeIndex] = item
+        GUI:QuickCell_Exit(AuctionWorld._qCells[item.item.MakeIndex])
+        GUI:QuickCell_Refresh(AuctionWorld._qCells[item.item.MakeIndex])
     else
         AuctionWorld.OnAuctionItemDel(item)
     end

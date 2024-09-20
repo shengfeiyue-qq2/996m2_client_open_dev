@@ -879,7 +879,7 @@ function LoginRolePanel.ShowRestoreUI()
         GUI:Text_setString(roleName, v.uname)
         GUI:Text_setString(roleLevel, v.ulevel)
         GUI:addOnClickEvent(btnRestore, function()
-            LoginRolePanel.OnRestoreRole(i)
+            LoginRolePanel.SubmitRestoreRole(i)
         end)
     end
 

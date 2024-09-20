@@ -212,7 +212,7 @@ function LookPlayerSuperEquip.SetSamePosEquip()
     end
     
     local Is = false
-    for belongPos,v in pairs(GUIDefine.EquipPosMapping or {}) do
+    for belongPos,v in pairs(GUIDefine.EquipPosMappingEx or {}) do
         for k,pos in ipairs(v) do
             local equipPanel = LookPlayerSuperEquip.GetEquipPosPanel(pos)
             if equipPanel then

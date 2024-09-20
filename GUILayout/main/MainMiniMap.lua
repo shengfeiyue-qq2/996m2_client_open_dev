@@ -4,7 +4,7 @@ MainMiniMap._showState = false
 
 -- 战斗模式
 local PKType = GUIDefine.PKModeType
-MainMiniMap._showPKTab = {PKType.HAM_ALL, PKType.HAM_PEACE, PKType.HAM_GROUP, PKType.HAM_GUILD, PKType.HAM_SHANE, PKType.HAM_NATION}
+MainMiniMap._showPKTab = {PKType.HAM_ALL, PKType.HAM_PEACE, PKType.HAM_GROUP, PKType.HAM_GUILD, PKType.HAM_SHANE, PKType.HAM_NATION, PKType.HAM_CAMP}
 MainMiniMap._pkModeStrList = {
     [PKType.HAM_ALL]    = "全体",
     [PKType.HAM_PEACE]  = "和平",

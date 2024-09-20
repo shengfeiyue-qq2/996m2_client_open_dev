@@ -972,7 +972,11 @@ end
 -- ItemTips
 function UIOperator:OpenItemTips(data)
     GUI:SetLayerOpenParam(data)
-    GUI:Win_Open(UIConst.LUAFile.LUA_FILE_ITEM_TIPS)
+    if SL:GetMetaValue("GAME_DATA", "enableTxtTipsConfig") == 1 then
+        GUI:Win_Open(UIConst.LUAFile.LUA_FILE_ITEM_TIPS_TXT)
+    else
+        GUI:Win_Open(UIConst.LUAFile.LUA_FILE_ITEM_TIPS)
+    end
 end
 function UIOperator:CloseItemTips()
     GUI:Win_CloseByID(UIConst.LAYERID.ItemTipsGUI)
@@ -1013,7 +1017,7 @@ end
 -- 打开道具拆分弹窗层
 function UIOperator:OpenTipsSplit(data)
     GUI:SetLayerOpenParam(data)
-    GUI:Win_Open(UIConst.LUAFile.LUA_FILE_ITEM_SPLIT_LAYER)
+    GUI:Win_Open(UIConst.LUAFile.LUA_FILE_ITEM_SPLIT_POP)
 end
 --关闭道具拆分弹窗层
 function UIOperator:CloseTipsSplit()

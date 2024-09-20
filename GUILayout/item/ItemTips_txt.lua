@@ -709,7 +709,7 @@ function ItemTips.GetSrcStr(itemData)
     local time = src.Time
 
     if not(map and string.len(map) > 0) and not(srcName and string.len(srcName) > 0) and not(userName and string.len(userName) > 0) and not(time and time > 0) then
-        return nil
+        return ""
     end
     if map and string.len(map) > 0 then
         str = str .. string.format("<font color='%s'>%s：%s</font><br>", SL:GetHexColorByStyleId(251), "地图", map)
@@ -1567,9 +1567,22 @@ local function removeLastLine()
     if (lastItem and string.find(GUI:getName(lastItem), "PLINE")) or (lastWidget and string.find(GUI:getName(lastWidget), "PLINE")) then
         local lastHei = GUI:getContentSize(lastItem).height
         GUI:ListView_removeChild(ItemTips._curCellView, lastItem)
-        ItemTips._cell_num = ItemTips._cell_num - 1
-        ItemTips._allCellHei = ItemTips._allCellHei - lastHei
         return lastHei
+    end
+end
+
+function ItemTips.AddEmbedWidget(widgetKey, tipsParam)
+    local funcKey = string.format("Create%sWidget", firstToUpper(widgetKey))
+    if ItemTips[funcKey] then
+        return ItemTips[funcKey](tipsParam)
+    elseif widgetKey == "line" then
+        return ItemTips.CreateSplitLine()
+    elseif widgetKey == "autoLine" then -- 自动分隔线(可绑定参数)
+        local removeCellHei = removeLastLine()
+        return ItemTips.CreateSplitLine(), removeCellHei
+    elseif string.find(widgetKey, "desc(%d+)$") then
+        local _, _, groupId = string.find(widgetKey, "desc(%d+)$")
+        return ItemTips.CreateDescWidget(tonumber(groupId), tipsParam)
     end
 end
 
@@ -2191,6 +2204,17 @@ function ItemTips.CreateDescWidget(groupId, param)
 end
 
 --------------------------------------------------------
+function ItemTips.InitExportShellCell(widgetKey, pathKey, tipsParam)
+    local cell = GUI:Widget_Create(-1, widgetKey, 0, 0, 0, 0)
+    GUI:LoadExportVar(cell, string.format("item/tips_cell/%s", pathKey), tipsParam)
+    local widget = GUI:getChildren(cell)[1]
+    GUI:setAnchorPoint(widget, 0, 0)
+    GUI:setPosition(widget, 0, 0)
+    local cellSize = GUI:getContentSize(widget)
+    GUI:setContentSize(cell, toEven(cellSize.width), toEven(cellSize.height))
+    return cell
+end
+
 function ItemTips.InitShellCell(widgetKey, widget)
     local cell = GUI:Widget_Create(-1, widgetKey, 0, 0, 0, 0)
     GUI:addChild(cell, widget)
@@ -2201,14 +2225,29 @@ function ItemTips.InitShellCell(widgetKey, widget)
     return cell
 end
 
-function ItemTips.PushItem(cellView, widget)
-    if not widget then
-        return
+local function checkCanShow(param, tipsParam, lastWidgetList)
+    if param and param.bindParam then
+        local value = tipsParam[param.bindParam]
+        if not value then
+            local _, _, groupId = string.find(param.bindParam, "tip_desc(%d+)Str")
+            if groupId then
+                local descList = tipsParam and tipsParam.tip_descList
+                value = ItemTips.GetDescStrByGroup(descList, tonumber(groupId))
+            end
+        end
+        if type(value) == "string" and string.len(value) > 0 then
+            return true
+        elseif tonumber(value) and tonumber(value) > 0 then
+            return true
+        end
+    elseif param and param.bindWidget then
+        if lastWidgetList and lastWidgetList[param.bindWidget] then
+            return true
+        end
+    else
+        return true
     end
-    local cell = ItemTips.InitShellCell("cell_" .. ItemTips._cell_num, widget)
-    ItemTips._allCellHei = ItemTips._allCellHei + GUI:getContentSize(cell).height
-    ItemTips._cell_num = ItemTips._cell_num + 1
-    GUI:ListView_pushBackCustomItem(cellView, cell)
+    return false
 end
 
 function ItemTips.FillTipsContent(tipsLayout, cellView, tipsParam)
@@ -2218,133 +2257,130 @@ function ItemTips.FillTipsContent(tipsLayout, cellView, tipsParam)
     local topLayout = nil
     local bottomHei = 0
     local bottomLayout = nil
-    ItemTips._allCellHei = 0
-    ItemTips._cell_num = 0
+    local allCellHei = 0
+    local cell_num = 0
 
-    -- 装备穿戴
-    local wearWidget = ItemTips.CreateWearWidget(tipsParam)
-    ItemTips.PushItem(cellView, wearWidget)
-    if wearWidget then
-        ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
+    if groupList and next(groupList) then
+        local embedWidgets = {}
+        for i, data in ipairs(groupList) do
+            local content = data.content
+            local widgetKey = data.widgetKey
+            if data.inTop then
+                local top_cell_num = 0
+                topLayout = GUI:Widget_Create(tipsLayout, "topLayout", 0, 0, maxWidth, 0)
+                GUI:setAnchorPoint(topLayout, 0, 1)
+
+                local topList = {}
+                if widgetKey then
+                    local canShow = checkCanShow(data, tipsParam, embedWidgets)
+                    local widget = canShow and ItemTips.AddEmbedWidget(widgetKey, tipsParam)
+                    if widget then
+                        embedWidgets[widgetKey] = true
+                        local topCell = ItemTips.InitShellCell("top_cell_" .. top_cell_num, widget)
+                        topHei = topHei + GUI:getContentSize(topCell).height
+                        top_cell_num = top_cell_num + 1
+                        GUI:addChild(topLayout, topCell)
+                        table.insert(topList, topCell)
+                    end
+
+                elseif content and next(content) then
+                    for _, param in ipairs(content) do
+                        if checkCanShow(param, tipsParam) then
+                            local topCell = ItemTips.InitExportShellCell("top_cell_" .. top_cell_num, param.key, tipsParam)
+                            topHei = topHei + GUI:getContentSize(topCell).height
+                            top_cell_num = top_cell_num + 1
+                            GUI:addChild(topLayout, topCell)
+                            table.insert(topList, topCell)
+                        end
+                    end
+                end
+                topHei = math.max(top_cell_num - 1, 0) * ItemTips._cellSpace + topHei
+                GUI:setContentSize(topLayout, maxWidth, topHei)
+                local posY = topHei
+                for i = 1, #topList do
+                    local child = topList[i]
+                    local childAPoint = GUI:getAnchorPoint(child)
+                    local childSize = GUI:getContentSize(child)
+                    GUI:setPosition(child, childAPoint.x * childSize.width, posY - (1 - childAPoint.y) * childSize.height)
+                    posY = posY - childSize.height - ItemTips._cellSpace
+                end
+            elseif data.inBottom then
+                local bottom_cell_num = 0
+                bottomLayout = GUI:Widget_Create(tipsLayout, "bottomLayout", 0, 0, maxWidth, 0)
+                GUI:setAnchorPoint(bottomLayout, 0, 0)
+
+                local bottomList = {}
+                if widgetKey then
+                    local canShow = checkCanShow(data, tipsParam, embedWidgets)
+                    local widget = canShow and ItemTips.AddEmbedWidget(widgetKey, tipsParam)
+                    if widget then
+                        embedWidgets[widgetKey] = true
+                        local bottomCell = ItemTips.InitShellCell("bottom_cell_" .. bottom_cell_num, widget)
+                        bottomHei = bottomHei + GUI:getContentSize(bottomCell).height
+                        bottom_cell_num = bottom_cell_num + 1
+                        GUI:addChild(bottomLayout, bottomCell)
+                        table.insert(bottomList, bottomCell)
+                    end
+
+                elseif content and next(content) then
+                    for _, param in ipairs(content) do
+                        if checkCanShow(param, tipsParam) then
+                            local bottomCell = ItemTips.InitExportShellCell("bottom_cell_" .. bottom_cell_num, param.key, tipsParam)
+                            bottomHei = bottomHei + GUI:getContentSize(bottomCell).height
+                            bottom_cell_num = bottom_cell_num + 1
+                            GUI:addChild(bottomLayout, bottomCell)
+                            table.insert(bottomList, bottomCell)
+                        end
+                    end
+                end
+                bottomHei = math.max(bottom_cell_num - 1, 0) * ItemTips._cellSpace + bottomHei
+                GUI:setContentSize(bottomLayout, maxWidth, bottomHei)
+                local posY = bottomHei
+                for i = 1, #bottomList do
+                    local child = bottomList[i]
+                    local childAPoint = GUI:getAnchorPoint(child)
+                    local childSize = GUI:getContentSize(child)
+                    GUI:setPosition(child, childAPoint.x * childSize.width, posY - (1 - childAPoint.y) * childSize.height)
+                    posY = posY - childSize.height - ItemTips._cellSpace
+                end
+            else
+                if widgetKey then
+                    local widget, removeCellHei = nil, nil
+                    if checkCanShow(data, tipsParam, embedWidgets) then
+                       widget, removeCellHei = ItemTips.AddEmbedWidget(widgetKey, tipsParam)
+                    end
+                    if widget then
+                        embedWidgets[widgetKey] = true
+                        if removeCellHei then
+                            cell_num = cell_num - 1
+                            allCellHei = allCellHei - removeCellHei
+                        end
+                        local cell = ItemTips.InitShellCell("cell_" .. cell_num, widget)
+                        allCellHei = allCellHei + GUI:getContentSize(cell).height
+                        cell_num = cell_num + 1
+                        GUI:ListView_pushBackCustomItem(cellView, cell)
+                    end
+                elseif content and next(content) then
+                    for _, param in ipairs(content) do
+                        if checkCanShow(param, tipsParam) then
+                            local cell = ItemTips.InitExportShellCell("cell_" .. cell_num, param.key, tipsParam)
+                            allCellHei = allCellHei + GUI:getContentSize(cell).height
+                            cell_num = cell_num + 1
+                            GUI:ListView_pushBackCustomItem(cellView, cell)
+                        end
+                    end
+                end
+            end
+        end
+        if not tipsParam.tip_isItem then
+            ItemTips.AddUpAttrMarkImg()
+        end
     end
 
-    -- 名字
-    local nameWidget = ItemTips.CreateNameWidget(tipsParam)
-    ItemTips.PushItem(cellView, nameWidget)
-
-    -- 描述1
-    local descWidget = ItemTips.CreateDescWidget(1, tipsParam)
-    ItemTips.PushItem(cellView, descWidget)
-
-    ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
-
-    -- 图标显示
-    local iconWidget = ItemTips.CreateIconWidget(tipsParam)
-    ItemTips.PushItem(cellView, iconWidget)
-    if iconWidget then
-        ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
-    end
-
-    -- 投保
-    local toubaoWidget = ItemTips.CreateTouBaoWidget(tipsParam)
-    ItemTips.PushItem(cellView, toubaoWidget)
-
-    -- hpMp
-    local hpMpWidget = ItemTips.CreateHpMpWidget(tipsParam)
-    ItemTips.PushItem(cellView, hpMpWidget)
-    if hpMpWidget then
-        ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
-    end
-
-    if tipsParam.tip_isItem then
-        -- 道具属性
-        local itemAttrWidget = ItemTips.CreateItemAttrWidget(tipsParam)
-        ItemTips.PushItem(cellView, itemAttrWidget)
-
-        -- 技能书限制
-        local skillLimitWidget = ItemTips.CreateSkillLimitWidget(tipsParam)
-        ItemTips.PushItem(cellView, skillLimitWidget)
-
-        -- 聚灵珠消耗
-        local julingCostWidget = ItemTips.CreateJulingCostWidget(tipsParam)
-        ItemTips.PushItem(cellView, julingCostWidget)
-    end
-
-    -- 星星
-    local starWidget = ItemTips.CreateStarWidget(tipsParam)
-    ItemTips.PushItem(cellView, starWidget)
-
-    -- 基础属性
-    local baseAttWidget = ItemTips.CreateBaseAttrWidget(tipsParam)
-    ItemTips.PushItem(cellView, baseAttWidget)
-    if baseAttWidget then
-        ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
-    end
-
-    -- 条件限制
-    local needWidget = ItemTips.CreateNeedWidget(tipsParam)
-    ItemTips.PushItem(cellView, needWidget)
-
-    -- 元素属性
-    local ysAttWidget = ItemTips.CreateYsAttrWidget(tipsParam)
-    ItemTips.PushItem(cellView, ysAttWidget)
-    if ysAttWidget then
-        ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
-    end
-
-    -- 自定义属性
-    local diyAttWidget = ItemTips.CreateDiyAttrWidget(tipsParam)
-    ItemTips.PushItem(cellView, diyAttWidget)
-    if diyAttWidget then
-        ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
-    end
-
-    -- 镶嵌
-    local inlayAttWidget = ItemTips.CreateInlayAttrWidget(tipsParam)
-    ItemTips.PushItem(cellView, inlayAttWidget)
-    if inlayAttWidget then
-        ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
-    end
-
-    -- 新套装 (关闭单独tips的显示方式)
-    local newSuitWidget = ItemTips.CreateNewSuitWidget(tipsParam)
-    ItemTips.PushItem(cellView, newSuitWidget)
-    if newSuitWidget then
-        ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
-    end
-
-    -- 限时道具
-    local limitTimeWidget = ItemTips.CreateLimitTimeWidget(tipsParam)
-    ItemTips.PushItem(cellView, limitTimeWidget)
-    if limitTimeWidget then
-        ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
-    end
-
-    -- 物品来源
-    local itemSrcWidget = ItemTips.CreateItemSrcWidget(tipsParam)
-    if itemSrcWidget then
-        removeLastLine()
-        ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
-        ItemTips.PushItem(cellView, itemSrcWidget)
-    end
-
-    -- 描述2
-    local desc2Widget = ItemTips.CreateDescWidget(2, tipsParam)
-    if desc2Widget then
-        removeLastLine()
-        ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
-        ItemTips.PushItem(cellView, desc2Widget)
-    end
-
-    -- 属性提升标识
-    if not tipsParam.tip_isItem then
-        ItemTips.AddUpAttrMarkImg()
-    end
-
-    ItemTips._allCellHei = math.max(ItemTips._cell_num - 1, 0) * ItemTips._cellSpace + ItemTips._allCellHei
+    allCellHei = math.max(cell_num - 1, 0) * ItemTips._cellSpace + allCellHei
     GUI:ListView_setItemsMargin(cellView, ItemTips._cellSpace)
 
-    local innerH = ItemTips._allCellHei
+    local innerH = allCellHei
     local needTopSpace = topHei and topHei > 0
     local needBottomSpace = bottomHei and bottomHei > 0 
     local listH = math.min(innerH, _tipsMaxH - topHei - (needTopSpace and vspace or 0) - bottomHei - (needBottomSpace and vspace or 0))
@@ -2586,10 +2622,12 @@ function ItemTips.CreateItemPanel(data, itemData)
         tip_name        = name,                                     -- string
         tip_nameStr     = nameStr,                                  -- string 富文本
         tip_nameColor   = color,                                    -- int
+        -- tip_modeStr = ItemTips.GetModeStr(itemData),             -- string 富文本
         tip_itemIsBind  = itemData.Bind and itemData.Bind > 0 and SL:GetValue("ITEM_IS_BIND", itemData), -- boolen
         tip_isWear      = false,                                    -- boolean
         tip_weight      = itemData.Weight,                          -- number
         tip_star        = itemData.Star,                            -- number
+        -- tips_toubaoStr  = ItemTips.GetTouBaoDesc(itemData),       -- string 富文本
         tip_needStr     = ItemTips.GetNeedStr(itemData, true),      -- string 富文本
         tip_timeStr     = ItemTips.GetTimeStr(2, itemData, data.from, _lookPlayer), -- string
         tip_srcStr      = ItemTips.GetSrcStr(itemData),             -- string 富文本

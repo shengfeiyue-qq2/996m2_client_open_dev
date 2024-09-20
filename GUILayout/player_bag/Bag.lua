@@ -498,7 +498,7 @@ function Bag.CreateBagItem(data)
                                 SL:ShowSystemTips("请输入正确数量!")
                                 return
                             end
-                            SL:RequestSplitItem(data.MakeIndex, num)
+                            SL:RequestSplitItem(data, num)
                         end
                     end
                 end
@@ -610,7 +610,7 @@ function Bag.CreateBagItem(data)
                                 return
                             end
 
-                            SL:RequestSplitItem(data.MakeIndex, num)
+                            SL:RequestSplitItem(data, num)
                         end
                     end
                 end

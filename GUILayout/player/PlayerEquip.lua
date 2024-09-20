@@ -53,7 +53,7 @@ local SetFeature = function (pos, data)
 end
 
 -- 部位位置配置(4 和 13 同部位)
-local EquipPosSet = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 56}
+local EquipPosSet = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 55, 56}
 
 -- 斗笠和头盔是否在相同的位置
 PlayerEquip._SamePos = true
@@ -341,14 +341,14 @@ function PlayerEquip.SetSamePosEquip()
         return false
     end
     
-    local Is = false
     for belongPos,v in pairs(GUIDefine.EquipPosMapping or {}) do
-        for k,pos in ipairs(v) do
+        for k, pos in ipairs(v) do
             local equipPanel = PlayerEquip.GetEquipPosPanel(pos)
             if equipPanel then
-                if Is == false and GUIFunction:GetEquipDataByPos(pos, EDType) then
+                local equipData = EquipData.FindEquipDataByPos(pos)
+                if equipData then
                     GUI:setVisible(equipPanel, true)
-                    Is = true
+                    GUI:setTouchEnabled(equipPanel, true)
                 else
                     GUI:setVisible(equipPanel, false)
                 end
@@ -517,18 +517,11 @@ function PlayerEquip.UpdateEquipLayer(data)
     local makeIndex = data.MakeIndex
 
     local pos = data.Where
-    if PlayerEquip.IsNaikan(pos) then
-        local dePos = GUIFunction:GetDeEquipMappingConfig(pos)
-        pos = dePos and dePos or pos
-    end
-    
     local equipPanel = PlayerEquip.GetEquipPosPanel(pos)
     if not equipPanel then
         return false
     end
     equipPanel._movingState = false
-
-    PlayerEquip.SetSamePosEquip()
 
     local function onRefEquipNaikan()
         if GUIDefine.OprateType.ADD == optType or GUIDefine.OprateType.DEL == optType or GUIDefine.OprateType.CHANGE == optType then
@@ -576,6 +569,8 @@ function PlayerEquip.UpdateEquipLayer(data)
     else
         onRefEquipIcon()
     end
+
+    PlayerEquip.SetSamePosEquip()
 end
 
 -- 装备状态改变时刷新
@@ -591,11 +586,6 @@ function PlayerEquip.UpdateEquipPanelState(data)
     end
     
     local pos = itemData.Where
-    if PlayerEquip.IsNaikan(pos) then
-        local dePos = GUIFunction:GetDeEquipMappingConfig(pos)
-        pos = dePos and dePos or pos
-    end
-
     local equipPanel = PlayerEquip.GetEquipPosPanel(pos)
     if not equipPanel then
         return false
@@ -603,8 +593,6 @@ function PlayerEquip.UpdateEquipPanelState(data)
 
     local state = data.state and data.state >= 1
     equipPanel._movingState = not state
-    
-    PlayerEquip.SetSamePosEquip()
 
     local function onRefEquipNaikan()
         PlayerEquip.UpdateModelFeatureData()
@@ -632,6 +620,8 @@ function PlayerEquip.UpdateEquipPanelState(data)
     else
         onRefEquipIcon()
     end
+
+    PlayerEquip.SetSamePosEquip()
 end
 
 -- 更新生肖框状态

@@ -302,7 +302,7 @@ end
 
 -- 新增任务
 function MainAssist.OnTaskAdd(data)
-    if GUI:Win_IsNull(MainAssist._ui) then
+    if GUI:Win_IsNull(MainAssist._root) then
         return false
     end
     
@@ -317,7 +317,7 @@ end
 
 -- 任务删除
 function MainAssist.OnTaskDel(data)
-    if GUI:Win_IsNull(MainAssist._ui) then
+    if GUI:Win_IsNull(MainAssist._root) then
         return false
     end
 
@@ -338,7 +338,7 @@ end
 
 -- 任务替换
 function MainAssist.OnTaskReplace(data)
-    if GUI:Win_IsNull(MainAssist._ui) then
+    if GUI:Win_IsNull(MainAssist._root) then
         return false
     end
 

@@ -927,7 +927,7 @@ function GUIFunction:GetItemQualityAttr(itemData)
         return attList
     end
     for _, att in ipairs(itemData.Quality) do
-        if att.Idx and att.Idx > 0 and att.Value and att.Value > 0 then
+        if att.Idx and att.Idx > 0 and att.Value and att.Value ~= 0 then
             table.insert(attList, {
                 id = att.Idx,
                 value = att.Value
@@ -944,7 +944,7 @@ function GUIFunction:GetItemDiyAttr(itemData)
         return attList
     end
     for _, att in ipairs(itemData.DiyAdv) do
-        if att.Idx and att.Idx > 0 and att.Value and att.Value > 0 and att.Type then
+        if att.Idx and att.Idx > 0 and att.Value and att.Value ~= 0 and att.Type then
             if not attList[att.Type] then
                 attList[att.Type] = {}
             end
@@ -1835,7 +1835,7 @@ function GUIFunction:GenerateChatMiniItem(data)
 
     -- 与发送者私聊
     if isWinMode then
-        local needFillInput = data.mt == MSG_TYPE.NORMAL
+        local needFillInput = data.textType == MSG_TYPE.NORMAL
         GUI:setTouchEnabled(richText, true)
         GUI:setSwallowTouches(richText, false)
         GUI:addOnClickEvent(richText, function()

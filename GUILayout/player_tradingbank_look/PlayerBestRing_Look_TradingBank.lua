@@ -110,7 +110,7 @@ end
 -- 注册鼠标经过事件
 function PlayerBestRing_Look_TradingBank.OnRegisterMouseMoveEvent(widget, pos)
     local function onShowItemTips()
-        local isMoving = SL:GetValue("ITEM_IS_MOVING")
+        local isMoving = SL:GetValue("ITEM_MOVE_STATE")
         if isMoving then
             return false
         end

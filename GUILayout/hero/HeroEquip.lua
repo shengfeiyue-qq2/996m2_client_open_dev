@@ -54,7 +54,7 @@ local SetFeature = function (pos, data)
 end
 
 -- 部位位置配置(4 和 13 同部位)
-local EquipPosSet = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 56}
+local EquipPosSet = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 55, 56}
 
 -- 斗笠和头盔是否在相同的位置
 HeroEquip._SamePos = true
@@ -313,15 +313,15 @@ function HeroEquip.SetSamePosEquip()
     if not HeroEquip._SamePos then
         return false
     end
-    
-    local Is = false
+
     for belongPos,v in pairs(GUIDefine.EquipPosMapping or {}) do
-        for k,pos in ipairs(v) do
+        for k, pos in ipairs(v) do
             local equipPanel = HeroEquip.GetEquipPosPanel(pos)
             if equipPanel then
-                if Is == false and GUIFunction:GetEquipDataByPos(pos, EDType) then
+                local equipData = HeroEquipData.FindEquipDataByPos(pos)
+                if equipData then
                     GUI:setVisible(equipPanel, true)
-                    Is = true
+                    GUI:setTouchEnabled(equipPanel, true)
                 else
                     GUI:setVisible(equipPanel, false)
                 end
@@ -485,18 +485,11 @@ function HeroEquip.UpdateEquipLayer(data)
     local makeIndex = data.MakeIndex
 
     local pos = data.Where
-    if HeroEquip.IsNaikan(pos) then
-        local dePos = GUIFunction:GetDeEquipMappingConfig(pos)
-        pos = dePos and dePos or pos
-    end
-    
     local equipPanel = HeroEquip.GetEquipPosPanel(pos)
     if not equipPanel then
         return false
     end
     equipPanel._movingState = false
-
-    HeroEquip.SetSamePosEquip()
 
     local function onRefEquipNaikan()
         if GUIDefine.OprateType.ADD == optType or GUIDefine.OprateType.DEL == optType or GUIDefine.OprateType.CHANGE == optType then
@@ -544,6 +537,8 @@ function HeroEquip.UpdateEquipLayer(data)
     else
         onRefEquipIcon()
     end
+
+    HeroEquip.SetSamePosEquip()
 end
 
 -- 装备状态改变时刷新
@@ -559,11 +554,6 @@ function HeroEquip.UpdateEquipPanelState(data)
     end
     
     local pos = itemData.Where
-    if HeroEquip.IsNaikan(pos) then
-        local dePos = GUIFunction:GetDeEquipMappingConfig(pos)
-        pos = dePos and dePos or pos
-    end
-
     local equipPanel = HeroEquip.GetEquipPosPanel(pos)
     if not equipPanel then
         return false
@@ -571,8 +561,6 @@ function HeroEquip.UpdateEquipPanelState(data)
 
     local state = data.state and data.state >= 1
     equipPanel._movingState = not state
-    
-    HeroEquip.SetSamePosEquip()
 
     local function onRefEquipNaikan()
         HeroEquip.UpdateModelFeatureData()
@@ -600,6 +588,8 @@ function HeroEquip.UpdateEquipPanelState(data)
     else
         onRefEquipIcon()
     end
+
+    HeroEquip.SetSamePosEquip()
 end
 
 -- 更新生肖框状态

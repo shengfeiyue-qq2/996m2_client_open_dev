@@ -299,14 +299,14 @@ function HeroSuperEquip.SetSamePosEquip()
         return false
     end
     
-    local Is = false
     for belongPos,v in pairs(GUIDefine.EquipPosMapping or {}) do
-        for k,pos in ipairs(v) do
+        for k, pos in ipairs(v) do
             local equipPanel = HeroSuperEquip.GetEquipPosPanel(pos)
             if equipPanel then
-                if Is == false and GUIFunction:GetEquipDataByPos(pos, nil, EDType) then
+                local equipData = HeroEquipData.FindEquipDataByPos(pos)
+                if equipData then
                     GUI:setVisible(equipPanel, true)
-                    Is = true
+                    GUI:setTouchEnabled(equipPanel, true)
                 else
                     GUI:setVisible(equipPanel, false)
                 end
@@ -489,18 +489,11 @@ function HeroSuperEquip.UpdateEquipLayer(data)
     local makeIndex = data.MakeIndex
 
     local pos = data.Where
-    if HeroSuperEquip.IsNaikan(pos) then
-        local dePos = GUIFunction:GetDeEquipMappingConfig(pos)
-        pos = dePos and dePos or pos
-    end
-    
     local equipPanel = HeroSuperEquip.GetEquipPosPanel(pos)
     if not equipPanel then
         return false
     end
     equipPanel._movingState = false
-
-    HeroSuperEquip.SetSamePosEquip()
 
     local function onRefEquipNaikan()
         if GUIDefine.OprateType.ADD == optType or GUIDefine.OprateType.DEL == optType or GUIDefine.OprateType.CHANGE == optType then
@@ -548,6 +541,8 @@ function HeroSuperEquip.UpdateEquipLayer(data)
     else
         onRefEquipIcon()
     end
+
+    HeroSuperEquip.SetSamePosEquip()
 end
 
 -- 装备状态改变时刷新
@@ -563,11 +558,6 @@ function HeroSuperEquip.UpdateEquipPanelState(data)
     end
     
     local pos = itemData.Where
-    if HeroSuperEquip.IsNaikan(pos) then
-        local dePos = GUIFunction:GetDeEquipMappingConfig(pos)
-        pos = dePos and dePos or pos
-    end
-
     local equipPanel = HeroSuperEquip.GetEquipPosPanel(pos)
     if not equipPanel then
         return false
@@ -575,8 +565,6 @@ function HeroSuperEquip.UpdateEquipPanelState(data)
 
     local state = data.state and data.state >= 1
     equipPanel._movingState = not state
-    
-    HeroSuperEquip.SetSamePosEquip()
 
     local function onRefEquipNaikan()
         HeroSuperEquip.UpdateModelFeatureData()
@@ -604,6 +592,8 @@ function HeroSuperEquip.UpdateEquipPanelState(data)
     else
         onRefEquipIcon()
     end
+
+    HeroSuperEquip.SetSamePosEquip()
 end
 
 -- 界面关闭回调
