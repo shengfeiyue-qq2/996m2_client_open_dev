@@ -199,5 +199,29 @@ function ui.init(parent)
 	GUI:setTouchEnabled(TouchSize, true)
 	GUI:setTag(TouchSize, 47)
 	GUI:setVisible(TouchSize, false)
+
+	-- Create btn_sure
+	local btn_sure = GUI:Button_Create(panel_main, "btn_sure", 259.00, 25.00, "res/public_win32/1900000612.png")
+	GUI:Button_loadTexturePressed(btn_sure, "res/public_win32/1900000612.png")
+	GUI:Button_loadTextureDisabled(btn_sure, "res/public_win32/1900000612.png")
+	GUI:Button_setTitleText(btn_sure, "确定收货")
+	GUI:Button_setTitleColor(btn_sure, "#f8e6c6")
+	GUI:Button_setTitleFontSize(btn_sure, 12)
+	GUI:Button_titleEnableOutline(btn_sure, "#111111", 2)
+	GUI:setAnchorPoint(btn_sure, 0.50, 0.50)
+	GUI:setTouchEnabled(btn_sure, true)
+	GUI:setTag(btn_sure, 19)
+
+	-- Create btn_refuse
+	local btn_refuse = GUI:Button_Create(panel_main, "btn_refuse", 352.00, 25.00, "res/public_win32/1900000612.png")
+	GUI:Button_loadTexturePressed(btn_refuse, "res/public_win32/1900000612.png")
+	GUI:Button_loadTextureDisabled(btn_refuse, "res/public_win32/1900000612.png")
+	GUI:Button_setTitleText(btn_refuse, "拒绝收货")
+	GUI:Button_setTitleColor(btn_refuse, "#f8e6c6")
+	GUI:Button_setTitleFontSize(btn_refuse, 12)
+	GUI:Button_titleEnableOutline(btn_refuse, "#111111", 2)
+	GUI:setAnchorPoint(btn_refuse, 0.50, 0.50)
+	GUI:setTouchEnabled(btn_refuse, true)
+	GUI:setTag(btn_refuse, 19)
 end
 return ui

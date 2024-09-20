@@ -43,6 +43,45 @@ function Mail.main()
         end
     end)
 
+     -- 确定收货
+     Mail._btn_sure = Mail._ui["btn_sure"]
+     GUI:addOnClickEvent(Mail._btn_sure, function()
+        local mailId = SL:GetMetaValue("MAIL_CURRENT_ID")
+        local mail = SL:GetMetaValue("MAIL_BY_ID", mailId)
+        if not mail then 
+            return
+        end
+        local itemData =  SL:JsonDecode(mail.sItem)
+        local other =  SL:JsonDecode(itemData.other)
+        if other then
+            other.emailId = mailId
+            SL:RequestSureTake(self, other, function(code, data, msg)
+                if code == 200 then
+                    SL:ShowSystemTips(msg)
+                end
+            end)
+        end
+     end)
+      -- 拒绝收货
+    Mail._btn_refuse = Mail._ui["btn_refuse"]
+    GUI:addOnClickEvent(Mail._btn_refuse, function()
+        local mailId = SL:GetMetaValue("MAIL_CURRENT_ID")
+        local mail = SL:GetMetaValue("MAIL_BY_ID", mailId)
+        if not mail then 
+            return
+        end
+        local itemData =  SL:JsonDecode(mail.sItem)
+        local other =  SL:JsonDecode(itemData.other)
+        if other then
+            other.emailId = mailId
+            SL:RequestRefuseTake(self, other, function(code, data, msg)
+                if code == 200 then
+                    SL:ShowSystemTips(msg)
+                end
+            end)
+        end
+    end)
+
     Mail.ShowDefaultMainPanel()
     SL:SetMetaValue("MAIL_CURRENT_ID", 0)
 
@@ -65,12 +104,15 @@ function Mail.ShowDefaultMainPanel()
     GUI:setVisible(Mail._btn_takeOut, false)
     GUI:setVisible(Mail._btn_delete, false)
     GUI:setVisible(Mail._ui["Text_item"], false)
+
+    GUI:setVisible(Mail._btn_sure, false)
+    GUI:setVisible(Mail._btn_refuse, false)
 end
 
 -- 刷新左边的邮件列表
 function Mail.RefreshMailList()
     local mailList = SL:GetMetaValue("MAIL_LIST")
-
+    dump(mailList,"mailList")
     local index = 0
     local mailSortList = {}
     for _, v in pairs(mailList) do
@@ -248,8 +290,14 @@ function Mail.RefreshMainPanel()
 
         if mail.btRecvFlag == 0 then
             -- 附件未领取 不能删除
-            GUI:setVisible(Mail._btn_takeOut, true)
-
+            if mail.btType == 9997 then
+                GUI:setVisible(Mail._btn_sure, true)
+                GUI:setVisible(Mail._btn_refuse, true)
+            else
+                GUI:setVisible(Mail._btn_takeOut, true)
+                GUI:setVisible(Mail._btn_sure, false)
+                GUI:setVisible(Mail._btn_refuse, false)
+            end
         elseif mail.btRecvFlag == 1 then
             GUI:setVisible(Mail._ui["rewardFlag_icon"], true)
             GUI:setVisible(Mail._btn_delete, true)
@@ -260,7 +308,15 @@ function Mail.RefreshMainPanel()
             countFontSize = 10
         end
 
-        if mail.btType == 9999 then --交易行的附件
+        if mail.btType == 9997 then --确定收货 or 拒绝收货邮件
+            local itemData =  SL:JsonDecode(mail.sItem)
+            local items = SL:TransItemDataIntoChatShow(itemData)
+            local itemdata = { index = items.Index, count = items.OverLap, look = true, countFontSize = countFontSize, bgVisible = true }
+            local item = GUI:ItemShow_Create(Mail._ui["list_items"], "item1", 0, 0, itemdata)
+            if mail.btRecvFlag == 1 then
+                GUI:ItemShow_setIconGrey(item, true)
+            end
+        elseif mail.btType == 9999 then --交易行的附件
             local itemData =  SL:JsonDecode(mail.sItem)
             local items = SL:TransItemDataIntoChatShow(itemData)
             local itemdata = { index = items.Index, count = items.OverLap, look = true, countFontSize = countFontSize, bgVisible = true }

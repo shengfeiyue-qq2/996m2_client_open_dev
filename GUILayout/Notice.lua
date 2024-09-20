@@ -139,6 +139,7 @@ end
 function Notice.OnAdapet()
     local screenW = SL:GetMetaValue("SCREEN_WIDTH")
     local screenH = SL:GetMetaValue("SCREEN_HEIGHT")
+    local notch, rect = SL:GetMetaValue("NOTCH_PHONE_INFO")
 
     GUI:setPosition(Notice._rootTimerTipsXY, screenW / 2, 200)
     GUI:setPosition(Notice._rootTimerTips, screenW / 2, 200)
@@ -146,7 +147,7 @@ function Notice.OnAdapet()
     GUI:setPositionX(Notice._rootAttribute, screenW - 300)
     GUI:setPositionY(Notice._rootServerTips, screenH)
     GUI:setPosition(Notice._rootSystem, screenW / 2, screenH)
-    GUI:setPositionX(Notice._rootItemTips, 50)
+    GUI:setPositionX(Notice._rootItemTips, rect.x + 50)
     GUI:setPositionX(Notice._rootNormalTips, screenW / 2)
 end
 
@@ -1096,6 +1097,7 @@ function Notice.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_NOTICE_DROP, "Notice", Notice.OnShowItemDropNotice)
     SL:RegisterLUAEvent(LUA_EVENT_PLAYER_INTERNAL_EXP_CHANGE, "Notice", Notice.OnShowPlayerNGEXPNotice)
     SL:RegisterLUAEvent(LUA_EVENT_HERO_INTERNAL_EXP_CHANGE, "Notice", Notice.OnShowHeroNGEXPNotice)
+    SL:RegisterLUAEvent(LUA_EVENT_DEVICE_ROTATION_CHANGED, "Notice", Notice.OnAdapet)
 end
 
 function Notice.RemoveEvent()
@@ -1116,4 +1118,5 @@ function Notice.RemoveEvent()
     SL:UnRegisterLUAEvent(LUA_EVENT_NOTICE_DROP, "Notice")
     SL:UnRegisterLUAEvent(LUA_EVENT_PLAYER_INTERNAL_EXP_CHANGE, "Notice")
     SL:UnRegisterLUAEvent(LUA_EVENT_HERO_INTERNAL_EXP_CHANGE, "Notice")
+    SL:UnRegisterLUAEvent(LUA_EVENT_DEVICE_ROTATION_CHANGED, "Notice")
 end

@@ -84,9 +84,25 @@ function SettingBasic.main()
     SettingBasic.initGroup2()
     --第三组开关
     SettingBasic.initGroup3()
-    --第四组开关
-    SettingBasic.initGroup4()
 
+    --第四组开关
+    local otherTradingBankProxy = global.Facade:retrieveProxy(global.ProxyTable.OtherTradingBankProxy)
+    if otherTradingBankProxy:getPublishOpen() == 1 then
+        GUI:setVisible(SettingBasic._ui.Image_4, false)
+        GUI:setVisible(SettingBasic._ui.Image_4_1, true)
+        GUI:setVisible(SettingBasic._ui.Image_4_1_1, true)
+        SettingBasic.initGroup4_1()
+    else
+        SettingBasic.initGroup4()
+    end
+    --复制key 上传文字
+    if otherTradingBankProxy:getPublishOpen() == 1 then
+        local sizePanel = GUI:getContentSize(SettingBasic._ui.Panel_1)
+        SettingBasic.textTips = GUI:Text_Create(SettingBasic._ui.Panel_1, "uploadtext", sizePanel.width/2, sizePanel.height/2-50, 18, "#FFFFFF", "")
+        GUI:setAnchorPoint(SettingBasic.textTips, 0.5, 0.5)
+    end
+    SL:RegisterLUAEvent(LUA_EVENT_OPEN_SETTING_HELP_UP_LOAD_TIPS, "SettingBasic", SettingBasic.UpLoadTextTipsOpen)
+    SL:RegisterLUAEvent(LUA_EVENT_CLOSE_SETTING_HELP_UP_LOAD_TIPS, "SettingBasic", SettingBasic.UpLoadTextTipsClose)
     --监听开关
     SL:RegisterLUAEvent(LUA_EVENT_SETTING_CAHNGE, "SettingBasic", SettingBasic.onSettingChange)
 end
@@ -174,10 +190,193 @@ end
 function SettingBasic.initGroup4()
     local groupConfig = getConfigFunc(group4)
     local ListView = SettingBasic._ui.ListView_4
+    local Panel_Voice = GUI:Layout_Create(ListView, "Panel_Voice", 0, 0, 340, 95, false)
     for i, config in ipairs(groupConfig) do
-        SettingBasic.CreateVoiceProgressCell(ListView, config)
+        SettingBasic.CreateVoiceProgressCell(Panel_Voice, config, i)
     end
     GUI:ListView_doLayout(ListView)
+end
+
+function SettingBasic.initGroup4_1()
+    local groupConfig = getConfigFunc(group4)
+    local ListView = SettingBasic._ui.ListView_4_1
+    local Panel_Voice = GUI:Layout_Create(ListView, "Panel_Voice", 0, 0, 220, 95, false)
+    for i, config in ipairs(groupConfig) do
+        SettingBasic.CreateVoiceProgressCell2(Panel_Voice, config, i)
+    end
+
+    local otherTradingBankProxy = global.Facade:retrieveProxy(global.ProxyTable.OtherTradingBankProxy)
+    if otherTradingBankProxy:getPublishOpen() == 1 then
+        local Panel_Click = GUI:Layout_Create(SettingBasic._ui.ListView_4_2, "Panel_Click_Key", 0, 0, 100, 95, false)
+        GUI:setTouchEnabled(Panel_Click, true)
+        -- Create Button_CobyAccountID
+        local Button_CobyAccountID = GUI:Button_Create(Panel_Click, "Button_CobyAccountID", 55, 50, "res/public/1900000673.png")
+        GUI:Button_loadTexturePressed(Button_CobyAccountID, "res/public/1900000674.png")
+        GUI:Button_loadTextureDisabled(Button_CobyAccountID, "res/public/1900000674.png")
+        GUI:Button_setTitleText(Button_CobyAccountID, "复制账号ID")
+        GUI:Button_setTitleColor(Button_CobyAccountID, "#ffffff")
+        GUI:Button_setTitleFontSize(Button_CobyAccountID, 14)
+        GUI:Button_titleEnableOutline(Button_CobyAccountID, "#000000", 1)
+        GUI:setTouchEnabled(Button_CobyAccountID, true)
+        SettingBasic.buttonCobyAccountID = Button_CobyAccountID
+
+        -- Create Button_CobyPlayerID
+        local Button_CobyPlayerID = GUI:Button_Create(Panel_Click, "Button_CobyPlayerID", 55, 7, "res/public/1900000673.png")
+        GUI:Button_loadTexturePressed(Button_CobyPlayerID, "res/public/1900000674.png")
+        GUI:Button_loadTextureDisabled(Button_CobyPlayerID, "res/public/1900000674.png")
+        GUI:Button_setTitleText(Button_CobyPlayerID, "复制角色码")
+        GUI:Button_setTitleColor(Button_CobyPlayerID, "#ffffff")
+        GUI:Button_setTitleFontSize(Button_CobyPlayerID, 14)
+        GUI:Button_titleEnableOutline(Button_CobyPlayerID, "#000000", 1)
+        GUI:setTouchEnabled(Button_CobyPlayerID, true)
+        SettingBasic.buttonCobyPlayerID = Button_CobyPlayerID
+        
+        --复制账号角色码ID按钮
+        SettingBasic.CreateCobyAccountButton()
+    end
+
+    GUI:ListView_doLayout(ListView)
+end
+
+-- 复制账号角色码ID按钮
+function SettingBasic.CreateCobyAccountButton()
+    local otherTradingBankProxy = global.Facade:retrieveProxy(global.ProxyTable.OtherTradingBankProxy)
+    local getRoleKey = function()
+        otherTradingBankProxy:getRoleKey(SettingBasic, function(code, data, msg)
+            if code == 200 then
+                SL:SetMetaValue("CLIPBOARD_TEXT", data)--账号ID (购买ID)
+                ShowSystemTips(GET_STRING(600000419))
+            else
+                ShowSystemTips(msg)
+            end
+        end)
+    end
+    local TextTips = function()
+        local params = {}
+        params.type = 1
+        params.btntext = {GET_STRING(600000139), GET_STRING(600000170)}
+        params.text = GET_STRING(700000134)
+        params.titleImg = global.MMO.PATH_RES_PRIVATE .. "trading_bank_other/img_tips.png"
+        params.callback = function(res)
+            global.Facade:sendNotification(global.NoticeTable.Layer_TradingBankTips2Layer_Close_other)
+            if res == 1 then
+                --是否登录
+                if otherTradingBankProxy:getToken() == "" then 
+                    otherTradingBankProxy:Login1_2(function(code, msg)
+                        if code == 200 then 
+                            if otherTradingBankProxy:getToken() ~= "" then 
+                                getRoleKey()
+                            end
+                        else
+                            ShowSystemTips(msg or "")
+                        end
+                    end)
+                else
+                    getRoleKey()
+                end
+            end
+            
+        end
+        global.Facade:sendNotification(global.NoticeTable.Layer_TradingBankTips2Layer_Open_other, params)
+    end
+
+    local btn = SettingBasic.buttonCobyAccountID
+    btn:addClickEventListener(function()
+        otherTradingBankProxy:doTrack(otherTradingBankProxy.UpLoadData.TraingCobyAccountIDBtnClick)
+        TextTips()
+    end)
+
+    --冻结角色
+    -- local LockPublishRole = function()
+    --     local params = {
+    --         prePublishLockId = otherTradingBankProxy:getPublishLockID()
+    --     }
+    --     otherTradingBankProxy:lockPublishRole(SettingBasic, params, function(code, data, msg)
+    --         if code == 200 then
+    --             if data then
+    --                 SL:print("冻结成功")
+    --                 --SL:SetMetaValue("CLIPBOARD_TEXT", otherTradingBankProxy:getPublishKey())
+    --                 --ShowSystemTips(GET_STRING(600000419))
+    --                 global.Facade:sendNotification(global.NoticeTable.TradingBank_other_Capture,{type = 1})
+    --             else
+    --                 --如果冻结失败让玩家重新获取一下寄售码 保证流程畅通
+    --                 otherTradingBankProxy:setPublishKeyValidTime(0)
+    --                 otherTradingBankProxy:setPublishKey("")
+    --                 ShowSystemTips(GET_STRING(700000136))--冻结失败 请稍后再试    备注：服务器处理异常情况
+    --             end
+    --         else
+    --             ShowSystemTips(msg)
+    --         end
+    --     end)
+    -- end
+
+    local getPublishKeyUsing = function()
+        if otherTradingBankProxy:getPublishKeyValidTime() <= 0 or  otherTradingBankProxy:getPublishKey() == "" then
+            otherTradingBankProxy:getPublishKeyUsing(SettingBasic, function(code, tabledata, msg)
+                if code == 200 then
+                    dump(tabledata,"tabledata")
+                    otherTradingBankProxy:setPublishKeyValidTime(1800)
+                    otherTradingBankProxy:setPublishTableData(tabledata)
+                    otherTradingBankProxy:setPublishKey(tabledata.key)
+                    otherTradingBankProxy:setPublishLockID(tabledata.prePublishId)
+
+                    global.Facade:sendNotification(global.NoticeTable.TradingBank_other_Capture,{type = 1})
+                else
+                    ShowSystemTips(msg)
+                end
+            end)
+        else
+            global.Facade:sendNotification(global.NoticeTable.TradingBank_other_Capture,{type = 1})
+        end
+    end
+
+    local TextTips = function()
+        local params = {}
+        params.rich = 1
+        params.type = 1
+        params.btntext = {GET_STRING(700000137), GET_STRING(600000170)}
+        params.text = GET_STRING(700000135)
+        params.titleImg = global.MMO.PATH_RES_PRIVATE .. "trading_bank_other/img_tips.png"
+        params.callback = function(res)     
+            global.Facade:sendNotification(global.NoticeTable.Layer_TradingBankTips2Layer_Close_other)
+            if res == 1 then
+                --是否登录
+                if otherTradingBankProxy:getToken() == "" then 
+                    otherTradingBankProxy:Login1_2(function(code, msg)
+                        if code == 200 then 
+                            if otherTradingBankProxy:getToken() ~= "" then 
+                                getPublishKeyUsing()
+                            end
+                        else
+                            ShowSystemTips(msg or "")
+                        end
+                    end)
+                else
+                    getPublishKeyUsing()
+                end
+            end
+            
+        end
+        global.Facade:sendNotification(global.NoticeTable.Layer_TradingBankTips2Layer_Open_other, params)
+    end
+
+    local btn = SettingBasic.buttonCobyPlayerID 
+    btn:addClickEventListener(function()
+        local MapProxy = global.Facade:retrieveProxy( global.ProxyTable.Map )
+        if not MapProxy:IsInSafeArea() then--安全区才能打开
+            ShowSystemTips(GET_STRING(700000144))
+            return
+        end
+
+        if SL:GetMetaValue("USEHERO") and SL:GetMetaValue("HERO_IS_ACTIVE") then
+            if not SL:GetMetaValue("HERO_IS_ALIVE") then
+                SL:ShowSystemTips("英雄还未召唤")
+                return
+            end
+        end
+        otherTradingBankProxy:doTrack(otherTradingBankProxy.UpLoadData.TraingCobyPlayerIDBtnClick)
+        TextTips()
+    end)
 end
 
 --创建 输入 点击 开关
@@ -326,16 +525,15 @@ function SettingBasic.CreateClickCell(parent, data)
 end
 
 
-function SettingBasic.CreateVoiceProgressCell(parent, data)
-    local Panel_Voice = GUI:Layout_Create(parent, "Panel_Voice_" .. data.id, 0, 0, 340, 100, false)
+function SettingBasic.CreateVoiceProgressCell(parent, data, index)
     --设置数据
     local value = SL:GetMetaValue("SETTING_ENABLED", (data.id))
     -- 描述
-    local Text_desc = GUI:Text_Create(Panel_Voice, "Text_desc", 30, 71, 16, "#ffffff", string.format("%s(%s%%)", data.content, value or 100))
+    local Text_desc = GUI:Text_Create(parent, "Text_desc"..data.id, 30 + (index-1)*340, 71, 16, "#ffffff", string.format("%s(%s%%)", data.content, value or 100))
     GUI:setAnchorPoint(Text_desc, 0, 0.5)
 
     -- 进度条
-    local Slider_progress = GUI:Slider_Create(Panel_Voice, "Slider_progress", 30, 38, "res/private/new_setting/bg_progress.png", "res/private/new_setting/bg_progress2.png", "res/private/new_setting/icon_xdtzy_17.png")
+    local Slider_progress = GUI:Slider_Create(parent, "Slider_progress"..data.id, 30 + (index-1)*340, 38, "res/private/new_setting/bg_progress.png", "res/private/new_setting/bg_progress2.png", "res/private/new_setting/icon_xdtzy_17.png")
     GUI:setContentSize(Slider_progress, 280, 11)
     GUI:setIgnoreContentAdaptWithSize(Slider_progress, false)
     GUI:Slider_setPercent(Slider_progress, value or 100)
@@ -353,5 +551,61 @@ function SettingBasic.CreateVoiceProgressCell(parent, data)
             end
         end
     end)
-    return Panel_Voice
+end
+
+function SettingBasic.CreateVoiceProgressCell2(parent, data, index)
+    --设置数据
+    local value = SL:GetMetaValue("SETTING_ENABLED", (data.id))
+    -- 描述
+    local Text_desc = GUI:Text_Create(parent, "Text_desc"..data.id, 10 + (index-1)*220, 60, 16, "#ffffff", string.format("%s(%s%%)", data.content, value or 100))
+    GUI:setAnchorPoint(Text_desc, 0, 0.5)
+
+    -- 进度条
+    local Slider_progress = GUI:Slider_Create(parent, "Slider_progress"..data.id, 10 + (index-1)*220, 38, "res/private/new_setting/bg_progress.png", "res/private/new_setting/bg_progress2.png", "res/private/new_setting/icon_xdtzy_17.png")
+    GUI:setContentSize(Slider_progress, 190, 11)
+    GUI:setIgnoreContentAdaptWithSize(Slider_progress, false)
+    GUI:Slider_setPercent(Slider_progress, value or 100)
+    GUI:setAnchorPoint(Slider_progress, 0, 0.5)
+    GUI:Slider_addOnEvent(Slider_progress, function(_, eventType)
+        if eventType == 0 then
+            local percent = GUI:Slider_getPercent(Slider_progress)
+            local value = math.floor((SL:GetMetaValue("SETTING_ENABLED", (data.id)) or 100) / 10) * 10
+            local newValue = math.floor(percent / 10) * 10
+            if math.abs(value - newValue) >= 10 then
+                --设置新值
+                SL:SetMetaValue("SETTING_VALUE", data.id, { newValue })
+                --刷新ui
+                GUI:Text_setString(Text_desc, string.format("%s(%s%%)", data.content, newValue or 100))
+            end
+        end
+    end)
+end
+
+function SettingBasic.UpLoadTextTipsOpen()
+    if SettingBasic.textTips then
+        GUI:stopAllActions(SettingBasic.textTips)
+        local str = GET_STRING(700000142)--"上传中，请稍等"
+        GUI:Text_setString(SettingBasic.textTips, str..".")
+        local callback1 = function ()
+            GUI:Text_setString(SettingBasic.textTips, str..".")
+        end
+        local callback2 = function ()
+            GUI:Text_setString(SettingBasic.textTips, str.."..")
+        end
+        local callback3 = function ()
+            GUI:Text_setString(SettingBasic.textTips, str.."...")
+        end
+        GUI:runAction(SettingBasic.textTips,GUI:ActionRepeatForever(GUI:ActionSequence(
+            GUI:CallFunc(callback1), GUI:DelayTime(0.3),
+            GUI:CallFunc(callback2), GUI:DelayTime(0.3),
+            GUI:CallFunc(callback3), GUI:DelayTime(0.3)
+        )))
+    end
+end
+
+function SettingBasic.UpLoadTextTipsClose()
+    if SettingBasic.textTips then
+        GUI:stopAllActions(SettingBasic.textTips)
+        GUI:Text_setString(SettingBasic.textTips, "")
+    end
 end

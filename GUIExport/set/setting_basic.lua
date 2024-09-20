@@ -68,10 +68,42 @@ function ui.init(parent)
 	GUI:setTag(Image_4, -1)
 
 	-- Create ListView_4
-	local ListView_4 = GUI:ListView_Create(Image_4, "ListView_4", 0.00, 0.00, 685.00, 100.00, 2)
+	local ListView_4 = GUI:ListView_Create(Image_4, "ListView_4", 0.00, 2.00, 685.00, 95.00, 1)
 	GUI:ListView_setGravity(ListView_4, 5)
 	GUI:setChineseName(ListView_4, "基础面板_面板4列表")
 	GUI:setTouchEnabled(ListView_4, true)
 	GUI:setTag(ListView_4, -1)
+
+	-- Create Image_4_1
+	local Image_4_1 = GUI:Image_Create(Panel_1, "Image_4_1", 24.00, 112.00, "res/private/new_setting/textBg.png")
+	GUI:Image_setScale9Slice(Image_4_1, 33, 33, 9, 3)
+	GUI:setContentSize(Image_4_1, 443, 100)
+	GUI:setIgnoreContentAdaptWithSize(Image_4_1, false)
+	GUI:setAnchorPoint(Image_4_1, 0.00, 1.00)
+	GUI:setTouchEnabled(Image_4_1, false)
+	GUI:setTag(Image_4_1, -1)
+	GUI:setVisible(Image_4_1, false)
+
+	-- Create ListView_4_1
+	local ListView_4_1 = GUI:ListView_Create(Image_4_1, "ListView_4_1", 0.00, 2.00, 440.00, 95.00, 1)
+	GUI:ListView_setGravity(ListView_4_1, 5)
+	GUI:setTouchEnabled(ListView_4_1, true)
+	GUI:setTag(ListView_4_1, -1)
+
+	-- Create Image_4_1_1
+	local Image_4_1_1 = GUI:Image_Create(Panel_1, "Image_4_1_1", 510.00, 112.00, "res/private/new_setting/textBg.png")
+	GUI:Image_setScale9Slice(Image_4_1_1, 33, 33, 9, 3)
+	GUI:setContentSize(Image_4_1_1, 200, 100)
+	GUI:setIgnoreContentAdaptWithSize(Image_4_1_1, false)
+	GUI:setAnchorPoint(Image_4_1_1, 0.00, 1.00)
+	GUI:setTouchEnabled(Image_4_1_1, false)
+	GUI:setTag(Image_4_1_1, -1)
+	GUI:setVisible(Image_4_1_1, false)
+
+	-- Create ListView_4_2
+	local ListView_4_2 = GUI:ListView_Create(Image_4_1_1, "ListView_4_2", 0.00, 2.00, 200.00, 95.00, 1)
+	GUI:ListView_setGravity(ListView_4_2, 5)
+	GUI:setTouchEnabled(ListView_4_2, true)
+	GUI:setTag(ListView_4_2, -1)
 end
 return ui
