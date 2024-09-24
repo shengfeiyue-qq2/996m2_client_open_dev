@@ -954,6 +954,8 @@ function ItemTips.GetGemShow(parent, itemData)
             GUI:setAnchorPoint(gemBg, 0.5, 0.5)
             local gemBgSize = GUI:getContentSize(gemBg)
 
+            local custGemIcon = nil
+
             richPosX = 0
             richPosX = richPosX + gemBgSize.width + 6
             local maxH = gemBgSize.height
@@ -983,11 +985,11 @@ function ItemTips.GetGemShow(parent, itemData)
                         local icon = GUI:Image_Create(goodLayout, "icon_" .. i, richPosX - gemBgSize.width - 6, 0, getIconResPath(gemData.Looks))
                         GUI:setAnchorPoint(icon, 0, 0.5)
                         local iconSz = GUI:getContentSize(icon)
-                        GUI:setPositionY(icon, iconSz.height / 2)
                         maxWidth = math.max(maxWidth, iconSz.width + gemBgSize.width)
                         richPosX = richPosX + iconSz.width
                         richPosX = richPosX - gemBgSize.width - 6
                         maxH = math.max(maxH, iconSz.height)
+                        custGemIcon = icon
                     end
 
                     local attList = GUIFunction:ParseItemBaseAtt(gemData.attribute)
@@ -1035,6 +1037,9 @@ function ItemTips.GetGemShow(parent, itemData)
             end
 
             GUI:setPosition(gemBg, size.width / 2, size.height / 2)
+            if custGemIcon then
+                GUI:setPositionY(custGemIcon, size.height / 2)
+            end
             ItemTips.PushItem(parent, goodLayout)
         end
     end

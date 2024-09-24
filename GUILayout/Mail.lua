@@ -45,42 +45,47 @@ function Mail.main()
 
      -- 确定收货
      Mail._btn_sure = Mail._ui["btn_sure"]
-     GUI:addOnClickEvent(Mail._btn_sure, function()
-        local mailId = SL:GetMetaValue("MAIL_CURRENT_ID")
-        local mail = SL:GetMetaValue("MAIL_BY_ID", mailId)
-        if not mail then 
-            return
-        end
-        local itemData =  SL:JsonDecode(mail.sItem)
-        local other =  SL:JsonDecode(itemData.other)
-        if other then
-            other.emailId = mailId
-            SL:RequestSureTake(self, other, function(code, data, msg)
-                if code == 200 then
-                    SL:ShowSystemTips(msg)
-                end
-            end)
-        end
-     end)
+     if Mail._btn_sure then
+        GUI:addOnClickEvent(Mail._btn_sure, function()
+            local mailId = SL:GetMetaValue("MAIL_CURRENT_ID")
+            local mail = SL:GetMetaValue("MAIL_BY_ID", mailId)
+            if not mail then 
+                return
+            end
+            local itemData =  SL:JsonDecode(mail.sItem)
+            local other =  SL:JsonDecode(itemData.other)
+            if other then
+                other.emailId = mailId
+                SL:RequestSureTake(nil, other, function(code, data, msg)
+                    if code == 200 then
+                        SL:ShowSystemTips(msg)
+                    end
+                end)
+            end
+        end)
+     end
       -- 拒绝收货
     Mail._btn_refuse = Mail._ui["btn_refuse"]
-    GUI:addOnClickEvent(Mail._btn_refuse, function()
-        local mailId = SL:GetMetaValue("MAIL_CURRENT_ID")
-        local mail = SL:GetMetaValue("MAIL_BY_ID", mailId)
-        if not mail then 
-            return
-        end
-        local itemData =  SL:JsonDecode(mail.sItem)
-        local other =  SL:JsonDecode(itemData.other)
-        if other then
-            other.emailId = mailId
-            SL:RequestRefuseTake(self, other, function(code, data, msg)
-                if code == 200 then
-                    SL:ShowSystemTips(msg)
-                end
-            end)
-        end
-    end)
+    if Mail._btn_refuse then
+        GUI:addOnClickEvent(Mail._btn_refuse, function()
+            local mailId = SL:GetMetaValue("MAIL_CURRENT_ID")
+            local mail = SL:GetMetaValue("MAIL_BY_ID", mailId)
+            if not mail then 
+                return
+            end
+            local itemData =  SL:JsonDecode(mail.sItem)
+            local other =  SL:JsonDecode(itemData.other)
+            if other then
+                other.emailId = mailId
+                SL:RequestRefuseTake(nil, other, function(code, data, msg)
+                    if code == 200 then
+                        SL:ShowSystemTips(msg)
+                    end
+                end)
+            end
+        end)
+    end
+    
 
     Mail.ShowDefaultMainPanel()
     SL:SetMetaValue("MAIL_CURRENT_ID", 0)
@@ -104,9 +109,6 @@ function Mail.ShowDefaultMainPanel()
     GUI:setVisible(Mail._btn_takeOut, false)
     GUI:setVisible(Mail._btn_delete, false)
     GUI:setVisible(Mail._ui["Text_item"], false)
-
-    GUI:setVisible(Mail._btn_sure, false)
-    GUI:setVisible(Mail._btn_refuse, false)
 end
 
 -- 刷新左边的邮件列表
@@ -291,12 +293,20 @@ function Mail.RefreshMainPanel()
         if mail.btRecvFlag == 0 then
             -- 附件未领取 不能删除
             if mail.btType == 9997 then
-                GUI:setVisible(Mail._btn_sure, true)
-                GUI:setVisible(Mail._btn_refuse, true)
+                if Mail._btn_sure then
+                    GUI:setVisible(Mail._btn_sure, true)
+                end
+                if Mail._btn_refuse then
+                    GUI:setVisible(Mail._btn_refuse, true)
+                end
             else
                 GUI:setVisible(Mail._btn_takeOut, true)
-                GUI:setVisible(Mail._btn_sure, false)
-                GUI:setVisible(Mail._btn_refuse, false)
+                if Mail._btn_sure then
+                    GUI:setVisible(Mail._btn_sure, false)
+                end
+                if Mail._btn_refuse then
+                    GUI:setVisible(Mail._btn_refuse, false)
+                end
             end
         elseif mail.btRecvFlag == 1 then
             GUI:setVisible(Mail._ui["rewardFlag_icon"], true)
