@@ -38,7 +38,7 @@ function PlayerBestRing_Look_TradingBank.CreateEquipItem(parent, data)
     local info = {}
 
     info.showModelEffect = true
-    info.from      = GUIDefine.ItemGoTo.BEST_RINGS
+    info.from      = GUIDefine.ItemFrom.BEST_RINGS
     info.itemData  = data
     info.index     = data.Index
     
@@ -69,7 +69,7 @@ function PlayerBestRing_Look_TradingBank.OnOpenItemTips(widget, pos)
     local data = {}
     data.itemData   = itemData
     data.pos        = GUI:getWorldPosition(widget)
-    data.from       = GUIDefine.ItemGoTo.BEST_RINGS
+    data.from       = GUIDefine.ItemFrom.BEST_RINGS
     data.lookPlayer = false
 
     UIOperator:OpenItemTips(data)

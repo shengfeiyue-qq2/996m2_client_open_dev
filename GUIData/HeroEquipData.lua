@@ -2,13 +2,13 @@ HeroEquipData = HeroEquipData or {}
 
 function HeroEquipData.Init()
     -- 装备MakeIndex maps
-    EquipData._equipMakeIndexDatas = {}
-
+    HeroEquipData._equipMakeIndexDatas = {}
+    
     -- 装备pos maps
-    EquipData._equipPosDatas = {}
+    HeroEquipData._equipPosDatas = {}
 
     -- 生肖盒子状态
-    EquipData._bestRingsOpen = false
+    HeroEquipData._bestRingsOpen = false
 end
 
 function HeroEquipData.ClearEquipData()

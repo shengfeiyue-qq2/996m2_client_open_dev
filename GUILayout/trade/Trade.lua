@@ -12,7 +12,7 @@ local TRADE_ITEM_PANEL_HEIGHT_WIN = 84
 local TRADE_ITEM_PANEL_WIDTH_WIN  = 210
 
 local isWinMode = SL:GetValue("IS_PC_OPER_MODE")
-local itemFrom  = GUIDefine.ItemGoTo
+local itemFrom  = GUIDefine.ItemFrom
 local itemGoTo  = GUIDefine.ItemGoTo
 
 Trade._isBeCancel = false

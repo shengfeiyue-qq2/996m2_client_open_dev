@@ -212,7 +212,6 @@ function GuildMember.RefreshMemberList(levelSort)
             end
         end
         
-        print(GuildMember._filterLevel)
         if GuildMember._filterLevel > 0 and a.Level ~= b.Level then
             if GuildMember._filterLevel == 1 then
                 return a.Level > b.Level

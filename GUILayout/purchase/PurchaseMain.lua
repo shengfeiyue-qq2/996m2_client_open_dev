@@ -135,7 +135,6 @@ end
 
 -- 打开子页签
 function PurchaseMain.OnOpenPage(file, data)
-    print(file, data)
 
     -- 设置父节点
     GUI:SetLayerOpenParam(PurchaseMain._ui["AttachLayout"])

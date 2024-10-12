@@ -127,7 +127,7 @@ function HeroBestRing.UpdateEquipLayer(data)
 
     local iconVisible = false
 
-    if GUIDefine.OprateType.ADD == optType then
+    if GUIDefine.OprateType.ADD == optType or GUIDefine.OprateType.CHANGE == optType then
         GUI:removeAllChildren(itemNode)
 
         local equipData = GUIFunction:GetEquipDataByMakeIndex(makeIndex, EDType)
@@ -136,13 +136,6 @@ function HeroBestRing.UpdateEquipLayer(data)
         GUI:removeAllChildren(itemNode)
 
         iconVisible = true
-    elseif GUIDefine.OprateType.CHANGE == optType then
-        local itemShow = GUI:getChildByTag(itemNode, makeIndex)
-        if GUI:Win_IsNull(itemShow) then
-            return false  
-        end
-        local equipData = GUIFunction:GetEquipDataByMakeIndex(makeIndex, EDType)
-        GUI:ItemShow_OnRunFunc(itemShow, "UpdateGoodsItem", equipData)
     end
 
     HeroBestRing.SetIconVisible(equipPanel, iconVisible)
@@ -211,13 +204,14 @@ end
 function HeroBestRing.CreateEquipItem(parent, data)
     local info = {}
     info.showModelEffect = true
-    info.from            = GUIDefine.ItemGoTo.BEST_RINGS
+    info.from            = GUIDefine.ItemFrom.BEST_RINGS
     info.itemData        = data
     info.index           = data.Index
     info.noMouseTips     = true     -- 此处不在注册鼠标经过事件
 
     local itemShow = GUI:ItemShow_Create(parent, "item", 0, 0, info)
     GUI:setAnchorPoint(itemShow, 0.5, 0.5)
+    GUI:setName(itemShow, data.MakeIndex)
 
     return itemShow
 end
@@ -252,7 +246,7 @@ function HeroBestRing.OnDoubleEvent(pos)
     end
 
     -- 卸下装备
-    SL:OnTakeOffEquip({itemData = itemData, pos = itemData.Where})
+    SL:RequestHeroTakeOffEquip({itemData = itemData, pos = itemData.Where})
 end
 
 function HeroBestRing.OnClickEvent(widget, pos)
@@ -279,7 +273,7 @@ function HeroBestRing.OnOpenItemTips(widget, pos)
     local data = {}
     data.itemData   = itemData
     data.pos        = GUI:getWorldPosition(widget)
-    data.from       = GUIDefine.ItemGoTo.BEST_RINGS
+    data.from       = GUIDefine.ItemFrom.BEST_RINGS
     data.lookPlayer = false
 
     UIOperator:OpenItemTips(data)
@@ -315,9 +309,9 @@ function HeroBestRing.InitEquipLayerEvent()
         local data = GUIFunction:GetEquipDataByPos(pos, nil, EDType)
         if data then
             HeroBestRing.CreateEquipItem(GUI:getChildByName(widget, "Node"), data)
-            InitPanel(widget, pos)
             iconVisible = false
         end
+        InitPanel(widget, pos)
         HeroBestRing.SetIconVisible(widget, iconVisible)
     end
 end

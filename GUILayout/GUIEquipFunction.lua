@@ -275,7 +275,7 @@ function GUIFunction:CheckEquipWeight(onItem, pos, type)
 
     local abilID = equipNeedSexConfig[onItem.StdMode] and GUIFunction:PShowAttType().Hand_Weight or GUIFunction:PShowAttType().Wear_Weight
 
-    local onItemWeight  = onItem.Weight
+    local onItemWeight  = onItem.Weight or 0
     local offItemWeight = offItem and offItem.Weight or 0
 
     local curWeight = 0

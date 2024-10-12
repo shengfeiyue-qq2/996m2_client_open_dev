@@ -2,9 +2,6 @@ MainProperty = {}
 
 MainProperty._path = "res/private/main-win32/"
 
--- 1024x768 默认聊天列表尺寸
-local DefaultChatListWidth = 608
-
 -- 斗转星移技能ID
 local DZXY_SkillID         = 118
 
@@ -169,6 +166,12 @@ function MainProperty.InitAdapet()
     local contentWidth = GUI:getContentSize(MainProperty._ui["Panel_chat"]).width
     if notAdapet then
         MainProperty._ChatItemWidth = GUI:getContentSize(MainProperty._ui["ListView_chat"]).width
+
+        local sizeW = PCShowSelectChannels and GUI:getContentSize(MainProperty._ui["Button_channel"]).width or 0
+        local TextField_input = MainProperty._ui["TextField_input"]
+        GUI:setPositionX(TextField_input, 14 + sizeW)
+        GUI:setContentSize(TextField_input, MainProperty._ChatItemWidth - sizeW, GUI:getContentSize(TextField_input).height)
+
         return
     end
     
@@ -196,8 +199,7 @@ function MainProperty.InitAdapet()
     GUI:setContentSize(Panel_chat_touch, contentWidth, GUI:getContentSize(Panel_chat_touch).height)
 
     local ListView_chat = MainProperty._ui["ListView_chat"]
-    local dValue = GUI:getContentSize(ListView_chat).width - DefaultChatListWidth
-    local chatListWid = contentWidth - 28 + dValue
+    local chatListWid = contentWidth - 28
     GUI:setPositionX(ListView_chat, contentWidth / 2)
     GUI:setContentSize(ListView_chat, chatListWid, GUI:getContentSize(ListView_chat).height)
 
@@ -207,7 +209,7 @@ function MainProperty.InitAdapet()
 
     local sizeW = PCShowSelectChannels and GUI:getContentSize(MainProperty._ui["Button_channel"]).width or 0
     local TextField_input = MainProperty._ui["TextField_input"]
-    GUI:setPositionX(TextField_input, 14 + sizeW - dValue/2)
+    GUI:setPositionX(TextField_input, 14 + sizeW)
     GUI:setContentSize(TextField_input, chatListWid - sizeW, GUI:getContentSize(TextField_input).height)
 
     GUI:setPositionX(MainProperty._ui["Panel_exit_funcs"], contentWidth - 8)
@@ -295,22 +297,35 @@ function MainProperty.InitAutoShout()
     local isAutoShout = ChatData.GetAutoShoutSwitch()
 
     -- 自动喊话开关
+    local function sendAutoShoutMsg(input, channel)
+        if not channel or not GUIFunction:CheckAbleToSayByChannel(channel) then
+            return
+        end
+
+        local sendData = {textType = GUIDefine.ChatTextType.NORMAL, msg = input, channel = channel, risk = 0, oriMsg = input, status = 0}
+        GUIFunction:SendChatMsg(sendData)
+    end
+
     local autoShoutCallback = function(shoutInput)
         GUI:stopActionByTag(btnAutoShout, 888)
 
-        if not shoutInput or shoutInput == "" or not isAutoShout then
+        if not shoutInput or shoutInput == "" then
+            return false
+        end
+
+        if not ChatData.GetAutoShoutSwitch() then
             return false
         end
 
         local action = SL:schedule(btnAutoShout, function()
-            -- 发送 PC端根据消息内容决定频道
-            MainProperty.SendChatMsg(shoutInput, CHANNEL.SHOUT)
+            -- 发送
+            sendAutoShoutMsg(shoutInput, CHANNEL.SHOUT)
         end, ChatData.GetAutoShoutDelay())
 
         GUI:setTag(action, 888)
     end
 
-    local picPath = string.format("%smain-win32/%s", MainProperty._path, isAutoShout and "190001112.png" or "190001113.png") 
+    local picPath = string.format("%s/%s", MainProperty._path, isAutoShout and "190001112.png" or "190001113.png") 
     GUI:Button_loadTextureNormal(btnAutoShout, picPath)
     GUI:Button_loadTexturePressed(btnAutoShout, picPath)
 
@@ -319,33 +334,54 @@ function MainProperty.InitAutoShout()
         autoShoutCallback(shoutInput)
     end
 
-    GUI:addOnClickEvent(btnAutoShout, function(sender)
-        ChatData.SetAutoShoutSwitch(not isAutoShout)
-
-        isAutoShout = not isAutoShout
-        local picPath = string.format("%smain-win32/%s", MainProperty._path, isAutoShout and "190001112.png" or "190001113.png") 
-        GUI:Button_loadTextureNormal(sender, picPath)
-        GUI:Button_loadTexturePressed(sender, picPath)
-
-        --记录自动喊话内容
-        local msg = GUI:Text_getString(MainProperty._ui["TextField_input"])
-        ChatData.SetLocalChatDataByChannel(CHANNEL.SHOUT, msg or "")
-        autoShoutCallback(msg)
-
-        -- 发送提示
-        local data = {}
-        data.ChannelId = CHANNEL.System
-        data.Msg = isAutoShout and "启动了自动喊话功能，聊天框中内容已记录为喊话内容" or "关闭了自动喊话功能"
-        SL:onLUAEvent(LUA_EVENT_CHAT_MSG_ADD, data)
-
-        SL:PlayBtnClickAudio()
-
-        if isAutoShout then
-            if msg == "" then
+    local function checkInputContent(inputStr)
+        local channel = CHANNEL.Shout
+        SL:RequestCheckSensitiveWord(inputStr, 2, function(state, str, risk_param, ex_param) 
+            -- 检测，不通过
+            if not state then
+                SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
                 return
             end
-            MainProperty.SendChatMsg(msg, CHANNEL.SHOUT)
-        end
+
+            if risk_param and risk_param ~= 0 then
+                SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
+                return
+            end
+
+            if ex_param then
+                if ex_param.status and ex_param.status ~= 0 then
+                    SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
+                    return
+                end
+            end
+
+            ChatData.SetAutoShoutSwitch(not ChatData.GetAutoShoutSwitch())
+
+            -- 记录自动喊话内容
+            ChatData.SetLocalChatDataByChannel(channel, inputStr or "")
+            autoShoutCallback(inputStr)
+
+            -- 发送提示
+            local isOpen = ChatData.GetAutoShoutSwitch()
+            local msg = isOpen and "启动了自动喊话功能，聊天框中内容已记录为喊话内容" or "关闭了自动喊话功能"
+            SL:ShowSystemChat(msg, 0, 255)
+            SL:PlayBtnClickAudio()
+
+            local picPath = string.format("%s/%s", MainProperty._path, isOpen and "190001112.png" or "190001113.png") 
+            GUI:Button_loadTextureNormal(btnAutoShout, picPath)
+            GUI:Button_loadTexturePressed(btnAutoShout, picPath)
+            if isOpen then
+                if inputStr == "" then
+                    return
+                end
+                sendAutoShoutMsg(inputStr, CHANNEL.SHOUT)
+            end
+        end, {channel_id = channel})
+    end
+
+    GUI:addOnClickEvent(btnAutoShout, function(sender)
+        local input = GUI:Text_getString(MainProperty._ui["TextField_input"])
+        checkInputContent(input)
     end)
 end
 
@@ -409,7 +445,7 @@ function MainProperty.InitActPanel()
     -- 角色
     GUI:addOnClickEvent(MainProperty._ui["Button_role"], function()
         local isOpen = (PlayerFrame and PlayerFrame.IsReOpen) and PlayerFrame:IsReOpen(UIConst.LayerTable.PlayerEquip)
-        if isOpen then
+        if isOpen and GUI:GetWindow(nil, UIConst.LAYERID.PlayerMainGUI) then
             UIOperator:CloseMyPlayerUI()
         else
             UIOperator:OpenMyPlayerUI({page = UIConst.LayerTable.PlayerEquip}) 
@@ -432,7 +468,7 @@ function MainProperty.InitActPanel()
     -- 技能
     GUI:addOnClickEvent(MainProperty._ui["Button_skill"], function()
         local isOpen = (PlayerFrame and PlayerFrame.IsReOpen) and PlayerFrame:IsReOpen(UIConst.LayerTable.PlayerSkill)
-        if isOpen then
+        if isOpen and GUI:GetWindow(nil, UIConst.LAYERID.PlayerMainGUI) then
             UIOperator:CloseMyPlayerUI()
         else
             UIOperator:OpenMyPlayerUI({page = UIConst.LayerTable.PlayerSkill}) 
@@ -868,14 +904,17 @@ function MainProperty.SendChatMsg(msg, channelID)
         return SL:ShowSystemTips("您还未输入任何信息！")
     end
 
-    local function toSendMsg(input, risk_param)
+    local function toSendMsg(input, risk_param, ext_param)
         -- 存储到输入缓存
         ChatData.AddInputCache(input)
         MainProperty._inputCache = SL:CopyData(ChatData.GetInputCache())
         MainProperty._inputIndex = #MainProperty._inputCache + 1
 
         -- 发送 PC端根据消息内容决定频道
-        local sendData  = {textType = GUIDefine.ChatTextType.NORMAL, msg = input, channel = channelID, risk = risk_param}
+        local oriMsg = ext_param and ext_param.originStr
+        local sensitiveWords = ext_param and ext_param.replacedWords
+        local status = ext_param and ext_param.status
+        local sendData  = {textType = GUIDefine.ChatTextType.NORMAL, msg = input, channel = channelID, risk = risk_param, oriMsg = oriMsg, sensitiveWords = sensitiveWords, status = status}
         GUIFunction:SendChatMsg(sendData)
     end
 
@@ -895,7 +934,7 @@ function MainProperty.SendChatMsg(msg, channelID)
             return false
         end
 
-        local function handle_Func(state, str, risk_param)
+        local function handle_Func(state, str, risk_param, ext_param)
             if not str then
                 return SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
             end
@@ -906,7 +945,7 @@ function MainProperty.SendChatMsg(msg, channelID)
                 str = string.format("/%s %s", targetName, str)
             end
 
-            toSendMsg(str, risk_param)
+            toSendMsg(str, risk_param, ext_param)
         end
 
         local data = {channel_id = channel}
@@ -2077,6 +2116,7 @@ end
 
 ---------------------------- 窗体尺寸改变 ----------------------------------------------------
 function MainProperty.OnWindowChange()
+    MainProperty.InitAdapet()
     GUI:setPositionX(MainProperty._root, SL:GetValue("SCREEN_WIDTH") / 2)
 end
 ---------------------------------------------------------------------------------------------

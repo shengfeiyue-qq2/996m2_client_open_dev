@@ -891,7 +891,7 @@ function MainProperty.OnChatAutoShout(data)
         if not channel or not GUIFunction:CheckAbleToSayByChannel(channel) then
             return false
         end
-        local sendData = {textType = GUIDefine.ChatTextType.NORMAL, msg = input, channel = channel}
+        local sendData = {textType = GUIDefine.ChatTextType.NORMAL, msg = input, channel = channel, risk = 0, oriMsg = input, status = 0}
         GUIFunction:SendChatMsg(sendData)
     end
 
@@ -911,6 +911,8 @@ function MainProperty.OnChatAutoShout(data)
             sendChatMsg(shoutInput, GUIDefine.ChatChannel.SHOUT)
         end, delay)
         GUI:setTag(action, 888)
+        --
+        sendChatMsg(shoutInput, GUIDefine.ChatChannel.SHOUT)
     end
     autoShoutCallback(shoutInput)
 end

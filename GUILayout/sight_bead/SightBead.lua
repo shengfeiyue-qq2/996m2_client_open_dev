@@ -68,9 +68,13 @@ function SightBead.RegisterTouch( is_register )
         else
             visibleSize = { width=0, height=0 }
         end
-        GUI:setContentSize(SightBead.panel, visibleSize.width, visibleSize.height)
+        if SightBead.panel then
+            GUI:setContentSize(SightBead.panel, visibleSize.width, visibleSize.height)
+        end
     else
-        GUI:setContentSize(SightBead.panel, 0, 0)
+        if SightBead.panel then
+            GUI:setContentSize(SightBead.panel, 0, 0)
+        end
     end
 end
 

@@ -177,7 +177,7 @@ function MainSkill.OnAddSkill(data)
 
     -- 已存在
     if MainSkill._skillCells[skillID] then
-        print("MAIN SKILL ADD ERROR: EXIST SKILL. ID: " .. skillID)
+        SL:Print("MAIN SKILL ADD ERROR: EXIST SKILL. ID: " .. skillID)
         return false
     end
 
@@ -264,15 +264,18 @@ function MainSkill.OnSkillCDChange(data)
     end
 
     local progressCD = cell["progressCD"]
-
-    local percent = data.percent
-
-    GUI:setVisible(progressCD, percent ~= 0)
-    GUI:ProgressTimer_setPercentage(progressCD, percent)
+    if progressCD then
+        local percent = data.percent
+        GUI:setVisible(progressCD, percent ~= 0)
+        GUI:ProgressTimer_setPercentage(progressCD, percent)
+    end
 
     -- 倒计时
-    local time = data.percent ~= 0 and string.format("%.1f", data.time) or ""
-    GUI:Text_setString(cell["CDTime"], time)
+    local CDTime = cell["CDTime"]
+    if CDTime then
+        local time = data.percent ~= 0 and string.format("%.1f", data.time) or ""
+        GUI:Text_setString(CDTime, time)
+    end
 end
 
 function MainSkill.OnComboSkillCDChange()
@@ -334,7 +337,6 @@ function MainSkill.OnClickSkillEvent(skillID)
                 GUI:removeAllChildren(cell["Node_select"])
             end
             SL:SetValue("SELECT_SKILL", nil)
-            print(skillID, lastSkill)
             if skillID == lastSkill then
                 return false
             end

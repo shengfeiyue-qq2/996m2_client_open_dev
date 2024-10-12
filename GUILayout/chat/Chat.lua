@@ -281,13 +281,16 @@ function Chat.InitInput()
             return
         end
 
-        local function sendChatMsg(input, risk_param)
+        local function sendChatMsg(input, risk_param, ext_param)
             -- 存储到输入缓存
             ChatData.AddInputCache(input)
             ChatInfo._inputCache = SL:CopyData(ChatData.GetInputCache())
 
             -- 发送
-            local sendData = {textType = GUIDefine.ChatTextType.NORMAL, msg = input, channel = ChatData.GetCurChannel(), risk = risk_param}
+            local oriMsg = ext_param and ext_param.originStr
+            local sensitiveWords = ext_param and ext_param.replacedWords
+            local status = ext_param and ext_param.status
+            local sendData = {textType = GUIDefine.ChatTextType.NORMAL, msg = input, channel = ChatData.GetCurChannel(), risk = risk_param, oriMsg = oriMsg, sensitiveWords = sensitiveWords, status = status}
             GUIFunction:SendChatMsg(sendData)
         end
 
@@ -307,7 +310,7 @@ function Chat.InitInput()
                 return
             end
 
-            local function handleFunc(_, str, risk_param)
+            local function handleFunc(_, str, risk_param, ext_param)
                 if not str then
                     SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
                     return
@@ -319,7 +322,7 @@ function Chat.InitInput()
                     str = string.format("/%s %s", targetName, str)
                 end
 
-                sendChatMsg(str, risk_param)
+                sendChatMsg(str, risk_param, ext_param)
             end
 
             local data = {}
@@ -353,33 +356,48 @@ function Chat.InitInput()
             GUI:setVisible(selectPanel, isOpen)
         end
 
-        local isAutoShout = ChatData.GetAutoShoutSwitch()
-        GUI:addOnClickEvent(ChatInfo._ui.Layout_check_auto_shout, function()
+        local function checkInputContent(inputStr)
             local channel = Chat._CHANNEL.SHOUT
-            ChatData.SetAutoShoutSwitch(not ChatData.GetAutoShoutSwitch())
-
-            --记录自动喊话内容
-            local input = ChatInfo._ui.TextField_input:getString()
-            ChatData.SetLocalChatDataByChannel(channel, input or "")
-
-            -- 发送提示
-            local isOpen = ChatData.GetAutoShoutSwitch()
-            local msg = ""
-            if isOpen then
-                msg = "启动了自动喊话功能，聊天框中内容已记录为喊话内容"
-            else
-                msg = "关闭了自动喊话功能"
-            end
-            SL:ShowSystemChat(msg, 0, 255)
-            SL:PlayBtnClickAudio()
-            SL:onLUAEvent(LUA_EVENT_CHAT_MOBILE_AUTO_SHOUT)
-
-            changeAutoShoutButton()
-            if isOpen then
-                if input == "" then
+            SL:RequestCheckSensitiveWord(inputStr, 2, function(state, str, risk_param, ex_param) 
+                -- 检测，不通过
+                if not state then
+                    SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
                     return
                 end
-            end
+    
+                if risk_param and risk_param ~= 0 then
+                    SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
+                    return
+                end
+
+                if ex_param then
+                    if ex_param.status and ex_param.status ~= 0 then
+                        SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
+                        return
+                    end
+                end
+
+                ChatData.SetAutoShoutSwitch(not ChatData.GetAutoShoutSwitch())
+
+                -- 记录自动喊话内容
+                ChatData.SetLocalChatDataByChannel(channel, inputStr or "")
+
+                -- 发送提示
+                local isOpen = ChatData.GetAutoShoutSwitch()
+                local msg = isOpen and "启动了自动喊话功能，聊天框中内容已记录为喊话内容" or "关闭了自动喊话功能"
+                SL:ShowSystemChat(msg, 0, 255)
+                SL:PlayBtnClickAudio()
+                SL:onLUAEvent(LUA_EVENT_CHAT_MOBILE_AUTO_SHOUT)
+
+                changeAutoShoutButton()
+
+            end, {channel_id = channel})
+        end
+
+        local isAutoShout = ChatData.GetAutoShoutSwitch()
+        GUI:addOnClickEvent(ChatInfo._ui.Layout_check_auto_shout, function()
+            local input = ChatInfo._ui.TextField_input:getString()
+            checkInputContent(input)
         end)
 
         changeAutoShoutButton()

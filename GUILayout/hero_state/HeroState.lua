@@ -383,13 +383,6 @@ function HeroState.Hero_Die(isDie)
     end
 end
 
--- 召唤按钮显示与否
-function HeroState.HeroBtnShowOrHide(isshow)
-    if SL:GetValue("USEHERO") then
-        GUI:setVisible(HeroState._heroBtn, isshow)
-    end
-end
-
 function HeroState.OnAssistHideStatusChange(data)
     local isOpen = (tonumber(SL:GetValue("GAME_DATA", "HeroStateHideWithAssist")) or 0) == 1
     if not isOpen then
@@ -506,11 +499,20 @@ end
 
 -- 按钮是否显示
 function HeroState.OnHeroBtnShowOrHide()
+    if IS_PC_OPER_MODE then
+        return false
+    end
+
     -- 是否开启英雄
     if not SL:GetValue("USEHERO")  then
         return false
     end
+    
     GUI:setVisible(HeroState._heroBtn, SL:GetValue("HERO_IS_ACTIVE"))
+end
+
+function HeroState.OnWindowChange()
+    GUI:setPositionY(HeroState._panel, SL:GetValue("SCREEN_HEIGHT") - 26)
 end
 
 function HeroState.RegisterEvent()    
@@ -532,6 +534,8 @@ function HeroState.RegisterEvent()
 
     SL:RegisterLUAEvent(LUA_EVENT_HERO_LEVEL_CHANGE,             "HeroState", HeroState.OnUpdateLevel)
     SL:RegisterLUAEvent(LUA_EVENT_HERO_CALL_BUTTON_SHOW,        "HeroState", HeroState.OnHeroBtnShowOrHide)
+
+    SL:RegisterLUAEvent(LUA_EVENT_WINDOW_CHANGE,                "HeroState", HeroState.OnWindowChange)
 end
 
 HeroState.main()

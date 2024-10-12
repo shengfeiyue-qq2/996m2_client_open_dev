@@ -219,6 +219,7 @@ UIConst.LUAFile =
 
     
     LUA_FILE_MINIMAP                            = "main/MiniMap",                                                           -- 小地图
+    LUA_FILE_MINIMAP_OTHER                      = "main/MiniMap_Other",                                                     -- 其他小地图 (非当前地图)
 
     LUA_FILE_UIMODEL                            = "GUILayout/UIModel",                                                      -- 内观模型
     LUA_FILE_BESTRONG_UP                        = "GUILayout/BeStrongUp",                                                   -- 变强按钮
@@ -254,6 +255,7 @@ UIConst.LAYERID =
     SightBeadGUI                = "SightBeadGUI",                   -- 准星
     RightTouchEventGUI          = "RightTouchEventGUI",
     MiniMapGUI                  = "MiniMapGUI",                     -- 小地图
+    MiniMapOtherGUI             = "MiniMapOtherGUI",                -- 其他小地图 (非当前地图)
     GoldBoxGUI                  = "GoldBoxGUI",                     -- 宝箱打开页面
     TreasureBoxGUI              = "TreasureBoxGUI",                 -- 宝箱
     LoginRoleGUI                = "LoginRoleGUI",                   -- 登录 选角

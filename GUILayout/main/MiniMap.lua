@@ -47,6 +47,7 @@ function MiniMap.main()
     MiniMap.InitPortals()
     MiniMap.InitTeamMember()
     MiniMap.InitMonsters()
+    MiniMap.InitMapLinks()
 
     MiniMap.BlinkPlayer()
 end
@@ -81,6 +82,7 @@ function MiniMap.InitMiniMap()
     MiniMap._nodeMonster   = GUI:Node_Create(MiniMap._panelMiniMap, "Node_monster_", 0.00, 0.00)
     MiniMap._nodeTeam      = GUI:Node_Create(MiniMap._panelMiniMap, "Node_team_", 0.00, 0.00)
     MiniMap._nodePortal    = GUI:Node_Create(MiniMap._panelMiniMap, "Node_portals_", 0.00, 0.00)
+    MiniMap._nodeLinks     = GUI:Node_Create(MiniMap._panelMiniMap, "Node_links_", 0.00, 0.00)
 
     MiniMap.loadSizeData()
 
@@ -429,16 +431,16 @@ end
 function MiniMap.UpdateMonsters()
     GUI:removeAllChildren(MiniMap._nodeMonster)
     local monsters = SL:GetValue("MINIMAP_MONSTERS")
-    for i, v in pairs(monsters) do
+    for i, v in ipairs(monsters) do
         local mapX = tonumber(v.x) or 1
         local mapY = tonumber(v.y) or 1
         local nodePos = MiniMap.CalcMiniMapPos({x = mapX, y = mapY})
         if nodePos then 
-            local node = GUI:Node_Create(MiniMap._nodeMonster, "node_monster"..i, nodePos.x, nodePos.y)
+            local node = GUI:Node_Create(MiniMap._nodeMonster, "node_monster" .. i, nodePos.x, nodePos.y)
 
             -- 显示
             local path = (v.time and v.time > 0) and "icon_xdtzy_10_6.png" or "icon_xdtzy_10_1.png"
-            local icon = GUI:Image_Create(node, "icon", 0, 0, "res/private/minimap/"..path)
+            local icon = GUI:Image_Create(node, "icon", 0, 0, "res/private/minimap/" .. path)
             GUI:setAnchorPoint(icon, 0.5, 0.5)
             GUI:setScale(icon, 0.7)
 
@@ -467,12 +469,12 @@ function MiniMap.UpdateMonsters()
                 local suffix = (remaining and remaining > 0) and SL:TimeFormatToStr(remaining) or ""
                 GUI:Text_setString(textTime, suffix)
                 if suffix and string.len( suffix ) > 0 then
-                    GUI:setPosition(textName ,0, 36)
-                    GUI:setPosition(nameBG ,0, 36)
-                    GUI:setPosition(textTime ,0, 20)
+                    GUI:setPosition(textName, 0, 36)
+                    GUI:setPosition(nameBG, 0, 36)
+                    GUI:setPosition(textTime, 0, 20)
                 else
-                    GUI:setPosition(textName ,0, 20)
-                    GUI:setPosition(nameBG ,0, 20)
+                    GUI:setPosition(textName, 0, 20)
+                    GUI:setPosition(nameBG, 0, 20)
                 end
             end
             SL:schedule(textTime, callback, 1)
@@ -536,7 +538,7 @@ function MiniMap.InitPortals()
         local mapY = tonumber(v.Y) or 1
         local nodePos = MiniMap.CalcMiniMapPos({x = mapX, y = mapY})
         local bShow = true 
-        local showName = string.gsub(v.sShowName, "%s+", "") 
+        local showName = string.gsub(v.sShowName or "", "%s+", "") 
         if string.len(showName) == 0 then 
             bShow = false 
         end 
@@ -555,7 +557,7 @@ function MiniMap.InitPortals()
             GUI:setAnchorPoint(nameBG, 0.5, 0.5)
 
             -- name
-            local textName = GUI:Text_Create(node, "textName", 0, 12, 14, "#ffffff", v.sShowName or "")
+            local textName = GUI:Text_Create(node, "textName", 0, 12, 14, "#ffffff", showName)
             local portalColor = v.nColor or "#ffffff"
             if v.nColor and tonumber(v.nColor) then
                 portalColor = SL:GetHexColorByStyleId(tonumber(v.nColor)) 
@@ -596,6 +598,60 @@ function MiniMap.InitPortals()
                     GUI:addOnClickEvent(textName, moveTo)
                 end
             end
+
+            local zOrder = MiniMap._miniMapHei - nodePos.y
+            GUI:setLocalZOrder(node, zOrder)
+        end 
+    end
+end
+
+-- 展示地图连接点
+function MiniMap.InitMapLinks()
+    GUI:removeAllChildren(MiniMap._nodeLinks)
+    local linkPoints = SL:GetMetaValue("MAP_LINKS_BY_ID", SL:GetValue("MAP_ID"))
+    if not linkPoints or not next(linkPoints) then
+        return
+    end
+    for i, v in ipairs(linkPoints) do
+        local mapX = tonumber(v.mapX) or 1
+        local mapY = tonumber(v.mapY) or 1
+        local nodePos = MiniMap.CalcMiniMapPos({x = mapX, y = mapY})
+        local bShow = true 
+        local showName = v.showName
+        local showBg = v.showBg
+        if not showName or string.len(showName) == 0 then 
+            bShow = false 
+        end
+        if not showBg or string.len(showBg) == 0 then 
+            bShow = false 
+        end
+
+        local function autoMove()
+            -- 自动寻路
+            local mapID = SL:GetValue("MAP_ID") 
+            local posX = mapX
+            local posY = mapY
+            SL:SetValue("BATTLE_MOVE_BEGIN", mapID, posX, posY)
+        end
+        if nodePos and bShow then 
+            local node = GUI:Node_Create(MiniMap._nodeLinks, "node_link_" .. i, nodePos.x, nodePos.y)
+    
+            -- bg
+            local nameBG = GUI:Image_Create(node, "nameBG", 0, 0, "res/private/minimap/" .. v.showBg)
+            GUI:setIgnoreContentAdaptWithSize(nameBG, false)
+            GUI:setAnchorPoint(nameBG, 0.5, 0.5)
+
+            -- name
+            local textName = GUI:Text_Create(node, "textName", 0, 0, 14, "#ffffff", showName)
+            GUI:Text_setTextColor(textName, SL:GetHexColorByStyleId(v.colorID or 255))
+            GUI:Text_enableOutline(textName, "#000000", 1)
+            GUI:setAnchorPoint(textName, 0.5, 0.5)
+
+            GUI:setTouchEnabled(nameBG, true)
+            GUI:addOnClickEvent(nameBG, autoMove)
+
+            GUI:setTouchEnabled(textName, true)
+            GUI:addOnClickEvent(textName, autoMove)
 
             local zOrder = MiniMap._miniMapHei - nodePos.y
             GUI:setLocalZOrder(node, zOrder)

@@ -4,7 +4,7 @@ local __GD_PowerDir = SL:GetValue("GAME_DATA", "itemPowerTagDir") or 0
 local __GD_ItemLock = SL:GetValue("GAME_DATA", "ItemLock") or 1
 local __GD_ShowRedMask = SL:GetValue("GAME_DATA", "show_equip_mask") or 0
 
-local ItemFrom  = GUIDefine.ItemGoTo
+local ItemFrom  = GUIDefine.ItemFrom
 local ItemType  = SL:GetValue("ITEMTYPE_ENUM")
 local ItemScale = SL:GetValue("ITEM_SCALE")
 local IsPc = SL:GetValue("IS_PC_OPER_MODE")

@@ -28,9 +28,7 @@ function MainMiniMap.main()
         return false
     end
 
-    local screenW = SL:GetValue("SCREEN_WIDTH")
-    local screenH = SL:GetValue("SCREEN_HEIGHT")
-    GUI:setPosition(MainMiniMap._root, screenW, screenH)
+    GUI:setPosition(MainMiniMap._root, SL:GetValue("SCREEN_WIDTH"), SL:GetValue("SCREEN_HEIGHT"))
 
     -- Panel_minimap
     local Panel_minimap = MainMiniMap._ui["Panel_minimap"]
@@ -232,6 +230,8 @@ function MainMiniMap.RegisterEvent()
 
     -- 释放内存
     SL:RegisterLUAEvent(LUA_EVENT_GAME_MEMORY_RELEASE, "MainMiniMap", MainMiniMap.OnReleaseMemory)
+
+    SL:RegisterLUAEvent(LUA_EVENT_WINDOW_CHANGE,       "MainMiniMap", MainMiniMap.OnWindowChange)
 end
 
 function MainMiniMap.UpdateMapState()
@@ -336,6 +336,11 @@ function MainMiniMap.UpdateMiniMap()
         GUI:setContentSize(MainMiniMap._Image_minimap, MainMiniMap._limitSize)
     end
     MainMiniMap._minimapSize = GUI:getContentSize(MainMiniMap._Image_minimap)
+
+    if MainMiniMap._minimapSize.width < MainMiniMap._mapSizes[1].width then
+        GUI:setContentSize(MainMiniMap._Image_minimap, MainMiniMap._mapSizes[1].width, MainMiniMap._mapSizes[1].height)
+        MainMiniMap._minimapSize = GUI:getContentSize(MainMiniMap._Image_minimap)
+    end
 end
 
 function MainMiniMap.UpdateMiniMapPos()
@@ -452,6 +457,10 @@ function MainMiniMap.OnReleaseMemory()
         GUI:autoDecRef(cell)
     end
     MainMiniMap._pointCache = {}
+end
+
+function MainMiniMap.OnWindowChange()
+    GUI:setPosition(MainMiniMap._root, SL:GetValue("SCREEN_WIDTH"), SL:GetValue("SCREEN_HEIGHT"))
 end
 
 ------------------------------------------------------------------------

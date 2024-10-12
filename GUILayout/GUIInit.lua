@@ -1003,7 +1003,7 @@ SL:RegisterLUAEvent(LUA_EVENT_ENTER_WORLD, "GUIInit_KeyBoard", function()
     -- F10 角色技能页
     local function pressedCB()
         local isOpen = (PlayerFrame and PlayerFrame.IsReOpen) and PlayerFrame:IsReOpen(UIConst.LayerTable.PlayerEquip)
-        if isOpen then
+        if isOpen and GUI:GetWindow(nil, UIConst.LAYERID.PlayerMainGUI) then
             UIOperator:CloseMyPlayerUI()
         else
             UIOperator:OpenMyPlayerUI({page = UIConst.LayerTable.PlayerEquip}) 
@@ -1014,7 +1014,7 @@ SL:RegisterLUAEvent(LUA_EVENT_ENTER_WORLD, "GUIInit_KeyBoard", function()
     -- F11 角色技能页
     local function pressedCB()
         local isOpen = (PlayerFrame and PlayerFrame.IsReOpen) and PlayerFrame:IsReOpen(UIConst.LayerTable.PlayerSkill)
-        if isOpen then
+        if isOpen and GUI:GetWindow(nil, UIConst.LAYERID.PlayerMainGUI) then
             UIOperator:CloseMyPlayerUI()
         else
             UIOperator:OpenMyPlayerUI({page = UIConst.LayerTable.PlayerSkill}) 
@@ -1069,8 +1069,15 @@ SL:RegisterLUAEvent(LUA_EVENT_ENTER_WORLD, "GUIInit_KeyBoard", function()
     end
     local codeKeys = {"KEY_CTRL", "KEY_B"}
     GUI:addKeyboardEvent(codeKeys, pressedCB)
+
+    -- ALT+R 刷新背包
+    local function pressedCB()
+        SL:onLUAEvent(LUA_EVENT_RESET_BAG_POS)
+    end
+    local codeKeys = {"KEY_ALT", "KEY_R"}
+    GUI:addKeyboardEvent(codeKeys, pressedCB)
     
-    -- ALT-X 返回角色
+    -- ALT+X 返回角色
     local function pressedCB()
         local function callback(bType)
             if bType == 1 then

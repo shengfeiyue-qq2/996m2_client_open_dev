@@ -68,6 +68,14 @@ function MainTarget.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_ACTOR_OWNER_CHANGE,     "MainTarget", MainTarget.OnActorOwnerChange)
     -- 目标血量变化
     SL:RegisterLUAEvent(LUA_EVENT_ACTOR_HP_REFRESH,       "MainTarget", MainTarget.OnRefreshActorHP)
+    
+    SL:RegisterLUAEvent(LUA_EVENT_WINDOW_CHANGE,           "MainTarget", MainTarget.OnWindowChange)
+end
+
+function MainTarget.OnWindowChange()
+    local screenH = SL:GetValue("SCREEN_HEIGHT")
+    local y = MainTarget._isPC and screenH - 190 or screenH - 225
+    GUI:setPositionY(MainTarget._root, y)
 end
 
 -- 点击查看菜单

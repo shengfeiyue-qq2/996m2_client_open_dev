@@ -86,14 +86,14 @@ function AuctionWorld.main()
             if innerPos.y == 0 then
                 if false == SL:GetValue("AUCTION_IS_COMPLETE") and status then
                     status = false
-                    performWithDelay(AuctionWorld._ui.ListView_items, function()
+                    SL:scheduleOnce(AuctionWorld._ui.ListView_items, function()
                         status = true
                     end, 0.5)
 
                     if realHei < contentSize.height then
                         return
                     end
-                    performWithDelay(AuctionWorld._ui.ListView_items, function()
+                    SL:scheduleOnce(AuctionWorld._ui.ListView_items, function()
                         AuctionWorld.PullItemList()
                     end, 0.01)
                 end

@@ -19,8 +19,7 @@ function MainCollect.main()
         return false
     end
 
-    local screenW = SL:GetValue("SCREEN_WIDTH")
-    GUI:setPositionX(MainCollect._root, screenW / 2, 200)
+    GUI:setPosition(MainCollect._root, SL:GetValue("SCREEN_WIDTH") / 2, 200)
 
     -- 采集列表底图
     MainCollect._listBg = MainCollect._ui["Layout_BG"]
@@ -40,6 +39,12 @@ function MainCollect.main()
     SL:RegisterLUAEvent(LUA_EVENT_COLLECT_VISIBLE, "MainCollect", MainCollect.OnCollectVisible)
     SL:RegisterLUAEvent(LUA_EVENT_COLLECT_BEGIN, "MainCollect", MainCollect.OnCollectBegin)
     SL:RegisterLUAEvent(LUA_EVENT_COLLECT_COMPLETED, "MainCollect", MainCollect.OnCollectCompleted)
+
+    SL:RegisterLUAEvent(LUA_EVENT_WINDOW_CHANGE, "MainCollect", MainCollect.OnWindowChange)
+end
+
+function MainCollect.OnWindowChange()
+    GUI:setPosition(MainCollect._root, SL:GetValue("SCREEN_WIDTH") / 2, 200)
 end
 
 -- 查找采集物

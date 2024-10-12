@@ -2398,6 +2398,12 @@ function GUIFunction:HandleLimitChatMsg(data)
             data.Msg = SL:GetUTF8SubString(data.Msg, 1, GUIDefine.ChatConfig.MSG_LIMIT_COUNT)
         end
     end
+
+    if data and type(data.oriMsg) == "string" then
+        if data and string.utf8len(data.oriMsg or "") > GUIDefine.ChatConfig.MSG_LIMIT_COUNT then
+            data.oriMsg = SL:GetUTF8SubString(data.Msg, 1, GUIDefine.ChatConfig.MSG_LIMIT_COUNT)
+        end
+    end
     return data
 end
 
@@ -2561,6 +2567,12 @@ function GUIFunction:SendChatMsg(data)
 
     -- 风险等级
     item.risk = data.risk
+    -- 原始文本
+    item.oriMsg = data.oriMsg
+    -- 匹配到的敏感词
+    item.sensitiveWords = data.sensitiveWords
+    -- 敏感词状态 0: 无标记 1: 被隐藏 2: 静默 3: 静默+被隐藏  
+    item.status = data.status
 
     -- send...
     item = GUIFunction:HandleLimitChatMsg(item)

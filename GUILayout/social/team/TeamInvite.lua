@@ -143,7 +143,6 @@ function TeamInvite.RefreshContent()
     local ListView = TeamInvite._ui.ListView
     GUI:ListView_removeAllItems(ListView)
     for _, member in pairs(members) do
-        print(SL:GetValue("TEAM_IS_MEMBER", member.uid))
         if not SL:GetValue("TEAM_IS_MEMBER", member.uid) then
             local cell = TeamInvite.CreateMemberCell()
             GUI:ListView_pushBackCustomItem(ListView, cell)

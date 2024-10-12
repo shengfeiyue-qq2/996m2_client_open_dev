@@ -993,6 +993,16 @@ function UIOperator:CloseMiniMap()
     GUI:Win_CloseByID(UIConst.LAYERID.MiniMapGUI)
 end
 
+-- 打开其他小地图
+function UIOperator:OpenOtherMiniMap(data)
+    GUI:SetLayerOpenParam(data)
+    GUI:Win_Open(UIConst.LUAFile.LUA_FILE_MINIMAP_OTHER)
+end
+
+function UIOperator:CloseOtherMiniMap()
+    GUI:Win_CloseByID(UIConst.LAYERID.MiniMapOtherGUI)
+end
+
 -- 打开世界公告
 function UIOperator:OpenGameWorld()
     GUI:Win_Open(UIConst.LUAFile.LUA_FILE_GAME_WORLD_CONFIRM)

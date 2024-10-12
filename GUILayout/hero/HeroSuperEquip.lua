@@ -205,17 +205,17 @@ function HeroSuperEquip.UpdateEquipStateChange(state, pos)
     -- 是否刷新内观和装备框
     local isShowAll = HeroSuperEquip.IsShowAll(pos)
     if isShowAll then
-        onRefEquipNaikan(pos, state)
-        onRefEquipIcon(pos, state)
+        onRefEquipNaikan()
+        onRefEquipIcon()
         return false
     end
 
     -- 是否刷新只内观
     local isNaikan = HeroSuperEquip.IsNaikan(pos)
     if isNaikan then
-        onRefEquipNaikan(pos, state)
+        onRefEquipNaikan()
     else
-        onRefEquipIcon(pos, state)
+        onRefEquipIcon()
     end
 end
 
@@ -504,7 +504,7 @@ function HeroSuperEquip.UpdateEquipLayer(data)
     end
 
     local function onRefEquipIcon()
-        if GUIDefine.OprateType.ADD == optType then
+        if GUIDefine.OprateType.ADD == optType or GUIDefine.OprateType.CHANGE == optType then
             local itemNode = HeroSuperEquip.GetEquipPosNode(pos)
             local visible  = GUI:getVisible(equipPanel)
             GUI:setVisible(itemNode, visible)
@@ -515,17 +515,6 @@ function HeroSuperEquip.UpdateEquipLayer(data)
         elseif GUIDefine.OprateType.DEL == optType then
             local itemNode = HeroSuperEquip.GetEquipPosNode(pos)
             GUI:removeAllChildren(itemNode)
-        elseif GUIDefine.OprateType.CHANGE == optType then
-            local itemNode = HeroSuperEquip.GetEquipPosNode(pos)
-            local visible  = GUI:getVisible(equipPanel)
-            GUI:setVisible(itemNode, visible)
-
-            local itemShow = GUI:getChildByName(itemNode, "item")            
-            if GUI:Win_IsNull(itemShow) then
-                return false  
-            end
-            local equipData =  GUIFunction:GetEquipDataByMakeIndex(makeIndex, EDType)
-            GUI:ItemShow_OnRunFunc(itemShow, "UpdateGoodsItem", equipData)
         end
     end
     

@@ -44,6 +44,12 @@ function MainTargetBigHp.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_ACTOR_HP_REFRESH, "MainTargetBigHp", MainTargetBigHp.OnRefreshActorHP)
     SL:RegisterLUAEvent(LUA_EVENT_ACTOR_OWNER_CHANGE, "MainTargetBigHp", MainTargetBigHp.OnActorOwnerChange)
     SL:RegisterLUAEvent(LUA_EVENT_SUMMON_ALIVE_CHANGE, "MainTargetBigHp", MainTargetBigHp.OnSummonsAliveStatusChange)
+
+    SL:RegisterLUAEvent(LUA_EVENT_WINDOW_CHANGE, "MainTargetBigHp", MainTargetBigHp.OnWindowChange)
+end
+
+function MainTargetBigHp.OnWindowChange()
+    GUI:setPosition(MainTargetBigHp._root, SL:GetValue("SCREEN_WIDTH") / 2, SL:GetValue("SCREEN_HEIGHT") - 50)
 end
 
 function MainTargetBigHp.Init()

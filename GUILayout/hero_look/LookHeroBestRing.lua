@@ -55,7 +55,7 @@ end
 function LookHeroBestRing.CreateEquipItem(parent, data)
     local info = {}
     info.showModelEffect = true
-    info.from            = GUIDefine.ItemGoTo.BEST_RINGS
+    info.from            = GUIDefine.ItemFrom.BEST_RINGS
     info.itemData        = data
     info.index           = data.Index
     info.noMouseTips     = true     -- 此处不在注册鼠标经过事件
@@ -87,7 +87,7 @@ function LookHeroBestRing.OnOpenItemTips(widget, pos)
     local data = {}
     data.itemData   = itemData
     data.pos        = GUI:getWorldPosition(widget)
-    data.from       = GUIDefine.ItemGoTo.BEST_RINGS
+    data.from       = GUIDefine.ItemFrom.BEST_RINGS
     data.lookPlayer = true
 
     UIOperator:OpenItemTips(data)
@@ -112,9 +112,9 @@ function LookHeroBestRing.InitEquipLayerEvent()
         local data = GUIFunction:GetEquipDataByPos(pos, nil, EDType)
         if data then
             LookHeroBestRing.CreateEquipItem(GUI:getChildByName(widget, "Node"), data)
-            InitPanel(widget, pos)
             iconVisible = false
         end
+        InitPanel(widget, pos)
         LookHeroBestRing.SetIconVisible(widget, iconVisible)
     end
 end

@@ -286,7 +286,7 @@ function Storage.UpdateItemList(page)
         info.look = true
         info.movable = true
         info.starLv = true
-        info.from = GUIDefine.ItemGoTo.STORAGE
+        info.from = GUIDefine.ItemFrom.STORAGE
 
         local gridY = math.floor((pos - 1) / Storage._PerRowItemNum)
         local gridX = (pos - 1) % Storage._PerRowItemNum

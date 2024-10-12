@@ -229,17 +229,17 @@ function PlayerSuperEquip.UpdateEquipStateChange(state, pos)
     -- 是否刷新内观和装备框
     local isShowAll = PlayerSuperEquip.IsShowAll(pos)
     if isShowAll then
-        onRefEquipNaikan(pos, state)
-        onRefEquipIcon(pos, state)
+        onRefEquipNaikan()
+        onRefEquipIcon()
         return false
     end
 
     -- 是否刷新只内观
     local isNaikan = PlayerSuperEquip.IsNaikan(pos)
     if isNaikan then
-        onRefEquipNaikan(pos, state)
+        onRefEquipNaikan()
     else
-        onRefEquipIcon(pos, state)
+        onRefEquipIcon()
     end
 end
 
@@ -300,17 +300,20 @@ function PlayerSuperEquip.InitEquipLayerEvent()
 
             -- 斗笠、头盔内装备特殊处理
             local isNaikan = GUIDefine.EquipNaikanShow and GUIDefine.EquipNaikanShow[pos]
+
+            local isSpeDeal = isNaikan == true or isNaikan == false
             GUI:setVisible(widget, true)
+
             local DefaultIcon = GUI:getChildByName(widget, "DefaultIcon")
-            if DefaultIcon then
+            if DefaultIcon and isSpeDeal then
                 GUI:setVisible(DefaultIcon, not isNaikan)
             end
 
             local PanelBg = GUI:getChildByName(widget, "PanelBg")
-            if PanelBg then
+            if PanelBg and isSpeDeal then
                 GUI:setVisible(PanelBg, not isNaikan)
             end
-
+    
             local Node = PlayerSuperEquip.GetEquipPosNode(pos)
             if Node then
                 GUI:setVisible(Node, not isNaikan)
@@ -535,7 +538,7 @@ function PlayerSuperEquip.UpdateEquipLayer(data)
     end
 
     local function onRefEquipIcon()
-        if GUIDefine.OprateType.ADD == optType then
+        if GUIDefine.OprateType.ADD == optType or GUIDefine.OprateType.CHANGE == optType then
             local itemNode = PlayerSuperEquip.GetEquipPosNode(pos)
             local visible  = GUI:getVisible(equipPanel)
             GUI:setVisible(itemNode, visible)
@@ -546,17 +549,6 @@ function PlayerSuperEquip.UpdateEquipLayer(data)
         elseif GUIDefine.OprateType.DEL == optType then
             local itemNode = PlayerSuperEquip.GetEquipPosNode(pos)
             GUI:removeAllChildren(itemNode)
-        elseif GUIDefine.OprateType.CHANGE == optType then
-            local itemNode = PlayerSuperEquip.GetEquipPosNode(pos)
-            local visible  = GUI:getVisible(equipPanel)
-            GUI:setVisible(itemNode, visible)
-
-            local itemShow = GUI:getChildByName(itemNode, "item")            
-            if GUI:Win_IsNull(itemShow) then
-                return false  
-            end
-            local equipData =  GUIFunction:GetEquipDataByMakeIndex(makeIndex, EDType)
-            GUI:ItemShow_OnRunFunc(itemShow, "UpdateGoodsItem", equipData)
         end
     end
     

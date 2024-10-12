@@ -162,7 +162,6 @@ end
 
 -- 打开子页签
 function AuctionMain.OnOpenPage(file, data)
-    print(file, data)
 
     -- 设置父节点
     GUI:SetLayerOpenParam({parent = AuctionMain._ui.AttachLayout, data = data})

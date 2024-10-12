@@ -207,13 +207,17 @@ function LookPlayerEquip.InitEquipLayerEvent()
             -- 斗笠、头盔内装备特殊处理
             local isNaikan = GUIDefine.EquipNaikanShow and GUIDefine.EquipNaikanShow[pos]
             GUI:setVisible(widget, true)
+
+            local isSpeDeal = isNaikan == true or isNaikan == false
+            GUI:setVisible(widget, true)
+
             local DefaultIcon = GUI:getChildByName(widget, "DefaultIcon")
-            if DefaultIcon then
+            if DefaultIcon and isSpeDeal then
                 GUI:setVisible(DefaultIcon, not isNaikan)
             end
 
             local PanelBg = GUI:getChildByName(widget, "PanelBg")
-            if PanelBg then
+            if PanelBg and isSpeDeal then
                 GUI:setVisible(PanelBg, not isNaikan)
             end
 

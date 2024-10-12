@@ -13,9 +13,13 @@ function Guide.main()
     Guide._path              = GUIDefine.PATH_RES_PRIVATE .. "guide/"
     Guide._ssrWidget         = Guide._data and Guide._data.guideWidget
     Guide._ssrParent         = Guide._data and Guide._data.guideParent
+    Guide._desc              = Guide._data and Guide._data.guideDesc
     Guide._isForce           = Guide._data and Guide._data.isForce or true -- 默认强制
     Guide._hideMask          = Guide._data and Guide._data.hideMask        -- 禁止蒙版
-    Guide._mainType          = data and tonumber(data.mainIdx)             -- 主界面
+    Guide._mainType          = Guide._data and tonumber(Guide._data.mainIdx)             -- 主界面
+    Guide._autoExcute        = Guide._data and tonumber(Guide._data.autoExcute)
+    Guide._clickCallback     = Guide._data and Guide._data.clickCB
+    Guide._dir               = Guide._data and tonumber(Guide._data.dir)
 
     -- 审核服屏蔽
     if SL:GetValue("REVIEW_STATUS") then
@@ -69,8 +73,6 @@ function Guide.Init()
         Guide._StartEventName = GUIDefine.GuideEvent[idx] and GUIDefine.GuideEvent[idx].start
         Guide._EndEventName = GUIDefine.GuideEvent[idx] and GUIDefine.GuideEvent[idx].close
         Guide.getNodesFunc = getNodesFunc
-        dump(Guide._widget, "控件:")
-        dump(Guide._parent, "父节点:")
         if idx == 110 then                --如果是任务就先把框漏出来
             SL:SetTaskBarState({ status = true })
         elseif idx == 109 then            -- 按钮模块 切换
@@ -110,8 +112,6 @@ function Guide.Init()
                     Guide._layoutBlack = nil
                 end
                 Guide._widget, Guide._parent = getNodesFunc(temp)
-                dump(Guide._widget, "控件2:")
-                dump(Guide._parent, "父节点2:")
                 if not Guide._widget or not Guide._parent then --还没有直接gg
                     SL:SetValue("KEY_BOARD_ABLE", true)
                     GUI:Win_Close(parent)
@@ -154,7 +154,6 @@ end
 
 -----
 function Guide.onGuideNodeChange(data)
-    dump(data, "onGuideNodeChange___")
     if Guide._active then
         if data.widget then
             Guide._widget = data.widget
@@ -180,15 +179,10 @@ function Guide.isActive()
 end
 
 function Guide.onEventBegan(data)
-    dump(data, "onEventBegan__")
-    dump(Guide._StartEventName, "__StartEventName")
-    dump(Guide._data, "_data__")
     if Guide._StartEventName then
         if Guide._StartEventName == data.name and Guide._active then
             local temp = { typeassist = Guide._data.uiId }
-            -- dump(temp,"temp__")
             Guide._widget, Guide._parent = Guide.getNodesFunc(temp)
-            dump({ Guide._widget, Guide._parent }, "收到消息")
             if Guide._widget and Guide._parent then
                 Guide.CreateGuide()
                 if Guide._scheduleId then
@@ -205,8 +199,6 @@ function Guide.onEventBegan(data)
 end
 
 function Guide.OnGuideEventEnded(data)
-    dump(data, "OnGuideEventEnded__")
-    dump(Guide._EndEventName, "_EndEventName")
     if Guide._EndEventName then
         if Guide._EndEventName == data.name and Guide._active then
             if Guide._BagPage and data.bag_page then
@@ -243,51 +235,85 @@ function Guide.CreateGuide()
 end
 
 function Guide.ShowDesc(wid, hei, pos, desc)
-    local path = "guide/desc_"
-    local size = GUI:Size(186, 59)
-    local isleft = false
-    if pos.x - wid / 2 - size.width > 0 then
-        isleft = true
-    end
-    path = path .. (isleft and "1" or "2")
-    GUI:LoadExport(Guide._layer, path)
-    local root = GUI:ui_delegate(Guide._layer)
-    local nodeDesc = root["Node_desc"]
-    local windex = string.find(desc, "widget:")
-    if windex and windex == 1 then
-        local function callback(data)
-            SL:SubmitAct(data)
+    if not Guide._dir then
+        local path = "guide/desc_"
+        local size = GUI:Size(186, 59)
+        local isleft = false
+        if pos.x - wid / 2 - size.width > 0 then
+            isleft = true
+        end
+        path = path .. (isleft and "1" or "2")
+        GUI:LoadExport(Guide._layer, path)
+        local root = GUI:ui_delegate(Guide._layer)
+        local nodeDesc = root["Node_desc"]
+        local windex = desc and string.find(desc, "widget:")
+        if windex and windex == 1 then
+            local function callback(data)
+                SL:SubmitAct(data)
+            end
+
+            local widgetstr = string.sub(desc, windex + 7)
+            local elements  = SL:LexicalHelperParse(widgetstr)
+            local rootRect  = GUI:Rect(0, 0, 0, 0)
+            local widget    = GUI:GetSUILoaderLoadContentRender(elements, callback, nil, rootRect)
+            GUI:addChild(nodeDesc, widget)
+        else
+            local richText = GUI:RichText_Create(nodeDesc, "richText", 0, 0, desc or "", 400, 16, "#ffffff")
+            GUI:setAnchorPoint(richText, 0.5, 0.5)
         end
 
-        local widgetstr = string.sub(desc, windex + 7)
-        local elements  = SL:LexicalHelperParse(widgetstr)
-        local rootRect  = GUI:Rect(0, 0, 0, 0)
-        local widget    = GUI:GetSUILoaderLoadContentRender(elements, callback, nil, rootRect)
-        GUI:addChild(nodeDesc, widget)
-    else
-        local richText = GUI:RichText_Create(nodeDesc, "richText", 0, 0, desc or "", 400, 16, "#ffffff")
-        GUI:setAnchorPoint(richText, 0.5, 0.5)
-    end
+        local pWpos = GUI:convertToNodeSpace(Guide._layer, pos.x, pos.y)
+        GUI:setPosition(root["Node"], pWpos.x + (isleft and -wid / 2 or wid / 2), pWpos.y)
 
-    local pWpos = GUI:convertToNodeSpace(Guide._layer, pos.x, pos.y)
-    GUI:setPosition(root["Node"], pWpos.x + (isleft and -wid / 2 or wid / 2), pWpos.y)
-
-    local disX = isleft and 10 or -10
-    local disY = 0
-    GUI:runAction(root["Node"],
-        GUI:ActionRepeatForever(
-            GUI:ActionSequence(
-                GUI:ActionMoveBy(0.5, -disX, -disY),
-                GUI:ActionMoveBy(0.5, disX, disY)
+        local disX = isleft and 10 or -10
+        local disY = 0
+        GUI:runAction(root["Node"],
+            GUI:ActionRepeatForever(
+                GUI:ActionSequence(
+                    GUI:ActionMoveBy(0.5, -disX, -disY),
+                    GUI:ActionMoveBy(0.5, disX, disY)
+                )
             )
         )
-    )
 
-    GUI:setVisible(root["Node"], false)
-    local delay = 0
-    SL:scheduleOnce(root["Node"], function()
-        GUI:setVisible(root["Node"], true)
-    end, delay)
+        GUI:setVisible(root["Node"], false)
+        local delay = 0
+        SL:scheduleOnce(root["Node"], function()
+            GUI:setVisible(root["Node"], true)
+        end, delay)
+    else
+        local path = string.format("guide/desc_dir_%s", Guide._dir)
+        GUI:LoadExport(Guide._layer, path)
+        local root = GUI:ui_delegate(Guide._layer)
+
+        local nodeDesc = root["Node_desc"]
+        local richText = GUI:RichText_Create(nodeDesc, "richText", 0, 0, desc or "", 400, 16, "#ffffff")
+        GUI:setAnchorPoint(richText, 0.5, 0.5)
+        -- 2 4 6 8
+        local rootPosDisX = {-wid/2, -(wid/2+10), 0, wid/2+10, wid/2, wid/2+10, 0, -(wid/2+10)}
+        local rootPosDisY = {0, hei/2+10, hei/2, hei/2+10, 0, -(hei/2+10), -hei/2, -(hei/2+10)}
+        local endedPos = GUI:pAdd(pos, {x = rootPosDisX[Guide._dir], y = rootPosDisY[Guide._dir]})
+        GUI:setPosition(root["Node"], endedPos)
+
+        local moveByDisX = {-10, -10, 0, 10, 10, 10, 0, -10}
+        local moveByDisY = {0, 10, 10, 10, 0, -10, -10, -10}
+        local disX = moveByDisX[Guide._dir]
+        local disY = moveByDisY[Guide._dir]
+        GUI:runAction(root["Node"],
+            GUI:ActionRepeatForever(
+                GUI:ActionSequence(
+                    GUI:ActionMoveBy(0.5, -disX, -disY),
+                    GUI:ActionMoveBy(0.5, disX, disY)
+                )
+            )
+        )
+        
+        GUI:setVisible(root["Node"], false)
+        local delay =  0
+        SL:scheduleOnce(root["Node"], function()
+            GUI:setVisible(root["Node"], true)
+        end, delay)
+    end
 end
 
 function Guide.ShowRim(wid, hei, pos)
@@ -332,7 +358,6 @@ function Guide.ShowForceGuide(data)
         hei = Guide._contentSize.height
     else
         local widget = Guide._widget
-        dump(widget, "widget___")
         if GUI:Widget_IsNull(widget) then
             return
         end
@@ -423,7 +448,7 @@ function Guide.ShowForceGuide(data)
             else -- 不在指引区域内
                 if not Guide._isForce then
                     if Guide._hideMask then
-                        layoutBlack:setSwallowTouches(false)
+                        GUI:setSwallowTouches(layoutBlack, false)
                     else
                         Guide.Exit()
                     end
@@ -435,7 +460,27 @@ function Guide.ShowForceGuide(data)
     GUI:addOnTouchEvent(layoutBlack, touchCallback)
     GUI:Layout_setBackGroundColorOpacity(layoutBlack, 100)
 
-    local desc = Guide._data.desc
+    if Guide._autoExcute then
+        SL:scheduleOnce(layoutBlack, function ( ... )
+            local notExit = false
+            if Guide._clickCallback then
+                notExit = Guide._clickCallback(Guide)
+            elseif Guide._widget and not tolua.isnull(Guide._widget) then
+                local touchCB = GUI:getOnTouchEvent(Guide._widget)
+                if tolua.type(touchCB) == "function" then
+                    touchCB(Guide._widget, 2)
+                end
+            end
+            if type(notExit) == "boolean" and notExit then
+                return
+            end
+            if Guide then
+                Guide:Exit()
+            end
+        end, Guide._autoExcute)
+    end
+
+    local desc = Guide._desc
     Guide.ShowRim(wid, hei, pos)
     Guide.ShowDesc(wid, hei, pos, desc)
 end

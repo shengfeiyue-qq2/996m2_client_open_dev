@@ -883,8 +883,8 @@ function Notice.OnShowPlayerEXPNotice(data)
 
     local tag = 999
     for index, cell in pairs(Notice._expCells) do
-        cell:setPositionY(30 * (#Notice._expCells - index - 1))
-        local action = GUI:ActionMoveTo(0.15, 0, 30 * (#Notice._expCells - index))
+        cell:setPositionY(20 * (#Notice._expCells - index - 1))
+        local action = GUI:ActionMoveTo(0.15, 0, 20 * (#Notice._expCells - index))
         GUI:setTag(action, tag)
         GUI:stopActionByTag(cell, tag)
         GUI:runAction(cell, action)
@@ -1051,8 +1051,8 @@ function Notice.OnShowNGEXPNotice(data)
 
     local tag = 999
     for index, cell in pairs(Notice._ngExpCells) do
-        cell:setPositionY(30 * (#Notice._ngExpCells - index - 1))
-        local action = GUI:ActionMoveTo(0.15, 0, 30 * (#Notice._ngExpCells - index))
+        cell:setPositionY(20 * (#Notice._ngExpCells - index - 1))
+        local action = GUI:ActionMoveTo(0.15, 0, 20 * (#Notice._ngExpCells - index))
         GUI:setTag(action, tag)
         GUI:stopActionByTag(cell, tag)
         GUI:runAction(cell, action)

@@ -559,7 +559,7 @@ function MainMiniMap.UpdatePortal(isUpdateMap)
         if MainMiniMap._markPortalIdx ~= showNameIndex then
             MainMiniMap._markPortalIdx = showNameIndex
             local showConfig = MainMiniMap._portals[showNameIndex] or {}
-            local showName = string.gsub(showConfig.sShowName, "%s+", "") 
+            local showName = string.gsub(showConfig.sShowName or "", "%s+", "") 
             if string.len(showName) == 0 then 
                 return false
             end 
@@ -571,7 +571,7 @@ function MainMiniMap.UpdatePortal(isUpdateMap)
             local color = tonumber(showConfig.nColor) and SL:GetHexColorByStyleId(tonumber(showConfig.nColor)) or showConfig.nColor
             GUI:Text_setTextColor(MainMiniMap._nameText, color)
             GUI:Text_enableOutline(MainMiniMap._nameText, "#000000", tonumber(showConfig.bOutLine) or 0)
-            GUI:Text_setString(MainMiniMap._nameText, showConfig.sShowName)
+            GUI:Text_setString(MainMiniMap._nameText, showName)
 
             local imgPath = showConfig.sImgPath or "icon_xdtzy_04.png"
             GUI:Image_loadTexture(MainMiniMap._icon, MainMiniMap._path .. imgPath)
