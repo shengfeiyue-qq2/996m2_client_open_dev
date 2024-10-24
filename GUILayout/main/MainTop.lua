@@ -20,7 +20,7 @@ function MainTop.InitAdapt()
     local screenW = SL:GetValue("SCREEN_WIDTH")
     local screenH = SL:GetValue("SCREEN_HEIGHT")
 
-    local topH = GUI:getContentSize().height
+    local topH = GUI:getContentSize(MainTop._root).height
 
     GUI:setPosition(MainTop._root, 0, screenH)
     GUI:setContentSize(MainTop._root, screenW, topH)

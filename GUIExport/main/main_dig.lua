@@ -1,7 +1,11 @@
 local ui = {}
 function ui.init(parent)
+	-- Create Main_Dig
+	local Main_Dig = GUI:Node_Create(parent, "Main_Dig", 0.00, 0.00)
+	GUI:setTag(Main_Dig, -1)
+
 	-- Create Button_dig
-	local Button_dig = GUI:Button_Create(parent, "Button_dig", 290.00, 270.00, "res/private/main/btn_xbzy_03.png")
+	local Button_dig = GUI:Button_Create(Main_Dig, "Button_dig", 290.00, 270.00, "res/private/main/btn_xbzy_03.png")
 	GUI:Button_setTitleText(Button_dig, "")
 	GUI:Button_setTitleColor(Button_dig, "#ffffff")
 	GUI:Button_setTitleFontSize(Button_dig, 10)

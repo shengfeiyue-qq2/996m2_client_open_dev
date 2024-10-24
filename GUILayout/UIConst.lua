@@ -242,7 +242,7 @@ UIConst.LUAFile =
     LUA_FILE_PC_SKILL_TO_MAINUI                 = "GUILayout/PCSkillToMainUITouch",                                         -- PC技能图标移到主界面上
     LUA_FILE_SIGHT_BEAD                         = "sight_bead/SightBead",                                                   -- 准星页面
     LUA_FILE_MOVE_EVENT                         = "moved_event/MoveEvent",                                                  -- 触摸事件
-    LUA_FILE_RTOUCH_EVENT                       = "moved_event/rtouchEvent",
+    LUA_FILE_RTOUCH_EVENT                       = "moved_event/RtouchEvent",
 
     LUA_FILE_GUIDE                              = "guide/Guide",                                                            -- 引导
 

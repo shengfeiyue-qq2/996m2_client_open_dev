@@ -647,9 +647,51 @@ function Notice.OnDeleteTimerXYNotice()
     GUI:removeAllChildren(Notice._rootTimerTipsXY)
 end
 
+-- 物品获得/消耗提示
+local itemGetF          = "获得 %s * %s"
+local itemGetRichF      = "<outline size='1'><font color = '%s'>获得 %s * %s</font></outline>"
+local heroItemGetRichF  = "<outline size='1'><font color='#ff0500'>英雄</font><font color = '%s'>获得 %s * %s</font></outline>"
+
+local itemCostF         = "消耗 %s * %s"
+local itemCostRichF     = "<outline size='1'><font color = '%s'>消耗 %s * %s</font></outline>"
+local heroItemCostRichF = "<outline size='1'><font color='#ff0500'>英雄</font><font color = '%s'>消耗 %s * %s</font></outline>"
+
+function Notice.ParseGetItemTipsStr(info)
+    local name = info.name
+    local count = info.num
+    local color = SL:GetHexColorByStyleId(250)
+    info.color = color
+    if info.isHero then
+        info.heroColor = "#ff0500"
+        info.str = Notice.isPC and string.format(itemGetF, name, count) or string.format(heroItemGetRichF, color, name, count)
+    else
+        info.str = Notice.isPC and string.format(itemGetF, name, count) or string.format(itemGetRichF, color, name, count)
+    end
+    return info
+end
+
+function Notice.ParseCostItemTipsStr(info)
+    local name = info.name
+    local count = info.num
+    local color = SL:GetHexColorByStyleId(22)
+    info.color = color
+    if info.isHero then
+        info.heroColor = "#ff0500"
+        info.str = Notice.isPC and string.format(itemCostF, name, count) or string.format(heroItemCostRichF, color, name, count)
+    else
+        info.str = Notice.isPC and string.format(itemCostF, name, count) or string.format(itemCostRichF, color, name, count)
+    end
+    return info
+end
 
 function Notice.OnShowItemTips(info)
     local size = {width = 170, height = 20}
+    
+    if info.type == 1 then -- 获得
+        info = Notice.ParseGetItemTipsStr(info)
+    else -- 消耗
+        info = Notice.ParseCostItemTipsStr(info)
+    end
 
     table.insert(Notice._itemTipsData, info)
     if #Notice._itemTipsData > 4 then 
@@ -664,7 +706,6 @@ function Notice.OnShowItemTips(info)
         end
 
         local tipsData = table.remove(Notice._itemTipsData, #Notice._itemTipsData)
-        local data = tipsData.data
         local str = tipsData.str
 
         -- node
@@ -674,9 +715,9 @@ function Notice.OnShowItemTips(info)
 
         -- richText
         if Notice.isPC then 
-            local text = GUI:BmpText_Create(node, "text", 0, 0, SL:ConvertColorFromHexString(data.color), str)
-            if data.heroStr then 
-                local text2 = GUI:BmpText_Create(node, "text2", -4, 0, SL:ConvertColorFromHexString(data.heroColor), data.heroStr)
+            local text = GUI:BmpText_Create(node, "text", 0, 0, tipsData.color, str)
+            if tipsData.isHero then 
+                local text2 = GUI:BmpText_Create(node, "text2", -4, 0, tipsData.heroColor, "英雄")
                 GUI:setAnchorPoint(text2, 1, 0)
             end
         else
@@ -698,7 +739,7 @@ function Notice.OnShowItemTips(info)
         end
 
         GUI:setCascadeOpacityEnabled(node, true)
-        local sequence = GUI:ActionSequence(GUI:DelayTime(2), GUI:ActionFadeTo(0.8,50), GUI:CallFunc(callback))
+        local sequence = GUI:ActionSequence(GUI:DelayTime(2), GUI:ActionFadeTo(0.8, 50), GUI:CallFunc(callback))
         GUI:runAction(node, sequence)
     
         local actionTag = 999

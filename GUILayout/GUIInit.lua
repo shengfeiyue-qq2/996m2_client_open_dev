@@ -1361,27 +1361,74 @@ SL:RegisterLUAEvent(LUA_EVENT_ENTER_WORLD, "GUIInit_KeyBoard", function()
         percent             = math.min(math.max(0, percent), 100)
         GUI:ListView_scrollToPercentVertical(list, percent, 0.03, false)
     end
-    
+
+    local keyPressed = {}
+    local arrowTimerList = {}
+    local function commonPressedCB(keyCode, func)
+        SL:ScheduleOnce(function()
+            if keyPressed[keyCode] and not arrowTimerList[keyCode] then
+                arrowTimerList[keyCode] = SL:Schedule(func, 0.01)
+            end
+        end, 0.3)
+        keyPressed[keyCode] = true
+    end
+    local function commonReleasedCB(keyCode)
+        if arrowTimerList[keyCode] then
+            SL:UnSchedule(arrowTimerList[keyCode])
+            arrowTimerList[keyCode] = nil
+        end
+        keyPressed[keyCode] = false
+    end
+    -- ↑
     local function pressedCB()
         scrollChatFunc(true)
+        commonPressedCB("KEY_UP_ARROW", function()
+            scrollChatFunc(true)
+        end)
     end
-    GUI:addKeyboardEvent("KEY_UP_ARROW", pressedCB)
+    local function releaseCB()
+        commonReleasedCB("KEY_UP_ARROW")
+    end
+    GUI:addKeyboardEvent("KEY_UP_ARROW", pressedCB, releaseCB)
     
+    -- ↓
     local function pressedCB()
         scrollChatFunc(false)
+        commonPressedCB("KEY_DOWN_ARROW", function()
+            scrollChatFunc(false)
+        end)
     end
-    GUI:addKeyboardEvent("KEY_DOWN_ARROW", pressedCB)
+
+    local function releaseCB()
+        commonReleasedCB("KEY_DOWN_ARROW")
+    end
+    GUI:addKeyboardEvent("KEY_DOWN_ARROW", pressedCB, releaseCB)
 
     --Page UP/DOWN 聊天翻页
     local function pressedCB()
         scrollChatFunc(true, true)
+        commonPressedCB("KEY_PG_UP", function()
+            scrollChatFunc(true, true)
+        end)
     end
-    GUI:addKeyboardEvent("KEY_PG_UP", pressedCB)
 
+    local function releaseCB()
+        commonReleasedCB("KEY_PG_UP")
+    end
+    GUI:addKeyboardEvent("KEY_PG_UP", pressedCB, releaseCB)
+
+    --
     local function pressedCB()
         scrollChatFunc(false, true)
+        commonPressedCB("KEY_PG_DOWN", function()
+            scrollChatFunc(false, true)
+        end)
     end
-    GUI:addKeyboardEvent("KEY_PG_DOWN", pressedCB)
+
+    local function releaseCB()
+        commonReleasedCB("KEY_PG_DOWN")
+    end
+    GUI:addKeyboardEvent("KEY_PG_DOWN", pressedCB, releaseCB)
 
     -- 波浪键 ` ~ 拾取当前位置道具
     local function pressedCB()

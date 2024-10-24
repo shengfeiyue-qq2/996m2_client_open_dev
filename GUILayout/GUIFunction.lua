@@ -540,11 +540,12 @@ function GUIFunction:OnAutoUseCheckItem_Hero(item)
 end
 
 -- 是否能挖肉
--- Race 51 52 53 90 105 106 82 84 85 可以挖的
+-- Race 51 52 53 60 90 105 106 82 84 85 可以挖的
 local DIG_RACE_SERVER_LST = {
     [51] = 1,
     [52] = 1,
     [53] = 1,
+    [60] = 1,
     [82] = 1,
     [84] = 1,
     [85] = 1,

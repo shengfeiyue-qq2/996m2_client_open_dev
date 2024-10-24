@@ -179,6 +179,17 @@ function Bag.InitPage()
     end
 end
 
+function Bag.UpdateItemList()
+    BagInfo._openNum = BagData.GetMaxBag()
+    Bag.InitPage()
+    Bag.UpdateItems()
+
+    local page = BagInfo._selPage or 1
+    BagData.SetCurPage(page)
+    BagInfo._selPage = page
+    Bag.SetPageBtnStatus()
+end
+
 function Bag.UpdateItems()
     local children = GUI:getChildren(BagInfo._ui.Panel_items)
     for _, item in pairs(children) do
@@ -976,7 +987,7 @@ function Bag.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_BAG_ITEM_CHANGE, "Bag", Bag.ItemDataChange, layer) --背包操作
     SL:RegisterLUAEvent(LUA_EVENT_BAG_ITEM_POS_CHANGE, "Bag", Bag.RefreshBagData, layer) --位置改变
     SL:RegisterLUAEvent(LUA_EVENT_BAG_STATE_CHANGE, "Bag", Bag.UpdateBagState, layer) --状态改变
-    SL:RegisterLUAEvent(LUA_EVENT_BAG_ITEM_LIST_REFRESH, "Bag", Bag.UpdateItems, layer) --背包刷新
+    SL:RegisterLUAEvent(LUA_EVENT_BAG_ITEM_LIST_REFRESH, "Bag", Bag.UpdateItemList, layer) --背包刷新
     SL:RegisterLUAEvent(LUA_EVENT_PLAYER_EQUIP_CHANGE, "Bag", Bag.UpdateItemPowerCheckState, layer) --检测提升提示
     SL:RegisterLUAEvent(LUA_EVENT_EQUIP_RETRIEVE_STATE_CHANGE, "Bag", Bag.UpdateEquipRetrieveState, layer) --更新背包回收勾选
     SL:RegisterLUAEvent(LUA_EVENT_BAG_ITEM_COLLIMATOR, "Bag", Bag.OnBatItemCollimator, layer) --显示准星
