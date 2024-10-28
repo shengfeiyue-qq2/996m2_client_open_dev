@@ -2336,6 +2336,15 @@ function GUIFunction:CheckAutoPickItemEnable_Extra(itemIndex)
 
     return true
 end
+
+-- 判断快速/自动选择时目标是否纳入列表中
+-- 参数: actorID  返回值: boolean
+function GUIFunction:CheckActorJoinInSelectList(actorID)
+
+
+    return true
+end
+
 -------------------------------------------------------------------------
 
 ------------------------------ PC快捷键触发方法 ---------------------------
