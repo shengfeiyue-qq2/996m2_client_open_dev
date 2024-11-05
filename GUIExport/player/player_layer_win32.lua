@@ -41,7 +41,7 @@ function ui.init(parent)
 	GUI:setTag(ButtonClose, 133)
 
 	-- Create Node_panel
-	local Node_panel = GUI:Node_Create(Panel_1, "Node_panel", 16.00, 14.00)
+	local Node_panel = GUI:Node_Create(Panel_1, "Node_panel", 16.00, 18.00)
 	GUI:setChineseName(Node_panel, "玩家面板_节点")
 	GUI:setAnchorPoint(Node_panel, 0.50, 0.50)
 	GUI:setTag(Node_panel, 134)

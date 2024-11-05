@@ -21,7 +21,7 @@ function ui.init(parent)
 	GUI:setTag(Image_server_bg, -1)
 
 	-- Create Text_server_name
-	local Text_server_name = GUI:Text_Create(Panel_bg, "Text_server_name", 568.00, 627.00, 15, "#ffffff", [[服务器名]])
+	local Text_server_name = GUI:Text_Create(Panel_bg, "Text_server_name", 568.00, 624.00, 15, "#ffffff", [[服务器名]])
 	GUI:setChineseName(Text_server_name, "创建角色_区服名称_文本")
 	GUI:setAnchorPoint(Text_server_name, 0.50, 0.50)
 	GUI:setTouchEnabled(Text_server_name, false)

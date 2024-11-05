@@ -211,20 +211,39 @@ function RobotAuto.SelectEnemy(delta)
     end
 
     local mainPlayerID = SL:GetValue("USER_ID")
-    if not SL:GetValue("MAIN_PLAYER_IS_VALID") or not mainPlayerID then
+    if not mainPlayerID or not SL:GetValue("MAIN_PLAYER_IS_VALID") then
         return
     end
 
     RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_ENEMY_ATTACK] = RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_ENEMY_ATTACK] - delta
-    local values = SL:GetValue("SETTING_VALUE", SLDefine.SETTINGID.SETTING_IDX_ENEMY_ATTACK)--周围有敌人时主动攻击
+    
+    local values = SL:GetValue("SETTING_VALUE", SLDefine.SETTINGID.SETTING_IDX_ENEMY_ATTACK) -- 周围有敌人时主动攻击
     if RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_ENEMY_ATTACK] <= 0 and values[1] == 1 then
         local distance = tonumber(values[2]) or 8
+
         local targetID = SL:GetValue("SELECT_TARGET_ID")
         if SL:GetValue("ACTOR_IS_PLAYER", targetID) then
             return false
         end
-        --找距离内可以攻击的人形怪
-        SL:SetValue("TARGET_ATTACK_CHANGE", distance)
+
+        -- 找距离内可以攻击的人形怪
+        local pMapX      = SL:GetValue("X")
+        local pMapY      = SL:GetValue("Y")
+        local aX         = 0
+        local aY         = 0
+
+        local playerVec, playerVecNum = SL:GetValue("FIND_IN_VIEW_PLAYER_LIST")
+        for i = 1, playerVecNum do
+            local playerID = playerVec[i]
+            if SL:GetValue("ACTOR_IS_VALID", playerID) and SL:GetValue("ACTOR_IS_HUMAN", playerID) then
+                aX = SL:GetValue("ACTOR_MAP_X", playerID)
+                aY = SL:GetValue("ACTOR_MAP_Y", playerID)
+                if GUIFunction:CheckLaunchEnableByID(playerID) and math.abs(aX - pMapX) <= distance and math.abs(aY - pMapY) <= distance then
+                    SL:SetValue("SELECT_TARGET_ID", playerID)
+                    break
+                end
+            end
+        end        
 
         RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_ENEMY_ATTACK] = 1
     end

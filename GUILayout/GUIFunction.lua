@@ -576,7 +576,7 @@ function GUIFunction:CheckTargetDigAble(targetID)
         end
     end
 
-    if SL:GetMetaValue("ACTOR_IS_MONSTER", targetID) or SL:GetMetaValue("ACTOR_IS_HUMAN", targetID) then
+    if SL:GetValue("ACTOR_IS_MONSTER", targetID) or SL:GetValue("ACTOR_IS_HUMAN", targetID) then
         -- 配置不可以挖
         local typeIndex = SL:GetValue("ACTOR_TYPE_INDEX", targetID)
         if GUIDefineEx.NoDigMonsterTypeMap and GUIDefineEx.NoDigMonsterTypeMap[typeIndex] then
@@ -668,6 +668,10 @@ local function GetAttScaleType(id)
     }
 
     if id == AttTypeTable.Anti_Magic and not SL:GetValue("SERVER_OPTION", SW_KEY_MAGIC_MISS_TYPE) then
+        return 1
+    end
+
+    if (id == AttTypeTable.Anti_Posion or id == AttTypeTable.Posion_Recover) and not SL:GetValue("SERVER_OPTION", SW_KEY_ANTI_POISON_TYPE) then
         return 1
     end
 
@@ -2671,3 +2675,306 @@ end
 function GUIFunction:IsTaoist(job)
     return GUIDefine.Job.TAOIST == job
 end
+
+-------------------------------------------------------------------------
+-- 战斗相关
+local function squLen(x, y)
+    return x * x + y * y
+end
+
+-- 检测Actor能否攻击 actorID
+function GUIFunction:CheckLaunchEnableByID(actorID)
+    if not actorID or not SL:GetValue("ACTOR_IS_VALID", actorID) then
+        return false
+    end
+    -- player & monster, only!!!!
+    if not SL:GetValue("ACTOR_IS_PLAYER", actorID) and not SL:GetValue("ACTOR_IS_MONSTER", actorID) then
+        return false
+    end
+
+    if not SL:GetValue("MAIN_PLAYER_IS_VALID") then
+        return false
+    end
+    
+    local actorMasterID = SL:GetValue("ACTOR_MASTER_ID", actorID)
+    
+    if SL:GetValue("BATTLE_IS_AUTO_FIGHT_STATE") then
+        ---- hero player / master is main hero
+        local heroID = SL:GetValue("HERO_ID")
+        local mainPlayerID = SL:GetValue("USER_ID")
+        if heroID and (actorID == heroID or actorMasterID == heroID) then
+            return false
+        end
+
+        -- main player / master is main player
+        if (SL:GetValue("ACTOR_IS_PLAYER", actorID) and SL:GetValue("ACTOR_IS_MAINPLAYER", actorID)) or actorMasterID == mainPlayerID then
+            return false
+        end
+    end
+
+    -- dead & born
+    if SL:GetValue("ACTOR_IS_DIE", actorID) or SL:GetValue("ACTOR_IS_DEATH", actorID) or SL:GetValue("ACTOR_IS_BORN", actorID) or SL:GetValue("ACTOR_IS_CAVE", actorID) then
+        return false
+    end
+    
+    -- hp 0
+    if SL:GetValue("ACTOR_HP", actorID) <= 0 then
+        return false
+    end
+
+    -- humanoid
+    if SL:GetValue("ACTOR_IS_PLAYER", actorID) and SL:GetValue("ACTOR_IS_HUMAN", actorID) then
+        if actorMasterID and SL:GetValue("ACTOR_RELATION_TAG", actorMasterID) ~= 1 then -- 人形怪如果有MasterID, 要判断Master是否是敌友
+            return false
+        end
+        return true
+    end
+
+    -- player, check is enmey
+    if SL:GetValue("ACTOR_IS_PLAYER", actorID) and SL:GetValue("ACTOR_RELATION_TAG", actorID) ~= 1 then
+        return false
+    end
+
+    if SL:GetValue("ACTOR_IS_HERO", actorID) and SL:GetValue("ACTOR_RELATION_TAG", actorID) ~= 1 then
+        return false
+    end
+
+    -- 采集物
+    if SL:GetValue("ACTOR_IS_COLLECTION", actorID) then
+        return false
+    end
+
+    return true
+end
+
+-- 检查Actor能否作为自动战斗目标
+function GUIFunction.CheckAutoTargetEnableByID(actorID)
+    if not actorID or not SL:GetValue("ACTOR_IS_VALID", actorID) then
+        return false
+    end
+
+    -- 被忽略
+    if SL:GetValue("ACTOR_IS_IGNORED", actorID) then
+        return false
+    end
+
+    -- 1.可攻击
+    if false == GUIFunction:CheckLaunchEnableByID(actorID) then
+        return false
+    end
+
+    -- 2.守卫/宝宝 -- 有主人的人型怪也不打,分身等
+    if not SL:GetValue("ACTOR_IS_HERO", actorID) and (SL:GetValue("ACTOR_IS_DEFENDER", actorID) or SL:GetValue("ACTOR_HAVE_MASTER", actorID)) then
+        return false
+    end
+
+    -- 3.归属不是自己的
+    local ownerID = SL:GetValue("ACTOR_OWNER_ID", actorID)
+    if SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_NO_ATTACK_HAVE_BELONG) == 1 and ownerID and ownerID ~= SL:GetValue("USER_ID") then 
+        return false
+    end
+
+    -- 内挂忽略的怪
+    local ignoreNames = SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_IGNORE_MONSTER)
+    local name = SL:GetValue("ACTOR_NAME", actorID)
+    if not ignoreNames or (type(ignoreNames) ~= "table") then 
+        ignoreNames = {} 
+    end
+    if name and ignoreNames[name] then 
+        return false
+    end
+
+    return true
+end
+
+-- 查找最近怪物
+function GUIFunction:FindNearestMonster(monsterVec, monsterVecNum)
+    -- 不自动选: 守卫/石化状态下祖玛卫士 
+    local target     = nil
+    local cost       = GUIDefine.MAX_COST
+    local pMapX      = SL:GetValue("X")
+    local pMapY      = SL:GetValue("Y")
+    local mX         = 0
+    local mY         = 0
+
+    for i = 1, monsterVecNum do
+        local monsterID = monsterVec[i]
+        if SL:GetValue("ACTOR_IS_VALID", monsterID) then
+            mX = SL:GetValue("ACTOR_MAP_X", monsterID)
+            mY = SL:GetValue("ACTOR_MAP_Y", monsterID)
+            if not (mX == pMapX and mY == pMapY) and GUIFunction.CheckAutoTargetEnableByID(monsterID) then
+                local len = squLen(mX - pMapX, mY - pMapY)
+                if len < cost then
+                    target = monsterID
+                    cost = len
+                end
+            end
+        end
+    end
+    
+    return target
+end
+
+function GUIFunction:GetMonsterVec(monsters, ncount)
+    local monsterVec = {}
+    local num = 0
+
+    for i = 1, ncount do
+        local monsterID = monsters[i]
+        if GUIFunction.CheckAutoTargetEnableByID(monsterID) then
+            num = num + 1
+            monsterVec[num] = monsterID
+        end
+    end
+
+    return monsterVec, num
+end
+
+-- 自动找怪, 设定目标
+function GUIFunction:OnAutoFindMonsterFunc()
+    if not SL:GetValue("MAIN_PLAYER_IS_VALID") then
+        return nil
+    end
+
+    local autoTarget = SL:GetValue("AUTO_TARGET")
+    local targetIndex = autoTarget.targetIndex
+    local targetType = autoTarget.targetType
+
+    local monsterVec  = {}
+    local monsterVecNum = 0
+    
+    if targetType ~= GUIDefine.ActorType.MONSTER or not targetIndex or GUIDefine.AUTO_FIND_TARGET_NONE == targetIndex or 0 == targetIndex then -- not target index,find nearst monster
+        local monsters, ncount = SL:GetValue("FIND_IN_VIEW_MONSTER_LIST", true, true)
+        monsterVec, monsterVecNum = GUIFunction:GetMonsterVec(monsters, ncount)
+    else
+        local monsters, ncount = SL:GetValue("FIND_IN_VIEW_MONSTER_LIST_BY_TYPEINDEX", targetIndex, true, true)
+        monsterVec, monsterVecNum = GUIFunction:GetMonsterVec(monsters, ncount)
+        
+        if monsterVecNum < 1 then
+            local monsters, ncount = SL:GetValue("FIND_IN_VIEW_MONSTER_LIST")
+            monsterVec, monsterVecNum = GUIFunction:GetMonsterVec(monsters, ncount)
+        end
+    end
+
+    if monsterVecNum < 1 then
+        return false
+    end
+    
+    -- find nearest monster
+    local targetID = GUIFunction:FindNearestMonster(monsterVec, monsterVecNum)
+    if SL:GetValue("ACTOR_IS_VALID", targetID) then
+        SL:SetValue("SELECT_TARGET_ID", targetID)
+    end
+end
+
+-- 自动找人形怪/怪, 设定目标
+function GUIFunction:OnAutoFindHumanoidFunc()
+    if not SL:GetValue("MAIN_PLAYER_IS_VALID") then
+        return nil
+    end
+
+    local targetID   = nil
+    local cost       = GUIDefine.MAX_COST
+    local pMapX      = SL:GetValue("X")
+    local pMapY      = SL:GetValue("Y")
+    local aX         = 0
+    local aY         = 0
+
+    local playerVec, playerVecNum = SL:GetValue("FIND_IN_VIEW_PLAYER_LIST")
+    for i = 1, playerVecNum do
+        local playerID = playerVec[i]
+        if SL:GetValue("ACTOR_IS_VALID", playerID) and SL:GetValue("ACTOR_IS_HUMAN", playerID) then
+            aX = SL:GetValue("ACTOR_MAP_X", playerID)
+            aY = SL:GetValue("ACTOR_MAP_Y", playerID)
+            if not (aX == pMapX and aY == pMapY) and GUIFunction.CheckAutoTargetEnableByID(playerID) then
+                local len = squLen(aX - pMapX, aY - pMapY)
+                if len < cost then
+                    targetID = playerID
+                    cost = len
+                end
+            end
+        end
+    end
+    
+    if targetID and SL:GetValue("ACTOR_IS_VALID", targetID) then
+        SL:SetValue("SELECT_TARGET_ID", targetID)
+    else
+        -- 没找到, 找其他怪
+        GUIFunction:OnAutoFindMonsterFunc()
+    end
+end
+
+-- 受攻击后自动反击
+function GUIFunction:OnAutoFightBackFunc(attackActorID, actorID)
+    
+    actorID = actorID or SL:GetValue("USER_ID")
+
+    local setValues = SL:GetValue("SETTING_VALUE", SLDefine.SETTINGID.SETTING_IDX_BEDAMAGED_PLAYER)  -- 被玩家攻击 1不处理 2反击 3逃跑
+    if not setValues or not setValues[1] or not (setValues[1] == 2 or setValues[1] == 3) then
+        return
+    end
+
+    if not attackActorID or not SL:GetValue("ACTOR_IS_VALID", attackActorID) then  -- 没有攻击者
+        return
+    end
+
+    local attackMasterID = SL:GetValue("ACTOR_MASTER_ID", attackActorID)
+    if (SL:GetValue("ACTOR_IS_HUMAN", attackActorID) or SL:GetValue("ACTOR_IS_MONSTER", attackActorID)) and not (attackMasterID and attackMasterID ~= "") then
+        return 
+    end
+
+    if not SL:GetValue("ACTOR_IS_VALID", actorID) then
+        return
+    end
+
+    local mainPlayerID = SL:GetValue("USER_ID")
+    local heroActorID = SL:GetValue("HERO_ID")
+    local masterID = SL:GetValue("ACTOR_MASTER_ID", actorID)
+
+    -- 攻击 我的宠物/元神/主角
+    if not (masterID == mainPlayerID or actorID == heroActorID or actorID == mainPlayerID) then
+        return
+    end
+
+    if not SL:GetValue("MAIN_PLAYER_IS_VALID") then 
+        return
+    end
+
+    -- 挂机
+    if not SL:GetValue("BATTLE_IS_AFK") and not SL:GetValue("BATTLE_IS_AUTO_FIGHT_STATE") then
+        return
+    end
+
+    if setValues[1] == 2 then
+        local attackBackID = nil -- 要反击的对象id
+        if attackMasterID and attackMasterID ~= "" and SL:GetValue("ACTOR_IS_VALID", attackMasterID) then
+            local value = SL:GetValue("SETTING_VALUE", SLDefine.SETTINGID.SETTING_IDX_FIRST_ATTACK_MASTER)  -- 优先打主人
+            if value[1] == 1 and SL:GetValue("ACTOR_IS_PLAYER", attackMasterID) and not SL:GetValue("ACTOR_IS_HUMAN", attackMasterID) then 
+                attackBackID = attackMasterID
+            end
+        end
+
+        if not attackBackID then 
+            attackBackID = attackActorID
+        end
+
+        local hateID = SL:GetValue("HATE_ID")
+        if hateID and SL:GetValue("ACTOR_IS_VALID", hateID) then
+            return 
+        end
+
+        -- 没仇恨对象
+        SL:SetValue("SELECT_SHIFT_ATTACK_ID", nil)
+        SL:SetValue("SELECT_TARGET_ID", nil)
+        SL:SetValue("CLEAR_CUR_MOVE")
+        SL:SetValue("SELECT_TARGET_ID", attackBackID)
+        SL:SetValue("HATE_ID", attackBackID)
+            
+    -- 攻击者必须是玩家  不是我的宠物/元神/主角
+    elseif setValues[1] == 3 and not SL:GetValue("ACTOR_IS_MAINPLAYER", attackActorID) and attackMasterID ~= mainPlayerID then
+        SL:SetValue("SELECT_SHIFT_ATTACK_ID", nil)
+        SL:SetValue("SELECT_TARGET_ID", nil)
+        SL:SetValue("AFK_CHECK_AIMLESS_MOVE")
+    end
+end
+-------------------------------------------------------------------------

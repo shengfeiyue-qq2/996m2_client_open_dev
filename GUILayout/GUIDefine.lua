@@ -18,6 +18,10 @@ GUIDefine.DESIGN_SIZE_MOBILE    = {width = 1136, height = 640}
 -- 仓库单页可存数量
 GUIDefine.STORAGE_PER_PAGE_MAX  = 48
 
+GUIDefine.AUTO_FIND_TARGET_NONE = -1              -- 自动寻路目标 - 无
+
+GUIDefine.MAX_COST              = 0xFFFFFFFF
+
 -- 属性类型
 local attTypeTable = {
     LEVEL                           = 0,            -- 等级
@@ -851,6 +855,19 @@ GUIDefine.BGMType = {
 	SELECT               = 102,             -- BGM 选角界面
 	DIE                  = 103,             -- BGM 死亡
 	MAP                  = 104              -- BGM 地图
+}
+
+-- Actor 类型
+GUIDefine.ActorType = 
+{
+    NONE            = -1,
+    PLAYER          = 0,
+    MONSTER         = 50,
+    NPC             = 100,
+    DROPITEM        = 150,
+    SEFFECT         = 200,
+    COLLECTION      = 250,
+    HERO            = 400
 }
 
 ----------------------------------------------------------------------------------------------------------

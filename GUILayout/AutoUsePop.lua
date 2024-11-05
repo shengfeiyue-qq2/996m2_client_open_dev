@@ -200,12 +200,6 @@ end
 -- 技能书
 function AutoUsePop.DealSkillBook(data)
     if data.isHero and data.isFromHeroBag then
-        SL:HeroUseItem(data.item)
-    else
-        SL:UseItem(data.item)
-    end
-
-    if data.isHero then
         SL:RequestUseHeroItem(data.item)
     else
         SL:RequestUseItem(data.item)
@@ -216,9 +210,9 @@ end
 -- 其他
 function AutoUsePop.DealOther(data)
     if data.isHero then
-        SL:HeroUseItem(data.item, true)
+        SL:RequestUseHeroItem(data.item)
     else
-        SL:UseItem(data.item, true)
+        SL:RequestUseItem(data.item)
     end
     AutoUsePop.OnClose(data.MakeIndex, data.targetPos, data.isHero)
 end

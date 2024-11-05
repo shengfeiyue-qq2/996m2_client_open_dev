@@ -473,6 +473,7 @@ function MainSkill.CtreateSelecetSfx(parent, skillID)
 end
 -------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------ 快速查找 ----------------------------------------------------------------------
+local sharedQuickSelTab = {}
 function MainSkill.InitQuickFind()
     local items = {
         [1] = {
@@ -509,7 +510,9 @@ function MainSkill.InitQuickFind()
             GUI:CallFunc(function () GUI:Image_loadTexture(image, item.normalPath) end)
         ))
 
-        SL:QuickSelectTarget({type = item.actorType, imgNotice = true})
+        sharedQuickSelTab.type = item.actorType
+        sharedQuickSelTab.imgNotice = true
+        SL:QuickSelectTarget(sharedQuickSelTab)
     end
 
     local Panel_quick_find = MainSkill._ui["Panel_quick_find"]

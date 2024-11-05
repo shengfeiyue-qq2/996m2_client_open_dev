@@ -64,12 +64,36 @@ function PrivateChat.InitUI()
 
     PrivateChat._editBox = PrivateChat._ui.TextField_1
     GUI:TextInput_addOnEvent(PrivateChat._editBox, function (sender, eventType)
+        local inputStr = GUI:TextInput_getString(PrivateChat._editBox)
         if eventType == 2 or eventType == 3 or eventType == 4 then
-            PrivateChat._autoStr = GUI:TextInput_getString(PrivateChat._editBox)
-            PrivateChat._autoStr = string.trim(PrivateChat._autoStr)
-            PrivateChat._autoStr = string.gsub(PrivateChat._autoStr, "[\t\n\r]", "")
-            GUI:TextInput_setString(PrivateChat._editBox, PrivateChat._autoStr)
-            ChatData.SetLocalChatDataByChannel(CHANNEL.PRIVATE, PrivateChat._autoStr)
+            inputStr = string.gsub(string.trim(inputStr), "[\t\n\r]", "")
+            GUI:TextInput_setString(PrivateChat._editBox, inputStr)
+        elseif eventType == 1 then
+            -- 检测敏感词
+            SL:RequestCheckSensitiveWord(inputStr, 2, function(state, str, risk_param, ex_param)
+                GUI:TextInput_setString(PrivateChat._editBox, str)
+                -- 检测，不通过
+                if not state then
+                    SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
+                    return
+                end
+    
+                if risk_param and risk_param ~= 0 then
+                    SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
+                    return
+                end
+
+                if ex_param then
+                    if ex_param.status and ex_param.status ~= 0 then
+                        SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
+                        return
+                    end
+                end
+
+                PrivateChat._autoStr = str
+                ChatData.SetLocalChatDataByChannel(CHANNEL.PRIVATE, PrivateChat._autoStr)
+            end, {channel_id = CHANNEL.PRIVATE})
+            
         end
     end)
     

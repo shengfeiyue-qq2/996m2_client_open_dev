@@ -56,6 +56,9 @@ SL:Require("GUILayout/PCSpellScope", true)
 --烟花特效
 SL:Require("GUILayout/firework_hall/FireWorkHall", true)
 
+-- 快速选择目标
+SL:Require("GUILayout/QuickSelect", true)
+
 -----------------------------------------------------------------------------
 -------社交------------
 --监听新邮件提醒
