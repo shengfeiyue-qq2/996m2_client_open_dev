@@ -430,7 +430,7 @@ function LookPlayerEquip.UpdateGuildInfo()
     GUI:Text_setString(textGuildInfo, str)
     local color = LookPlayerData.GetPlayerNameColor()
     if color and color > 0 then
-        SL:SetColorStyle(textGuildInfo, SL:GetHexColorByStyleId(color))
+        SL:SetColorStyle(textGuildInfo, color)
     end
 end
 

@@ -5,7 +5,7 @@ LookPlayerBestRing._ui = nil
 local EquipPosSet = {30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41}
 
 -- 装备数据类型
-local EDType = GUIDefine.EquipDataType.EQUIP
+local EDType = GUIDefine.EquipDataType.OTHER_EQUIP
 
 local isPC = SL:GetValue("IS_PC_OPER_MODE")
 
@@ -110,7 +110,7 @@ function LookPlayerBestRing.InitEquipLayerEvent()
     for _,pos in ipairs(LookPlayerBestRing._EquipPosSet) do
         local widget = LookPlayerBestRing.GetPanel(pos)
         local iconVisible = true
-        local data =  GUIFunction:GetEquipDataByPos(pos, nil, EDType)
+        local data = GUIFunction:GetEquipDataByPos(pos, nil, EDType)
         if data then
             LookPlayerBestRing.CreateEquipItem(GUI:getChildByName(widget, "Node"), data)
             iconVisible = false

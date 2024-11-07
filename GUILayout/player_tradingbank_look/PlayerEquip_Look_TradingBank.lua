@@ -387,7 +387,7 @@ function PlayerEquip_Look_TradingBank.UpdateGuildInfo()
     GUI:Text_setString(textGuildInfo, str)
     local color = TradingBankLookPlayerData.GetPlayerNameColor()
     if color and color > 0 then
-        SL:SetColorStyle(textGuildInfo, SL:GetHexColorByStyleId(color))
+        SL:SetColorStyle(textGuildInfo, color)
     end
 end
 

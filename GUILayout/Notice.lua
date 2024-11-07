@@ -1112,6 +1112,42 @@ function Notice.OnShowPlayerNGEXPNotice(data)
     Notice.OnShowNGEXPNotice(data)
 end
 
+function Notice.OnAddChild(child)
+    if not child then
+        return
+    end
+
+    local size = GUI:getContentSize(child)
+    local anr = GUI:getAnchorPoint(child)
+    local pos = GUI:getWorldPosition(child)
+
+    local viewSize = global.Director:getVisibleSize()
+    local screenW = SL:GetValue("SCREEN_WIDTH")
+    local screenH = SL:GetValue("SCREEN_HEIGHT")
+
+    local x = math.min(math.max(0, pos.x), screenW)
+    local y = math.min(math.max(0, pos.y), screenH)
+
+    local maxX = x + size.width  * (1 - anr.x)
+    local maxY = y + size.height * (1 - anr.y)
+    
+    x = maxX > screenW and (x - maxX + screenW) or x
+    y = maxY > screenH and (y - maxY + screenH) or y
+    GUI:setPosition(child, x, y)
+
+    GUI:addChild(Notice._root, child)
+end
+
+function Notice.OnRemoveChild(name)
+    if not name or not Notice._root then
+        return
+    end
+
+    if GUI:getChildByName(Notice._root, name) then
+        GUI:removeChildByName(Notice._root, name)
+    end
+end
+
 -----------------------------------注册事件--------------------------------------
 function Notice.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_WINDOW_CHANGE, "Notice", Notice.OnAdapet)
@@ -1129,6 +1165,8 @@ function Notice.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_NOTICE_ATTRIBUTE, "Notice", Notice.OnShowAttributeTips)
     SL:RegisterLUAEvent(LUA_EVENT_NOTICE_EXP, "Notice", Notice.OnShowPlayerEXPNotice)
     SL:RegisterLUAEvent(LUA_EVENT_NOTICE_DROP, "Notice", Notice.OnShowItemDropNotice)
+    SL:RegisterLUAEvent(LUA_EVENT_NOTICE_CHILD_ADD, "Notice", Notice.OnAddChild)
+    SL:RegisterLUAEvent(LUA_EVENT_NOTICE_CHILD_REMOVE, "Notice", Notice.OnRemoveChild)
     SL:RegisterLUAEvent(LUA_EVENT_PLAYER_INTERNAL_EXP_CHANGE, "Notice", Notice.OnShowPlayerNGEXPNotice)
     SL:RegisterLUAEvent(LUA_EVENT_HERO_INTERNAL_EXP_CHANGE, "Notice", Notice.OnShowHeroNGEXPNotice)
     SL:RegisterLUAEvent(LUA_EVENT_DEVICE_ROTATION_CHANGED, "Notice", Notice.OnAdapet)
@@ -1150,6 +1188,8 @@ function Notice.RemoveEvent()
     SL:UnRegisterLUAEvent(LUA_EVENT_NOTICE_ATTRIBUTE, "Notice")
     SL:UnRegisterLUAEvent(LUA_EVENT_NOTICE_EXP, "Notice")
     SL:UnRegisterLUAEvent(LUA_EVENT_NOTICE_DROP, "Notice")
+    SL:UnRegisterLUAEvent(LUA_EVENT_NOTICE_CHILD_ADD, "Notice")
+    SL:UnRegisterLUAEvent(LUA_EVENT_NOTICE_CHILD_REMOVE, "Notice")
     SL:UnRegisterLUAEvent(LUA_EVENT_PLAYER_INTERNAL_EXP_CHANGE, "Notice")
     SL:UnRegisterLUAEvent(LUA_EVENT_HERO_INTERNAL_EXP_CHANGE, "Notice")
     SL:UnRegisterLUAEvent(LUA_EVENT_DEVICE_ROTATION_CHANGED, "Notice")

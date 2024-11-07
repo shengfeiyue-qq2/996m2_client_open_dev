@@ -181,13 +181,38 @@ end
 
 function Bag.UpdateItemList()
     BagInfo._openNum = BagData.GetMaxBag()
-    Bag.InitPage()
+    Bag.RefreshPageShow()
     Bag.UpdateItems()
 
     local page = BagInfo._selPage or 1
     BagData.SetCurPage(page)
     BagInfo._selPage = page
     Bag.SetPageBtnStatus()
+end
+
+function Bag.RefreshPageShow()
+    BagInfo._bagPage = math.ceil(BagInfo._openNum / BagInfo._perPageNum)
+    BagInfo._bagPage = math.max(BagInfo._bagPage, 1)
+    BagInfo._bagPage = math.min(BagInfo._bagPage, BagInfo._maxPage)
+
+    for i = 1, BagInfo._maxPage do
+        local pageBtn = BagInfo._ui["Button_page" .. i]
+        GUI:setVisible(pageBtn, false)
+        if BagInfo._bagPage ~= 1 and i <= BagInfo._bagPage then
+            GUI:setVisible(pageBtn, true)
+            GUI:setTag(pageBtn, i)
+            if not BagInfo._bagPageBtns[i] then
+                BagInfo._bagPageBtns[i] = pageBtn
+                GUI:addOnClickEvent(GUI:getChildByName(pageBtn, "TouchSize"), function()
+                    if BagInfo._selPage == i then
+                        return false
+                    end
+                    Bag.PageTo(i)
+                    Bag.UpdateItems()
+                end)
+            end
+        end
+    end
 end
 
 function Bag.UpdateItems()
@@ -328,15 +353,10 @@ function Bag.InitBigBag()
         local slices = string.split(bag_row_col, "|") 
         BagInfo._row = tonumber(slices[2]) or 5
         BagInfo._col = tonumber(slices[1]) or 8
-        BagInfo._perPageNum   = BagInfo._row * BagInfo._col
+        BagInfo._perPageNum = BagInfo._row * BagInfo._col
 
-        -- 隐藏页签
-        if BagInfo._perPageNum > BagInfo._defaultNum then 
-            for i = 1, BagInfo._maxPage do
-                local pageBtn = BagInfo._ui["Button_page"..i]
-                GUI:setVisible(pageBtn, false)
-            end
-        end 
+        -- 刷新页签
+        Bag.RefreshPageShow()
 
         local pSize       = GUI:getContentSize(BagInfo._ui.Panel_items)
         GUI:ScrollView_setInnerContainerSize(BagInfo._ui.Panel_items, pSize)

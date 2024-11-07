@@ -2190,7 +2190,7 @@ function GUIFunction:CreateChatRichElements(data)
                 table.insert(elements, element)
             elseif v.sfxID then
                 -- 创建一个表情
-                local layout = GUI:Layout_Create(-1, "emoji_panel", 0, 0, 35, 35)
+                local layout = GUI:Layout_Create(-1, "emoji_panel", 0, 0, 36, 36)
                 GUI:addStateEvent(layout, function(state)
                     if state == "enter" then
                         GUI:removeAllChildren(layout)

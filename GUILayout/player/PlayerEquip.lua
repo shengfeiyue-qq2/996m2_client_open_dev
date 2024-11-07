@@ -451,7 +451,6 @@ function PlayerEquip.UpdateModelFeatureData()
     PlayerEquip._feature.hairID = PlayerEquip._hairID
     PlayerEquip._feature.embattlesID = GUIFunction:GetEmbattle(EDType)
 
-    dump(PlayerEquip._feature, "--PlayerEquip._feature-----")
 end
 
 -- 额外的装备位置
@@ -473,7 +472,8 @@ end
 
 function PlayerEquip.InitBestRingsBox()
     local texture = GUI:GetWindow(nil, UIConst.LAYERID.PlayerBestRingGUI) and "btn_jewelry_1_1.png" or "btn_jewelry_1_0.png"
-    GUI:Image_loadTexture(PlayerEquip._ui.Image_box, GUIDefine.PATH_RES_PRIVATE .. "player_best_rings_ui/player_best_rings_ui_mobile/" .. texture)
+    local path = isPC and "player_best_rings_ui_win32" or "player_best_rings_ui_mobile"
+    GUI:Image_loadTexture(PlayerEquip._ui.Image_box, string.format("res/private/player_best_rings_ui/%s/%s", path, texture))
     -- 重置尺寸
     GUI:setIgnoreContentAdaptWithSize(PlayerEquip._ui.Image_box, true)
     PlayerEquip.UpdateBestRingsBox()
@@ -663,7 +663,7 @@ function PlayerEquip.UpdateGuildInfo()
     GUI:Text_setString(textGuildInfo, str)
     local color = SL:GetValue("USER_NAME_COLOR")
     if color and color > 0 then
-        SL:SetColorStyle(textGuildInfo, SL:GetHexColorByStyleId(color))
+        SL:SetColorStyle(textGuildInfo, color)
     end
 end
 

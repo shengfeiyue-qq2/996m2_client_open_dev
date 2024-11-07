@@ -1558,3 +1558,98 @@ SL:RegisterLUAEvent(LUA_EVENT_SOCIAL_RELATION_NOTICE, "GUIInit", function(data)
         SL:ShowSystemTips(string.format("【%s】加入了【%s】", member, relationName))
     end
 end)
+
+-----------------------------------------------------------------------------
+-- 通知
+function FixNodePosToAnchorZero(node)
+    local positionX     = GUI:getPositionX(node)
+    local positionY     = GUI:getPositionY(node)
+    local anchorPoint   = GUI:getAnchorPoint(node)
+    local contentSize   = GUI:getContentSize(node)
+    local nPositionX    = math.floor(positionX - anchorPoint.x * contentSize.width)
+    local nPositionY    = math.floor(positionY - anchorPoint.y * contentSize.height)
+    GUI:setAnchorPoint(node, 0, 0)
+    GUI:setPosition(node, nPositionX, nPositionY)
+    return nPositionX, nPositionY
+end
+
+function ShowWorldTips(tips, worldPos, anchorPoint)
+    HideMouseOverTips()
+
+    local layoutTips = GUI:Layout_Create(-1, "__MouseTips", 0, 0, 0, 0)
+    GUI:Layout_setBackGroundColor(layoutTips, "#000000")
+    GUI:Layout_setBackGroundColorType(layoutTips, 1)
+    GUI:Layout_setBackGroundColorOpacity(layoutTips, 100)
+
+    local imageFrame = GUI:Image_Create(layoutTips, "imageFrame", 0, 0, "res/public/1900000582.png")
+    GUI:Image_setScale9Slice(imageFrame, 10, 10, 10, 10)
+
+    if type(tips) == "function" then
+        tips = tips()
+    end
+
+    local fontSize = SL:GetValue("GAME_DATA","DEFAULT_FONT_SIZE") or 16
+    local textTips = GUI:RichTextFCOLOR_Create(layoutTips, "textTips", 0, 0, tips, SL:GetValue("SCREEN_WIDTH"), fontSize, "#FFFFFF")
+    GUI:setAnchorPoint(textTips, 0.5, 0.5)
+
+    local richSize  = GUI:getContentSize(textTips)
+    local layoutWid = richSize.width + 10
+    local layoutHei = richSize.height + 10
+    GUI:setContentSize(layoutTips, layoutWid, layoutHei)
+    GUI:setPosition(textTips, layoutWid / 2, layoutHei / 2)
+    GUI:setContentSize(imageFrame, layoutWid, layoutHei)
+    GUI:setAnchorPoint(layoutTips, anchorPoint.x, anchorPoint.y)
+    GUI:setPosition(layoutTips, worldPos.x, worldPos.y)
+
+    FixNodePosToAnchorZero(layoutTips)
+
+    SL:OnLUAEvent(LUA_EVENT_NOTICE_CHILD_ADD, layoutTips)
+end
+
+local defaultOffset = {x = 0, y = 0}
+local defaultAnchor = {x = 0.5, y = 0.5}
+function ShowMouseOverTips(widget, tips, offset, anchor)
+    HideMouseOverTips()
+
+    offset = offset or defaultOffset
+    anchor = anchor or defaultAnchor
+
+    local layoutTips = GUI:Layout_Create(-1, "__MouseTips", 0, 0, 0, 0)
+    GUI:Layout_setBackGroundColor(layoutTips, "#000000")
+    GUI:Layout_setBackGroundColorType(layoutTips, 1)
+    GUI:Layout_setBackGroundColorOpacity(layoutTips, 100)
+
+    local imageFrame = GUI:Image_Create(layoutTips, "imageFrame", 0, 0, "res/public/1900000582.png")
+    GUI:Image_setScale9Slice(imageFrame, 10, 10, 10, 10)
+
+    if type(tips) == "function" then
+        tips = tips()
+    end
+
+    local fontSize = SL:GetValue("GAME_DATA","DEFAULT_FONT_SIZE") or 16
+    local textTips = GUI:RichTextFCOLOR_Create(layoutTips, "textTips", 0, 0, tips, SL:GetValue("SCREEN_WIDTH"), fontSize, "#FFFFFF")
+    GUI:setAnchorPoint(textTips, 0.5, 0.5)
+
+    local richSize  = GUI:getContentSize(textTips)
+    local layoutWid = richSize.width + 10
+    local layoutHei = richSize.height + 10
+    GUI:setContentSize(layoutTips, layoutWid, layoutHei)
+    GUI:setPosition(textTips, layoutWid / 2, layoutHei / 2)
+    GUI:setContentSize(imageFrame, layoutWid, layoutHei)
+
+    local contentSize   = GUI:getContentSize(widget)
+    local anchorPoint   = GUI:getAnchorPoint(widget)
+    local worldPos      = GUI:getWorldPosition(widget)
+    local fixPosX       = worldPos.x + (0.5 - anchorPoint.x) * contentSize.width
+    local fixPosY       = worldPos.y + (1 - anchorPoint.y) * contentSize.height + layoutHei / 2
+    GUI:setAnchorPoint(layoutTips, anchor.x, anchor.y)
+    GUI:setPosition(layoutTips, fixPosX + offset.x, fixPosY + offset.y)
+
+    FixNodePosToAnchorZero(layoutTips)
+
+    SL:OnLUAEvent(LUA_EVENT_NOTICE_CHILD_ADD, layoutTips)
+end
+
+function HideMouseOverTips()
+    SL:onLUAEvent(LUA_EVENT_NOTICE_CHILD_REMOVE, "__MouseTips")
+end

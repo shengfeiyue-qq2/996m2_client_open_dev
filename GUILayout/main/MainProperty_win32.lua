@@ -710,7 +710,7 @@ function MainProperty.InitChatPanel()
                 MainProperty.UpdateReceiving()
             end)
             if isOpen then
-                GUI:addMouseOverTips(btnChannel, strs[i], {x = -10,y = -20}, {x = 1, y = 0.5})
+                GUI:addMouseOverTips(btnChannel, strs[i], {x = -10, y = -20}, {x = 1, y = 0.5})
             end
         end
     end
@@ -1018,6 +1018,14 @@ function MainProperty.SelectChannel(channel)
         MainProperty.OnPrivateChatWithTarget(target)
     end
 end
+function MainProperty.CreateChannelCell(id)
+    local widget = GUI:Widget_Create(-1, "Widget_" .. id, 0, 0, 0, 0)
+    GUI:LoadExport(widget, "main/main_channel_cell_win32")
+    local cell = GUI:getChildByName(widget, "channel_cell")
+
+    GUI:removeFromParent(cell)
+    return cell
+end
 
 function MainProperty.ShowChannels()
     local Panel_channel_s = MainProperty._ui["Panel_channel_s"]
@@ -1052,8 +1060,7 @@ function MainProperty.ShowChannels()
             end
 
             local name = CHANNEL_NAME[id]
-            local cell = GUI:Clone(MainProperty._ui["channel_cell"])
-            GUI:setVisible(cell, true)
+            local cell = MainProperty.CreateChannelCell(id)
             GUI:Text_setString(GUI:getChildByName(cell, "Text_title"), name)
             GUI:setVisible(GUI:getChildByName(cell, "Image_selected"), id == ChatData.GetCurChannel())
 
@@ -1110,12 +1117,13 @@ end
 function MainProperty.OnAddChatItem(cell)
     -- 是否正在拖动
     local listviewCells = MainProperty._ui["ListView_chat"]
-    if next(listviewCells:getItems()) then
-        local lastItem  = listviewCells:getItem(#listviewCells:getItems() - 1)
-        local size      = lastItem:getContentSize()
-        local aPoint    = lastItem:getAnchorPoint()
-        local worldPosY = lastItem:getWorldPosition().y - (size.height * aPoint.y) 
-        local listviewY = listviewCells:getWorldPosition().y
+    if next(GUI:ListView_getItems(listviewCells)) then
+        local lastIdx   = #GUI:ListView_getItems(listviewCells) - 1
+        local lastItem  = GUI:ListView_getItemByIndex(listviewCells, lastIdx)
+        local size      = GUI:getContentSize(lastItem)
+        local aPoint    = GUI:getAnchorPoint(lastItem)
+        local worldPosY = GUI:getWorldPosition(lastItem).y - (size.height * aPoint.y) 
+        local listviewY = GUI:getWorldPosition(listviewCells).y
         -- 是否屏幕外
         if worldPosY < listviewY then
             MainProperty._isScrolling = true
@@ -1124,12 +1132,12 @@ function MainProperty.OnAddChatItem(cell)
 
     if MainProperty._isScrolling then
         -- 正在拖动，消息缓存
-        cell:retain()
+        GUI:addRef(cell)
         table.insert(MainProperty._chatCellCache, cell)
     
         while #MainProperty._chatCellCache > GUIDefine.ChatConfig.LIMIT_COUNT_PC do
             local cell = table.remove(MainProperty._chatCellCache, 1)
-            cell:autorelease()
+            GUI:autoDecRef(cell)
         end
     else
         MainProperty.PushChatCell(cell)

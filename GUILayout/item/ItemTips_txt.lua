@@ -2479,6 +2479,7 @@ function ItemTips.CreateEquipPanel(data, itemData, isWear, panelInsertIndex)
 
     _panelNum = _panelNum + 1
 
+    ItemTips._baseAttList, ItemTips._diyAttList = nil, nil
     ItemTips._baseAttrs, ItemTips._ysAttrs, ItemTips._upAttrs = nil, nil, nil
 
     ItemTips.InitTipsWidth()
