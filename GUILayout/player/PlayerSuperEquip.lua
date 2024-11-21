@@ -107,9 +107,9 @@ function PlayerSuperEquip.main()
     PlayerSuperEquip.CreateUIModel()
 
     -- 自定义组件挂接
-    SL:AttachTXTSUI({root = parent, index = SLDefine.SUIComponentTable.PlayerSuperEquip})
+    SL:AttachTXTSUI({root = PlayerSuperEquip._ui["Panel_1"], index = SLDefine.SUIComponentTable.PlayerSuperEquip})
 
-    SL:AttachTXTSUI({root = PlayerSuperEquip._ui["BG"], index = SLDefine.SUIComponentTable.PlayerSuperEquipB})
+    SL:AttachTXTSUI({root = isPC and PlayerSuperEquip._ui["Image_equippanel"] or PlayerSuperEquip._ui["Image_20"], index = SLDefine.SUIComponentTable.PlayerSuperEquipB})
 
     PlayerSuperEquip.InitJJSplit()
 end

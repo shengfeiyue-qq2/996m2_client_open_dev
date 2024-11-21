@@ -114,7 +114,7 @@ function LookHeroEquip.main()
     LookHeroEquip.CreateUIModel()
 
     -- 自定义组件挂接
-    SL:AttachTXTSUI({root = parent, index = SLDefine.SUIComponentTable.PlayerEquipB_hero})
+    SL:AttachTXTSUI({root = LookHeroEquip._ui["EquipUI"], index = SLDefine.SUIComponentTable.PlayerEquipB_hero})
 
     SL:AttachTXTSUI({root = LookHeroEquip._ui["BG"], index = SLDefine.SUIComponentTable.PlayerEquipBO_hero})
 end

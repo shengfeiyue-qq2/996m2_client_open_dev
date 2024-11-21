@@ -30,7 +30,7 @@ function LookPlayerBuff.main()
     -- 加载内容
     LookPlayerBuff.OnFillContent()
 
-    SL:AttachTXTSUI({root = self._layer._root, index = SLDefine.SUIComponentTable.PlayerBuffO})
+    SL:AttachTXTSUI({root = parent, index = SLDefine.SUIComponentTable.PlayerBuffO})
 
     SL:RegisterLUAEvent(LUA_EVENT_BUFF_UPDATE, "LookPlayerBuff", LookPlayerBuff.OnUpdateBuff)
 end

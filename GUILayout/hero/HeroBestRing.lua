@@ -161,7 +161,7 @@ function HeroBestRing.RegisterMouseEvent()
         local nRect = GUI:Rect(0, 0, TouchSize.width, TouchSize.height)
         local iPos  = {x = posXInPanel, y = posYInPanel}
         for _,pos in ipairs(HeroBestRing._EquipPosSet) do
-            local itemNode = self:GetPanel(pos)
+            local itemNode = HeroBestRing.GetPanel(pos)
             if itemNode then
                 local p = GUI:getPosition(itemNode)
                 nRect.x = p.x - TouchSize.width / 2

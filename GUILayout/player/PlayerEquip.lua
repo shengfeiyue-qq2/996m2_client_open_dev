@@ -123,7 +123,7 @@ function PlayerEquip.main()
     SL:PlayerEquipUILoadSuccessAddRed()
 
     -- 自定义组件挂接
-    SL:AttachTXTSUI({root = parent, index = SLDefine.SUIComponentTable.PlayerEquip})
+    SL:AttachTXTSUI({root = PlayerEquip._ui["EquipUI"], index = SLDefine.SUIComponentTable.PlayerEquip})
 
     SL:AttachTXTSUI({root = PlayerEquip._ui["BG"], index = SLDefine.SUIComponentTable.PlayerEquipB})
 

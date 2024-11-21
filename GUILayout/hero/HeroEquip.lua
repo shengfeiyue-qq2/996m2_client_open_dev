@@ -118,7 +118,7 @@ function HeroEquip.main()
     SL:HeroEquipUILoadSuccessAddRed()
 
     -- 自定义组件挂接
-    SL:AttachTXTSUI({root = parent, index = SLDefine.SUIComponentTable.PlayerEquip_hero})
+    SL:AttachTXTSUI({root = HeroEquip._ui["EquipUI"], index = SLDefine.SUIComponentTable.PlayerEquip_hero})
 
     SL:AttachTXTSUI({root = HeroEquip._ui["BG"], index = SLDefine.SUIComponentTable.PlayerEquipB_hero})
 end
