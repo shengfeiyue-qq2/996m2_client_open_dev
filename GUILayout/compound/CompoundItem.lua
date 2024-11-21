@@ -145,7 +145,7 @@ function CompoundItem.RefreshInfoMenu()
     for i, v in pairs(data) do 
         local param = CompoundItem.GetPageParam(i)
         if not list[i] and CompoundItem._choosePage1 == param.page1 then
-            local isShow = SL:GetValue("COMPOUND_CHECK_LIST_IS_SHOW", param.page1, param.page2) 
+            local isShow = CompoundItemData.CheckTabIsShow(param.page1, param.page2)
             if isShow then
                 list[i] = true
             end
@@ -717,41 +717,37 @@ function CompoundItem.RefreshCompoundRedPoint(upData)
     end
 
     if upData.id then
-        local function refreshRed()
-            local secondPage = SL:GetValue("COMPOUND_PAGE_BY_ID", upData.id)
-            local config = CompoundItemData.GetConfigByID(upData.id)
-            local firstPage = config and config.page1
-            local secondPage = config and config.page2
-            if firstPage and secondPage then
-                local firstLayout = GUI:getChildByTag(CompoundItem._ui["ListView_list1"], firstPage)
+        local config = CompoundItemData.GetConfigByID(upData.id)
+        local firstPage = config and config.page1
+        local secondPage = config and config.page2
+        if firstPage and secondPage then
+            local firstLayout = GUI:getChildByTag(CompoundItem._ui["ListView_list1"], firstPage)
 
-                if firstLayout then
-                    local redState = CompoundItemData.CheckTabRedState(firstPage)
-                    local imgRed = GUI:getChildByName(firstLayout, "Image_red")
-                    GUI:setVisible(imgRed, redState)
-                end
-
-                local secondLayout = GUI:getChildByTag(CompoundItem._ui["ListView_list2"], secondPage)
-                if secondLayout then
-                    local redState2 = CompoundItemData.CheckTabRedState(firstPage, secondPage)
-                    local imgRed2 = GUI:getChildByName(secondLayout, "Image_red")
-                    GUI:setVisible(imgRed2, redState2)
-                end
-
-                local itemLayout = GUI:getChildByTag(CompoundItem._ui["ListView_list2"], upData.id + 100000) 
-                if itemLayout then
-                    local redState3 = CompoundItemData.GetCompoundStateByID(upData.id)
-                    local imgRed3 = GUI:getChildByName(itemLayout, "Image_red")
-                    GUI:setVisible(imgRed3, redState3)
-                end 
-
-                if CompoundItem._chooseCompoundID == upData.id then
-                    CompoundItem.UpdateCompoundLayer(CompoundItem._chooseCompoundID)
-                end
+            if firstLayout then
+                local redState = CompoundItemData.CheckTabRedState(firstPage)
+                local imgRed = GUI:getChildByName(firstLayout, "Image_red")
+                GUI:setVisible(imgRed, redState)
             end
-        end 
 
-        refreshRed()
+            local pageIndex = firstPage * 1000 + secondPage
+            local secondLayout = GUI:getChildByTag(CompoundItem._ui["ListView_list2"], pageIndex)
+            if secondLayout then
+                local redState2 = CompoundItemData.CheckTabRedState(firstPage, secondPage)
+                local imgRed2 = GUI:getChildByName(secondLayout, "Image_red")
+                GUI:setVisible(imgRed2, redState2)
+            end
+
+            local itemLayout = GUI:getChildByTag(CompoundItem._ui["ListView_list2"], upData.id + 100000) 
+            if itemLayout then
+                local redState3 = CompoundItemData.GetCompoundStateByID(upData.id)
+                local imgRed3 = GUI:getChildByName(itemLayout, "Image_red")
+                GUI:setVisible(imgRed3, redState3)
+            end 
+
+            if CompoundItem._chooseCompoundID == upData.id then
+                CompoundItem.UpdateCompoundLayer(CompoundItem._chooseCompoundID)
+            end
+        end
     end 
 end
 

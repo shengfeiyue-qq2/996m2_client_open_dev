@@ -1653,3 +1653,38 @@ end
 function HideMouseOverTips()
     SL:onLUAEvent(LUA_EVENT_NOTICE_CHILD_REMOVE, "__MouseTips")
 end
+
+-----------------------------------------------------------------------------
+-- NPC进视野控制气泡显示
+SL:RegisterLUAEvent(LUA_EVENT_ACTOR_IN_OF_VIEW, "GUIInit", function(data)
+    local actorID = data and data.id
+    if not actorID then
+        return
+    end
+
+    if not SL:GetValue("ACTOR_IS_VALID", actorID) then
+        return
+    end
+
+    if not SL:GetValue("ACTOR_IS_NPC", actorID) then
+        return
+    end
+
+    local x         = SL:GetValue("X")
+    local y         = SL:GetValue("Y")
+    local npcMapX   = SL:GetValue("ACTOR_MAP_X", actorID)
+    local npcMapY   = SL:GetValue("ACTOR_MAP_Y", actorID)
+    if math.abs(x - npcMapX) <= 2 and math.abs(y - npcMapY) <= 2 then
+        GUIFunction:OnShowNpcTalkTips(actorID)
+    end
+end)
+
+-- 地图切换移除NPC气泡
+SL:RegisterLUAEvent(LUA_EVENT_CHANGESCENE, "GUIInit", function()
+    GUIFunction:OnHideNpcTalkTips()
+end)
+
+-- 清理
+SL:RegisterLUAEvent(LUA_EVENT_GAME_MEMORY_RELEASE, "GUIInit", function()
+    GUIFunction:OnClearNpcTalkTips()
+end)

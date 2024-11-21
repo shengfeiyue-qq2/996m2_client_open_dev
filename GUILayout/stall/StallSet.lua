@@ -51,7 +51,7 @@ function StallSet.InitUI()
             UIOperator:CloseStallSetLayerUI()
         end
         SL:RequestCheckSensitiveWord(name, 1, handle_Func)
-        GUI:delayTouchEnabled(sender, StallSet._ui.Button_ok)
+        GUI:delayTouchEnabled(StallSet._ui.Button_ok)
     end
     GUI:addOnClickEvent(StallSet._ui.Button_ok, SellCallBack)
 

@@ -2158,6 +2158,120 @@ function GUIFunction:GenerateChatPCPrivateItem(data)
     return cell
 end
 
+-------- 解析消息元素
+-- 普通
+local function createNormalElements(msg, defaultfontPath, defaultSize, color, outlineColor, outlineSize, isActorSay)
+    local elements  = {}
+    local defaultOutlineColor = outlineColor or "#000000"
+    local defaultOutlineSize = outlineSize or 0
+    local emojiOffSetY = isActorSay and -4 or 0
+    local parseT = GUIFunction:ChatParseNormal(msg)
+    for i, v in ipairs(parseT) do
+        if v.text then
+            local element = GUI:RichTextCombineCell_Create(-1, "normal_text", 0, 0, "TEXT", {
+                str             = v.text,
+                color           = v.color and SL:GetHexColorByStyleId(v.color) or color,
+                opacity         = v.opacity,
+                fontPath        = v.fontPath or defaultfontPath,
+                fontSize        = v.fontSize or defaultSize,
+                outlineColor    = v.outColor and SL:GetHexColorByStyleId(v.outColor) or defaultOutlineColor,
+                outlineSize     = v.outlineSize or defaultOutlineSize
+            })
+            table.insert(elements, element)
+        elseif v.sfxID then
+            -- 创建一个表情
+            local layout = GUI:Layout_Create(-1, "emoji_panel", 0, 0, 36, 36)
+            GUI:addStateEvent(layout, function(state)
+                if state == "enter" then
+                    GUI:removeAllChildren(layout)
+                    local size = GUI:getContentSize(layout)
+                    local emojiSfx = GUI:Effect_Create(layout, "emoji_sfx", size.width / 2, size.height / 2 + emojiOffSetY, 0, v.sfxID)
+                    GUI:setScale(emojiSfx, 0.7)
+                end
+            end)
+            local element = GUI:RichTextCombineCell_Create(-1, "emoji_element", 0, 0, "NODE", {node = layout})
+            table.insert(elements, element)
+        end
+    end
+    return elements
+end
+
+-- 坐标
+local function parseEPosition(msg, defaultfontPath, defaultSize)
+    local elements  = {}
+    local jsonData  = SL:JsonDecode(msg)
+    local parseT    = GUIFunction:ChatParseEPosition(jsonData)
+    local color     = "#00cb52"         -- 默认色值
+    for i, v in ipairs(parseT) do
+        if v.text then  
+            local element = GUI:RichTextCombineCell_Create(-1, "position_text", 0, 0, "TEXT", {
+                str             = v.text,
+                color           = v.color and SL:GetHexColorByStyleId(v.color) or color,
+                opacity         = v.opacity,
+                fontPath        = v.fontPath or defaultfontPath,
+                fontSize        = v.fontSize or defaultSize,
+                link            = v.link or "",
+                outlineColor    = v.outColor and SL:GetHexColorByStyleId(v.outColor) or "#000000",
+                outlineSize     = v.outlineSize or 0
+            })
+            table.insert(elements, element)
+        end
+    end
+    return elements
+end
+
+-- 装备
+local function parseEItem(msg, defaultfontPath, defaultSize, color)
+    local jsonData = SL:JsonDecode(msg)
+    if type(jsonData.ExtendInfo) == "string" then
+        jsonData.ExtendInfo = SL:JsonDecode(jsonData.ExtendInfo)
+    end
+    jsonData = SL:TransItemDataIntoChatShow(jsonData)
+
+    local elements = {}
+    local parseT = GUIFunction:ChatParseEItem(jsonData)
+    local isPc = SL:GetValue("IS_PC_OPER_MODE")
+    local size = isPc and {width = 40, height = 40} or {width = 66, height = 66}
+    for i, v in ipairs(parseT) do
+        if v.text then
+            local element = GUI:RichTextCombineCell_Create(-1, "equip_text", 0, 0, "TEXT", {
+                str             = v.text,
+                color           = v.color and SL:GetHexColorByStyleId(v.color) or color,
+                opacity         = v.opacity,
+                fontPath        = v.fontPath or defaultfontPath,
+                fontSize        = v.fontSize or defaultSize,
+                link            = v.link or "",
+                outlineColor    = v.outColor and SL:GetHexColorByStyleId(v.outColor) or "#000000",
+                outlineSize     = v.outlineSize or 0
+            })
+            table.insert(elements, element)
+        elseif v.equip then
+            -- 创建道具item
+            local layout = GUI:Layout_Create(-1, "item_panel", 0, 0, size.width, size.height)
+            GUI:addStateEvent(layout, function(state)
+                if state == "enter" then
+                    GUI:removeAllChildren(layout)
+                    local item = GUI:ItemShow_Create(layout, "item", size.width / 2, size.height / 2, {
+                        index       = v.equip.Index,
+                        itemData    = v.equip,
+                        look        = true,
+                        bgVisible   = true,
+                        checkPower  = true
+                    })
+                    GUI:setAnchorPoint(item, 0.5, 0.5)
+                end
+            end)
+            local element = GUI:RichTextCombineCell_Create(-1, "equip_element", 0, 0, "NODE", {
+                node    = layout,
+                color   = v.color and SL:GetHexColorByStyleId(v.color) or "#FFFFFF",
+                opacity = v.opacity or 255
+            })
+            table.insert(elements, element)
+        end
+    end
+    return elements
+end
+
 -- 创建不同类型聊天富文本元素
 function GUIFunction:CreateChatRichElements(data)
     data.FColor     = data.FColor or 0
@@ -2172,124 +2286,14 @@ function GUIFunction:CreateChatRichElements(data)
     local mt        = tonumber(data.MT) or 0
     local msg       = data.Msg
 
-    -- 普通
-    local function createNormalElements()
-        local elements  = {}
-        local parseT = GUIFunction:ChatParseNormal(msg)
-        for i, v in ipairs(parseT) do
-            if v.text then
-                local element = GUI:RichTextCombineCell_Create(-1, "normal_text", 0, 0, "TEXT", {
-                    str             = v.text,
-                    color           = v.color and SL:GetHexColorByStyleId(v.color) or FColorHEX,
-                    opacity         = v.opacity,
-                    fontPath        = v.fontPath or defaultfontPath,
-                    fontSize        = v.fontSize or defaultSize,
-                    outlineColor    = v.outColor and SL:GetHexColorByStyleId(v.outColor) or "#000000",
-                    outlineSize     = v.outlineSize or 0
-                })
-                table.insert(elements, element)
-            elseif v.sfxID then
-                -- 创建一个表情
-                local layout = GUI:Layout_Create(-1, "emoji_panel", 0, 0, 36, 36)
-                GUI:addStateEvent(layout, function(state)
-                    if state == "enter" then
-                        GUI:removeAllChildren(layout)
-                        local size = GUI:getContentSize(layout)
-                        local emojiSfx = GUI:Effect_Create(layout, "emoji_sfx", size.width / 2, size.height / 2, 0, v.sfxID)
-                        GUI:setScale(emojiSfx, 0.7)
-                    end
-                end)
-                local element = GUI:RichTextCombineCell_Create(-1, "emoji_element", 0, 0, "NODE", {node = layout})
-                table.insert(elements, element)
-            end
-        end
-        return elements
-    end
-
-    -- 坐标
-    local function parseEPosition()
-        local elements  = {}
-        local jsonData  = SL:JsonDecode(msg)
-        local parseT    = GUIFunction:ChatParseEPosition(jsonData)
-        local color     = "#00cb52"         -- 默认色值
-        for i, v in ipairs(parseT) do
-            if v.text then  
-                local element = GUI:RichTextCombineCell_Create(-1, "position_text", 0, 0, "TEXT", {
-                    str             = v.text,
-                    color           = v.color and SL:GetHexColorByStyleId(v.color) or color,
-                    opacity         = v.opacity,
-                    fontPath        = v.fontPath or defaultfontPath,
-                    fontSize        = v.fontSize or defaultSize,
-                    link            = v.link or "",
-                    outlineColor    = v.outColor and SL:GetHexColorByStyleId(v.outColor) or "#000000",
-                    outlineSize     = v.outlineSize or 0
-                })
-                table.insert(elements, element)
-            end
-        end
-        return elements
-    end
-
-    -- 装备
-    local function parseEItem()
-        local jsonData = SL:JsonDecode(msg)
-        if type(jsonData.ExtendInfo) == "string" then
-            jsonData.ExtendInfo = SL:JsonDecode(jsonData.ExtendInfo)
-        end
-        jsonData = SL:TransItemDataIntoChatShow(jsonData)
-
-        local elements = {}
-        local parseT = GUIFunction:ChatParseEItem(jsonData)
-        local isPc = SL:GetValue("IS_PC_OPER_MODE")
-        local size = isPc and {width = 40, height = 40} or {width = 66, height = 66}
-        for i, v in ipairs(parseT) do
-            if v.text then
-                local element = GUI:RichTextCombineCell_Create(-1, "equip_text", 0, 0, "TEXT", {
-                    str             = v.text,
-                    color           = v.color and SL:GetHexColorByStyleId(v.color) or FColorHEX,
-                    opacity         = v.opacity,
-                    fontPath        = v.fontPath or defaultfontPath,
-                    fontSize        = v.fontSize or defaultSize,
-                    link            = v.link or "",
-                    outlineColor    = v.outColor and SL:GetHexColorByStyleId(v.outColor) or "#000000",
-                    outlineSize     = v.outlineSize or 0
-                })
-                table.insert(elements, element)
-            elseif v.equip then
-                -- 创建道具item
-                local layout = GUI:Layout_Create(-1, "item_panel", 0, 0, size.width, size.height)
-                GUI:addStateEvent(layout, function(state)
-                    if state == "enter" then
-                        GUI:removeAllChildren(layout)
-                        local item = GUI:ItemShow_Create(layout, "item", size.width / 2, size.height / 2, {
-                            index       = v.equip.Index,
-                            itemData    = v.equip,
-                            look        = true,
-                            bgVisible   = true,
-                            checkPower  = true
-                        })
-                        GUI:setAnchorPoint(item, 0.5, 0.5)
-                    end
-                end)
-                local element = GUI:RichTextCombineCell_Create(-1, "equip_element", 0, 0, "NODE", {
-                    node    = layout,
-                    color   = v.color and SL:GetHexColorByStyleId(v.color) or "#FFFFFF",
-                    opacity = v.opacity or 255
-                })
-                table.insert(elements, element)
-            end
-        end
-        return elements
-    end
-
     if mt == GUIDefine.ChatMsgType.POSITION then
-        return parseEPosition()
+        return parseEPosition(msg, defaultfontPath, defaultSize)
         
     elseif mt == GUIDefine.ChatMsgType.EQUIP then
-        return parseEItem()
+        return parseEItem(msg, defaultfontPath, defaultSize, FColorHEX)
     end
 
-    return createNormalElements()
+    return createNormalElements(msg, defaultfontPath, defaultSize, FColorHEX)
 end
 
 -- 处理私聊名字后接空格状况
@@ -2978,3 +2982,101 @@ function GUIFunction:OnAutoFightBackFunc(attackActorID, actorID)
     end
 end
 -------------------------------------------------------------------------
+-- 检查NPC气泡显示
+local npcTalkNode = nil
+function GUIFunction:CheckNpcTalkTips()
+    if not SL:GetValue("MAIN_PLAYER_IS_VALID") then
+        return
+    end
+
+    local x = SL:GetValue("X")
+    local y = SL:GetValue("Y")
+
+    local targetNpcID = nil
+
+    local npcVec, nCount = SL:GetValue("FIND_IN_VIEW_NPC_LIST")
+    for i = 1, nCount do
+        local npcID = npcVec[i]
+        local npcMapX = SL:GetValue("ACTOR_MAP_X", npcID)
+        local npcMapY = SL:GetValue("ACTOR_MAP_Y", npcID)
+        if SL:GetValue("ACTOR_IS_VALID", npcID) and math.abs(x - npcMapX) <= 2 and math.abs(y - npcMapY) <= 2 then
+            targetNpcID = npcID
+            break
+        end
+    end
+
+    if not targetNpcID then
+        if npcTalkNode then
+            GUI:removeAllChildren(npcTalkNode)
+        end
+        return
+    end
+
+    GUIFunction:OnShowNpcTalkTips(targetNpcID)
+
+end
+
+-- NPC气泡显示
+function GUIFunction:OnShowNpcTalkTips(npcID)
+    if not SL:GetValue("MAIN_PLAYER_IS_VALID") then
+        return
+    end
+
+    if not SL:GetValue("SERVER_OPTION", SW_KEY_NPC_BUTTON) then
+        return
+    end
+
+    if npcTalkNode then
+        GUI:removeAllChildren(npcTalkNode)
+    else
+        local winSize = SL:GetValue("SCREEN_SIZE")
+        local moveY = SL:GetValue("IS_PC_OPER_MODE") and 0 or -88
+        npcTalkNode = GUI:Widget_Create(GUI:Attach_Center(), "npcTalkNode", winSize.width / 2 + 18, winSize.height / 2 + moveY, 0, 0)
+    end
+
+    local imagePopBg = GUI:Image_Create(npcTalkNode, "touch", 0, 0, "res/public/bg_bubble_1.png")
+    GUI:setTouchEnabled(imagePopBg, true)
+    GUI:addOnClickEvent(imagePopBg, function()
+        SL:RequestNPCTalk(npcID)
+    end)
+
+    local size = GUI:getContentSize(imagePopBg)
+    local npcName = SL:GetValue("ACTOR_NAME", npcID)
+    if npcName then
+        local _, _, showName = string.find(npcName, ".-%#(.-)%#")
+        if showName then
+            npcName = showName
+        end
+    end
+    local contentText = GUI:Text_Create(imagePopBg, "content", size.width / 2, size.height * 0.6, SL:GetValue("GAME_DATA","DEFAULT_FONT_SIZE") or 16, "#FFFFFF", npcName)
+    GUI:setAnchorPoint(contentText, 0.5, 0.5)
+    GUI:Text_enableOutline(contentText, "#111111", 1)
+end
+
+-- NPC气泡隐藏
+function GUIFunction:OnHideNpcTalkTips()
+    if npcTalkNode then
+        GUI:removeAllChildren(npcTalkNode)
+    end
+end
+
+-- NPC气泡清理
+function GUIFunction:OnClearNpcTalkTips()
+    if npcTalkNode then
+        npcTalkNode = nil
+    end
+end
+-------------------------------------------------------------------------
+-- 人物头顶说话 富文本
+function GUIFunction:GenerateActorSayItem(data)
+
+    local content = string.format("%s:%s", data.SendName, data.Msg)
+    local elements = createNormalElements(content, "fonts/font2.ttf", 12, "#FFFFFF", "#000000", 1, true)
+
+    local richText = GUI:RichTextCombine_Create(-1, "sayRichText", 0, 0, 200, 0)
+    GUI:setAnchorPoint(richText, 0.5, 0)
+    -- 填充
+    GUI:RichTextCombine_pushBackElements(richText, elements)
+
+    return richText
+end

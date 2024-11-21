@@ -153,8 +153,8 @@ function SkillSetting.UpdateSkillChangeKey(data)
         return false
     end
 
-    local startPos = cc.p(0, 0)
-    local ctrlPos  = cc.p(0, 0)
+    local startPos = {x = 0, y = 0}
+    local ctrlPos  = {x = 0, y = 0}
     local endPos   = GUI:getWorldPosition(iSkill)
 
     for id, ui in pairs(SkillSetting._skillCells) do
@@ -167,9 +167,10 @@ function SkillSetting.UpdateSkillChangeKey(data)
     local SetUI = SkillSetting._ui["SetUI"]
     startPos = GUI:convertToNodeSpace(SetUI, startPos)
     endPos   = GUI:convertToNodeSpace(SetUI, endPos)
-    ctrlPos  = {x = startPos.x + math.abs(endPos.x - startPos.x) * 0.4, y= startPos.y + 200}
+    ctrlPos.x = startPos.x + math.abs(endPos.x - startPos.x) * 0.4
+    ctrlPos.y = startPos.y + 200
 
-    local mStreak = GUI:MotionStreak_Create(SetUI, "mStreak", startPos.x, startPos.y, 0.12, 1, 50, cc.c3b(255, 255, 255), path)
+    local mStreak = GUI:MotionStreak_Create(SetUI, "mStreak", startPos.x, startPos.y, 0.12, 1, 50, "#FFFFFF", path)
     GUI:MotionStreak_reset(mStreak)
     
     -- 贝塞尔曲线

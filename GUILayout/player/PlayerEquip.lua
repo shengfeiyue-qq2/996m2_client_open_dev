@@ -293,12 +293,10 @@ function PlayerEquip.InitEquipLayerEvent()
                 data.pos = touchPos
                 data.equipPos = pos
 
-                -- 拖动结束处理函数; PC端做个延迟处理，防止再次触发点击事件
-                if isPC then
-                    SL:ScheduleOnce(function () SL:ItemMoveCheck(data) end, GUIDefine.CLICK_DOUBLE_TIME)
-                else
-                    SL:ItemMoveCheck(data)
-                end
+                widget._Click_flag = true
+
+                SL:ItemMoveCheck(data)
+
                 return 1
             end
 

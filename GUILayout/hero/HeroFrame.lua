@@ -38,7 +38,7 @@ local ChildsUICfgs = {
             Open = handler(UIOperator, UIOperator.OpenInternalSkillUI), Close = handler(UIOperator, UIOperator.CloseInternalSkillUI)
         },
         [UIConst.LayerTable.InternalMeridian] = {
-            Open = handler(UIOperator, UIOperator.OpenInternalMeridianUI), Close = handler(UIOperator, UIOperator.CloseInternalMeridianUI)
+            Open = handler(UIOperator, UIOperator.OpenInternalMerdianUI), Close = handler(UIOperator, UIOperator.CloseInternalMerdianUI)
         },
         [UIConst.LayerTable.InternalCombo] = {
             Open = handler(UIOperator, UIOperator.OpenInternalComboUI), Close = handler(UIOperator, UIOperator.CloseInternalComboUI)
@@ -185,13 +185,19 @@ end
 
 function HeroFrame.OnChangeShowType(widget)
     local showType = GUI:getTag(widget)
-    if PlayerFrame._showType == showType then
+    if HeroFrame._showType == showType then
         return false
     end
-    PlayerFrame._showType = showType
+
+    HeroFrame.OperateChildUI(false)
+
+    HeroFrame._showType = showType
 
     HeroFrame.UpdateTopLayout()
     HeroFrame.InitPageChangeBtn()
+
+    HeroFrame._pageID = nil
+    HeroFrame.OnOpenPage(({[1] = UIConst.LayerTable.PlayerEquip, [2] = UIConst.LayerTable.InternalState})[showType])
 end
 
 function HeroFrame.RefreshHeroName()
@@ -214,7 +220,7 @@ function HeroFrame.RefreshBtnState()
         GUI:Text_setTextColor(nameText, isSelected and "#f8e6c6" or "#807256")
     end
 
-    local list = (isShowNG and HeroFrame._showType == 1) and HeroFrame._ui["Panel_btnList_ng"] or HeroFrame._ui["Panel_btnList"]
+    local list = (isShowNG and HeroFrame._showType == 2) and HeroFrame._ui["Panel_btnList_ng"] or HeroFrame._ui["Panel_btnList"]
     local childs = GUI:getChildren(list)
     for _, child in ipairs(childs) do
         setChild(child)

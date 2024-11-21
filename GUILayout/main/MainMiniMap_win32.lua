@@ -306,7 +306,7 @@ end
 
 function MainMiniMap.IsEnableMiniMap()
     local miniMapID = SL:GetValue("MINIMAP_ID")
-    if not miniMapID or miniMapID == 0 then
+    if not miniMapID then
         return false
     end
     return SL:GetValue("MINIMAP_ABLE")

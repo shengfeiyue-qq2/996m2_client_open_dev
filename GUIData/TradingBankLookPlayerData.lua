@@ -129,6 +129,10 @@ function TradingBankLookPlayerData.SetPlayerEquipsData(items)
     end
 end
 
+function TradingBankLookPlayerData.GetPlayerEquipsData()
+    return TradingBankLookPlayerData._lookPlayerEquipsMakeIndex or {}
+end
+
 -- 通过pos获取装备
 function TradingBankLookPlayerData.FindEquipDataByPos(pos)
     local makeIndex = TradingBankLookPlayerData._lookPlayerEquips and TradingBankLookPlayerData._lookPlayerEquips[pos]
@@ -148,6 +152,10 @@ function TradingBankLookPlayerData.SetHeroEquipsData(items)
         TradingBankLookPlayerData._lookHeroEquips[itemData.Where] = itemData.MakeIndex
         TradingBankLookPlayerData._lookHeroEquipssMakeIndex[itemData.MakeIndex] = itemData
     end
+end
+
+function TradingBankLookPlayerData.GetHeroEquipsData()
+    return TradingBankLookPlayerData._lookHeroEquipssMakeIndex or {}
 end
 
 -- 通过pos获取装备

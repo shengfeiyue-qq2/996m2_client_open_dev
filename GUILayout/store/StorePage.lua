@@ -263,7 +263,6 @@ function StorePage.CreateStoreItemCell(parent, data)
         if isBuyMax then
             return
         end
-        -- SL:OpenStoreDetailUI(data.Index)
         UIOperator:OpenStoreDetailUI(data.Index)
     end)
 

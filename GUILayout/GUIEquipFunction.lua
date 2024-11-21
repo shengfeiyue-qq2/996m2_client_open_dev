@@ -222,7 +222,14 @@ function GUIFunction:GetEquipDataByName(name, type)
         return {}
     end
 
-    local data = equipUtil.GetEquipData()
+    local data = {}
+    if type == GUIDefine.EquipDataType.TRADE_EQUIP then
+        data = equipUtil.GetPlayerEquipsData()
+    elseif type == GUIDefine.EquipDataType.TRADE_HEROEQUIP then
+        data = equipUtil.GetHeroEquipsData()
+    else
+        data = equipUtil.GetEquipData()
+    end
 
     if not next(data) then
         return {}
@@ -469,6 +476,8 @@ function GUIFunction:DealEquipTouch(widget, eventType, params)
         widget.__isMoving = false
         widget.__hasEventCallOnTouchBegin = true
 
+        widget._Click_flag = false
+
         SL:scheduleOnce(widget, function () delayCallback() end, GUIDefine.CLICK_DOUBLE_TIME)
     elseif eventType == GUIDefine.TouchEventType.MOVED then
         if IsPC then
@@ -487,6 +496,11 @@ function GUIFunction:DealEquipTouch(widget, eventType, params)
         updateEquipState(MoveEvent.MOVEING, pos, movedPos)
     elseif eventType == GUIDefine.TouchEventType.ENDED then
         GUI:stopAllActions(widget)
+
+        if widget._Click_flag == true then
+            return false
+        end
+
         if widget.__isMoving then
             updateEquipState(MoveEvent.ENDED, pos, GUI:getTouchEndPosition(widget))
         elseif widget.__isPress then

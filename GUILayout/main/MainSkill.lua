@@ -27,6 +27,7 @@ function MainSkill.main()
     MainSkill._nodeCells  = {}
     MainSkill._skillCells = {}
     MainSkill._jointSkillCell = nil
+    MainSkill._comboSkillID = nil
 
     MainSkill.InitPick()
     MainSkill.InitButton()
@@ -245,7 +246,7 @@ function MainSkill.OnSkillOn(skillID)
 
     GUI:removeAllChildren(cell["Node_on"])
 
-    MainSkill.CtreateSelecetSfx(cell["Node_on"], skillID)
+    MainSkill.CreateSelectSfx(cell["Node_on"], skillID)
 end
 
 function MainSkill.OnSkillOff(skillID)
@@ -327,7 +328,7 @@ end
 function MainSkill.OnClickSkillEvent(skillID)
     -- 是否是开关型技能
     if SL:GetValue("SKILL_IS_ONOFF_SKILL", skillID) then
-        SL:SetValue("SKILL_SWITCH", skillID)
+        SL:RequestOnOffSkill(skillID)
     elseif SL:GetValue("SKILL_IS_INPUT_POS_SKILL", skillID) then
         -- 当前选中技能
         local lastSkill = SL:GetValue("SELECT_SKILL")
@@ -352,10 +353,14 @@ function MainSkill.OnClickSkillEvent(skillID)
 
         local cell = MainSkill._skillCells[skillID]
         if cell then
-            MainSkill.CtreateSelecetSfx(cell["Node_select"], skillID)
+            MainSkill.CreateSelectSfx(cell["Node_select"], skillID)
         end
     else
         -- 普通释放技能
+        if skillID == 0 and MainSkill._comboSkillID then
+            skillID = MainSkill._comboSkillID
+            MainSkill._comboSkillID = nil
+        end
         SL:OnLaunchSkill(skillID) 
     end
 end
@@ -454,13 +459,13 @@ function MainSkill.CreateSkillCell(data)
 
     -- Effect
     if SL:GetValue("SKILL_IS_ONOFF_SKILL", skillID) and SL:GetValue("SKILL_IS_ON_SKILL", skillID) then
-        MainSkill.CtreateSelecetSfx(ui["Node_on"], skillID)
+        MainSkill.CreateSelectSfx(ui["Node_on"], skillID)
     end
 
     return ui
 end
 
-function MainSkill.CtreateSelecetSfx(parent, skillID)
+function MainSkill.CreateSelectSfx(parent, skillID)
     local sfx = GUI:Effect_Create(parent, "sfx", 0, 0, 0, 4005)
     GUI:Effect_setGlobalElapseEnable(sfx, true)
 
@@ -692,6 +697,8 @@ function MainSkill.CreateComboSkillCell(data)
     -- 特效
     GUI:Effect_Create(ui["Node_sfx"], "sfx", 3, 50, 0, 7230)
 
+    GUI:setVisible(ui, true)
+
     return ui
 end
 
@@ -701,7 +708,11 @@ function MainSkill.OnClickComboSkillEvent(skillID)
     end
 
     -- 开关型技能
-    SL:SetValue("SKILL_SWITCH", skillID)
+    if SL:GetValue("SKILL_IS_ONOFF_SKILL", skillID) then
+        SL:RequestOnOffSkill(skillID)
+        MainSkill._comboSkillID = skillID
+        return
+    end
 
     -- 普通释放技能
     SL:OnLaunchSkill(skillID) 
@@ -716,12 +727,14 @@ function MainSkill.OnRefreshComboSkillShow()
 
     local selectSkills = SL:GetValue("SET_COMBO_SKILLS")
     MainSkill._comboSkillCell = nil
+
     if selectSkills[1] then
         local skillID = selectSkills[1]
         if skillID and skillID ~= 0 then
             local data = SL:GetValue("COMBO_SKILL_DATA", skillID)
             if data then
                 MainSkill._comboSkillCell = MainSkill.CreateComboSkillCell(data)
+                GUI:addChild(MainSkill._ui["Node_combo_skill"], MainSkill._comboSkillCell)
             end
         end
     end
@@ -737,9 +750,9 @@ function MainSkill.OnActiveComboSkill(state)
         return false
     end
 
-    GUI:setGrey(cell["icon"], not state)
-    GUI:setTouchEnabled(cell["icon"], state)
-    GUI:setVisible(cell["nodeSFX"], state)
+    GUI:setGrey(cell["skill_icon"], not state)
+    GUI:setTouchEnabled(cell["skill_icon"], state)
+    GUI:setVisible(cell["Node_sfx"], state)
 end
 
 -------------------------------------------------------------------------------------------------------------------------------------------

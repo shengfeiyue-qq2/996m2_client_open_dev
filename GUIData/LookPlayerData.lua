@@ -75,6 +75,10 @@ function LookPlayerData.FindEquipDataByPos(pos)
     end
 end
 
+function LookPlayerData.GetEquipData()
+    return LookPlayerData._equipMakeIndexDatas or {}
+end
+
 function LookPlayerData.GetEquipDataByMakeIndex(makeIndex)
     return LookPlayerData._equipMakeIndexDatas[makeIndex]
 end

@@ -41,7 +41,7 @@ local ChildsUICfgs = {
             Open = handler(UIOperator, UIOperator.OpenInternalSkillUI), Close = handler(UIOperator, UIOperator.CloseInternalSkillUI)
         },
         [UIConst.LayerTable.InternalMeridian] = {
-            Open = handler(UIOperator, UIOperator.OpenInternalMeridianUI), Close = handler(UIOperator, UIOperator.CloseInternalMeridianUI)
+            Open = handler(UIOperator, UIOperator.OpenInternalMerdianUI), Close = handler(UIOperator, UIOperator.CloseInternalMerdianUI)
         },
         [UIConst.LayerTable.InternalCombo] = {
             Open = handler(UIOperator, UIOperator.OpenInternalComboUI), Close = handler(UIOperator, UIOperator.CloseInternalComboUI)

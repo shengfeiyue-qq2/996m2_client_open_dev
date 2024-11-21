@@ -32,7 +32,7 @@ function PlayerBuff.main()
     -- 加载内容
     PlayerBuff.OnFillContent()
 
-    SL:AttachTXTSUI({root = self._layer._root, index = SLDefine.SUIComponentTable.PlayerBuff})
+    SL:AttachTXTSUI({root = parent, index = SLDefine.SUIComponentTable.PlayerBuff})
 
     SL:RegisterLUAEvent(LUA_EVENT_MAINPLAYER_BUFF_UPDATE, "PlayerBuff", PlayerBuff.OnUpdateBuff)
 end

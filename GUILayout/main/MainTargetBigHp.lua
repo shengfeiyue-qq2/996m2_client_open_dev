@@ -59,7 +59,7 @@ function MainTargetBigHp.Init()
     MainTargetBigHp._selectActorID = nil                        -- 目标targetID
     MainTargetBigHp._barHpLocalZ = 99                           -- 血条层级
     MainTargetBigHp._showTubeAction = false                     -- 血量文本是否正在进行动画
-    MainTargetBigHp._tubeTipOringPos = cc.p(0, 0)        -- 记录血量文本初始位置
+    MainTargetBigHp._tubeTipOringPos = GUI:p(0, 0)        -- 记录血量文本初始位置
     MainTargetBigHp._hpActions = {}                             -- 血量变化记录
     MainTargetBigHp._lastHP = 0                                 -- 记录最后一次的血量
     MainTargetBigHp._runActioning = false                       -- 记录是否正在进行血量文本加载
@@ -577,7 +577,7 @@ function MainTargetBigHp.ShowHideAction(isHide, func)
     local endOpacity = isHide and 0 or 255
 
     local action2 = GUI:ActionSequence(
-        GUI:ActionSpawn(GUI:ActionScaleTo(0.15, endScale), cc.FadeTo:create(0.15, endOpacity)), 
+        GUI:ActionSpawn(GUI:ActionScaleTo(0.15, endScale), GUI:ActionFadeTo(0.15, endOpacity)), 
         GUI:CallFunc(function()
             if func then
                 func()

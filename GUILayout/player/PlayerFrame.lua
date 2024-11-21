@@ -41,7 +41,7 @@ local ChildsUICfgs = {
             Open = handler(UIOperator, UIOperator.OpenInternalSkillUI), Close = handler(UIOperator, UIOperator.CloseInternalSkillUI)
         },
         [UIConst.LayerTable.InternalMeridian] = {
-            Open = handler(UIOperator, UIOperator.OpenInternalMeridianUI), Close = handler(UIOperator, UIOperator.CloseInternalMeridianUI)
+            Open = handler(UIOperator, UIOperator.OpenInternalMerdianUI), Close = handler(UIOperator, UIOperator.CloseInternalMerdianUI)
         },
         [UIConst.LayerTable.InternalCombo] = {
             Open = handler(UIOperator, UIOperator.OpenInternalComboUI), Close = handler(UIOperator, UIOperator.CloseInternalComboUI)
@@ -185,7 +185,7 @@ function PlayerFrame.InitPageChangeBtn()
     else
         GUI:setVisible(btnList, true)
         GUI:setVisible(btnListNG, false)
-        GUI:setVisible(btnListLeft, false)
+        GUI:setVisible(btnListLeft, true)
     end
 end
 
@@ -194,10 +194,16 @@ function PlayerFrame.OnChangeShowType(widget)
     if PlayerFrame._showType == showType then
         return false
     end
+
+    PlayerFrame.OperateChildUI(false)
+
     PlayerFrame._showType = showType
 
     PlayerFrame.UpdateTopLayout()
     PlayerFrame.InitPageChangeBtn()
+
+    PlayerFrame._pageID = nil
+    PlayerFrame.OnOpenPage(({[1] = UIConst.LayerTable.PlayerEquip, [2] = UIConst.LayerTable.InternalState})[showType])
 end
 
 function PlayerFrame.RefreshPlayerName()
@@ -220,7 +226,7 @@ function PlayerFrame.RefreshBtnState()
         GUI:Text_setTextColor(nameText, isSelected and "#f8e6c6" or "#807256")
     end
 
-    local list = (isShowNG and PlayerFrame._showType == 1) and PlayerFrame._ui["Panel_btnList_ng"] or PlayerFrame._ui["Panel_btnList"]
+    local list = (isShowNG and PlayerFrame._showType == 2) and PlayerFrame._ui["Panel_btnList_ng"] or PlayerFrame._ui["Panel_btnList"]
     local childs = GUI:getChildren(list)
     for _, child in ipairs(childs) do
         setChild(child)

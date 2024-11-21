@@ -9,7 +9,7 @@ CommonTipsPop.Event = {
 
 function CommonTipsPop.main()
     local data = GUI:GetLayerOpenParam()
-    local parent = GUI:Win_Create(UIConst.LAYERID.CommonTipsGUI, 0, 0, 0, 0, false, false, true, true)
+    local parent = GUI:Win_Create(UIConst.LAYERID.CommonTipsGUI, 0, 0, 0, 0, false, false, true, true, nil, nil, global.UIZ.UI_TOBOX)
     GUI:LoadExport(parent, "common_tips/common_tips")
 
     local screenW = SL:GetValue("SCREEN_WIDTH")

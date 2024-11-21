@@ -148,7 +148,7 @@ function PCSkillToMainUI.AddSkillToUI(data)
 						local config 	= SL:GetValue("SKILL_CONFIG", skillID)
 						local desc   	= (config and config.desc or "") .. "\\<双击从屏幕上删除/FCOLOR=250>"
 						local worldPos 	= GUI:getTouchEndPosition(sender)
-						SL:SHOW_DESCTIP(desc, nil, worldPos, cc.p(0, 1))
+						SL:SHOW_DESCTIP(desc, nil, worldPos, GUI:p(0, 1))
 					end
 
 					times = 0

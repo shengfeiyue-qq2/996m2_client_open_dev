@@ -385,6 +385,14 @@ UIConst.LAYERID =
     RelationInviteGUI           = "RelationInviteGUI",              -- 关系邀请页
 }
 
+-- 禁止关闭界面
+UIConst.ForbidCloseLayers = {
+    [UIConst.LAYERID.MoveEventGUI]          = true,
+    [UIConst.LAYERID.SightBeadGUI]          = true,
+    [UIConst.LAYERID.RightTouchEventGUI]    = true,
+    [UIConst.LAYERID.PCSkillToMainUIGUI]    = true,
+}
+
 UIConst.LayerTable = {
     TradingBankBuy          = 60,             -- 交易行购买
     TradingBankSell         = 61,             -- 交易行寄售
