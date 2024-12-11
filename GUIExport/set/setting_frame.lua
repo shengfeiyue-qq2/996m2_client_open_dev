@@ -1,13 +1,13 @@
 local ui = {}
 function ui.init(parent)
-	-- Create Panel_cancle
-	local Panel_cancle = GUI:Layout_Create(parent, "Panel_cancle", 0.00, 0.00, 1136.00, 640.00, false)
-	GUI:Layout_setBackGroundColorType(Panel_cancle, 1)
-	GUI:Layout_setBackGroundColor(Panel_cancle, "#000000")
-	GUI:Layout_setBackGroundColorOpacity(Panel_cancle, 73)
-	GUI:setChineseName(Panel_cancle, "内挂_范围点击关闭")
-	GUI:setTouchEnabled(Panel_cancle, true)
-	GUI:setTag(Panel_cancle, 123)
+	-- Create Panel_cancel
+	local Panel_cancel = GUI:Layout_Create(parent, "Panel_cancel", 0.00, 0.00, 1136.00, 640.00, false)
+	GUI:Layout_setBackGroundColorType(Panel_cancel, 1)
+	GUI:Layout_setBackGroundColor(Panel_cancel, "#000000")
+	GUI:Layout_setBackGroundColorOpacity(Panel_cancel, 73)
+	GUI:setChineseName(Panel_cancel, "内挂_范围点击关闭")
+	GUI:setTouchEnabled(Panel_cancel, true)
+	GUI:setTag(Panel_cancel, 123)
 
 	-- Create PMainUI
 	local PMainUI = GUI:Layout_Create(parent, "PMainUI", 568.00, 320.00, 790.00, 536.00, false)

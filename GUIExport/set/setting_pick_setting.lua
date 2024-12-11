@@ -6,14 +6,14 @@ function ui.init(parent)
 	GUI:setAnchorPoint(Scene, 0.50, 0.50)
 	GUI:setTag(Scene, -1)
 
-	-- Create Panel_cancle
-	local Panel_cancle = GUI:Layout_Create(Scene, "Panel_cancle", 0.00, 0.00, 3000.00, 3000.00, false)
-	GUI:Layout_setBackGroundColorType(Panel_cancle, 1)
-	GUI:Layout_setBackGroundColor(Panel_cancle, "#000000")
-	GUI:Layout_setBackGroundColorOpacity(Panel_cancle, 73)
-	GUI:setChineseName(Panel_cancle, "拾取设置_范围点击关闭")
-	GUI:setTouchEnabled(Panel_cancle, true)
-	GUI:setTag(Panel_cancle, 89)
+	-- Create Panel_cancel
+	local Panel_cancel = GUI:Layout_Create(Scene, "Panel_cancel", 0.00, 0.00, 3000.00, 3000.00, false)
+	GUI:Layout_setBackGroundColorType(Panel_cancel, 1)
+	GUI:Layout_setBackGroundColor(Panel_cancel, "#000000")
+	GUI:Layout_setBackGroundColorOpacity(Panel_cancel, 73)
+	GUI:setChineseName(Panel_cancel, "拾取设置_范围点击关闭")
+	GUI:setTouchEnabled(Panel_cancel, true)
+	GUI:setTag(Panel_cancel, 89)
 
 	-- Create Panel_1
 	local Panel_1 = GUI:Image_Create(Scene, "Panel_1", 568.00, 320.00, "res/public/bg_npc_02.png")

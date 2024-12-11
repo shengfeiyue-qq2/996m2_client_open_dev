@@ -826,12 +826,14 @@ function GUIFunction:GetAttDataShow(att, stars, tipsShow)
             configShow = config.noshowtips ~= 1
         end
         if v.id > 10000 or configShow then
-            local name, value = GetAttNumShow(v.id, v.min or v.value, v.max, v.maxID)
+            local min = tonumber(v.min or v.value) or 0
+            local name, value = GetAttNumShow(v.id, min, v.max, v.maxID)
             attStrs[v.id] = {
                 name = name,
                 value = value,
                 id = v.id,
-                color = config and config.color or nil
+                color = config and config.color or nil,
+                isCurse = v.id == GUIDefine.AttTypeTable.Lucky and min < 0
             }
         end
     end
@@ -3080,3 +3082,583 @@ function GUIFunction:GenerateActorSayItem(data)
 
     return richText
 end
+
+-------------------------------------------------------------------------
+-- 技能相关
+function GUIFunction:CheckSkillAbleToLaunch(skillID, isUserInput)
+    --[[
+     1: able
+    -1: not learned
+    -2: is cd
+    -3: not enough mana
+    -4: buff not allowed
+    -5: not enough mount mana
+    -6: map limit
+    -8: stiffness
+    -9: isOff
+    -10: horse
+    -11: 延迟释放
+    -12: 内力值不够
+    -13: 目标buff有禁止技能 launch
+    -14: 目标buff有禁止技能 User Input
+    ]]
+    -- 挖矿使用普普攻CD
+    if skillID == global.MMO.SKILL_INDEX_DIG and not SL:GetValue("SKILL_IS_CDING", global.MMO.SKILL_INDEX_BASIC) then
+        return 1
+    end
+
+    local skillData = SL:GetValue("SKILL_DATA", skillID) or SL:GetValue("COMBO_SKILL_DATA", skillID)
+    if not skillData then
+        return -1
+    end
+
+    local isCD, currCDTime = SL:GetValue("SKILL_IS_CDING", skillID)
+    if isCD then
+        if SL:GetValue("SKILL_NEED_CDHINT", skillID) then 
+            currCDTime = currCDTime or 0
+            local lastHintTime = skillData.lastHintTime or 0
+            if lastHintTime - currCDTime >= 1 or (lastHintTime == 0 and skillData.DelayTime > 1000) then
+                local data = {}
+                data.ChannelId = GUIDefine.ChatChannel.SYSTEM
+                data.BColor = 249
+                data.FColor = 255
+                data.Msg = string.format("系统：请在%d秒后使用该技能", math.ceil(currCDTime))
+                SL:onLUAEvent(LUA_EVENT_CHAT_MSG_ADD, data)
+
+                skillData.lastHintTime = currCDTime
+            end
+        end
+        return -2
+    end
+
+    if not SL:GetValue("SKILL_IS_ENOUGH_MP", skillID) then
+        return -3
+    end
+
+    if not SL:GetValue("SKILL_IS_ENOUGH_IV", skillID) then
+        return -12
+    end
+
+    if SL:GetValue("SKILL_IS_ONOFF_SKILL", skillID) and not SL:GetValue("SKILL_IS_ON_SKILL", skillID) then
+        return -9
+    end
+
+    if not SL:GetValue("HORSE_CAN_LAUNCH_SKILL", skillID) then
+        return -10
+    end
+
+    if not SL:GetValue("BUFF_CHECK_SKILL_ENABLE", skillID) then
+        return -4
+    end
+
+    if SL:GetValue("MAP_FORBID_LAUNCH_SKILL", skillID) then
+        return -6
+    end
+
+    if SL:GetValue("SKILL_IS_DELAY_LAUNCH", skillID) then
+        return -11
+    end
+
+    local targetID = SL:GetValue("SELECT_SHIFT_ATTACK_ID") or SL:GetValue("SELECT_TARGET_ID")
+    if targetID then
+        if isUserInput then
+            -- 手动释放时是否有不能释放该技能BUFF
+            local buffID = SL:GetValue("TARGET_FORBID_SKILL_LAUNCH_BUFF", targetID, skillID)
+            if buffID then
+                return -13, buffID
+            end
+            -- 自动释放时是否有不能释放该技能BUFF
+        elseif SL:GetValue("TARGET_FORBID_SKILL_AUTO_BUFF", targetID, skillID) then
+            return -14
+        end
+    end
+    
+    if skillData then 
+        skillData.lastHintTime = 0
+    end
+    return 1
+end
+
+-- 查找背包物品
+local function findBagItem(stdMode, shape)
+    local items = BagData.GetBagData()
+    for _, item in pairs(items) do
+        if item.StdMode == stdMode and item.Shape == shape then
+            return item
+        end
+    end
+    return nil
+end
+
+-- 检查毒符
+function GUIFunction:CheckDuItem(type)
+    local dressType = SL:GetValue("SERVER_OPTION", "UseAmuletType")-- 0 穿戴 1 背包 2 无
+
+    local dressEquip = GUIFunction:GetEquipDataByPos(GUIDefine.EquipPosUI.Equip_Type_Bujuk)
+    if dressType == 2 then 
+        return true
+    end
+    if type == 1 then
+
+        if dressEquip then 
+            return dressEquip.Shape == 1 or findBagItem(25, 1)  
+        else
+            return findBagItem(25, 1)  
+        end
+    elseif type == 2 then 
+        if dressEquip then 
+            return dressEquip.Shape == 2 or findBagItem(25, 2)  
+        else
+            return findBagItem(25, 2)  
+        end
+    end
+end
+
+-- 是否护身符
+local function isAmuletItem(item)
+    if not item then
+        return false
+    end
+    return item.StdMode == 25 and item.Shape == 5
+end
+
+-- 是否毒药粉
+local function isPoisonItem(item)
+    if not item then
+        return false
+    end
+    return item.StdMode == 25 and (item.Shape == 1 or item.Shape == 2)
+end
+
+-- 使用护身符的技能
+local useAmuletSkill = {
+    [13] = true,
+    [14] = true,
+    [15] = true,
+    [16] = true,
+    [17] = true,
+    [18] = true,
+    [19] = true,
+    [30] = true,
+    [55] = true,
+    [57] = true,
+    [76] = true,
+}
+
+-- 使用毒药粉技能
+local usePoisonSkill = {
+    [6]     = true,
+    [51]    = true,
+}
+
+-- 检查是否穿戴对应技能装备
+function GUIFunction:CheckDressEquipSkillID(skillID)
+    if not (useAmuletSkill[skillID] or usePoisonSkill[skillID]) then
+        return true
+    end
+
+    local dressEquip = GUIFunction:GetEquipDataByPos(GUIDefine.EquipPosUI.Equip_Type_Bujuk)
+
+    -- 没穿
+    if not dressEquip then
+        return false
+    end
+
+    -- 符
+    if useAmuletSkill[skillID] and isAmuletItem(dressEquip) then
+        return true
+    end
+    
+    -- 毒
+    if usePoisonSkill[skillID] and isPoisonItem(dressEquip) then
+        return true
+    end
+
+    return false
+end
+
+-- 检查背包中是否有释放技能装备
+function GUIFunction:CheckBagEquipSkillID(skillID)
+    if not (useAmuletSkill[skillID] or usePoisonSkill[skillID]) then
+        return true
+    end
+
+    -- 符
+    if useAmuletSkill[skillID] and findBagItem(25, 5) then
+        return true
+    end
+    
+    -- 毒
+    if usePoisonSkill[skillID] and (findBagItem(25, 1) or findBagItem(25, 2)) then
+        return true
+    end
+
+    return false
+end
+
+-- 获取技能最小攻击距离
+function GUIFunction:GetSkillMinLaunchDistance(skillID)
+    local config = SL:GetValue("SKILL_CONFIG", skillID)
+    if not config then
+        return 1
+    end
+
+    -- 寻路阻塞
+    if SL:GetValue("IS_MOVE_BLOCKED") then
+        return config.minDis or 1
+    end
+
+    -- 刺杀剑术
+    if skillID == SKILL_ID_CiSha then
+        return SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_MOVE_GEWEI_CISHA) == 1 and 2 or 0
+    end
+    
+    -- 自动走位
+    if SL:GetValue("BATTLE_IS_AFK") and SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_AUTO_MOVE) == 1 then
+        return config.autoMinDis or 1
+    end
+
+    return config.minDis or 1
+end
+
+-- 获取技能最大攻击距离
+function GUIFunction:GetSkillMaxLaunchDistance(skillID)
+    local config = SL:GetValue("SKILL_CONFIG", skillID)
+    if not config then
+        return 1
+    end
+
+    -- 刺杀剑术
+    if skillID == SKILL_ID_CiSha then
+        return (SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_DAODAOCISHA) ~= 1 and SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_GEWEICISHA) ~= 1) and 1 or 2
+    end
+
+    -- 自动战斗使用手机端范围
+    if SL:GetValue("BATTLE_IS_AFK") then
+        return config.maxDis
+    end
+
+    local maxDis = SL:GetValue("IS_PC_OPER_MODE") and config.maxDis_pc or config.maxDis
+    return maxDis
+end
+
+-- 地图坐标计算方向
+function GUIFunction:CalcMapDirection(dX, dY, sX, sY)
+    local diffX = dX - sX
+    local diffY = dY - sY
+    local angle = math.deg(math.atan2(diffY, diffX))
+    local ret = SLDefine.Direction.INVALID
+    if (angle > -22.5 and angle <= 22.5) then
+        ret = SLDefine.Direction.RIGHT
+    
+    elseif (angle > 22.5 and angle <= 67.5) then
+        ret = SLDefine.Direction.RIGHT_BOTTOM
+    
+    elseif (angle > 67.5 and angle <= 112.5) then
+        ret = SLDefine.Direction.BOTTOM
+    
+    elseif (angle > 112.5 and angle <= 157.5) then
+        ret = SLDefine.Direction.LEFT_BOTTOM
+    
+    elseif ((angle > 157.5 and angle <= 180) or (angle <= -157.5 and angle > -180)) then
+        ret = SLDefine.Direction.LEFT
+    
+    elseif (angle <= -112.5 and angle > -157.5) then
+        ret = SLDefine.Direction.LEFT_UP
+    
+    elseif (angle <= -67.5 and angle > -112.5) then
+        ret = SLDefine.Direction.UP
+    
+    elseif (angle <= -22.5 and angle > -67.5) then
+        ret = SLDefine.Direction.RIGHT_UP
+    end
+    return ret
+end
+
+-- 计算地图距离
+function GUIFunction:CalcMapDistance(sX, sY, dX, dY)
+    return math.max(math.abs(sX - dX), math.abs(sY - dY))
+end
+
+---------------------------------------检测技能释放--------------------------------------------
+local SharedInputLaunchData = {}
+local SharedInputMoveData = {}
+local SharedInputMiningData = {}
+-- 自动检测技能行为
+function GUIFunction:AutoFindSkillBehavior()
+    if GUIFunction:CheckLaunchFirstSkill() then
+        return true
+    end
+
+    if GUIFunction:CheckLaunchComboSkill() then
+        return true
+    end
+
+    if GUIFunction:CheckLaunchAutoSkill() then
+        return true
+    end
+
+    if GUIFunction:CheckLaunchSimpleSkill() then
+        return true
+    end
+
+    if GUIFunction:CheckLaunchLockSkill() then
+        return true
+    end
+
+    if GUIFunction:CheckAutoMining() then
+        return true
+    end
+
+    return false
+end
+
+function GUIFunction:CheckLaunchFirstSkill()
+    if not SL:GetValue("SELECT_TARGET_ID") then
+        return false
+    end
+
+    if SL:GetValue("INPUT_LAUNCH_SKILLID") then
+        return false
+    end
+
+    if not SL:GetValue("ATTACK_STATE") and not SL:GetValue("BATTLE_IS_AUTO_LOCK_STATE") and not SL:GetValue("BATTLE_IS_AFK") and
+        not SL:GetValue("BATTLE_IS_AUTO_FIGHT_STATE") then
+        return false
+    end
+
+    local skillID, destPosX, destPosY = SkillUtils.FindFirstLaunchSkill()
+    if not skillID then
+        return false
+    end
+
+    local lastMouseInsideActorID     = SL:GetValue("MOUSE_INSIDE_ACTORID")
+    SharedInputLaunchData.launchType = SL:GetValue("INPUT_LAUNCH_TYPE")
+    SharedInputLaunchData.priority   = SL:GetValue("INPUT_LAUNCH_PRIORITY")
+    SharedInputLaunchData.targetID   = lastMouseInsideActorID or SL:GetValue("SELECT_TARGET_ID")
+    SharedInputLaunchData.skillID    = skillID
+    SharedInputLaunchData.destPosX   = destPosX
+    SharedInputLaunchData.destPosY   = destPosY
+    SL:InputLaunch(SharedInputLaunchData)
+    return true
+end
+
+function GUIFunction:CheckLaunchComboSkill()
+    if not SL:GetValue("SELECT_TARGET_ID") then
+        return false
+    end
+
+    if SL:GetValue("INPUT_LAUNCH_SKILLID") then
+        return false
+    end
+
+    local isAttackState = SL:GetValue("IS_PC_OPER_MODE") and SL:GetValue("ATTACK_STATE") or false
+    if not isAttackState and not SL:GetValue("BATTLE_IS_AUTO_LOCK_STATE") and not SL:GetValue("BATTLE_IS_AFK") and not SL:GetValue("BATTLE_IS_AUTO_FIGHT_STATE") then
+        return false
+    end
+
+    local skillID, destPosX, destPosY, isAuto = SkillUtils.FindComboLaunchSkill()
+    if not skillID then
+        return false
+    end
+
+    SharedInputLaunchData.launchType = isAuto and GUIDefine.LaunchType.AUTO or GUIDefine.LaunchType.USER
+    SharedInputLaunchData.priority = GUIDefine.LaunchPriority.SYSTEM
+    SharedInputLaunchData.targetID = SL:GetValue("SELECT_TARGET_ID")
+    SharedInputLaunchData.skillID = skillID
+    SharedInputLaunchData.destPosX = destPosX
+    SharedInputLaunchData.destPosY = destPosY
+    SL:InputLaunch(SharedInputLaunchData)
+    return true
+end
+
+function GUIFunction:CheckLaunchAutoSkill()
+    -- 挂机/自动战斗
+    if not SL:GetValue("BATTLE_IS_AFK") and not SL:GetValue("BATTLE_IS_AUTO_FIGHT_STATE") then
+        return false
+    end
+
+    if SL:GetValue("INPUT_LAUNCH_SKILLID") then
+        return false
+    end
+
+    local targetID = SL:GetValue("SELECT_TARGET_ID")
+    if not targetID then
+        return false
+    end
+
+    if not GUIFunction:CheckLaunchEnableByID(targetID) then
+        SL:SetValue("SELECT_TARGET_ID", nil)
+        return false
+    end
+
+    -- 挂机目标死亡，原地等待一段时间
+    if SL:GetValue("AFK_TARGET_DEATH") then
+        return true
+    end
+
+    if not SL:GetValue("ACTOR_IS_VALID", targetID) then
+        SL:SetValue("SELECT_TARGET_ID", nil)
+        return false
+    end
+
+    -- 闪避技能
+    local skillID, destPosX, destPosY = SkillUtils.FindAvoidDangerSkill()
+    if skillID then
+        SL:SetValue("AUTO_LAUNCH_AVOID_STAMP")
+    else
+        -- 自动释放技能
+        skillID, destPosX, destPosY = SkillUtils.FindAutoLaunchSkill()
+    end
+
+    if skillID then
+        SharedInputLaunchData.launchType = GUIDefine.LaunchType.AUTO
+        SharedInputLaunchData.priority = GUIDefine.LaunchPriority.SYSTEM
+        SharedInputLaunchData.targetID = targetID
+        SharedInputLaunchData.skillID = skillID
+        SharedInputLaunchData.destPosX = destPosX
+        SharedInputLaunchData.destPosY = destPosY
+        SL:InputLaunch(SharedInputLaunchData)
+        return true
+    end
+
+    -- 闪避走位
+    destPosX, destPosY = SkillUtils.FindAvoidDangerPos()
+    if destPosX and destPosY then
+        SharedInputMoveData.mapID = SL:GetValue("MAP_ID")
+        SharedInputMoveData.x = destPosX
+        SharedInputMoveData.y = destPosY
+        SharedInputMoveData.type = GUIDefine.InputMoveType.AUTOMOVE
+        SL:InputMove(SharedInputMoveData)
+        return true
+    end
+    return false
+end
+
+function GUIFunction:CheckLaunchSimpleSkill()
+    if SL:GetValue("INPUT_LAUNCH_SKILLID") then
+        return false
+    end
+
+    local targetID = SL:GetValue("SELECT_TARGET_ID")
+    if not targetID then
+        return false
+    end
+
+    -- 锁定目标状态
+    if not SL:GetValue("BATTLE_IS_AUTO_LOCK_STATE") then
+        return false
+    end
+
+    if not GUIFunction:CheckLaunchEnableByID(targetID) then
+        SL:SetValue("SELECT_TARGET_ID", nil)
+        return false
+    end
+
+    if not SL:GetValue("ACTOR_IS_VALID", targetID) then
+        SL:SetValue("SELECT_TARGET_ID", nil)
+        return false
+    end
+
+    if SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_ALWAYS_ATTACK) ~= 1 then
+        return false
+    end
+
+    local skillID, destPosX, destPosY = SkillUtils.FindSimpleLaunchSkill()
+    if skillID then
+        SharedInputLaunchData.launchType = GUIDefine.LaunchType.LOCK
+        SharedInputLaunchData.priority = GUIDefine.LaunchPriority.SYSTEM
+        SharedInputLaunchData.targetID = targetID
+        SharedInputLaunchData.skillID = skillID
+        SharedInputLaunchData.destPosX = destPosX
+        SharedInputLaunchData.destPosY = destPosY
+        SL:InputLaunch(SharedInputLaunchData)
+        return true
+    end
+
+    return false
+end
+
+function GUIFunction:CheckLaunchLockSkill()
+    -- shift锁定
+    if not global.isWinPlayMode then
+        return false
+    end
+
+    -- 不在锁定攻击状态
+    if not SL:GetValue("ATTACK_STATE") then
+        return false
+    end
+
+    local targetID = SL:GetValue("SELECT_SHIFT_ATTACK_ID")
+    if not targetID then
+        return false
+    end
+
+    if not SL:GetValue("ACTOR_IS_VALID", targetID) then
+        SL:SetValue("SELECT_SHIFT_ATTACK_ID", nil)
+        return false
+    end
+
+    -- 免shift
+    local optionAble = SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_NOT_NEED_SHIFT) == 1
+    local shiftAble = SL:GetValue("IS_PRESSED_SHIFT")
+
+    if (SL:GetValue("ACTOR_IS_PLAYER", targetID) and (optionAble or shiftAble)) or SL:GetValue("ACTOR_IS_MONSTER", targetID) then
+        -- 骑马检测
+        if not SL:GetValue("HORSE_CAN_LAUNCH_SKILL", SKILL_ID_PuGong) then
+            if not SL:RequestHorseDown() then
+                SL:SetValue("ATTACK_STATE", false)
+            end
+            return false
+        end
+
+        local skillID, destPosX, destPosY = SkillUtils.FindLockLaunchSkill()
+        if skillID then
+            SharedInputLaunchData.launchType = GUIDefine.LaunchType.LOCK
+            SharedInputLaunchData.priority = GUIDefine.LaunchPriority.SYSTEM
+            SharedInputLaunchData.targetID = targetID
+            SharedInputLaunchData.skillID = skillID
+            SharedInputLaunchData.destPosX = destPosX
+            SharedInputLaunchData.destPosY = destPosY
+            SL:InputLaunch(SharedInputLaunchData)
+        end
+        return true
+    end
+    return false
+end
+
+-- 检查能否挖矿
+function GUIFunction:CheckMiningAble()
+    local equip = GUIFunction:GetEquipDataByPos(GUIDefine.EquipPosUI.Equip_Type_Weapon)
+	if equip and equip.Shape == 19 and equip.Dura and equip.Dura > 0 then
+		return true
+	end
+	return false
+end
+
+-- 自动挖矿
+function GUIFunction:CheckAutoMining()
+    if SL:GetValue("BATTLE_IS_AUTO_FIGHT_STATE") then
+        return false
+    end
+
+    local autoMiningDir, autoMiningDstX, autoMiningDstY = SL:GetValue("AUTO_MINING_DATA")
+    if not autoMiningDir or not autoMiningDstX or not autoMiningDstY then
+        return false
+    end
+
+    if not GUIFunction:CheckMiningAble() then
+        SL:SetValue("AUTO_MINING_DATA", nil, nil, nil)
+        return false
+    end
+
+    SharedInputMiningData.dir  = autoMiningDir
+    SharedInputMiningData.destX = autoMiningDstX
+    SharedInputMiningData.destY = autoMiningDstY
+    SL:InputMining(SharedInputMiningData)
+
+    return true
+end
+
+-------------------------------------------------------------------------

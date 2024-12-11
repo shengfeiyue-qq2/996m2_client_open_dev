@@ -882,7 +882,7 @@ function ChatData.OnAddDropMsg(data)
     end
 
     if not ChatData._fakeDropMsgF then
-        releasePrint("error: server not send drop_msg_format!")
+        SL:release_print("error: server not send drop_msg_format!")
         return
     end
 

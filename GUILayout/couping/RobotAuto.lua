@@ -585,20 +585,20 @@ function RobotAuto.AutoLaunch(delta)
     RobotAuto._launchTime = 0
 
 
-    local skillID, destPos = SL:GetValue("SKILL_FIND_ROBOT_LAUNCH")
+    local skillID, destPosX, destPosY = SkillUtils.FindRobotLaunchSkill()
     if not skillID then
         return nil
     end
 
     local skillID           = skillID
-    local destPos           = destPos
-    local priority          = SLDefine.SETTINGID.LAUNCH_PRIORITY_ROBOT
-    local launchType        = SLDefine.SETTINGID.LAUNCH_TYPE_AUTO
+    local priority          = GUIDefine.LaunchPriority.ROBOT
+    local launchType        = GUIDefine.LaunchType.AUTO
     SharedInputLaunchData.launchType = launchType
     SharedInputLaunchData.priority = priority
     SharedInputLaunchData.skillID = skillID
-    SharedInputLaunchData.destPos = destPos
-    SL:SharedInputLaunchData(SharedInputLaunchData)
+    SharedInputLaunchData.destPosX = destPosX
+    SharedInputLaunchData.destPosY = destPosY
+    SL:InputLaunch(SharedInputLaunchData)
 end
 
 -------------------------------------------------------
@@ -630,13 +630,14 @@ function RobotAuto.AutoTraining(delta)
     
         local skillID           = skillID
         local destPos           = SL:GetValue("FACE_DEST")
-        local priority          = SLDefine.SETTINGID.LAUNCH_PRIORITY_ROBOT
-        local launchType        = SLDefine.SETTINGID.LAUNCH_TYPE_AUTO
+        local priority          = GUIDefine.LaunchPriority.ROBOT
+        local launchType        = GUIDefine.LaunchType.AUTO
         SharedInputLaunchData.launchType = launchType
         SharedInputLaunchData.priority = priority
         SharedInputLaunchData.skillID = skillID
-        SharedInputLaunchData.destPos = destPos
-        SL:SharedInputLaunchData(SharedInputLaunchData)
+        SharedInputLaunchData.destPosX = destPos and destPos.x
+        SharedInputLaunchData.destPosY = destPos and destPos.y
+        SL:InputLaunch(SharedInputLaunchData)
     end
 end
 

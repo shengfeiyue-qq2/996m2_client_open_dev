@@ -21,7 +21,7 @@ function SettingBossTips.InitUI(data)
     local screenH = SL:GetValue("SCREEN_HEIGHT")
     local posY = isWinPlayMode and SL:GetValue("PC_POS_Y") or screenH / 2
     GUI:setPosition(SettingBossTips._ui.Panel_1, screenW / 2, posY)
-    GUI:setContentSize(SettingBossTips._ui.Panel_cancle, screenW, screenH)
+    GUI:setContentSize(SettingBossTips._ui.Panel_cancel, screenW, screenH)
     if not SettingBossTips._ui then
         return false
     end
@@ -40,7 +40,7 @@ function SettingBossTips.InitUI(data)
         UIOperator:CloseBossTipsUI()
     end)
 
-    GUI:addOnClickEvent(ui.Panel_cancle, function()
+    GUI:addOnClickEvent(ui.Panel_cancel, function()
         UIOperator:CloseBossTipsUI()
     end)
 

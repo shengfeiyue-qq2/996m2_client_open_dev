@@ -84,8 +84,8 @@ function SkillSetting.InitEvent()
 
     -- 重置事件
     GUI:addOnClickEvent(SkillSetting._ui["btnReset"], function ()
-        local skills = SL:GetValue("LEARNED_SKILLS", true)
-        for _, v in pairs(skills) do
+        local _, skills = SL:GetValue("LEARNED_SKILLS", true)
+        for _, v in ipairs(skills) do
             SL:DeleteSkillKey(v.MagicID)
         end
         SL:SetValue("SKILL_KEY", BASIC_SKILL_ID, 1)
@@ -106,8 +106,8 @@ end
 
 -- 初始化右侧技能槽位
 function SkillSetting.InitSkillSlot()
-    local skills = SL:GetValue("LEARNED_SKILLS", false, true)
-    for _, v in pairs(skills) do
+    local _, skills = SL:GetValue("LEARNED_SKILLS", false, true)
+    for _, v in ipairs(skills) do
         if v.Key and (v.Key >= MinKey and v.Key <= MaxKey) then
             SkillSetting.UpdateSkillChangeKey({skill = v, isInit = true}, true)
         end
@@ -272,8 +272,8 @@ function SkillSetting.UpdateSkillList()
         return a_info.index < b_info.index
     end
 
-    local skills = SL:GetValue("LEARNED_SKILLS", true, true)
-    skills = SL:HashToSortArray(skills, function(a, b) return sort(a, b) end)
+    local _, skills = SL:GetValue("LEARNED_SKILLS", true, true)
+    table.sort(skills, sort)
 
     local itemWid  = 95
     local itemHei  = 110

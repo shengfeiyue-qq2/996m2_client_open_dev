@@ -46,7 +46,7 @@ function SettingProtectSetting.InitUI(data)
         UIOperator:CloseProtectSettingUI()
     end)
 
-    GUI:addOnClickEvent(ui.Panel_cancle, function()
+    GUI:addOnClickEvent(ui.Panel_cancel, function()
         UIOperator:CloseProtectSettingUI()
     end)
 

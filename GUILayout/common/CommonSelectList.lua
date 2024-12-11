@@ -25,11 +25,12 @@ function CommonSelectList.InitUI(data)
     local cellSize  = {width = 260, height = 28}  -- 原cell 尺寸
     local cellW     = data.cellwidth or cellSize.width
     local cellH     = data.cellheight or cellSize.height
-    local MoveCount = data.MoveItemCount or 0
+    local moveCount = data.MoveItemCount or 0
     CommonSelectList._func      = data.func 
     CommonSelectList._iconPaths = data.iconPaths
     CommonSelectList._fontSize  = data.fontSize 
     CommonSelectList._autoNext  = data.autoNext--文本自动换行
+    CommonSelectList._isColor   = data.isColorShow
     if type(values) == "string" then 
         values = {values}
     end 
@@ -38,8 +39,8 @@ function CommonSelectList.InitUI(data)
     count = math.min(count, CommonSelectList._maxShowNum)
     if position.y < cellH * count then
         GUI:setAnchorPoint(CommonSelectList._ui.Image_bg, 0, 0) 
-        if MoveCount > 0 then 
-            position.y = position.y + MoveCount * cellH
+        if moveCount > 0 then 
+            position.y = position.y + moveCount * cellH
         end
     end
 
@@ -51,7 +52,12 @@ function CommonSelectList.InitUI(data)
     CommonSelectList._cellSize = {width = cellW, height = cellH}
     CommonSelectList._allCellH = 0
     for i, v in ipairs(values) do
-        local cell = CommonSelectList.CreateItemCell(i, v)
+        local cell = nil
+        if CommonSelectList._isColor and string.find(v, "#") then
+            cell = CommonSelectList.CreateColorCell(i, v)
+        else
+            cell = CommonSelectList.CreateItemCell(i, v)
+        end
         GUI:ListView_pushBackCustomItem(CommonSelectList._ui.ListView_1, cell)
     end
     if CommonSelectList._autoNext then 
@@ -86,7 +92,7 @@ function CommonSelectList.CreateItemCell(index, str)
         GUI:Text_setFontSize(ui.Text_desc, CommonSelectList._fontSize)
     end
     if CommonSelectList._autoNext then 
-        GUI:Text_setMaxLineWidth(ui.Text_desc,size.width)
+        GUI:Text_setMaxLineWidth(ui.Text_desc, size.width)
         GUI:Text_setString(ui.Text_desc, str)
         local labelSize = GUI:getContentSize(ui.Text_desc)
         GUI:setContentSize(cell, size.width, labelSize.height + 8)
@@ -113,6 +119,25 @@ function CommonSelectList.CreateItemCell(index, str)
     GUI:removeFromParent(cell)
     GUI:removeFromParent(parent)
     
+    return cell
+end
+
+function CommonSelectList.CreateColorCell(index, color)
+    local size = CommonSelectList._cellSize
+    local cell = GUI:Widget_Create(-1, "widget_" .. index, 0, 0, size.width, size.height)
+    GUI:setTouchEnabled(cell, true)
+    
+    local layout = GUI:Layout_Create(cell, "colorLayout", 0, 0, size.width, size.height)
+    GUI:Layout_setBackGroundColorType(layout, 1)
+    GUI:Layout_setBackGroundColor(layout, color)
+    
+    GUI:addOnClickEvent(cell, function()
+        if CommonSelectList._func then
+            CommonSelectList._func(index)
+        end
+        UIOperator:CloseCommonSelectListUI()
+    end)
+
     return cell
 end
 

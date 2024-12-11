@@ -100,7 +100,7 @@ function AutoUsePop.AddItem(data)
     local targetPos     = data.targetPos
     local isSkillBook   = data.isSkillBook
     local itemBelong    = SL:GetValue("ITEM_BELONG_BY_MAKEINDEX", MakeIndex)
-    local isFromHeroBag = itemBelong == GUIDefine.ItemBelong.ITEM_FROM_BELONG_HEROBAG          -- 是否来源于英雄背包
+    local isFromHeroBag = itemBelong == GUIDefine.ItemBelong.HEROBAG          -- 是否来源于英雄背包
     local isHero        = data.isHero
 
     local dt = {

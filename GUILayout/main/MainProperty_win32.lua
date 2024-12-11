@@ -839,7 +839,7 @@ function MainProperty.InitChatPanel()
             end
         end
         local data = {}
-        data.str = GET_STRING(30003036)
+        data.str = "是否确定退出游戏"
         data.btnType = 2
         data.callback = callback
         UIOperator:OpenCommonTipsUI(data)

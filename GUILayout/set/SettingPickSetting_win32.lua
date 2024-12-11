@@ -27,7 +27,7 @@ function SettingPickSetting.InitFrameUI()
     GUI:addOnClickEvent(ui.Button_close, function()
         UIOperator:ClosePickSettingUI()
     end)
-    GUI:addOnClickEvent(ui.Panel_cancle, function()
+    GUI:addOnClickEvent(ui.Panel_cancel, function()
         UIOperator:ClosePickSettingUI()
     end)
 
@@ -36,7 +36,7 @@ function SettingPickSetting.InitFrameUI()
     local screenH = SL:GetValue("SCREEN_HEIGHT")
     GUI:setPosition(ui.Panel_1, screenW / 2, SL:GetValue("PC_POS_Y"))
     
-    GUI:setContentSize(ui.Panel_cancle, screenW, screenH)
+    GUI:setContentSize(ui.Panel_cancel, screenW, screenH)
 end
 
 --内容

@@ -343,11 +343,6 @@ function MainSkill.OnClickSkillEvent(skillID)
             end
         end
 
-        -- 十步一杀在cd状态中, 不能进行选中
-        if skillID == 82 and SL:GetValue("SKILL_IS_CDING", skillID) then
-        return false
-        end
-
         -- select
         SL:SetValue("SELECT_SKILL", skillID)
 
@@ -540,7 +535,7 @@ function MainSkill.InitQuickFind()
             return quickFind(1)
         end
 
-        if isOpenHero and endedPos.x > beganPos.x then
+        if isOpenHero and endedPos.y > beganPos.y then
             return quickFind(3)
         end
 

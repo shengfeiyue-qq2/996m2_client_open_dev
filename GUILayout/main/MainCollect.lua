@@ -56,7 +56,7 @@ function MainCollect.GoToAutoFindCollection()
 end
 
 function MainCollect.CreateItemCell(collectID)
-    local ui = GUI:LoadExportEx2("main/collect/collect_cell", "collect_cell")
+    local ui = GUI:LoadExportEx2("main/collect/collect_cell", "Collect_cell")
     GUI:ui_IterChilds(ui, ui)
     GUI:setVisible(ui, true)
 

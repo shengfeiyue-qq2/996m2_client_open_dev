@@ -1,9 +1,12 @@
 SL:Print("Hello World, This is GUIInit!!!")
 local sformat = string.format
+local _initedWorld = false
 
 -----------------------------------------------------------------------------
 -- 加载GUIUtil.lua
 SL:Require("GUILayout/GUIUtil", true)
+-- 加载SkillUtil.lua
+SL:Require("GUILayout/SkillUtils", true)
 
 -----------------------------------------------------------------------------
 -- 主界面UI
@@ -25,6 +28,7 @@ local MainUIFiles = SL:GetValue("IS_PC_OPER_MODE") and {
     UIConst.LUAFile.LUA_FILE_MAIN_PROPERTY                  -- 主界面
 }
 SL:RegisterLUAEvent(LUA_EVENT_ENTER_WORLD, "GUIInit", function()
+    _initedWorld = true
     for i = 1, #MainUIFiles do
         SL:RequireFile(MainUIFiles[i])
     end
@@ -932,7 +936,7 @@ SL:RegisterLUAEvent(LUA_EVENT_ENTER_WORLD, "GUIInit_KeyBoard", function()
             SL:RequestLaunchSkill(skillID)
         end
         local function releaseCB()
-            SL:ClearLaunchSkill()
+            SL:ClearLaunchFirstSkill()
         end
         GUI:addKeyboardEvent(string.format("KEY_F%s", i), pressedCB, releaseCB, 0.1)
     end
@@ -958,7 +962,7 @@ SL:RegisterLUAEvent(LUA_EVENT_ENTER_WORLD, "GUIInit_KeyBoard", function()
             SL:RequestLaunchSkill(skillID)
         end
         local function releaseCB()
-            SL:ClearLaunchSkill()
+            SL:ClearLaunchFirstSkill()
         end
         local codeKeys = {"KEY_CTRL", string.format("KEY_F%s", i)}
         GUI:addKeyboardEvent(codeKeys, pressedCB, releaseCB, 0.1)
@@ -1333,7 +1337,7 @@ SL:RegisterLUAEvent(LUA_EVENT_ENTER_WORLD, "GUIInit_KeyBoard", function()
         SL:RequestLaunchSkill(skillID)
     end
     local function releaseCB()
-        SL:ClearLaunchSkill()
+        SL:ClearLaunchFirstSkill()
     end
     local codeKeys = {"KEY_CTRL", "KEY_D"}
     GUI:addKeyboardEvent(codeKeys, pressedCB, releaseCB, 0.1)
@@ -1687,4 +1691,106 @@ end)
 -- 清理
 SL:RegisterLUAEvent(LUA_EVENT_GAME_MEMORY_RELEASE, "GUIInit", function()
     GUIFunction:OnClearNpcTalkTips()
+end)
+
+-----------------------------------------------------------------------------
+-- 技能
+local SharedInputLaunchData = {}
+local UnableLaunchTips = {
+    [-3]    = "您的魔法值不足",
+    [-4]    = "承受状态中，无法使用",
+    [-5]    = "您的精力值不足",
+    [-6]    = "此地图无法执行该操作",
+    [-12]   = "您的内力值不足",
+}
+-- 处理玩家自主释放技能 （如: 主界面技能按钮 / PC快捷键）
+SL:RegisterLUAEvent(LUA_EVENT_USER_INPUT_LAUNCH_SKILL , "GUIInit", function(data)
+    if not _initedWorld then
+        SL:Print("no init world completed!!!!!")
+        return
+    end
+
+    SL:ClearAllInputState()
+
+    local skillID       = data.skillID
+    local destPosX      = data.destPosX
+    local destPosY      = data.destPosY
+    local priority      = GUIDefine.LaunchPriority.USER
+    
+    -- 普攻
+    if skillID == 0 then
+        skillID         = SkillUtils.FindLockLaunchSkill()
+        skillID         = skillID or 0
+    end
+
+    -- auto find target
+    if SL:GetValue("SKILL_IS_NEED_TARGET", skillID) then
+        if SL:GetValue("SELECT_TARGET_ID") then
+            if not GUIFunction:CheckLaunchEnableByID(SL:GetValue("SELECT_TARGET_ID")) then
+                SL:SetValue("SELECT_TARGET_ID", nil)
+                return nil
+            end
+        else
+            if not SL:GetValue("IS_PC_OPER_MODE") then -- fix PC出现锁定光圈，施法还是打在其他地方； PC是根据鼠标位置进行施法
+                SkillUtils.FindTarget()
+            end
+        end
+    end
+
+    -- unable tips
+    local ret, param = GUIFunction:CheckSkillAbleToLaunch(skillID, true)
+    if UnableLaunchTips[ret] then
+        SL:ShowSystemTips(UnableLaunchTips[ret])
+        SL:Print("CheckAbleToLaunch:" .. ret, skillID)
+    end
+    
+    -- 1.check launch
+    if 1 == ret then 
+        -- 打断动作, 立即施法
+        if skillID == SKILL_ID_YMChongZhuang then
+            -- 野蛮不需要结束就能进入
+            if SL:GetValue("MAIN_PLAYER_IS_VALID") and GUIFunction:CheckActionDashAble(SL:GetValue("ACTOR_ACTION", SL:GetValue("USER_ID"))) then
+                SL:RequestLaunchSkillImmediate(skillID)
+            end
+            return
+        end
+
+        -- launch
+        SharedInputLaunchData.launchType = global.MMO.LAUNCH_TYPE_USER
+        SharedInputLaunchData.priority = global.MMO.LAUNCH_PRIORITY_USER
+        SharedInputLaunchData.targetID = nil
+        SharedInputLaunchData.skillID = skillID
+        SharedInputLaunchData.destPosX = destPosX
+        SharedInputLaunchData.destPosY = destPosY
+        SL:InputLaunch(SharedInputLaunchData)
+        
+    else
+        if ret == -10 then
+            SL:RequestHorseDown()
+        elseif ret == -13 then
+            if param then
+                local buffTitle = SL:GetValue("BUFF_SKILL_UNABLE_TITLE", param)
+                if buffTitle then
+                    SL:ShowSystemTips(buffTitle)
+                end
+            end
+        end
+        
+        if not (GUIFunction:IsFighter(SL:GetValue("JOB")) and skillID == 0) then
+            -- record
+            SL:SetValue("AUTO_LAUNCH_FIRST_SKILL", skillID, destPosX, destPosY)
+        end
+    end
+    
+    -- 2.check lock state
+    skillID = data.skillID
+    if not SL:GetValue("BATTLE_IS_AUTO_LOCK_STATE") and not SL:GetValue("BATTLE_IS_AFK") and SL:GetValue("SKILL_IS_LOCK_TARGET", skillID) 
+    and SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_ALWAYS_ATTACK) == 1 then
+        SL:SetValue("BATTLE_IS_AUTO_LOCK_STATE", true)
+        if SL:GetValue("SKILL_IS_COMBO_SKILL", skillID) then
+            SL:SetValue("AUTO_LOCK_SKILLID", 0)
+        else
+            SL:SetValue("AUTO_LOCK_SKILLID", skillID)
+        end
+    end
 end)

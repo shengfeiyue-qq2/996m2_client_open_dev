@@ -18,6 +18,7 @@ local commonGroup = {
         SLDefine.SETTINGID.SETTING_IDX_EXP_IGNORE,  --经验过滤
         SLDefine.SETTINGID.SETTING_IDX_AUTO_LAUNCH, --自动练功
         SLDefine.SETTINGID.SETTING_IDX_FIRE_OPACITY,--火墙淡化
+        SLDefine.SETTINGID.SETTING_IDX_FIRE_OWN_COLOR,  -- 自己火墙颜色
     }
 }
 
@@ -136,11 +137,11 @@ SettingLaunch._newAutoSummon = false --新的自动召唤
 
 local getConfigFunc = function(group)
     local configs = {}
-    local config
+    local config = nil
     for i, id in ipairs(group) do
         config = SL:GetValue("SETTING_CONFIG", id)
-        if id ==  SLDefine.SETTINGID.SETTING_IDX_PICK_SETTING and not config then --未配置的加上默认配置
-            config  = { 
+        if id == SLDefine.SETTINGID.SETTING_IDX_PICK_SETTING and not config then --未配置的加上默认配置
+            config = { 
                 id=121,
                 content="拾取设置",
                 default=0,
@@ -149,7 +150,7 @@ local getConfigFunc = function(group)
             }
         end
         if config and (config.platform == 0 or config.platform == SL:GetValue("CURRENT_OPERMODE")) then
-            if not config.order or  not tonumber(config.order) then
+            if not config.order or not tonumber(config.order) then
                 config.order = 0 
             end
             table.insert(configs, config)
@@ -187,7 +188,7 @@ function SettingLaunch.InitCommonGroup()
         commonConfig[i] = getConfigFunc(v)
     end
     local commonConfig2 = getConfigFunc(commonGroup2)
-    ---计算大小
+    -- 计算大小
     local cellW = 228
     local cellH = 40
     local cellH2 = 60
@@ -205,25 +206,24 @@ function SettingLaunch.InitCommonGroup()
         end
 
     end
-    --计算位置
-    local ScrollView_1 = SettingLaunch._ui.ScrollView_1
-    local commonSize = GUI:Size(686, maxH)
-    GUI:setContentSize(SettingLaunch._ui.ImageBG1, commonSize.width,160 + 4)
-    GUI:setContentSize(ScrollView_1, GUI:Size(686, 160))
-    GUI:ScrollView_setInnerContainerSize(ScrollView_1, commonSize)
+    -- 计算位置
+    local scrollView1 = SettingLaunch._ui.ScrollView_1
+    local commonSizeW = GUI:getContentSize(scrollView1).width
+    local commonSizeH = maxH
+    GUI:ScrollView_setInnerContainerSize(scrollView1, commonSizeW, commonSizeH)
 
     for i, configs in ipairs(commonConfig) do
         for j, config in ipairs(configs) do
-            local cell = SettingLaunch.CreateCell(ScrollView_1, config)
+            local cell = SettingLaunch.CreateCell(scrollView1, config)
             if cell then 
-                GUI:setPosition(cell, cellW * (i - 1), commonSize.height - config.height)
+                GUI:setPosition(cell, cellW * (i - 1), commonSizeH - config.height)
             end 
         end
     end
-    local ScrollView_4 = SettingLaunch._ui.ScrollView_4
-    local cellW2 = 289
+    local scrollView4 = SettingLaunch._ui.ScrollView_4
+    local cellW2 = 288
     for i, config in ipairs(commonConfig2) do
-        local cell = SettingLaunch.CreateCell(ScrollView_4, config)
+        local cell = SettingLaunch.CreateCell(scrollView4, config)
         if cell then 
             GUI:setPosition(cell, cellW2 * (i - 1) + 20, 0)
         end 
@@ -232,41 +232,40 @@ end
 
 function SettingLaunch.InitHeroGroup()
     local cellH = 40
-    local ScrollView_2 = SettingLaunch._ui.ScrollView_2
-    local heroConfigs = {}
-    heroConfigs = getConfigFunc(heroGroup)
+    local scrollView2 = SettingLaunch._ui.ScrollView_2
+    local heroConfigs = getConfigFunc(heroGroup)
     local heroItemCount = #heroConfigs
     if SL:GetValue("USEHERO") and heroItemCount > 0 then
         SettingLaunch._isHaveHero = true
-        -- -- ---计算大小
-        local contentSize = GUI:getContentSize(ScrollView_2)
+        -- 计算大小
+        local contentSize = GUI:getContentSize(scrollView2)
         for i, v in ipairs(heroConfigs) do
-            local cell = SettingLaunch.CreateCell(ScrollView_2, v)
+            local cell = SettingLaunch.CreateCell(scrollView2, v)
             if cell then 
                 GUI:setPosition(cell, 0, contentSize.height - i * cellH)
             end 
         end
     else
-        GUI:setVisible(ScrollView_2, false)
+        GUI:setVisible(SettingLaunch._ui.ImageBG2, false)
     end
 end
 
 function SettingLaunch.InitSkillGroup()
     local cellW = 228
     local cellH = 40
-    local ScrollView_3 = SettingLaunch._ui.ScrollView_3
+    local scrollView3 = SettingLaunch._ui.ScrollView_3
     local skills = SL:GetValue("SKILL_INFO_FILTER", -1, 3, true, true)--已学的技能
     local jobConfig = {}
     for i, v in pairs(skills) do
         local showIDS = skillsGroups[v.MagicID]  
-        local config = SL:GetValue("SKILL_CONFIG",v.MagicID)
+        local config = SL:GetValue("SKILL_CONFIG", v.MagicID)
         if not showIDS then 
             if v.skilltype == 4 then --自定义召唤类技能
                 showIDS = {SLDefine.SETTINGID.SETTING_IDX_AUTO_SUMMON}
-            elseif v.MagicID>1000 and SL:GetValue("SKILL_IS_ONOFF_SKILL",v.MagicID) and (config.job == 0 or config.job == 3)  then--自定义战士开关技能
-                showIDS = {10000+v.MagicID}
-            elseif v.MagicID>1000 and SL:GetValue("SETTING_CONFIG", 10000+v.MagicID) then
-                showIDS = {10000+v.MagicID}
+            elseif v.MagicID > 1000 and SL:GetValue("SKILL_IS_ONOFF_SKILL", v.MagicID) and (config.job == 0 or config.job == 3) then -- 自定义战士开关技能
+                showIDS = {10000 + v.MagicID}
+            elseif v.MagicID > 1000 and SL:GetValue("SETTING_CONFIG", 10000 + v.MagicID) then
+                showIDS = {10000 + v.MagicID}
             end
         end
         if showIDS then
@@ -285,7 +284,7 @@ function SettingLaunch.InitSkillGroup()
             jobConfig[v.id] = v
         end
     end
-    --排序
+    -- 排序
     local sortT = {}
     for k, v in pairs(jobConfig) do
         table.insert(sortT, v)
@@ -295,29 +294,32 @@ function SettingLaunch.InitSkillGroup()
     end)
     jobConfig = sortT
     local configCount = table.nums(jobConfig)
-    local contentSize = GUI:getContentSize(ScrollView_3)
+    local contentSize = GUI:getContentSize(scrollView3)
+    local totalWid = GUI:getContentSize(SettingLaunch._ui.ScrollView_1).width
     local innerContainerSize = contentSize
     local colCount = 3
     if SettingLaunch._isHaveHero then
         colCount = 2
-        GUI:setPositionX(SettingLaunch._ui.ImageBG3, cellW)
+        GUI:setPositionX(SettingLaunch._ui.ImageBG3, cellW + 2)
     else
         GUI:setPositionX(SettingLaunch._ui.ImageBG3, 0)
-        contentSize = GUI:Size(686, contentSize.height)
+        contentSize.width = totalWid
         innerContainerSize = contentSize
     end
     local maxH = math.ceil(configCount / colCount) * cellH
     if maxH > contentSize.height then
         if SettingLaunch._isHaveHero then
-            innerContainerSize = GUI:Size(686 - cellW, maxH)
+            innerContainerSize.width = totalWid - cellW
+            innerContainerSize.height = maxH
         else
-            contentSize = GUI:Size(686, contentSize.height)
-            innerContainerSize = GUI:Size(686, maxH)
+            contentSize.width = totalWid
+            innerContainerSize.width = totalWid
+            innerContainerSize.height = maxH
         end
     end
-    GUI:setContentSize(ScrollView_3, contentSize)
-    GUI:setContentSize(SettingLaunch._ui.ImageBG3, contentSize.width,contentSize.height + 4)
-    GUI:ScrollView_setInnerContainerSize(ScrollView_3, innerContainerSize)
+    GUI:setContentSize(scrollView3, contentSize)
+    GUI:setContentSize(SettingLaunch._ui.ImageBG3, contentSize.width, contentSize.height + 4)
+    GUI:ScrollView_setInnerContainerSize(scrollView3, innerContainerSize)
     local i = 1
     local maxH = 0
     for k, config in pairs(jobConfig) do
@@ -326,10 +328,10 @@ function SettingLaunch.InitSkillGroup()
         if config.id == SLDefine.SETTINGID.SETTING_IDX_AUTO_SUMMON then
             maxH = maxH + 20
         end
-        local H = y * cellH + maxH
-        local cell = SettingLaunch.CreateCell(ScrollView_3, config)
+        local hei = y * cellH + maxH
+        local cell = SettingLaunch.CreateCell(scrollView3, config)
         if cell then 
-            GUI:setPosition(cell, cellW * x, innerContainerSize.height - H)
+            GUI:setPosition(cell, cellW * x, innerContainerSize.height - hei)
         end 
         i = i + 1
     end
@@ -351,6 +353,8 @@ function SettingLaunch.CreateCell(parent, config)
         end 
     elseif config.id == SLDefine.SETTINGID.SETTING_IDX_AUTO_SUMMON then -- 自动召唤
         cell = SettingLaunch.CreateSelectClickCell(parent, config)
+    elseif config.id == SLDefine.SETTINGID.SETTING_IDX_FIRE_OWN_COLOR then -- 火墙颜色
+        cell = SettingLaunch.CreateSelectColorCell(parent, config)
     else
         cell = SettingLaunch.CreateClickCell(parent, config)
     end
@@ -498,31 +502,31 @@ function SettingLaunch.CreateSkillIcon(parent, skillID)
     return icon
 end
 
---显示选择技能
+-- 显示选择技能
 function SettingLaunch.ShowSelectSkill(data)
     local items    = {}
     if data.id == SLDefine.SETTINGID.SETTING_IDX_AUTO_SUMMON then
         -- 自动召唤
         items = SL:GetValue("SKILL_INFO_FILTER", 4, 3, true)
         if SettingLaunch._newAutoSummon then 
-            table.insert(items, { MagicID = -1, skillgroup = -1})--自动
+            table.insert(items, {MagicID = -1, skillgroup = -1}) -- 自动
         end
     elseif data.id == SLDefine.SETTINGID.SETTING_IDX_AUTO_LAUNCH then
         -- 自动练功
         local items2 = SL:GetValue("SKILL_INFO_FILTER", -1, 3, true, true)
         for i, v in pairs(items2) do
-            local isActive = SL:GetValue("SKILL_IS_ACTIVE",v.MagicID)--主动技能
+            local isActive = SL:GetValue("SKILL_IS_ACTIVE", v.MagicID) -- 主动技能
             if isActive then 
                 table.insert(items,v)
             end
         end
-        table.insert(items, { MagicID = -1, skillgroup = -1})--无
+        table.insert(items, {MagicID = -1, skillgroup = -1}) -- 无
     end
     items = SL:HashToSortArray(items, function(a, b)
         return a.MagicID < b.MagicID
     end)
     if not next(items) then
-        SL:ShowSystemTips(GET_STRING(30052303))
+        SL:ShowSystemTips("未发现可用技能")
         return nil
     end
 
@@ -534,7 +538,7 @@ function SettingLaunch.ShowSelectSkill(data)
     GUI:setTouchEnabled(Panel_1, true)
 
     -- 底框
-    local Panel_2 = GUI:Layout_Create(Panel_1, "Panel_2", 366, 222.5, 360, 280, false)
+    local Panel_2 = GUI:Layout_Create(Panel_1, "Panel_2", 366, 222, 360, 280, false)
     GUI:setAnchorPoint(Panel_2, 0.5, 0.5)
     GUI:setTouchEnabled(Panel_2, true)
 
@@ -555,7 +559,6 @@ function SettingLaunch.ShowSelectSkill(data)
     GUI:addOnClickEvent(Panel_1, function()
         GUI:removeFromParent(Panel_1)
     end)
-
 
     for i, v in ipairs(items) do
         local item    = {}
@@ -585,7 +588,7 @@ function SettingLaunch.CreateSelectSkillCell(parent, data)
     GUI:setAnchorPoint(Node_desc, 0.5, 0.5)
 
     -- 线条
-    local Image_2 = GUI:Image_Create(Panel_item, "Image_2", 177.5, 0, "res/public/1900000667.png")
+    local Image_2 = GUI:Image_Create(Panel_item, "Image_2", 178, 0, "res/public/1900000667.png")
     GUI:setContentSize(Image_2, 355, 2)
     GUI:setIgnoreContentAdaptWithSize(Image_2, false)
     GUI:setAnchorPoint(Image_2, 0.5, 0)
@@ -974,5 +977,88 @@ function SettingLaunch.CreateSelectClickCell(parent, data)
     GUI:addOnClickEvent(Image_skill, function()
         SettingLaunch.ShowSelectSkill(data)
     end)
+    return Panel_Layout
+end
+
+function SettingLaunch.CreateSelectColorCell(parent, data)
+    -- 容器
+    local Panel_Layout = GUI:Layout_Create(parent, "Panel_" .. data.id, 0, 0, 228, 40, false)
+    GUI:setTouchEnabled(Panel_Layout, true)
+
+    -- 描述
+    local Text_desc = GUI:Text_Create(Panel_Layout, "Text_desc", 4, 20, 16, "#ffffff", data.content or "")
+    GUI:setAnchorPoint(Text_desc, 0, 0.5)
+    GUI:setTouchEnabled(Text_desc, false)
+    GUI:Text_enableOutline(Text_desc, "#000000", 1)
+
+    -- 点击的背景
+    local Image_Click = GUI:Image_Create(Panel_Layout, "Image_Click", 116, 8, "res/private/new_setting/textBg.png")
+    GUI:Image_setScale9Slice(Image_Click, 33, 33, 9, 9)
+    GUI:setContentSize(Image_Click, 104, 28)
+    GUI:setIgnoreContentAdaptWithSize(Image_Click, false)
+    GUI:setTouchEnabled(Image_Click, true)
+
+    -- 描述
+    local Text_desc2 = GUI:Text_Create(Image_Click, "Text_desc2", 52, 14, 18, "#FFFFFF", "")
+    GUI:setAnchorPoint(Text_desc2, 0.5, 0.5)
+    GUI:setTouchEnabled(Text_desc2, false)
+    GUI:Text_enableOutline(Text_desc2, "#111111", 1)
+
+    -- 颜色显示
+    local Layout_color = GUI:Layout_Create(Image_Click, "Layout_color", 2, 2, 100, 24)
+    GUI:Layout_setBackGroundColorType(Layout_color, 1)
+    GUI:Layout_setBackGroundColor(Layout_color, "#FFFFFF")
+
+
+    local colorItems = {}
+
+    local values = SL:GetValue("SETTING_VALUE", data.id)
+    if data.id == SLDefine.SETTINGID.SETTING_IDX_FIRE_OWN_COLOR then
+        colorItems = GUIDefine.SettingFireColors or {}
+        -- 1: 默认无
+        if not values[1] or (values[1] and values[1] == 0) then -- 默认值
+            values[1] = 1
+        end
+        if values[1] == 1 then
+            GUI:Text_setString(Text_desc2, colorItems[values[1]])
+            GUI:setVisible(Text_desc2, true)
+            GUI:setVisible(Layout_color, false)
+        else
+            GUI:setVisible(Text_desc2, false)
+            GUI:setVisible(Layout_color, true)
+            if colorItems[values[1]] then
+                GUI:Layout_setBackGroundColor(Layout_color, colorItems[values[1]])
+            end
+        end
+    end
+
+    GUI:addOnClickEvent(Image_Click, function()
+        if #colorItems == 0 then
+            return
+        end
+        local func = function(idx)
+            if idx ~= 0 then --0关闭  非0 选中的编号
+                if data.id == SLDefine.SETTINGID.SETTING_IDX_FIRE_OWN_COLOR then
+                    SL:SetValue("SETTING_VALUE", data.id, { idx })
+                    
+                    if idx == 1 then
+                        GUI:Text_setString(Text_desc2, colorItems[idx])
+                        GUI:setVisible(Text_desc2, true)
+                        GUI:setVisible(Layout_color, false)
+                    else
+                        GUI:setVisible(Text_desc2, false)
+                        GUI:setVisible(Layout_color, true)
+                        if colorItems[idx] then
+                            GUI:Layout_setBackGroundColor(Layout_color, colorItems[idx])
+                        end
+                    end
+                end
+            end
+        end
+        local size = GUI:getContentSize(Image_Click)
+        local position = GUI:convertToWorldSpace(Image_Click, 0, 0)
+        UIOperator:OpenCommonSelectListUI(colorItems, position, size.width, size.heigth, func, {isColorShow = true}) -- 打开选择列表
+    end)
+
     return Panel_Layout
 end

@@ -22,7 +22,7 @@ function AuctionWorld.main()
     AuctionWorld.filterjob = {
         {
             value = 3,
-            name  = GET_STRING(1088),
+            name  = "全部",
         },
     }
     local jobAble          = SL:GetValue("AUCTION_JOB_ABLE")
@@ -35,21 +35,21 @@ function AuctionWorld.main()
 
     -- 品阶
     AuctionWorld.qualities = clone(SL:GetValue("AUCTION_QUALITIES"))
-    table.insert(AuctionWorld.qualities, 1, { id = 0, name = GET_STRING(1088) })
+    table.insert(AuctionWorld.qualities, 1, {id = 0, name = "全部"})
 
     -- 货币
     AuctionWorld.currencies = clone(SL:GetValue("AUCTION_CURRENCIES"))
-    table.insert(AuctionWorld.currencies, 1, { id = 0, name = GET_STRING(1088) })
+    table.insert(AuctionWorld.currencies, 1, {id = 0, name = "全部"})
 
     -- 价格
     AuctionWorld.filter_price       = {
         {
             value = 1,
-            name  = GET_STRING(30103067),
+            name  = "价格",
         },
         {
             value = 2,
-            name  = GET_STRING(30103067),
+            name  = "价格",
         },
     }
 

@@ -10,7 +10,7 @@ local GetBelongID = function(actorID)
     end
 
     local actorID = SL:GetValue("ACTOR_OWNER_ID", actorID)
-    if not actorID or actorID == "" or actorID == -1 then
+    if not actorID or actorID == "" or actorID == -1 or actorID == "0" then
         return nil
     end
 

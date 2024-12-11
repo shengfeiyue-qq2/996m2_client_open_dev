@@ -6,12 +6,12 @@ function ui.init(parent)
 	GUI:setAnchorPoint(Scene, 0.50, 0.50)
 	GUI:setTag(Scene, -1)
 
-	-- Create Panel_cancle
-	local Panel_cancle = GUI:Layout_Create(Scene, "Panel_cancle", 569.00, 320.00, 3000.00, 3000.00, false)
-	GUI:setChineseName(Panel_cancle, "挂机技能_范围点击关闭")
-	GUI:setAnchorPoint(Panel_cancle, 0.50, 0.50)
-	GUI:setTouchEnabled(Panel_cancle, true)
-	GUI:setTag(Panel_cancle, 123)
+	-- Create Panel_cancel
+	local Panel_cancel = GUI:Layout_Create(Scene, "Panel_cancel", 569.00, 320.00, 3000.00, 3000.00, false)
+	GUI:setChineseName(Panel_cancel, "挂机技能_范围点击关闭")
+	GUI:setAnchorPoint(Panel_cancel, 0.50, 0.50)
+	GUI:setTouchEnabled(Panel_cancel, true)
+	GUI:setTag(Panel_cancel, 123)
 
 	-- Create Panel_1
 	local Panel_1 = GUI:Image_Create(Scene, "Panel_1", 816.00, 325.00, "res/public/bg_npc_02.png")

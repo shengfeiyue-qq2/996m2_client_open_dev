@@ -96,8 +96,8 @@ function PlayerSkill.UpdateSkillListView()
     PlayerSkill._cells = {}
 
     -- 已学的技能排除普攻
-    local items = SL:CopyData(SL:GetValue("LEARNED_SKILLS", true))
-    items = SL:HashToSortArray(items, function(a, b)
+    local _, items = SL:GetValue("LEARNED_SKILLS", true)
+    table.sort(items, function(a, b)
         return a.MagicID < b.MagicID
     end)
 

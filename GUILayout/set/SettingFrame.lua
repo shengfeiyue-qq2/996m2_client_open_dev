@@ -23,13 +23,13 @@ function SettingFrame.main(skipPage)
     local screenW = SL:GetValue("SCREEN_WIDTH")
     local screenH = SL:GetValue("SCREEN_HEIGHT")
     GUI:setPosition(PMainUI, screenW / 2, screenH / 2)
-    GUI:setContentSize(SettingFrame._ui.Panel_cancle, screenW, screenH)
+    GUI:setContentSize(SettingFrame._ui.Panel_cancel, screenW, screenH)
     GUI:Win_SetZPanel(parent, PMainUI)
 
     -- 关闭按钮
     GUI:addOnClickEvent(SettingFrame._ui["CloseButton"], function() GUI:Win_Close(parent) end)
     --全屏关闭
-    GUI:addOnClickEvent(SettingFrame._ui.Panel_cancle,function() GUI:Win_Close(parent)end)
+    GUI:addOnClickEvent(SettingFrame._ui.Panel_cancel, function() GUI:Win_Close(parent) end)
 
     SettingFrame._pages = {}
     SettingFrame._index = 0

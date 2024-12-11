@@ -44,7 +44,7 @@ function SettingAddMonsterName.InitUI(data)
         UIOperator:CloseAddMonsterNameUI()
     end)
 
-    GUI:addOnClickEvent(ui.Panel_cancle, function()
+    GUI:addOnClickEvent(ui.Panel_cancel, function()
         UIOperator:CloseAddMonsterNameUI()
     end)
 

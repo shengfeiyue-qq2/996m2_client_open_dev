@@ -236,6 +236,7 @@ function MainBuffList.OnFillContent(isAutoCol)
 
     MainBuffList._showBuffData = {}
     MainBuffList._showBuffCount = #items
+    local cellNum = 0
     for i = 1, #items do
         local v = items[i]
         if v.icon and string.len(v.icon) > 0 then
@@ -246,9 +247,10 @@ function MainBuffList.OnFillContent(isAutoCol)
             end
             local cell = GUI:QuickCell_Create(MainBuffList._buffList, "item_" .. i, 0, 0, MainBuffList._cellWid, MainBuffList._cellHei, createCell)
             GUI:setTag(cell, v.id)
+            cellNum = cellNum + 1
             if isAutoCol then
-                local row = math.ceil(i / isAutoCol)
-                local posX = MainBuffList._cellWid * ((i - 1) % isAutoCol)
+                local row = math.ceil(cellNum / isAutoCol)
+                local posX = MainBuffList._cellWid * ((cellNum - 1) % isAutoCol)
                 local posY = MainBuffList._totalHei - MainBuffList._cellHei * row
                 GUI:setPosition(cell, posX, posY)
             end

@@ -394,7 +394,7 @@ function SettingProtect.ShowSelectSkill(data)
         return a.MagicID < b.MagicID
     end)
     if not next(items) then
-        SL:ShowSystemTips(GET_STRING(30052303))
+        SL:ShowSystemTips("未发现可用技能")
         return nil
     end
 

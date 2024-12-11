@@ -52,7 +52,7 @@ function SettingAddMonsterType.InitUI()
         UIOperator:CloseAddMonsterTypeUI()
     end)
 
-    GUI:addOnClickEvent(ui.Panel_cancle, function()
+    GUI:addOnClickEvent(ui.Panel_cancel, function()
         UIOperator:CloseAddMonsterTypeUI()
     end)
 

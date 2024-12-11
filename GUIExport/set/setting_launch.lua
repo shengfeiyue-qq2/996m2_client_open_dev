@@ -13,16 +13,16 @@ function ui.init(parent)
 	GUI:setTag(Panel_1, 6)
 
 	-- Create ImageBG1
-	local ImageBG1 = GUI:Image_Create(Panel_1, "ImageBG1", 22.00, 271.00, "res/private/new_setting/textBg.png")
+	local ImageBG1 = GUI:Image_Create(Panel_1, "ImageBG1", 22.00, 272.00, "res/private/new_setting/textBg.png")
 	GUI:Image_setScale9Slice(ImageBG1, 5, 5, 5, 5)
-	GUI:setContentSize(ImageBG1, 686, 145)
+	GUI:setContentSize(ImageBG1, 686, 164)
 	GUI:setIgnoreContentAdaptWithSize(ImageBG1, false)
 	GUI:setChineseName(ImageBG1, "战斗设置_分布1组合")
 	GUI:setTouchEnabled(ImageBG1, false)
 	GUI:setTag(ImageBG1, -1)
 
 	-- Create ScrollView_1
-	local ScrollView_1 = GUI:ScrollView_Create(ImageBG1, "ScrollView_1", 0.00, 2.00, 686.00, 141.00, 1)
+	local ScrollView_1 = GUI:ScrollView_Create(ImageBG1, "ScrollView_1", 0.00, 2.00, 686.00, 160.00, 1)
 	GUI:ScrollView_setBackGroundImageScale9Slice(ScrollView_1, 33, 33, 9, 9)
 	GUI:ScrollView_setBounceEnabled(ScrollView_1, true)
 	GUI:ScrollView_setInnerContainerSize(ScrollView_1, 686.00, 300.00)
@@ -55,7 +55,7 @@ function ui.init(parent)
 	GUI:setTag(ScrollView_2, 105)
 
 	-- Create ImageBG3
-	local ImageBG3 = GUI:Image_Create(Panel_3, "ImageBG3", 231.00, 0.00, "res/private/new_setting/textBg.png")
+	local ImageBG3 = GUI:Image_Create(Panel_3, "ImageBG3", 230.00, 0.00, "res/private/new_setting/textBg.png")
 	GUI:Image_setScale9Slice(ImageBG3, 5, 5, 5, 5)
 	GUI:setContentSize(ImageBG3, 454, 204)
 	GUI:setIgnoreContentAdaptWithSize(ImageBG3, false)
