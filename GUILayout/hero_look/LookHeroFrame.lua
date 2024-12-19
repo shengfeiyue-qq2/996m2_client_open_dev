@@ -20,7 +20,6 @@ local roleUIType = GUIDefine.RoleUIType.HERO_OTHER
 local isPC = SL:GetValue("IS_PC_OPER_MODE")
 
 function LookHeroFrame.main()
-    SL:PrintTraceback()
     local parent = GUI:Win_Create(UIConst.LAYERID.LookHeroMainGUI, 0, 0, 0, 0, false, false, true, true)
     local data = GUI:GetLayerOpenParam()
     GUI:SetLayerOpenParam(nil)

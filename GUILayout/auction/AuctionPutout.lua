@@ -71,12 +71,12 @@ function AuctionPutout.main()
             GUI:Text_setString(Text_status, "竞拍中")
             GUI:Text_setTextColor(Text_status, "#28ef01")
             local timeStr = TimeFormatToStr(remaining)
-            Text_remaining:setString("竞拍中 " .. timeStr)
+            GUI:Text_setString(Text_remaining, "竞拍中 " .. timeStr)
             GUI:Text_setTextColor(Text_remaining, "#28ef01")
         elseif status == 3 then
             GUI:Text_setString(Text_status, "超时")
             GUI:Text_setTextColor(Text_status, "#ff0500")
-            Text_remaining:setString("超时")
+            GUI:Text_setString(Text_remaining, "超时")
             GUI:Text_setTextColor(Text_remaining, "#ff0500")
         end
     end

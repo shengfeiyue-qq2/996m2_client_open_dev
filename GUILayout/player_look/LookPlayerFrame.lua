@@ -23,7 +23,6 @@ local roleUIType = GUIDefine.RoleUIType.PLAYER_OTHER
 local isPC = SL:GetValue("IS_PC_OPER_MODE")
 
 function LookPlayerFrame.main()
-    SL:PrintTraceback()
     local parent = GUI:Win_Create(UIConst.LAYERID.LookPlayerMainGUI, 0, 0, 0, 0, false, false, true, true)
     local data = GUI:GetLayerOpenParam()
     GUI:SetLayerOpenParam(nil)

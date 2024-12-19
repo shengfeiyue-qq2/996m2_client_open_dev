@@ -194,13 +194,14 @@ end
 
 function TradingBankLookPlayerData.GetSkillTrainData(skillID)
     -- 技能等级>3的全部特殊处理下
+    local maxStr = "-"
     if not skillID or not TradingBankLookPlayerData._skills[skillID] then
         return maxStr
     end
-    if skillID == global.MMO.SKILL_INDEX_BASIC then
+    if skillID == SKILL_ID_PuGong then
         return maxStr
     end
-    local skillData    = TradingBankLookPlayerData._skills[skillID]
+    local skillData = TradingBankLookPlayerData._skills[skillID]
 
     return TradingBankLookPlayerData.GetSkillTrain(skillData)
 end
@@ -208,7 +209,7 @@ end
 function TradingBankLookPlayerData.GetSkillTrain(skillData)
     -- 技能等级>3的全部特殊处理下
     local maxStr = "-"
-    local isBaseSkill = skillData.Level <= 3
+    local isBaseSkill   = skillData.Level <= 3
     local skillLevel    = skillData.Level
     local maxSkillLevel = skillData.TrainLv
     if isBaseSkill and skillLevel >= maxSkillLevel then
@@ -248,13 +249,14 @@ end
 
 function TradingBankLookPlayerData.GetHeroSkillTrainData(skillID)
     -- 技能等级>3的全部特殊处理下
+    local maxStr = "-"
     if not skillID or not TradingBankLookPlayerData._heroSkills[skillID] then
         return maxStr
     end
-    if skillID == global.MMO.SKILL_INDEX_BASIC then
+    if skillID == SKILL_ID_PuGong then
         return maxStr
     end
-    local skillData    = TradingBankLookPlayerData._heroSkills[skillID]
+    local skillData = TradingBankLookPlayerData._heroSkills[skillID]
 
     return TradingBankLookPlayerData.GetSkillTrain(skillData)
 end

@@ -122,7 +122,7 @@ function Chat.InitChatParam()
     end
 
     local set = SL:GetValue("GAME_DATA", "ChatShowInterval")
-    local idx = global.isWinPlayMode and 2 or 1
+    local idx = SL:GetValue("IS_PC_OPER_MODE") and 2 or 1
     if set and string.len(set) > 0 then
         local setList = string.split(set, "|")
         local param = setList[idx] and string.split(setList[idx], "#")

@@ -27,7 +27,7 @@ function FriendApply.RefreshList()
     for _, v in pairs(data) do
         local cell = FriendApply.CreateApplyCell()
         GUI:ListView_pushBackCustomItem(ListView, cell)
-        cell:setPositionX(8)
+        GUI:setPositionX(cell, 8)
 
         local cellUI = GUI:ui_delegate(cell)
 

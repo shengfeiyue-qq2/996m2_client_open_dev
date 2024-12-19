@@ -846,13 +846,13 @@ function GUIFunction:GetAttShowOrder(att, stars, tipsShow)
     if not att or next(att) == nil then
         return {}
     end
-    local orederList = {}
+    local orderList = {}
     for k, v in pairs(showList) do
-        table.insert(orederList, v)
+        table.insert(orderList, v)
     end
 
     table.sort(
-        orederList,
+        orderList,
         function(a, b)
             if a.id <= AttTypeTable.Speed_Point and b.id <= AttTypeTable.Speed_Point then
                 return a.id < b.id
@@ -871,7 +871,7 @@ function GUIFunction:GetAttShowOrder(att, stars, tipsShow)
             end
         end
     )
-    return orederList
+    return orderList
 end
 
 function GUIFunction:GetDuraStr(dura, maxdura, one)
@@ -2315,6 +2315,7 @@ end
 function GUIFunction:GetChannelByChatMsg(msg)
     local channel = nil
     local content = msg
+    local targetName = nil
     for _, v in ipairs(GUIDefine.ChatChannelPrefix) do
         local pattern = v.pattern or "^" .. v.prefix .. "(.+)"
         local findInfo = {string.find(msg, pattern)}
@@ -2324,6 +2325,9 @@ function GUIFunction:GetChannelByChatMsg(msg)
             if channel == GUIDefine.ChatChannel.PRIVATE then
                 local fName, fContent = GUIFunction:FixPrivateChatMsgWithSpace(findInfo)
                 rContent = fContent
+                if fName and string.len(fName) > 0 then
+                    targetName = fName
+                end
             end
             content = rContent
             break
@@ -2338,14 +2342,19 @@ function GUIFunction:GetChannelByChatMsg(msg)
         end
     end
 
-    return channel, content
+    return channel, content, targetName
 end
 
 -- 根据聊天消息内容获取聊天对象
 function GUIFunction:FindTargetByChatMsg(msg)
-    local data = GUIDefine.ChatChannelPrefix[GUIDefine.ChatChannel.PRIVATE]
-    local pattern = data and data.pattern
+    local pattern = nil
     local res = nil
+    for _, v in pairs(GUIDefine.ChatChannelPrefix) do
+        if v.channel == GUIDefine.ChatChannel.PRIVATE then
+            pattern = v.pattern
+            break
+        end
+    end
     
     if not pattern then
         return res
@@ -2665,6 +2674,24 @@ local MOVE_ACTIONS = {
 -- actor移动
 function GUIFunction:IsMoveAction(act)
     return MOVE_ACTIONS[act]
+end
+
+-- 野蛮互斥动作
+local dashActions = {
+    [GUIDefine.Action.DASH]             = true, -- 野蛮
+    [GUIDefine.Action.ONPUSH]           = true, -- 被野蛮
+    [GUIDefine.Action.TELEPORT]         = true, -- 瞬移
+    [GUIDefine.Action.SBYS]             = true, -- 十步一杀
+    [GUIDefine.Action.DASH_FAIL]        = true, -- 野蛮失败
+    [GUIDefine.Action.DASH_WAITING]     = true, -- 野蛮等待
+}
+
+-- 检查能否野蛮冲撞
+function GUIFunction:CheckActionDashAble(act)
+    if not act then
+        return false
+    end
+    return dashActions[act] == nil
 end
 
 -- 是否是战士
@@ -3102,8 +3129,8 @@ function GUIFunction:CheckSkillAbleToLaunch(skillID, isUserInput)
     -13: 目标buff有禁止技能 launch
     -14: 目标buff有禁止技能 User Input
     ]]
-    -- 挖矿使用普普攻CD
-    if skillID == global.MMO.SKILL_INDEX_DIG and not SL:GetValue("SKILL_IS_CDING", global.MMO.SKILL_INDEX_BASIC) then
+    -- 挖矿使用普攻CD
+    if skillID == SKILL_ID_DIG and not SL:GetValue("SKILL_IS_CDING", SKILL_ID_PuGong) then
         return 1
     end
 
@@ -3581,7 +3608,7 @@ end
 
 function GUIFunction:CheckLaunchLockSkill()
     -- shift锁定
-    if not global.isWinPlayMode then
+    if not SL:GetValue("IS_PC_OPER_MODE") then
         return false
     end
 

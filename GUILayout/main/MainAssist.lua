@@ -919,7 +919,7 @@ function MainAssist.CreateTaskCell(data)
     GUI:ui_IterChilds(ui, ui)
 
     local taskID = data.type
-    ui:setTag(taskID)
+    GUI:setTag(ui, taskID)
 
     -- 提交任务
     GUI:addOnClickEvent(ui["Button_act"], function(sender)

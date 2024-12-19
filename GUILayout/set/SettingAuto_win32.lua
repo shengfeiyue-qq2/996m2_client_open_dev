@@ -10,7 +10,7 @@ local group1 = {
     SLDefine.SETTINGID.SETTING_IDX_NO_ATTACK_HAVE_BELONG, -- 不抢别人归属怪物
 }
 local group2 = {
-    SLDefine.SETTINGID.SETTING_IDX_NO_MONSTAER_USE, -- 多少秒没怪物使用
+    SLDefine.SETTINGID.SETTING_IDX_NO_MONSTER_USE, -- 多少秒没怪物使用
     SLDefine.SETTINGID.SETTING_IDX_BESIEGE_FLEE, -- 周围有多少敌人时使用
     SLDefine.SETTINGID.SETTING_IDX_RED_BESIEGE_FLEE, -- 周围有多少红名时使用
     SLDefine.SETTINGID.SETTING_IDX_ENEMY_ATTACK, -- 周围有敌人时主动攻击
@@ -112,7 +112,7 @@ function SettingAuto.CreateCell(parent, config)
     elseif config.id == SLDefine.SETTINGID.SETTING_IDX_FIRST_ATTACK_MASTER
     or config.id == SLDefine.SETTINGID.SETTING_IDX_NO_ATTACK_HAVE_BELONG then
         cell = SettingAuto.CreateClickCell(parent, config)
-    elseif config.id == SLDefine.SETTINGID.SETTING_IDX_NO_MONSTAER_USE then
+    elseif config.id == SLDefine.SETTINGID.SETTING_IDX_NO_MONSTER_USE then
         cell = SettingAuto.CreateClickInputListCell(parent, config)
     elseif config.id == SLDefine.SETTINGID.SETTING_IDX_BESIEGE_FLEE
     or config.id == SLDefine.SETTINGID.SETTING_IDX_RED_BESIEGE_FLEE then

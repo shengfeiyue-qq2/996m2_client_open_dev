@@ -59,13 +59,13 @@ function MainTargetBigHp.Init()
     MainTargetBigHp._selectActorID = nil                        -- 目标targetID
     MainTargetBigHp._barHpLocalZ = 99                           -- 血条层级
     MainTargetBigHp._showTubeAction = false                     -- 血量文本是否正在进行动画
-    MainTargetBigHp._tubeTipOringPos = GUI:p(0, 0)        -- 记录血量文本初始位置
+    MainTargetBigHp._tubeTipOringPos = GUI:p(0, 0)              -- 记录血量文本初始位置
     MainTargetBigHp._hpActions = {}                             -- 血量变化记录
     MainTargetBigHp._lastHP = 0                                 -- 记录最后一次的血量
     MainTargetBigHp._runActioning = false                       -- 记录是否正在进行血量文本加载
     MainTargetBigHp._tubeActions = {}                           -- 血量文本变化记录
-    MainTargetBigHp._hpBasePath = global.MMO.PATH_RES_PRIVATE .. "main_monster_ui/hp/"          -- 资源位置
-    MainTargetBigHp._monsterBasePath = global.MMO.PATH_RES_PRIVATE .. "main_monster_ui/monster/" -- 资源位置
+    MainTargetBigHp._hpBasePath = GUIDefine.PATH_RES_PRIVATE .. "main_monster_ui/hp/"          -- 资源位置
+    MainTargetBigHp._monsterBasePath = GUIDefine.PATH_RES_PRIVATE .. "main_monster_ui/monster/" -- 资源位置
 end
 
 function MainTargetBigHp.InitUI()

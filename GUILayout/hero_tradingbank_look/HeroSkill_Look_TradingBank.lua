@@ -85,10 +85,10 @@ function HeroSkill_Look_TradingBank.CreateSkillCell(parent, skillID)
     GUI:Text_setString(ui.Text_skillName, name)
 
     -- show tips
-    GUI:setTouchEnabled(ui.Image_icon,true)
-    GUI:addOnClickEvent(ui.Image_icon,function(sneder)
+    GUI:setTouchEnabled(ui.Image_icon, true)
+    GUI:addOnClickEvent(ui.Image_icon, function(sender)
         if config and config.desc then
-            local worldPos = GUI:getTouchEndPosition(sneder)
+            local worldPos = GUI:getTouchEndPosition(sender)
             GUI:ShowWorldTips(config.desc, worldPos, GUI:p(0, 0))
         end
     end)

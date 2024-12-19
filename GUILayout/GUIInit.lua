@@ -1756,8 +1756,8 @@ SL:RegisterLUAEvent(LUA_EVENT_USER_INPUT_LAUNCH_SKILL , "GUIInit", function(data
         end
 
         -- launch
-        SharedInputLaunchData.launchType = global.MMO.LAUNCH_TYPE_USER
-        SharedInputLaunchData.priority = global.MMO.LAUNCH_PRIORITY_USER
+        SharedInputLaunchData.launchType = GUIDefine.LaunchType.USER
+        SharedInputLaunchData.priority = GUIDefine.LaunchPriority.USER
         SharedInputLaunchData.targetID = nil
         SharedInputLaunchData.skillID = skillID
         SharedInputLaunchData.destPosX = destPosX

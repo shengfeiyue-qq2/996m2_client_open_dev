@@ -177,7 +177,7 @@ function StoreDetail.InitMoneyCell()
         GUI:setPosition(totalCell, offX, 0)
         GUI:setAnchorPoint(totalCell, 0, 0.5)
         GUI:addChild(StoreDetail._ui["Node_total"], totalCell)
-        offX = offX + totalCell:getContentSize().width
+        offX = offX + GUI:getContentSize(totalCell).width
     end
 
     -- 拥有
@@ -193,7 +193,7 @@ function StoreDetail.InitMoneyCell()
         GUI:setPosition(haveCell, offX2, 0)
         GUI:setAnchorPoint(haveCell, 0, 0.5)
         GUI:addChild(StoreDetail._ui["Node_have"], haveCell)
-        offX2 = offX2 + haveCell:getContentSize().width
+        offX2 = offX2 + GUI:getContentSize(haveCell).width
     end
 end 
 

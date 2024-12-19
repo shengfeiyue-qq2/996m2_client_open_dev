@@ -309,7 +309,6 @@ function LookHeroEquip.UpdateModelFeatureData()
     LookHeroEquip._feature.hairID = LookHeroEquip._hairID
     LookHeroEquip._feature.embattlesID = GUIFunction:GetEmbattle(EDType)
 
-    dump(LookHeroEquip._feature, "--LookHeroEquip._feature-----")
 end
 
 -- 额外的装备位置

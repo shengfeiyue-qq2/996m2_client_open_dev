@@ -22,7 +22,7 @@ function PCSpellScope.main()
     SL:RegisterLUAEvent(LUA_EVENT_PC_SPELL_SCOPE_CELL, "PCSpellScope", function(data)
         if data and type(data.cvMapRange) == "number" and data.cvMapRange > 0 then
             PCSpellScope._range = data.cvMapRange*2
-            if CHECK_SETTING(SLDefine.SETTINGID.SETTING_IDX_SPELL_HELP) == 1 then
+            if SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_SPELL_HELP) == 1 then
                 PCSpellScope.CreateDrawPolygon(PCSpellScope._range)
             end
         end

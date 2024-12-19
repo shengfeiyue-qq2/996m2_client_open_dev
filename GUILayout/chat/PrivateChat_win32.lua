@@ -172,7 +172,7 @@ function PrivateChat.InitListEvent()
         PrivateChat._percent = PrivateChat._percent + (isUp and -per or per)
         local posY  = (1 - PrivateChat._percent) * hei + originY
         posY        = math.min(math.max(posY, minY), maxY)
-        progressBar:setPositionY(posY)
+        GUI:setPositionY(progressBar, posY)
 
         local p     = (hei - (posY - originY)) / hei
         p           = math.min(math.max(p, 0), 1)

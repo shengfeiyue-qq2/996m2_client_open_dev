@@ -122,10 +122,10 @@ function HeroInternalSkill.CreateSkillCell(parent, skillID, skillType)
 
     -- show tips
     GUI:setTouchEnabled(ui.Image_icon, true)
-    GUI:addOnClickEvent(ui.Image_icon, function(sneder)
+    GUI:addOnClickEvent(ui.Image_icon, function(sender)
         local desc = SL:GetValue("H.INTERNAL_SKILL_DESC", skillID, skillType)
         if desc then
-            local worldPos = GUI:getTouchEndPosition(sneder)
+            local worldPos = GUI:getTouchEndPosition(sender)
             GUI:ShowWorldTips(desc, worldPos, {x = 0, y = 0})
         end
     end)

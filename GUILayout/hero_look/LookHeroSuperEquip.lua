@@ -289,7 +289,6 @@ function LookHeroSuperEquip.UpdateModelFeatureData()
 
     LookHeroSuperEquip._feature.hairID = LookHeroSuperEquip._hairID
 
-    dump(LookHeroSuperEquip._feature, "--LookHeroSuperEquip._feature-----")
 end
 
 -- 额外的装备位置

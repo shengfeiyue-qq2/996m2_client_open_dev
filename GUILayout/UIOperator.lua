@@ -12,7 +12,7 @@ function UIOperator:OpenMyPlayerUI(data)
         PlayerFrame.OnClose()
     end
 
-    if not SL:GetValue("IS_PC_OPER_MODE") and tostring(SL:GetValue("GAME_DATA", "playerInfoMode")) == "1" and tostring(SL:GetValue("GAME_DATA", "syshero")) == "1" then
+    if GUIDefineEx.IsMergeMode then
         GUI:Win_Open(UIConst.LUAFile.LUA_FILE_MERGE_PLAYER_MAIN)
     else
         GUI:Win_Open(UIConst.LUAFile.LUA_FILE_PLAYER_FRAME)
@@ -40,7 +40,7 @@ function UIOperator:OpenMyHeroUI(data)
         return false
     end
 
-    if not SL:GetValue("IS_PC_OPER_MODE") and tostring(SL:GetValue("GAME_DATA", "playerInfoMode")) == "1" and tostring(SL:GetValue("GAME_DATA", "syshero")) == "1" then
+    if GUIDefineEx.IsMergeMode then
         data.roleType = 2
         GUI:SetLayerOpenParam(data)
         GUI:Win_Open(UIConst.LUAFile.LUA_FILE_MERGE_PLAYER_MAIN)

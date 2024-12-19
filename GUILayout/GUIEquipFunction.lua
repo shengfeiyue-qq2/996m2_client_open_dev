@@ -346,8 +346,7 @@ function GUIFunction:CheckEquipCondition(pos)
     local equipCondition = EquipData.equipConditions[pos]
     if equipCondition then
         local checkConditions = equipCondition or ""
-        local ConditionProxy = global.Facade:retrieveProxy(global.ProxyTable.ConditionProxy)
-        if ConditionProxy:CheckCondition(checkConditions) then
+        if SL:CheckCondition(checkConditions) then
             return true
         else
             return false

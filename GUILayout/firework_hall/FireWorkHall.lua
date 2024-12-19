@@ -24,7 +24,7 @@ function FireWorkHall.ShowFireWorks(data)
         FireWorkHall._fireworks_count = FireWorkHall._fireworks_count - 1
         if FireWorkHall._fireworks_count == 0 then
             if FireWorkHall._anim_layer then
-                FireWorkHall._anim_layer:removeFromParent()
+                GUI:removeFromParent(FireWorkHall._anim_layer)
                 FireWorkHall._anim_layer = nil
             end
         end

@@ -398,7 +398,6 @@ function HeroSuperEquip.UpdateModelFeatureData()
 
     HeroSuperEquip._feature.hairID = HeroSuperEquip._heroHairID
 
-    dump(HeroSuperEquip._feature, "--HeroSuperEquip._feature-----")
 end
 
 -- 额外的装备位置

@@ -949,9 +949,9 @@ function Notice.OnShowItemDropNotice(data)
 
     -- node
     local viewSize = SL:GetValue("SCREEN_SIZE")
-    Notice._rootDropTips:setPositionX(viewSize.width / 2 + X)
+    GUI:setPositionX(Notice._rootDropTips, viewSize.width / 2 + X)
     local originY = viewSize.height - 50
-    Notice._rootDropTips:setPositionY(originY + Y)
+    GUI:setPositionY(Notice._rootDropTips, originY + Y)
     Notice._dropIndex = Notice._dropIndex + 1
     local node = GUI:Node_Create(Notice._rootDropTips, "nodeDrop" .. Notice._dropIndex, 0, 0)
     GUI:setAnchorPoint(node, 0.5, 0)
@@ -1121,7 +1121,6 @@ function Notice.OnAddChild(child)
     local anr = GUI:getAnchorPoint(child)
     local pos = GUI:getWorldPosition(child)
 
-    local viewSize = global.Director:getVisibleSize()
     local screenW = SL:GetValue("SCREEN_WIDTH")
     local screenH = SL:GetValue("SCREEN_HEIGHT")
 

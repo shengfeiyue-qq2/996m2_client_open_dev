@@ -106,13 +106,13 @@ function StorePage.CreateStoreItemCell(parent, data)
         goodsData.look = true
         goodsData.checkPower = true
         local goodItem = GUI:ItemShow_Create(ui_icon, "ui_icon", 0, 0, goodsData)
-        goodItem:setAnchorPoint(0.5, 0.5)
+        GUI:setAnchorPoint(goodItem, 0.5, 0.5)
     end
 
     GUI:setVisible(ui_imgTag, false)
     local imageName = StorePage.GetTagImage(data.ShowLable)
     if imageName then
-        ui_imgTag:loadTexture(GUIDefine.PATH_RES_PRIVATE .. "page_store_ui/page_store_ui_mobile/" .. imageName)
+        GUI:Image_loadTexture(ui_imgTag, GUIDefine.PATH_RES_PRIVATE .. "page_store_ui/page_store_ui_mobile/" .. imageName)
         GUI:setVisible(ui_imgTag, true)
     end
 

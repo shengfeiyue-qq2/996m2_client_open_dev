@@ -63,7 +63,7 @@ function StallSet.InitUI()
             if SL:GetValue("M2_FORBID_NAME", true) then
                 GUI:Text_setString(pSender, "")
             end
-            local str = pSender:getString()
+            local str = GUI:Text_getString(pSender)
             GUI:setVisible(StallSet._ui.Text_name, string.len(str) <= 0)
         end
     end

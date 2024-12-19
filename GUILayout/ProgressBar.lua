@@ -52,10 +52,10 @@ function ProgressBar.OnActionBegin(actorID, act)
     end
 
     if ProgressBar._data and ProgressBar._data.dis > 0 then
-        if ProgressBar._data.NoDisJump == 1 and global.MMO.ACTION_STUCK == act then --受击时不中断(后仰动作)
+        if ProgressBar._data.NoDisJump == 1 and GUIDefine.Action.STUCK == act then --受击时不中断(后仰动作)
             return
         end
-        if ProgressBar._data.dis == 2 and global.MMO.ACTION_SKILL == act then --施法时监听部分技能是否中断
+        if ProgressBar._data.dis == 2 and GUIDefine.Action.SKILL == act then --施法时监听部分技能是否中断
             return
         end
         ProgressBar.UnRegisterEvent()

@@ -217,8 +217,8 @@ function NPCStore.ChooseItems(item, data)
     end
 
     local function setSelect()
-        local textItemName = item:getChildByName("Text_item_name")
-        local textItemPrice = item:getChildByName("Text_item_price")
+        local textItemName = GUI:getChildByName(item, "Text_item_name")
+        local textItemPrice = GUI:getChildByName(item, "Text_item_price")
         GUI:Text_setTextColor(textItemName, "#FF0000")
         GUI:Text_setTextColor(textItemPrice, "#FF0000")
         NPCStore.selectItemCell = item
@@ -250,13 +250,13 @@ end
 
 function NPCStore.RemoveItems(MakeIndex)
     if MakeIndex and NPCStore.list then
-        local cells = NPCStore.list:getItems()
+        local cells = GUI:ListView_getItems(NPCStore.list)
         local removeTBIndex = nil
         for key, _cell in ipairs(cells) do
             for i = 1, 2 do
-                local item = _cell:getChildByTag(MakeIndex)
+                local item = GUI:getChildByStrTag(_cell, MakeIndex)
                 if item then
-                    removeTBIndex = tonumber(item:getName())
+                    removeTBIndex = tonumber(GUI:getName(item))
                     break
                 end
             end

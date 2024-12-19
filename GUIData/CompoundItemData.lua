@@ -213,8 +213,7 @@ function CompoundItemData.CheckStrCondition(condition)
         return true
     end
 
-    local ConditionProxy = global.Facade:retrieveProxy(global.ProxyTable.ConditionProxy)
-    return ConditionProxy:CheckCondition(condition)
+    return SL:CheckCondition(condition)
 end
 
 -- 检查页签是否可展示
@@ -277,7 +276,7 @@ function CompoundItemData.CheckIsCanCompoud(item, isTips)
     if not item then
         return
     end
-    local PayProxy = global.Facade:retrieveProxy(global.ProxyTable.PayProxy)
+
     local compoundCount = nil
     local takeoffPlayerEquip = {}
 
@@ -449,8 +448,6 @@ function CompoundItemData.OnUpdateItemChange(data)
             CompoundItemData.OnCheckItemCount(v.item.Index, false)
         end
     elseif data.opera == GUIDefine.OprateType.CHANGE then
-        local ItemManagerProxy = global.Facade:retrieveProxy(global.ProxyTable.ItemManagerProxy)
-        local Item_Type = ItemManagerProxy:GetItemSettingType()
         for k, v in pairs(itemList) do
             local change = v.change or 0
             if change ~= 0 then

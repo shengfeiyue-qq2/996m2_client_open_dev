@@ -31,6 +31,33 @@ function AuctionPutin.main()
         table.insert(AuctionPutin._rebateItems, { value = i * 10, name = string.format("%s折", i) })
     end
 
+    -- 物品配置不同货币竞拍价/一口价最小价格
+    AuctionPutin._limitMinBuyPrices = {}
+    AuctionPutin._limitMinBidPrices = {}
+
+    local buyMinPriceSets = itemData.auctionBuyMinPrice and SL:Split(tostring(itemData.auctionBuyMinPrice), "|") or {}
+    if buyMinPriceSets and next(buyMinPriceSets) then
+        for i, data in ipairs(buyMinPriceSets) do
+            local params = string.len(data) > 0 and SL:Split(data, "#") or {}
+            local id = tonumber(params[1])
+            local value = tonumber(params[2])
+            if id and value then
+                AuctionPutin._limitMinBuyPrices[id] = value
+            end
+        end
+    end
+    local bidMinPriceSets = itemData.auctionBidMinPrice and SL:Split(tostring(itemData.auctionBidMinPrice), "|") or {}
+    if bidMinPriceSets and next(bidMinPriceSets) then
+        for i, data in ipairs(bidMinPriceSets) do
+            local params = string.len(data) > 0 and SL:Split(data, "#") or {}
+            local id = tonumber(params[1])
+            local value = tonumber(params[2])
+            if id and value then
+                AuctionPutin._limitMinBidPrices[id] = value
+            end
+        end
+    end
+
     -- 价格限制
     local fixLowBidPrice  = SL:GetValue("AUCTION_BIDPRICE_MIN") or fixMinPrice
     local fixHighBidPrice = SL:GetValue("AUCTION_BIDPRICE_MAX") or fixMaxPrice
@@ -73,6 +100,8 @@ function AuctionPutin.main()
 
         -- 价格
         local currencyID    = AuctionPutin._currcies[AuctionPutin._currencyIndex].id
+        fixLowBuyPrice      = currencyID and AuctionPutin._limitMinBuyPrices[currencyID] or fixLowBuyPrice
+        fixLowBidPrice      = currencyID and AuctionPutin._limitMinBidPrices[currencyID] or fixLowBidPrice
         local inputBidPrice = tonumber(GUI:TextInput_getString(AuctionPutin._ui["TextField_bid_price"])) or 0
         inputBidPrice       = AuctionPutin._bidAble and inputBidPrice or 0
         local inputBuyPrice = tonumber(GUI:TextInput_getString(AuctionPutin._ui["TextField_buy_price"])) or 0

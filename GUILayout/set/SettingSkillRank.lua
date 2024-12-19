@@ -89,8 +89,6 @@ function SettingSkillRank.InitUI(data)
                     local order = SettingSkillRank._selItem.order
                     local index = SettingSkillRank._selItem.index
                     SettingSkillRank._touchItem = SettingSkillRank.CreateItem(ui.Panel_touch, order + 100000)
-                    SettingSkillRank._touchItem:setAnchorPoint(GUI:p(0.5, 0.5))
-                    SettingSkillRank._touchItem:setTouchEnabled(false)
                     GUI:setAnchorPoint(SettingSkillRank._touchItem, 0.5, 0.5)
                     GUI:setTouchEnabled(SettingSkillRank._touchItem, false)
                     local name = SL:GetValue("SKILL_NAME", index)--技能名字

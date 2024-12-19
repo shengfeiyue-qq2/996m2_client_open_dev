@@ -123,7 +123,7 @@ end
 -- 更新UI显示
 function MainTargetBelong.GetRootVisible()
     -- 和平模式也不显示
-    if GetBelongID(MainTargetBelong._targetID) and SL:GetValue('PKMODE') ~= global.MMO.HAM_PEACE then
+    if GetBelongID(MainTargetBelong._targetID) and SL:GetValue("PKMODE") ~= GUIDefine.PKModeType.HAM_PEACE then
         return true
     else
         return false 

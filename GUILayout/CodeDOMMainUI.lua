@@ -10,7 +10,6 @@ local showUIs = {
 }
 
 function CodeDOMMainUI.OpenGUIUI(data)
-    dump(data, "----CodeDOMMainUI---")
     local parent = GUI:Win_Create(data.GUI_ID, 0, 0, 0, 0, data.hideMain, data.hideLast, data.needVoice, data.escClose, data.isRevmsg, data.npcID, data.orderParam)
     GUI:LoadExportVar(parent, data.exportID, data)
     local showFunc = showUIs[data.showType]

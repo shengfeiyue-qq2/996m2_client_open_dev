@@ -68,7 +68,6 @@ function Storage.main()
     GUI:Win_SetDrag(parent, Storage._ui["Panel_1"])
 
     Storage.InitUI()
-    Storage.InitEditMode()
     Storage.InitMouseEvent()
     -- 初始化右侧页签
     Storage.InitPage()
@@ -131,32 +130,6 @@ function Storage.SetPageBtnStatus()
             local pageText = GUI:getChildByName(btnPage, "PageText")
             GUI:Text_setTextColor(pageText, isPress and "#f8e6c6" or "#807256")
             GUI:setScale(pageText, isPress and 1 or 0.9)
-        end
-    end
-end
-
-function Storage.InitEditMode(...)
-    local items = {
-        "Image_bg",
-        "Button_quick",
-        "Button_reset",
-        "Button_close",
-        "Panel_items",
-        "Panel_itemstouch",
-    }
-    for _, widgetName in ipairs(items) do
-        if Storage._ui[widgetName] then
-            Storage._ui[widgetName].editMode = 1
-        end
-    end
-
-    for i = 1, Storage._MaxPage do
-        if Storage._ui["Button_page" .. i] then
-            Storage._ui["Button_page" .. i].editMode = 1
-            local btnText = Storage._ui["Button_page" .. i]:getChildByName("PageText")
-            if btnText then
-                btnText.editMode = 1
-            end
         end
     end
 end
@@ -374,8 +347,8 @@ function Storage.UpdateStorageOpenNum()
             return
         end
         for i = lastIndex + 1, openIndex do
-            if Storage._panelItems:getChildByName("clock_" .. i) then
-                Storage._panelItems:removeChildByName("clock_" .. i)
+            if GUI:getChildByName(Storage._panelItems, "clock_" .. i) then
+                GUI:removeChildByName(Storage._panelItems, "clock_" .. i)
             end
         end
     end

@@ -60,7 +60,6 @@ function GuildAllyApply.OnRefreshAllyApplyList()
         GuildAllyApply._cells[guildID] = cell
 
         local ui = GUI:ui_delegate(cell)
-        local sliceStr = SL:Split(SL:GetValue("GAME_DATA", "alliance_time"), "#")
         GUI:removeAllChildren(ui.Node_tips)
         local str = "<font color='#28EF01'>%s</font>向您发起结盟申请，持续<font color='#28EF01'>%s分钟</font>"
         local richText = GUI:RichText_Create(ui.Node_tips, "richText", 0, 0, string.format(str, info.GuildName, info.InviteTime), 400, 16, "#ffffff")

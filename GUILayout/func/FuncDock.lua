@@ -50,7 +50,7 @@ function FuncDock.main()
     FuncDock._ui = GUI:ui_delegate(parent)
     GUI:setContentSize(FuncDock._ui.Panel_1, screenW, screenH)
 
-    FuncDock._ui.Panel_1:addClickEventListener(function()
+    GUI:addOnClickEvent(FuncDock._ui.Panel_1, function()
         UIOperator:CloseFuncDockTips()
     end)
 

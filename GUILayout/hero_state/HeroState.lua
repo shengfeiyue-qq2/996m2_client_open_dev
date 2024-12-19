@@ -67,8 +67,8 @@ function HeroState.InitUI()
     GUI:addOnClickEvent(HeroState._ui.Button_state,function()
         UIOperator:OpenMyHeroUI({page = UIConst.LayerTable.PlayerEquip})
     end)
-    -- 唤收回
-    GUI:addOnClickEvent(HeroState._heroBtn,function()
+    -- 召唤收回
+    GUI:addOnClickEvent(HeroState._heroBtn, function()
         GUI:setClickDelay(HeroState._heroBtn, 0.5)
         SL:RequestCallOrOutHero()
     end)

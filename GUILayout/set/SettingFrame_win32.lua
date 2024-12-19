@@ -99,5 +99,5 @@ function SettingFrame.UpdateTitle(text)
     if not SettingFrame._ui["TitleText"] then
         return false
     end
-    SettingFrame._ui.TitleText:setString(text)
+    GUI:Text_setString(SettingFrame._ui.TitleText, text)
 end

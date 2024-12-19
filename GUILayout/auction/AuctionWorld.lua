@@ -496,7 +496,7 @@ function AuctionWorld.OnAuctionItemDel(item)
     AuctionWorld._qCells[item.item.MakeIndex] = nil
     AuctionWorld._items[item.item.MakeIndex] = nil
 
-    AuctionWorld._ui.Image_empty:setVisible(next(AuctionWorld._qCells) == nil)
+    GUI:setVisible(AuctionWorld._ui.Image_empty, next(AuctionWorld._qCells) == nil)
 end
 
 function AuctionWorld.OnAuctionItemChange(item)

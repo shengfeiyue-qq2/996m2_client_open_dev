@@ -13,6 +13,7 @@ function AutoUsePop.main()
 
     AutoUsePop._node = GUI:getChildByName(parent, "Node")
     AutoUsePop._item = GUI:getChildByName(parent, "Item")
+    AutoUsePop._bg = GUI:getChildByName(AutoUsePop._item, "pBg")
 
     AutoUsePop.InitAdapt()
 
@@ -37,7 +38,7 @@ function AutoUsePop.InitAdapt()
 
     if SL:GetValue("IS_PC_OPER_MODE") then
         baseOffX = 220
-        posY = screenH - 330 - GUI:getContentSize(AutoUsePop._node).height
+        posY = screenH - 330 - GUI:getContentSize(AutoUsePop._bg).height
     end
 
     local notch, rect = SL:GetValue("NOTCH_PHONE_INFO")
@@ -145,8 +146,8 @@ function AutoUsePop.AddItem(data)
 
     -- 道具图标
     GUI:removeAllChildren(ui["ItemNode"])
-    local bgSize = GUI:getContentSize(ui["ItemBg"])
-    GUI:ItemShow_Create(ui["ItemNode"], "itemShow", -bgSize.width/2, -bgSize.height/2, {look = true, index = item.Index, itemData = item})
+    local item = GUI:ItemShow_Create(ui["ItemNode"], "itemShow", 0, 0, {look = true, index = item.Index, itemData = item})
+    GUI:setAnchorPoint(item, 0.5, 0.5)
 
     -- 剩余时间
     local remaining = tonumber(SL:GetValue("GAME_DATA", "autousetimes")) or 5

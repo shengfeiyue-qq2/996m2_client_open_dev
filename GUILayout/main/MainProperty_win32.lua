@@ -597,11 +597,11 @@ function MainProperty.InitChatInputHandler()
 
     local inputEvent = function (sender, eventType)
         if eventType == GUIDefine.TextInputEventType.SEND then
-            if string.len(MainProperty._ui["TextField_input"]:getString()) > 0 then
+            if string.len(GUI:Text_getString(MainProperty._ui["TextField_input"])) > 0 then
                 MainProperty.SendChatMsg()
             end
         elseif eventType == GUIDefine.TextInputEventType.BEGAN or eventType == GUIDefine.TextInputEventType.CHANGE then
-            local str = sender:getString()
+            local str = GUI:Text_getString(sender)
             local target = ChatData.GetTargets()[1]
             if sender._lastInput == "" and str == "/" and target then
                 MainProperty.OnPrivateChatWithTarget(target)
@@ -924,8 +924,10 @@ function MainProperty.SendChatMsg(msg, channelID)
         special_Str = string.sub(msg, eIdx + 1, string.len(msg))
     end
 
-    local channel, content = GUIFunction:GetChannelByChatMsg(msg)
-    local targetName = GUIFunction:FindTargetByChatMsg(msg)
+    local channel, content, targetName = GUIFunction:GetChannelByChatMsg(msg)
+    if channel then
+        channelID = channel
+    end
 
     -- 敏感词
     if not (string.find(msg, "^@.-") and not special_Str) then

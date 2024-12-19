@@ -103,7 +103,7 @@ function UIRotateView.main(parent, ID, x, y, width, height, scrollGap, param)
 
             local scaleGap = nextConfig.scale - curConfig.scale 
             local realScale = scaleGap * math.abs(realMove) / math.abs(distanceGap) -- 真实缩放大小
-            items[idx]:setScale(curConfig.scale + realScale)
+            GUI:setScale(items[idx], curConfig.scale + realScale)
 
             if not bZOder then 
                 if direct == 1 then 
@@ -117,7 +117,7 @@ function UIRotateView.main(parent, ID, x, y, width, height, scrollGap, param)
 
             if offsetMove >= scrollGap then 
                 GUI:setPosition(items[idx], nextConfig.x, nextConfig.y)
-                items[idx]:setScale(nextConfig.scale)
+                GUI:setScale(items[idx], nextConfig.scale)
                 GUI:setLocalZOrder(items[idx], idx)  
                 if idx == itemCount then 
                     complete = true  
@@ -174,7 +174,7 @@ function UIRotateView.main(parent, ID, x, y, width, height, scrollGap, param)
                 for i = 1, itemCount do
                     local curConfig = param[i]
                     GUI:setPosition(items[i], curConfig.x, curConfig.y)
-                    items[i]:setScale(curConfig.scale) 
+                    GUI:setScale(items[i], curConfig.scale) 
                     GUI:setLocalZOrder(items[i], i)  
                 end  
             end 

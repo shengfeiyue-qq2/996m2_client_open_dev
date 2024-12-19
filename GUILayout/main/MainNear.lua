@@ -462,7 +462,6 @@ function MainNear.AutoAddMonster()
     end
 
     local actors, nActor = SL:GetValue("FIND_IN_VIEW_MONSTER_LIST", nil, false)
-    dump(actors, "-----actors----")
     
     local playerVec, nPlayer = SL:GetValue("FIND_IN_VIEW_PLAYER_LIST")
     for i = 1, nPlayer do

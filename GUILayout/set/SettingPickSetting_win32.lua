@@ -265,7 +265,6 @@ function SettingPickSetting.CreatePickCell(parent, data)
     end)
 
     local cansets = SL:GetValue("SETTING_IS_ITEM_PICK_CAN_SET", data.Index)
-    dump(cansets, "++++")
     GUI:setVisible(ui.Panel_drop, cansets[1] == 1)
     GUI:setVisible(ui.Panel_pick, cansets[2] == 1)
     GUI:setVisible(ui.Panel_pick_hang_up, cansets[3] == 1)

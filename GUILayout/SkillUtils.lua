@@ -40,6 +40,7 @@ SKILL_ID_LieShenFu          = 85        -- 裂神符
 SKILL_ID_SWZhiYan           = 86        -- 死亡之眼
 SKILL_ID_WuLiDun            = 87        -- 武力盾
 SKILL_ID_XPYiJi             = 115       -- 血魄一击
+SKILL_ID_DIG                = 999       -- 挖矿
 
 local AUTO_SETTING_KEY_VALUE = {
     [SKILL_ID_MoFaDun]      = SLDefine.SETTINGID.SETTING_IDX_AUTO_MOFADUN,          -- 自动魔法盾
@@ -1141,7 +1142,7 @@ SkillUtils.FindAutoLaunchSkill = function()
             if not isBlocked then
                 _, __, n = SL:GetValue("LEARNED_SKILLS", true, true, true)
             end
-            if CHECK_SETTING(SLDefine.SETTINGID.SETTING_IDX_SKILL_NEXT_ATTACK) == 1 or isBlocked or n < 1 then
+            if SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_SKILL_NEXT_ATTACK) == 1 or isBlocked or n < 1 then
                 skillID = 0
             end
         elseif GUIFunction:IsTaoist(roleJob) then
@@ -1149,7 +1150,7 @@ SkillUtils.FindAutoLaunchSkill = function()
             if not isBlocked then
                 _, __, n = SL:GetValue("LEARNED_SKILLS", true, true, true)
             end
-            if CHECK_SETTING(SLDefine.SETTINGID.SETTING_IDX_SKILL_NEXT_ATTACK) == 1 or isBlocked or n < 1 then
+            if SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_SKILL_NEXT_ATTACK) == 1 or isBlocked or n < 1 then
                 skillID = 0
             end
         else

@@ -321,7 +321,6 @@ function LookPlayerSuperEquip.UpdateModelFeatureData()
 
     LookPlayerSuperEquip._feature.hairID = LookPlayerSuperEquip._hairID
 
-    dump(LookPlayerSuperEquip._feature, "--LookPlayerSuperEquip._feature-----")
 end
 
 -- 额外的装备位置

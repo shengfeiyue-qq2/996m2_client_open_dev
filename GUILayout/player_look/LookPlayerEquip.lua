@@ -342,7 +342,6 @@ function LookPlayerEquip.UpdateModelFeatureData()
     LookPlayerEquip._feature.hairID = LookPlayerEquip._hairID
     LookPlayerEquip._feature.embattlesID = GUIFunction:GetEmbattle(EDType)
 
-    dump(LookPlayerEquip._feature, "--LookPlayerEquip._feature-----")
 end
 
 -- 额外的装备位置

@@ -376,7 +376,7 @@ function PurchaseWorld.OnPurchaseItemDel(item)
     PurchaseWorld._qCells[item.guid] = nil
     PurchaseWorld._items[item.guid] = nil
 
-    PurchaseWorld._ui.Image_empty:setVisible(next(PurchaseWorld._qCells) == nil)
+    GUI:setVisible(PurchaseWorld._ui.Image_empty, next(PurchaseWorld._qCells) == nil)
 end
 
 function PurchaseWorld.OnPurchaseItemChange(item)

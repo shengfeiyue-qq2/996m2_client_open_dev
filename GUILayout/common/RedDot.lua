@@ -30,19 +30,6 @@ end
 function RedDot.findNode()
     local idx = tonumber(RedDot._data.mainId)
 
-    -- local indext = {
-    --     [0]   = 1,--npc
-    --     [101] = 5,
-    --     [102] = 6,
-    --     [103] = 7,
-    --     [104] = 8,
-    --     [105] = 9,
-    --     [106] = 10,
-    --     [107] = 11,
-    --     [108] = 11,
-    --     [109] = 2,
-    --     [110] = 3,--任务
-    -- }
     local getNodesFunc = RedDot._GuideWidgetConfig[idx]
     if not getNodesFunc then
         return
@@ -59,7 +46,6 @@ end
 
 function RedDot.addRedDot()
     local widget = RedDot.findNode()
-    --local worldPos = widget:getWorldPosition()
     if not widget then
         return
     end
@@ -72,7 +58,7 @@ function RedDot.addRedDot()
         GUI:removeFromParent(reddot)
     end
     local strs = string.split(SL:GetValue("GAME_DATA", "Redtips"), "|")
-    local path = strs[global.isWinPlayMode and 1 or 2]
+    local path = strs[SL:GetValue("IS_PC_OPER_MODE") and 1 or 2]
     if not RedDot._data.mode or (RedDot._data.mode and RedDot._data.mode == 0) then -- 图片模式
         if RedDot._data.mode and RedDot._data.res and string.len(RedDot._data.res) > 0 then
             path = RedDot._data.res

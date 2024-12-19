@@ -81,7 +81,7 @@ function RobotAuto.TimerBegan()
         RobotAuto._timerID = SL:Schedule(callback, 0.1)
     end
 
-    if CHECK_SETTING(SLDefine.SETTINGID.SETTING_IDX_SPELL_HELP) == 1 then
+    if SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_SPELL_HELP) == 1 then
         RobotAuto._spellScopeShowHide = 1
     end
     if SL:GetValue("IS_PC_OPER_MODE") then

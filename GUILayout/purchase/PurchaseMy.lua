@@ -218,7 +218,7 @@ function PurchaseMy.OnPurchaseItemDel(item)
     PurchaseMy._qCells[item.guid] = nil
     PurchaseMy._items[item.guid] = nil
 
-    PurchaseMy._ui.Image_empty:setVisible(next(PurchaseMy._qCells) == nil)
+    GUI:setVisible(PurchaseMy._ui.Image_empty, next(PurchaseMy._qCells) == nil)
 end
 
 function PurchaseMy.OnPurchaseItemChange(item)

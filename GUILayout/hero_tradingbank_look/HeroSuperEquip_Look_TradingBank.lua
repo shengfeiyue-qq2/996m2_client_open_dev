@@ -276,7 +276,6 @@ function HeroSuperEquip_Look_TradingBank.UpdateModelFeatureData()
 
     HeroSuperEquip_Look_TradingBank._feature.hairID = HeroSuperEquip_Look_TradingBank._hairID
 
-    dump(HeroSuperEquip_Look_TradingBank._feature, "--HeroSuperEquip_Look_TradingBank._feature-----")
 end
 
 -- 额外的装备位置

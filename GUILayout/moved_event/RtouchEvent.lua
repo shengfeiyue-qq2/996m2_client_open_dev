@@ -34,11 +34,7 @@ function RtouchEvent.main()
 
     local function onMouseMoving(touch)
         if RtouchEvent.isMoving then
-            local data = {
-                way = global.MMO.MOVE_EVENT_MOUSE_R,
-                pos = touch
-            }
-            global.Facade:sendNotification(global.NoticeTable.keepMovingUpdate, data)
+            SL:KeepMovingUpdate(touch)
         end
         SL:MouseMoveWorldEvent(touch)
     end

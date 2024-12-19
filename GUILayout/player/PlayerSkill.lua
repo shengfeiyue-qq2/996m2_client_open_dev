@@ -166,10 +166,10 @@ function PlayerSkill.CreateSkillCell_Phone(parent, skillID)
     GUI:Text_setString(ui["Text_skillName"], name)
 
     -- show tips
-    GUI:setTouchEnabled(ui["Image_icon"],true)
-    GUI:addOnClickEvent(ui["Image_icon"],function(sneder)
+    GUI:setTouchEnabled(ui["Image_icon"], true)
+    GUI:addOnClickEvent(ui["Image_icon"], function(sender)
         if config and config.desc then
-            local worldPos = GUI:getTouchEndPosition(sneder)
+            local worldPos = GUI:getTouchEndPosition(sender)
             GUI:ShowWorldTips(config.desc, worldPos, GUI:p(0, 0))
         end
     end)
@@ -232,7 +232,7 @@ function PlayerSkill.RegisterNodeMovable(skillID, deleteChange)
                     PlayerSkill._moveIconCells[skillID]._movingState = false
                 end
             end
-            PlayerSkill._moveIconCells[skillID]:setTouchEnabled(true)
+            GUI:setTouchEnabled(PlayerSkill._moveIconCells[skillID], true)
             GUI:RegisterNodeMovaEvent(PlayerSkill._moveIconCells[skillID], param)
         end
     else

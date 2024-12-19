@@ -6,7 +6,7 @@ local commonGroup = {
         SLDefine.SETTINGID.SETTING_IDX_AUTO_MOVE, --自动走位
         SLDefine.SETTINGID.SETTING_IDX_ALWAYS_ATTACK, --持续攻击
         SLDefine.SETTINGID.SETTING_IDX_MAGIC_LOCK, --魔法锁定
-        --SLDefine.SETTINGID.SETTING_IDX_SPELL_HELP, --施法辅助
+        SLDefine.SETTINGID.SETTING_IDX_FIRE_OWN_HIGHTLIGHT,  -- 自己火墙高亮
     },
     {
         SLDefine.SETTINGID.SETTING_IDX_SKILL_NEXT_ATTACK, --技能接平砍
@@ -18,7 +18,6 @@ local commonGroup = {
         SLDefine.SETTINGID.SETTING_IDX_EXP_IGNORE,  --经验过滤
         SLDefine.SETTINGID.SETTING_IDX_AUTO_LAUNCH, --自动练功
         SLDefine.SETTINGID.SETTING_IDX_FIRE_OPACITY,--火墙淡化
-        SLDefine.SETTINGID.SETTING_IDX_FIRE_OWN_COLOR,  -- 自己火墙颜色
     }
 }
 
@@ -353,8 +352,6 @@ function SettingLaunch.CreateCell(parent, config)
         end 
     elseif config.id == SLDefine.SETTINGID.SETTING_IDX_AUTO_SUMMON then -- 自动召唤
         cell = SettingLaunch.CreateSelectClickCell(parent, config)
-    elseif config.id == SLDefine.SETTINGID.SETTING_IDX_FIRE_OWN_COLOR then -- 火墙颜色
-        cell = SettingLaunch.CreateSelectColorCell(parent, config)
     else
         cell = SettingLaunch.CreateClickCell(parent, config)
     end
@@ -977,88 +974,5 @@ function SettingLaunch.CreateSelectClickCell(parent, data)
     GUI:addOnClickEvent(Image_skill, function()
         SettingLaunch.ShowSelectSkill(data)
     end)
-    return Panel_Layout
-end
-
-function SettingLaunch.CreateSelectColorCell(parent, data)
-    -- 容器
-    local Panel_Layout = GUI:Layout_Create(parent, "Panel_" .. data.id, 0, 0, 228, 40, false)
-    GUI:setTouchEnabled(Panel_Layout, true)
-
-    -- 描述
-    local Text_desc = GUI:Text_Create(Panel_Layout, "Text_desc", 4, 20, 16, "#ffffff", data.content or "")
-    GUI:setAnchorPoint(Text_desc, 0, 0.5)
-    GUI:setTouchEnabled(Text_desc, false)
-    GUI:Text_enableOutline(Text_desc, "#000000", 1)
-
-    -- 点击的背景
-    local Image_Click = GUI:Image_Create(Panel_Layout, "Image_Click", 116, 8, "res/private/new_setting/textBg.png")
-    GUI:Image_setScale9Slice(Image_Click, 33, 33, 9, 9)
-    GUI:setContentSize(Image_Click, 104, 28)
-    GUI:setIgnoreContentAdaptWithSize(Image_Click, false)
-    GUI:setTouchEnabled(Image_Click, true)
-
-    -- 描述
-    local Text_desc2 = GUI:Text_Create(Image_Click, "Text_desc2", 52, 14, 18, "#FFFFFF", "")
-    GUI:setAnchorPoint(Text_desc2, 0.5, 0.5)
-    GUI:setTouchEnabled(Text_desc2, false)
-    GUI:Text_enableOutline(Text_desc2, "#111111", 1)
-
-    -- 颜色显示
-    local Layout_color = GUI:Layout_Create(Image_Click, "Layout_color", 2, 2, 100, 24)
-    GUI:Layout_setBackGroundColorType(Layout_color, 1)
-    GUI:Layout_setBackGroundColor(Layout_color, "#FFFFFF")
-
-
-    local colorItems = {}
-
-    local values = SL:GetValue("SETTING_VALUE", data.id)
-    if data.id == SLDefine.SETTINGID.SETTING_IDX_FIRE_OWN_COLOR then
-        colorItems = GUIDefine.SettingFireColors or {}
-        -- 1: 默认无
-        if not values[1] or (values[1] and values[1] == 0) then -- 默认值
-            values[1] = 1
-        end
-        if values[1] == 1 then
-            GUI:Text_setString(Text_desc2, colorItems[values[1]])
-            GUI:setVisible(Text_desc2, true)
-            GUI:setVisible(Layout_color, false)
-        else
-            GUI:setVisible(Text_desc2, false)
-            GUI:setVisible(Layout_color, true)
-            if colorItems[values[1]] then
-                GUI:Layout_setBackGroundColor(Layout_color, colorItems[values[1]])
-            end
-        end
-    end
-
-    GUI:addOnClickEvent(Image_Click, function()
-        if #colorItems == 0 then
-            return
-        end
-        local func = function(idx)
-            if idx ~= 0 then --0关闭  非0 选中的编号
-                if data.id == SLDefine.SETTINGID.SETTING_IDX_FIRE_OWN_COLOR then
-                    SL:SetValue("SETTING_VALUE", data.id, { idx })
-                    
-                    if idx == 1 then
-                        GUI:Text_setString(Text_desc2, colorItems[idx])
-                        GUI:setVisible(Text_desc2, true)
-                        GUI:setVisible(Layout_color, false)
-                    else
-                        GUI:setVisible(Text_desc2, false)
-                        GUI:setVisible(Layout_color, true)
-                        if colorItems[idx] then
-                            GUI:Layout_setBackGroundColor(Layout_color, colorItems[idx])
-                        end
-                    end
-                end
-            end
-        end
-        local size = GUI:getContentSize(Image_Click)
-        local position = GUI:convertToWorldSpace(Image_Click, 0, 0)
-        UIOperator:OpenCommonSelectListUI(colorItems, position, size.width, size.heigth, func, {isColorShow = true}) -- 打开选择列表
-    end)
-
     return Panel_Layout
 end

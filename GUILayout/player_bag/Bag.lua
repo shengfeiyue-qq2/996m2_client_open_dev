@@ -659,7 +659,7 @@ function Bag.CreateBagItem(data)
                 }
                 UIOperator:OpenCommonTipsUI(commonData)
             else
-                GUI:ItemShow_setMoveEable(goodItem, true)
+                GUI:ItemShow_setMoveEnable(goodItem, true)
             end
         end)
     end

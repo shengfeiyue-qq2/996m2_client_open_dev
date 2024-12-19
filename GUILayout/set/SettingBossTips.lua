@@ -127,7 +127,7 @@ function SettingBossTips.AddItem(data)
     GUI:addOnClickEvent(item, function()
         if SettingBossTips._selItem then
             local last_Image_bg = GUI:getChildByName(SettingBossTips._selItem, "Image_bg")
-            last_Image_bg:setVisible(false)
+            GUI:setVisible(last_Image_bg, false)
         end
         SettingBossTips._selItem = item
         GUI:setVisible(cell.Image_bg, true)

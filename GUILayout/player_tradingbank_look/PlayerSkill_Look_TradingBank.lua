@@ -8,7 +8,7 @@ function PlayerSkill_Look_TradingBank.main()
     PlayerSkill_Look_TradingBank._index = 0--添加的技能条编号
     PlayerSkill_Look_TradingBank._ui = GUI:ui_delegate(parent)
     PlayerSkill_Look_TradingBank._parent = parent
-    dump(PlayerSkill_Look_TradingBank._ui,"PlayerSkill_Look_TradingBank._ui__")
+
     if not PlayerSkill_Look_TradingBank._ui then
         return false
     end
@@ -80,10 +80,10 @@ function PlayerSkill_Look_TradingBank.CreateSkillCell(parent, skillID)
     GUI:Text_setString(ui.Text_skillName, name)
 
     -- show tips
-    GUI:setTouchEnabled(ui.Image_icon,true)
-    GUI:addOnClickEvent(ui.Image_icon,function(sneder)
+    GUI:setTouchEnabled(ui.Image_icon, true)
+    GUI:addOnClickEvent(ui.Image_icon, function(sender)
         if config and config.desc then
-            local worldPos = GUI:getTouchEndPosition(sneder)
+            local worldPos = GUI:getTouchEndPosition(sender)
             GUI:ShowWorldTips(config.desc, worldPos, GUI:p(0, 0))
         end
     end)

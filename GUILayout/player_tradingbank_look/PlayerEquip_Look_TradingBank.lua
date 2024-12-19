@@ -301,7 +301,7 @@ function PlayerEquip_Look_TradingBank.UpdateModelFeatureData()
     SetFeature(EquipPosCfg.Equip_Type_Veil,   PlayerEquip_Look_TradingBank.GetLooks(EquipPosCfg.Equip_Type_Veil))
 
     PlayerEquip_Look_TradingBank._feature.hairID = PlayerEquip_Look_TradingBank._hairID
-    dump(PlayerEquip_Look_TradingBank._feature, "--PlayerEquip_Look_TradingBank._feature-----")
+
 end
 
 -- 额外的装备位置

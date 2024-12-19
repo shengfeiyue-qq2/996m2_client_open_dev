@@ -286,7 +286,7 @@ function MainMiniMap.UpdateActorPoints()
             local x = SL:GetValue("ACTOR_MAP_X", actorID)
             local y = SL:GetValue("ACTOR_MAP_Y", actorID)
             local miniMapPos = MainMiniMap.CalcMiniMapPos(x, y)
-            actorPoint:setPosition(miniMapPos)
+            GUI:setPosition(actorPoint, miniMapPos)
         end
     end
 end
