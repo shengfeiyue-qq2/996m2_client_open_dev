@@ -520,6 +520,7 @@ function Notice.OnShowTimerNotice(data)
 
     Notice._timerIndex = Notice._timerIndex + 1
     local layout = GUI:Layout_Create(Notice._listviewTimerTips, "layoutTimer"..Notice._timerIndex, 0, 0, capacitySize.width, capacitySize.height, false)
+    layout.tag = data.Label
     resetListview()
 
     local remaining = data.Time
@@ -563,10 +564,19 @@ function Notice.OnShowTimerNotice(data)
     callback()
 end
 
-function Notice.OnDeleteTimerNotice()
-    GUI:ListView_removeAllItems(Notice._listviewTimerTips)
+function Notice.OnDeleteTimerNotice(tag)
     local visibleSize = SL:GetValue("SCREEN_SIZE")
     local capacitySize = {width = visibleSize.width * 0.6, height = Notice.isPC and 20 or 30}
+    if tag then
+        local items = GUI:ListView_getItems(Notice._listviewTimerTips)
+        for i, item in ipairs(items) do
+            if item.tag and item.tag == tag then
+                GUI:ListView_removeChild(Notice._listviewTimerTips, item)
+            end
+        end
+    else
+        GUI:ListView_removeAllItems(Notice._listviewTimerTips)
+    end
     local count = GUI:ListView_getItemCount(Notice._listviewTimerTips)
     local height = count * capacitySize.height
     GUI:setContentSize(Notice._listviewTimerTips, capacitySize.width, height)

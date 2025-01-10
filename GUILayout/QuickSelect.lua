@@ -167,7 +167,6 @@ function QuickSelect.SelectMonster(imgNotice, systemTips)
         local enemy     = enemyVec[1]
         local targetID  = enemy.actorID
         if SL:GetValue("SELECT_TARGET_ID") ~= targetID then
-            local targetID  = target:GetID()
             QuickSelect._selectMonster[targetID] = enemy.selectCount + 1
             SL:SetValue("SELECT_TARGET_ID", targetID)
         end

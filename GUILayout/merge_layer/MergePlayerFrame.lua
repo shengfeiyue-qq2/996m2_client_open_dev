@@ -184,19 +184,23 @@ function MergePlayerFrame.OnChangeShowType(widget)
     if MergePlayerFrame._showType == showType then
         return false
     end
+    local lastShowType = MergePlayerFrame._showType
     MergePlayerFrame._showType = showType
 
     MergePlayerFrame.UpdateTopLayout()
     MergePlayerFrame.InitPageChangeBtn()
+
+    local pageID = MergePlayerFrame._showType == 1 and UIConst.LayerTable.PlayerEquip or UIConst.LayerTable.InternalState
+    MergePlayerFrame.OnOpenPage(pageID, nil, lastShowType)
 end
 
 -- 打开子页签
-function MergePlayerFrame.OnOpenPage(pageID, lastRoleType)
+function MergePlayerFrame.OnOpenPage(pageID, lastRoleType, lastShowType)
     if not lastRoleType and MergePlayerFrame._pageID == pageID then
         return false
     end
 
-    MergePlayerFrame.OperateChildUI(false, lastRoleType)
+    MergePlayerFrame.OperateChildUI(false, lastRoleType, lastShowType)
 
     MergePlayerFrame._pageID = pageID
 
@@ -209,8 +213,13 @@ function MergePlayerFrame.OnOpenPage(pageID, lastRoleType)
     MergePlayerFrame.OperateChildUI(true)
 end
 
-function MergePlayerFrame.OperateChildUI(open, lastRoleType)
-    local uiCfg = (MergePlayerFrame._pageID and ChildsUICfgs[MergePlayerFrame._showType]) and ChildsUICfgs[MergePlayerFrame._showType][MergePlayerFrame._pageID]
+function MergePlayerFrame.OperateChildUI(open, lastRoleType, lastShowType)
+    local uiCfg = nil
+    if not open and lastShowType then
+        uiCfg = (MergePlayerFrame._pageID and ChildsUICfgs[lastShowType]) and ChildsUICfgs[lastShowType][MergePlayerFrame._pageID]
+    else
+        uiCfg = (MergePlayerFrame._pageID and ChildsUICfgs[MergePlayerFrame._showType]) and ChildsUICfgs[MergePlayerFrame._showType][MergePlayerFrame._pageID]
+    end
     if not uiCfg then
         return false
     end
@@ -227,19 +236,6 @@ function MergePlayerFrame.UpdateTopLayout()
         return false
     end
 
-    local keyList = {"base_btn", "ng_btn"}
-    for i, name in ipairs(keyList) do
-        GUI:Button_setBright(MergePlayerFrame._ui[name], MergePlayerFrame._showType ~= i)
-        GUI:setLocalZOrder(MergePlayerFrame._ui[name], MergePlayerFrame._showType == i and 1 or 0)
-        local nameText = GUI:getChildByName(MergePlayerFrame._ui[name], "Text_1")
-        GUI:Text_setTextColor(nameText, MergePlayerFrame._showType == i and "#f8e6c6" or "#807256")
-    end
-end
-
-function MergePlayerFrame.RefreshTopTypePanel()
-    if not isShowNG then
-        return
-    end
     local keyList = {"base_btn", "ng_btn"}
     for i, name in ipairs(keyList) do
         GUI:Button_setBright(MergePlayerFrame._ui[name], MergePlayerFrame._showType ~= i)
@@ -273,7 +269,7 @@ function MergePlayerFrame.RefreshBtnState()
         GUI:Text_setTextColor(nameText, isSelected and "#f8e6c6" or "#807256")
     end
 
-    local list = (isShowNG and MergePlayerFrame._showType == 1) and MergePlayerFrame._ui["Panel_btnList_ng"] or MergePlayerFrame._ui["Panel_btnList"]
+    local list = (isShowNG and MergePlayerFrame._showType == 2) and MergePlayerFrame._ui["Panel_btnList_ng"] or MergePlayerFrame._ui["Panel_btnList"]
     local childs = GUI:getChildren(list)
     for _, child in ipairs(childs) do
         setChild(child)

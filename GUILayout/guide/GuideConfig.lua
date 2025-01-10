@@ -83,7 +83,7 @@ local config = {
 
         local layer = isMergePanelMode and MergeBagInfo._ui or BagInfo._ui
         if isMergePanelMode then
-            if not layer or not layer.Panel_items or layer:getShowType() ~= 1 then
+            if not layer or not layer.Panel_items or MergeBagInfo._selType ~= 1 then
                 return nil
             end
         else
@@ -101,13 +101,13 @@ local config = {
             widget = isMergePanelMode and layer.Button_store_mode or layer.Button_store_hero_bag
         else
             for i, v in ipairs(items) do
-                if GUI:getStrTag(v) == tonumber(config.typeassist) then
+                if GUI:getStrTag(v) == config.typeassist then
                     widget = v
                     break
                 end
             end
         end
-        return widget, layer
+        return widget, parent
     end,
     -- 人物装备位
     [2] = function(config)
@@ -374,59 +374,60 @@ local config = {
 
     -- 导航栏 任务
     [110] = function(config)
-        local widget = GUI:GetWindow(nil, UIConst.LUAFile.LUA_FILE_MAIN_ASSIST)
-        if not widget then
+        local assistWidget = getChildByKey(GUI:Attach_LeftTop(), "Main_Assist")
+        if not assistWidget then
             return nil
         end
-        if not MainAssist._ui then
+        if not MainAssist or not MainAssist._ui then
             return nil
         end
 
         if not SL:GetValue("IS_PC_OPER_MODE") then
-            if widget._assistGroup ~= 2 then
+            if MainAssist._assistGroup ~= 2 then
                 return nil
             end
 
-            if widget._contentIndex ~= 1 then
+            if MainAssist._contentIndex ~= 1 then
                 return nil
             end
         end
 
-        local listview = widget._ui["ListView_mission"]
-        if not listview then
+        local listView = MainAssist._ui["ListView_task"]
+        if not listView then
             return nil
         end
-        GUI:ListView_doLayout(listview)
+        GUI:ListView_doLayout(listView)
 
         local taskID = tonumber(config.typeassist)
-        local cell = GUI:getChildByTag(listview, taskID)
+        local cell = GUI:getChildByTag(listView, taskID)
 
         -- 没找到任务的 找挂接按钮
         if not cell then
-            return nil, widget
+            local widget = getChildByKey(assistWidget, tostring(config.typeassist))
+            local parent = assistWidget
+            return widget, parent
         end
 
-        if not cell.quickUI or not cell.quickUI.Button_act then
+        if not cell or not cell.Button_act then
             return
         end
 
-        local anchorY   = GUI:getAnchorPoint(listview).y
-        local limitYMAX = GUI:getWorldPosition(listview).y + GUI:getContentSize(listview).height * (1 - anchorY)
-        local limitYMIN = GUI:getWorldPosition(listview).y - GUI:getContentSize(listview).height * anchorY
-        local btnAnY    = GUI:getAnchorPoint(cell.quickUI.Button_act).y
-        local cellYMAX  = GUI:getWorldPosition(cell.quickUI.Button_act).y +
-        GUI:getContentSize(cell.quickUI.Button_act).height * (1 - btnAnY)
-        local cellYMIN  = GUI:getWorldPosition(cell.quickUI.Button_act).y -
-        GUI:getContentSize(cell.quickUI.Button_act).height * btnAnY
+        local anchorY   = GUI:getAnchorPoint(listView).y
+        local limitYMAX = GUI:getWorldPosition(listView).y + GUI:getContentSize(listView).height * (1 - anchorY)
+        local limitYMIN = GUI:getWorldPosition(listView).y - GUI:getContentSize(listView).height * anchorY
+        local btnAnY    = GUI:getAnchorPoint(cell.Button_act).y
+        local cellYMAX  = GUI:getWorldPosition(cell.Button_act).y +
+        GUI:getContentSize(cell.Button_act).height * (1 - btnAnY)
+        local cellYMIN  = GUI:getWorldPosition(cell.Button_act).y -
+        GUI:getContentSize(cell.Button_act).height * btnAnY
         if cellYMAX > limitYMAX or cellYMIN < limitYMIN then
-            local idx = GUI:ListView_getItemIndex(listview, cell.quickUI.nativeUI)
+            local idx = GUI:ListView_getItemIndex(listView, cell)
             if idx then
-                GUI:ListView_jumpToItem(listview, idx)
+                GUI:ListView_jumpToItem(listView, idx)
             end
-            -- return nil
         end
 
-        local widget = cell.quickUI.Button_act
+        local widget = cell.Button_act
         local parent = GUI.ATTACH_GUIDE
         return widget, parent
     end,
@@ -554,8 +555,13 @@ local config = {
                 return nil
             end
 
-            local nodeParent = GUI:Attach_Bottom()
-            if not nodeParent or GUI:getChildByName(nodeParent, "Main_Property") then
+            local nodeParent = GUI:Attach_Center()
+            if not nodeParent then
+                return nil
+            end
+
+            local parent = GUI:getChildByName(nodeParent, "Main_Property")
+            if not parent then
                 return nil
             end
 
@@ -566,7 +572,6 @@ local config = {
 
             local btnname = { "Button_role", "Button_bag", "Button_skill" }
             local widget = ui[btnname[num - 99]]
-            local parent = ui
             return widget, parent
         else
             local rightBottom = GUI.ATTACH_RIGHTBOTTOM

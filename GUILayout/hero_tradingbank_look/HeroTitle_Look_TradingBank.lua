@@ -109,6 +109,7 @@ function HeroTitle_Look_TradingBank.RefTitleList(activeID)
                 data.type = 1
                 data.time = time
                 data.job = TradingBankLookPlayerData.GetHeroJob()
+                data.lookOther = true
                 UIOperator:OpenTitleTipsUI(data)
             end
             local function delayCallback()

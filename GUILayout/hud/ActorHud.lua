@@ -245,8 +245,8 @@ end
 -------------------------------------------------------
 -- 刷新称号封号时触发
 local SharedResult = {}
-SharedResult.label ={}
-SharedResult.sprite={}
+SharedResult.label = {}
+SharedResult.sprite= {}
 function ActorHud.GetActorHUDTitleInfo(actorID, titleID)
     local offsetY   = 78
     local titleH    = 0
@@ -269,7 +269,7 @@ function ActorHud.GetActorHUDTitleInfo(actorID, titleID)
     local reserved = SL:GetValue("ITEM_RESERVED_BY_INDEX", titleID)
     local remove   = reserved == 2
     local offsetX  = reserved == 1 and 0 or -40 
-    local offsetY  = ActorHud._isWin32 and 78  or 83
+    local offsetY  = ActorHud._isWin32 and 78 or 83
 
     -----label 
     -- reserved: 不为0不显示

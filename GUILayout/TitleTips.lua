@@ -116,8 +116,10 @@ function TitleTips.CreateItemPanel(data)
         local richText = GUI:RichText_Create(listView, "rich_time", 0, 0, string.format("剩余时间：%s", SL:TimeFormatToStr(time - SL:GetValue("SERVER_TIME"))), width, strSize, "#28EF01") 
     end
 
-    local desc = TitleTips.isWinPlayMode and (data.type == 1 and "(单击图标激活当前称号)" or "(单击图标取消当前称号)") or (data.type == 1 and "(双击图标激活当前称号)" or "(双击图标取消当前称号)")
-    local richText = GUI:RichText_Create(listView, "rich_desc", 0, 0, desc, width, strSize, "#FFFFFF")
+    if not data.lookOther then
+        local desc = TitleTips.isWinPlayMode and (data.type == 1 and "(单击图标激活当前称号)" or "(单击图标取消当前称号)") or (data.type == 1 and "(双击图标激活当前称号)" or "(双击图标取消当前称号)")
+        local richText = GUI:RichText_Create(listView, "rich_desc", 0, 0, desc, width, strSize, "#FFFFFF")
+    end
 
     local function pushDescItem(desc, descTag)
         if not desc then

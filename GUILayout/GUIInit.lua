@@ -555,7 +555,7 @@ SL:RegisterLUAEvent(LUA_EVENT_TRADE_REQUEST_ERROR_TIPS, "GUIInit", function(code
 end)
 
 -- 交易气泡提醒
-SL:RegisterLUAEvent(LUA_EVENT_TARDE_BUBBLE_TIPS_CHANGE, "GUIInit", function(data)
+SL:RegisterLUAEvent(LUA_EVENT_TRADE_BUBBLE_TIPS_CHANGE, "GUIInit", function(data)
     local function callback()
         local count = SL:GetValue("TRADE_INVITE_COUNT")
         local tradeList = SL:GetValue("TRADE_INVITE_ITEMS")

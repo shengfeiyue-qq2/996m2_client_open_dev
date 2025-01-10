@@ -252,13 +252,13 @@ function MainAssist.UpdateTaskCellsOrder(topTaskID)
     for i, cell in ipairs(GUI:getChildren(list)) do
         cells[i] = cell
     end
-    table.sort(cells, function(a, b) return GUI:Win_GetParam(a) < GUI:Win_GetParam(a) end)
+    table.sort(cells, function(a, b) return GUI:Win_GetParam(a) < GUI:Win_GetParam(b) end)
 
     local index = -1
     for k, v in ipairs(cells) do
+        GUI:addRef(v)
         if topTaskID and topTaskID == GUI:getTag(v) then
             index = k
-            break
         end
     end
 
@@ -267,13 +267,12 @@ function MainAssist.UpdateTaskCellsOrder(topTaskID)
     local nCell = #cells
     
     for k, cell in ipairs(cells) do
-        GUI:Retain(cell)
-
         if index == k then
             GUI:ListView_insertCustomItem(list, cell, 0)
         else
             GUI:ListView_pushBackCustomItem(list, cell)
         end
+        GUI:decRef(cell)
 
         if nCell == k then
             GUI:setVisible(cell["image_line"], false)
@@ -284,6 +283,7 @@ function MainAssist.UpdateTaskCellsOrder(topTaskID)
         if cell.sfx then
             GUI:Effect_play(cell.sfx, 0, 0, true)
         end
+        GUI:setTouchEnabled(cell.Button_act, true)
     end
 
     GUI:ListView_doLayout(list)

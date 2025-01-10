@@ -74,15 +74,14 @@ function Guide.Init()
         Guide._EndEventName = GUIDefine.GuideEvent[idx] and GUIDefine.GuideEvent[idx].close
         Guide.getNodesFunc = getNodesFunc
         if idx == 110 then                --如果是任务就先把框漏出来
-            SL:SetTaskBarState({ status = true })
+            SL:SetTaskBarState({ status = false })
         elseif idx == 109 then            -- 按钮模块 切换
             SL:onLUAEvent(LUA_EVENT_GUIDE_ENTER_TRANSITION, { name = "GUIDE_BEGIN_SKILL_BUTTON" })
         elseif idx == 1 or idx == 47 then -- 背包 英雄背包 的双击使用
             if idx == 1 then
                 Guide._BagPage = BagData.GetBagPageByMakeIndex(Guide._data.uiId)
                 if Guide._BagPage and Guide._parent then --页数不对  得切换 一下
-                    local curPage = Guide._parent.GetSelectPage and Guide._parent:GetSelectPage() or
-                        BagData.GetCurPage()
+                    local curPage = Guide._parent.GetSelectPage and Guide._parent:GetSelectPage() or BagData.GetCurPage()
                     if curPage ~= Guide._BagPage then
                         UIOperator:OpenBagUI({ bag_page = Guide._BagPage })
                     end
@@ -90,8 +89,9 @@ function Guide.Init()
             end
 
             if id ~= -1 then
+                Guide._uiID = tostring(Guide._uiID)
                 Guide._clickCallback = function()
-                    local nowItemData = BagData.GetItemDataByMakeIndex(id)
+                    local nowItemData = BagData.GetItemDataByMakeIndex(Guide._data.uiId)
                     if idx == 1 then
                         nowItemData.from = GUIDefine.ItemGoTo.BAG
                         SL:RequestUseItem(nowItemData)
@@ -475,7 +475,7 @@ function Guide.ShowForceGuide(data)
                 return
             end
             if Guide then
-                Guide:Exit()
+                Guide.Exit()
             end
         end, Guide._autoExcute)
     end

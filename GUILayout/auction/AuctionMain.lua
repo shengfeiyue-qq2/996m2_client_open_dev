@@ -83,6 +83,7 @@ function AuctionMain.main()
     SL:RequestAuctionPutList(2)
 
     AuctionMain.OnSelectGroup(math.min(index or 1, #AuctionMain._items))
+    AuctionMain.InitSearchPanel()
 
     AuctionMain.RegisterEvent()
 

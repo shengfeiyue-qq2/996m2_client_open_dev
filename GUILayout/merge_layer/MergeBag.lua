@@ -97,6 +97,7 @@ function MergeBag.InitUI(bagType)
 
     GUI:setSwallowTouches(MergeBagInfo._ui.Panel_addItems, false)
 
+    MergeBag.ResetInitData()
     MergeBag.OnSelType(bagType, 1, true)
     MergeBag.InitMouseEvent()
     MergeBag.UpdateItems()
@@ -170,6 +171,18 @@ function MergeBag.RemoveSui()
             SL:UnAttachTXTSUI(componentData)
         end
     end
+end
+
+-- 重置初始参数
+function MergeBag.ResetInitData()
+    local pSize = GUI:getContentSize(MergeBagInfo._ui.Panel_items)
+    GUI:ScrollView_setInnerContainerSize(MergeBagInfo._ui.Panel_items, pSize)
+    MergeBagInfo._scrollHeight  = pSize.height
+    MergeBagInfo._pWidth        = pSize.width
+    MergeBagInfo._pHeight       = pSize.height
+    MergeBagInfo._iWidth        = MergeBagInfo._pWidth / MergeBagInfo._col
+    MergeBagInfo._iHeight       = MergeBagInfo._pHeight / MergeBagInfo._row
+
 end
 
 function MergeBag.OnSelType(type, page, init)

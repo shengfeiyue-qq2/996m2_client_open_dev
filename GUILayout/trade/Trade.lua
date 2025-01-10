@@ -381,8 +381,8 @@ function Trade.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_TRADE_MYSELF_MONEY_CHANGE, "Trade", Trade.OnRefreshMyselfMoney)   -- 交易自己货币改变
     SL:RegisterLUAEvent(LUA_EVENT_TRADE_STATUS_CHANGE,       "Trade", Trade.OnRefreshTradeStatus)   -- 交易状态改变
     SL:RegisterLUAEvent(LUA_EVENT_TRADE_MY_STATUS_CHANGE,    "Trade", Trade.OnRefreshMyStatus)      -- 交易自己状态改变
-    SL:RegisterLUAEvent(LUA_EVENT_TRADE_TRADER_TIEM_CHANGE,  "Trade", Trade.OnTraderItemChange)
-    SL:RegisterLUAEvent(LUA_EVENT_TRADE_MYSEFL_ITEM_CHANGE,  "Trade", Trade.OnMyselfItemChange)
+    SL:RegisterLUAEvent(LUA_EVENT_TRADE_TRADER_ITEM_CHANGE,  "Trade", Trade.OnTraderItemChange)
+    SL:RegisterLUAEvent(LUA_EVENT_TRADE_MYSELF_ITEM_CHANGE,  "Trade", Trade.OnMyselfItemChange)
 end
 
 function Trade.RemoveEvent()
@@ -391,8 +391,8 @@ function Trade.RemoveEvent()
     SL:UnRegisterLUAEvent(LUA_EVENT_TRADE_MYSELF_MONEY_CHANGE, "Trade") -- 交易自己货币改变
     SL:UnRegisterLUAEvent(LUA_EVENT_TRADE_STATUS_CHANGE,       "Trade") -- 交易状态改变
     SL:UnRegisterLUAEvent(LUA_EVENT_TRADE_MY_STATUS_CHANGE,    "Trade") -- 交易自己状态改变
-    SL:UnRegisterLUAEvent(LUA_EVENT_TRADE_TRADER_TIEM_CHANGE,  "Trade")
-    SL:UnRegisterLUAEvent(LUA_EVENT_TRADE_MYSEFL_ITEM_CHANGE,  "Trade")
+    SL:UnRegisterLUAEvent(LUA_EVENT_TRADE_TRADER_ITEM_CHANGE,  "Trade")
+    SL:UnRegisterLUAEvent(LUA_EVENT_TRADE_MYSELF_ITEM_CHANGE,  "Trade")
 end
 
 Trade.main()

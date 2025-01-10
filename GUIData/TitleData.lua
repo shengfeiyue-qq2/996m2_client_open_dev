@@ -55,7 +55,7 @@ function TitleData.GetTitleActivateImage(id)
     if not TitleActivateImageCache[showID] then
         TitleActivateImageCache[showID] = string.format("%s%s%s.png", GUIDefine.PATH_RES_PRIVATE, "title_icon/", showID)
     end
-    return TitleActivateImageCache[picID]
+    return TitleActivateImageCache[showID]
 end
 
 -- 称号列表的图片
@@ -66,7 +66,7 @@ function TitleData.GetTitleListImage(id)
     if not TitleListImageCache[showID] then
         TitleListImageCache[showID] = string.format("%s%s%s.png", GUIDefine.PATH_RES_PRIVATE, "title_icon/", showID)
     end
-    return TitleListImageCache[picID]
+    return TitleListImageCache[showID]
 end
 
 -- 场景中的图片

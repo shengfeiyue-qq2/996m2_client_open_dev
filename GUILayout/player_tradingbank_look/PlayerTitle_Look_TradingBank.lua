@@ -109,6 +109,7 @@ function PlayerTitle_Look_TradingBank.RefTitleList(activeID)
                 data.type = 1
                 data.time = time
                 data.job = TradingBankLookPlayerData.GetPlayerJob()
+                data.lookOther = true
                 UIOperator:OpenTitleTipsUI(data)
             end
 

@@ -1351,7 +1351,6 @@ function ItemTips.GetModelPanel(itemData)
         sex = 0 and StdMode == 10 and 0 or 1
         feature.clothID = itemData.Looks
         feature.clothEffectID = itemData.sEffect
-        feature.noHead = itemData.show == 1
     elseif pos == 1 or pos == 18 then -- 武器
         feature.weaponID = itemData.Looks
         feature.weaponEffectID = itemData.sEffect
@@ -1363,6 +1362,7 @@ function ItemTips.GetModelPanel(itemData)
     end
 
     feature.hairID = hairID
+    feature.showNodeModel = true
     _panelNum = _panelNum + 1
 
     local size = {width = 200, height = 260}
@@ -2319,6 +2319,15 @@ function ItemTips.FillTipsContent(tipsLayout, cellView, tipsParam)
     local ysAttWidget = ItemTips.CreateYsAttrWidget(tipsParam)
     ItemTips.PushItem(cellView, ysAttWidget)
     if ysAttWidget then
+        ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
+    end
+
+    -- 描述3
+    local desc3Widget = ItemTips.CreateDescWidget(3, tipsParam)
+    if desc3Widget then
+        removeLastLine()
+        ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
+        ItemTips.PushItem(cellView, desc3Widget)
         ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
     end
 

@@ -125,7 +125,6 @@ UIConst.LUAFile =
 
 
     LUA_FILE_NPC_TALK                           = "GUILayout/NPCTalk",                                                      -- NPC
-    LUA_FILE_GAME_WORLD_CONFIRM                 = "GameWorldConfirm",                                                       -- 游戏世界确认公告
 
     LUA_FILE_GUILD_FRAME                        = "guild/GuildFrame",                                                       -- 行会 外框
     LUA_FILE_GUILD_MAIN                         = "guild/GuildMain",                                                        -- 行会主界面

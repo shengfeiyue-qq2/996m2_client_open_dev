@@ -1003,16 +1003,6 @@ function UIOperator:CloseOtherMiniMap()
     GUI:Win_CloseByID(UIConst.LAYERID.MiniMapOtherGUI)
 end
 
--- 打开世界公告
-function UIOperator:OpenGameWorld()
-    GUI:Win_Open(UIConst.LUAFile.LUA_FILE_GAME_WORLD_CONFIRM)
-end
--- 关闭世界公告
-function UIOperator:CloseGameWorld()
-    GUI:Win_CloseByID(UIConst.LAYERID.GameWorldConfirmGUI)
-    SL:CloseGameWorldEvent()
-end
-
 ----------------------------------------
 -- 打开宝箱 data: 宝箱物品数据
 function UIOperator:OpenGoldBox(data)

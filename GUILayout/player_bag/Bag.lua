@@ -346,7 +346,7 @@ function Bag.InitGird()
     end
 end
 
--- 大背包
+-- 检测大背包, 同时重置初始参数
 function Bag.InitBigBag()
     local bag_row_col = SL:GetValue("GAME_DATA", "bag_row_col_max")
     if BagInfo._isWin32 and bag_row_col then 
@@ -357,15 +357,15 @@ function Bag.InitBigBag()
 
         -- 刷新页签
         Bag.RefreshPageShow()
+    end
 
-        local pSize       = GUI:getContentSize(BagInfo._ui.Panel_items)
-        GUI:ScrollView_setInnerContainerSize(BagInfo._ui.Panel_items, pSize)
-        BagInfo._scrollHeight = pSize.height
-        BagInfo._pWidth       = pSize.width
-        BagInfo._pHeight      = pSize.height
-        BagInfo._iWidth       = BagInfo._pWidth / BagInfo._col
-        BagInfo._iHeight      = BagInfo._pHeight / BagInfo._row
-    end 
+    local pSize = GUI:getContentSize(BagInfo._ui.Panel_items)
+    GUI:ScrollView_setInnerContainerSize(BagInfo._ui.Panel_items, pSize)
+    BagInfo._scrollHeight = pSize.height
+    BagInfo._pWidth       = pSize.width
+    BagInfo._pHeight      = pSize.height
+    BagInfo._iWidth       = BagInfo._pWidth / BagInfo._col
+    BagInfo._iHeight      = BagInfo._pHeight / BagInfo._row
 end
 
 -- PC背包金币数量刷新

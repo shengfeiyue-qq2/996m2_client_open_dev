@@ -120,6 +120,7 @@ function LookPlayerTitle.RefTitleList(activeID)
                 data.type = 1
                 data.time = time
                 data.job = SL:GetMetaValue("L.M.JOB")
+                data.lookOther = true
                 UIOperator:OpenTitleTipsUI(data)
             end
 
