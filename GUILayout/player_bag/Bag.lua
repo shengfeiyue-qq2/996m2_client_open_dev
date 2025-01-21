@@ -117,7 +117,7 @@ function Bag.ItemDataChange(data)
 
     local isBaitan = data.isBaitan
     local type = data.opera
-    if type == GUIDefine.OprateType.ADD or type == GUIDefine.OprateType.INIT then
+    if type == GUIDefine.OperateType.ADD or type == GUIDefine.OperateType.INIT then
         for _, v in pairs(itemData) do
             local pos = BagData.GetBagPosByMakeIndex(v.item.MakeIndex) 
             local startPos = BagInfo._perPageNum * (BagData.GetCurPage() - 1) + 1
@@ -128,7 +128,7 @@ function Bag.ItemDataChange(data)
             end
         end
 
-    elseif type == GUIDefine.OprateType.DEL then
+    elseif type == GUIDefine.OperateType.DEL then
         for _, v in pairs(itemData) do
             local item = GUI:getChildByStrTag(BagInfo._ui.Panel_items, v.MakeIndex)
             if isBaitan then
@@ -142,7 +142,7 @@ function Bag.ItemDataChange(data)
             end
         end
 
-    elseif type == GUIDefine.OprateType.CHANGE then
+    elseif type == GUIDefine.OperateType.CHANGE then
         for _, v in pairs(itemData) do
             local thisItemData = BagData.GetItemDataByMakeIndex(v.MakeIndex)
             local buifenlei = thisItemData.buifenlei and tonumber(thisItemData.buifenlei) or nil

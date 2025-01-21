@@ -240,7 +240,7 @@ function LookHeroSuperEquip.GetLooks(pos)
     local data = {}
 
     -- 通过唯一ID MakeIndex 获取装备数据
-    if pos == EquipPosCfg.Equip_Type_Super_Dress and equipData and LookHeroSuperEquip._feature.showNodeModel and equipData.shonourSell and tonumber(equipData.shonourSell) == 1 then -- shonourSell == 1 不显示裸模, 服务器下发字段
+    if pos == EquipPosCfg.Equip_Type_Super_Dress and equipData and LookHeroSuperEquip._feature.showNodeModel and equipData.zblmtkz and tonumber(equipData.zblmtkz) == 1 then -- zblmtkz == 1 不显示裸模, 表配置字段
         LookHeroSuperEquip._feature.showNodeModel = false
     end
 

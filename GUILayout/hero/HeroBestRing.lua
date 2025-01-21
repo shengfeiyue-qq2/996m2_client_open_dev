@@ -127,12 +127,12 @@ function HeroBestRing.UpdateEquipLayer(data)
 
     local iconVisible = false
 
-    if GUIDefine.OprateType.ADD == optType or GUIDefine.OprateType.CHANGE == optType then
+    if GUIDefine.OperateType.ADD == optType or GUIDefine.OperateType.CHANGE == optType then
         GUI:removeAllChildren(itemNode)
 
         local equipData = GUIFunction:GetEquipDataByMakeIndex(makeIndex, EDType)
         HeroBestRing.CreateEquipItem(itemNode, equipData)
-    elseif GUIDefine.OprateType.DEL == optType then
+    elseif GUIDefine.OperateType.DEL == optType then
         GUI:removeAllChildren(itemNode)
 
         iconVisible = true

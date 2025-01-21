@@ -462,7 +462,7 @@ function Rank.UpdateModel(looks)
                     showNodeModel = true,
                     showHair = true
                 }
-                if dressData and dressData.shonourSell and tonumber(dressData.shonourSell) == 1 then
+                if dressData and dressData.zblmtkz and tonumber(dressData.zblmtkz) == 1 then
                     modelData.showNodeModel = false
                     modelData.showHair = false
                 end

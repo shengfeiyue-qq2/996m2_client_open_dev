@@ -557,6 +557,9 @@ function ItemTips.GetDiyAttStr(itemData)
                 local config = GUIDefineEx.TipsDiyAttrTypeTitle and GUIDefineEx.TipsDiyAttrTypeTitle[type]
                 local titleName = config and config.name
                 if titleName then
+                    if GUIFunction.ParseTitleHasCustomVar then
+                        titleName = GUIFunction:ParseTitleHasCustomVar(itemData.MakeIndex, titleName)
+                    end
                     local titleColor = config.color or 154
                     local titleStr = string.format("<font color='%s'>%s</font>", SL:GetHexColorByStyleId(titleColor), titleName)
                     table.insert(strList, {

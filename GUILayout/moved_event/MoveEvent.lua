@@ -214,7 +214,7 @@ function MoveEvent.CancelQuickUseMove(data)
     if not data or not next(data) then
         return false
     end
-    if data.opra ~= GUIDefine.OprateType.DEL then
+    if data.opra ~= GUIDefine.OperateType.DEL then
         return false
     end
     local itemData = data.itemData

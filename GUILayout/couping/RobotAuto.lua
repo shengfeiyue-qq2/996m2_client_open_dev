@@ -35,7 +35,7 @@ function RobotAuto.main()
 end
 
 function RobotAuto.OnBagOperData(data)
-    if data.opera == GUIDefine.OprateType.DEL and data.operID and data.operID[1].item then
+    if data.opera == GUIDefine.OperateType.DEL and data.operID and data.operID[1].item then
         SL:UnpackDrugByIndex(data.operID[1].item.Index)
     end
 end
@@ -50,7 +50,7 @@ function RobotAuto.FindBagCountByIndex(index)
 end
 
 function RobotAuto.OnQuickUseItemRmv(data)
-    if data.opra ~= GUIDefine.OprateType.DEL then
+    if data.opra ~= GUIDefine.OperateType.DEL then
         return false
     end
 

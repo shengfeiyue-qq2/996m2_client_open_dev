@@ -233,7 +233,7 @@ local EquipPosUI = {
 }
 GUIDefine.EquipPosUI = EquipPosUI
 
-GUIDefine.EquipPosByStdMode = {
+GUIDefine.EquipPosByStdModeOri = {
     [5]   = {EquipPosUI.Equip_Type_Weapon},
     [6]   = {EquipPosUI.Equip_Type_Weapon},
     [7]   = {EquipPosUI.Equip_Type_Charm},
@@ -311,6 +311,8 @@ GUIDefine.EquipPosByStdMode = {
     [168] = {EquipPosUI.Equip_Fashion_Weapon},
     [169] = {EquipPosUI.Equip_Fashion_Weapon},
 }
+
+GUIDefine.EquipPosByStdMode = clone(GUIDefine.EquipPosByStdModeOri)
 
 GUIDefine.EquipMapByStdMode = {}
 for StdMode,_ in pairs(GUIDefine.EquipPosByStdMode or {}) do
@@ -569,7 +571,7 @@ local itemArticleType = {
 GUIDefine.ItemArticleType = itemArticleType
 
 ----------------------------------------------操作类型-----------------------------------------------------
-GUIDefine.OprateType = {
+GUIDefine.OperateType = {
     INIT                = 0,                -- 初始
     ADD                 = 1,                -- 增加
     DEL                 = 2,                -- 删除

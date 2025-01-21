@@ -944,6 +944,29 @@ function GUIFunction:GetItemQualityAttr(itemData)
     return attList
 end
 
+-- 解析自定义属性标题 (带装备变量)
+function GUIFunction:ParseTitleHasCustomVar(itemMakeIndex, titleName)
+    local source = titleName
+    local results = {}
+    while true do
+        local sIdx, eIdx, oriStr, param = string.find(source, "(<$ITEMVAR%((.-)%)>)")
+        if not (oriStr and param) then
+            break
+        end
+        results[oriStr] = SL:GetValue("ITEM_CUSTOM_VAR_BY_VNAME", itemMakeIndex, param) or ""
+        local s1 = string.sub(source, 1, sIdx - 1)
+        local s2 = string.sub(source, eIdx + 1, string.len(source))
+        source = s1 .. s2
+    end
+
+    for key, result in pairs(results) do
+        local sIdx, eIdx = string.find(titleName, key, 1, true)
+        titleName = string.sub(titleName, 1, sIdx - 1) .. tostring(result) .. string.sub(titleName, eIdx + 1, string.len(titleName))
+    end
+
+    return titleName
+end
+
 -- 装备自定义属性
 function GUIFunction:GetItemDiyAttr(itemData)
     local attList = {}

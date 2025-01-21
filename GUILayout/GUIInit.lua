@@ -1489,7 +1489,7 @@ local OnBagItemChange = function(data, isHero)
         return firstHero == 1 and (GUIFunction:OnAutoUseCheckItem_Hero(item) or GUIFunction:OnAutoUseCheckItem(item)) or (GUIFunction:OnAutoUseCheckItem(item) or GUIFunction:OnAutoUseCheckItem_Hero(item))
     end
 
-    if data and data.opera and (data.opera == GUIDefine.OprateType.ADD or data.opera == GUIDefine.OprateType.CHANGE) then
+    if data and data.opera and (data.opera == GUIDefine.OperateType.ADD or data.opera == GUIDefine.OperateType.CHANGE) then
         for _, v in pairs(data.operID) do
             if not v.isHad or (v.change and v.change > 0) then
                 local item = v.item or {}

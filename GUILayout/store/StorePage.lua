@@ -380,7 +380,7 @@ function StorePage.RegisterEvent()
 end
 
 function StorePage.UnRegisterEvent()
-    SL:UnRegisterLUAEvent(LUA_EVENT_CLOSEWIN, "StorePage")
+    SL:UnRegisterLUAEvent(LUA_EVENT_LAYER_PAGE_STORE_REFRESH, "StorePage")
     SL:UnRegisterLUAEvent(LUA_EVENT_MONEY_CHANGE, "StorePage")
     SL:UnRegisterLUAEvent(LUA_EVENT_STORE_HOT_LAYER_CLOSE, "StorePage")
     SL:UnRegisterLUAEvent(LUA_EVENT_STORE_BEAUTY_LAYER_CLOSE, "StorePage")

@@ -63,7 +63,7 @@ function RobotHeroAuto.OnHeroBeAttacked()
 end
 
 function RobotHeroAuto.OnBagOperData(data)
-    if data.opera == GUIDefine.OprateType.DEL and data.operID and data.operID[1].item then
+    if data.opera == GUIDefine.OperateType.DEL and data.operID and data.operID[1].item then
         SL:UnpackDrugByIndexHero(data.operID[1].item.Index)
     end
 end

@@ -435,19 +435,19 @@ function CompoundItemData.OnUpdateItemChange(data)
     end
     
     local itemList = data.operID or {}
-    if data.opera == GUIDefine.OprateType.INIT then
+    if data.opera == GUIDefine.OperateType.INIT then
         for k, v in pairs(itemList) do
             CompoundItemData.OnCheckItemCount(v.item.Index, true)
         end
-    elseif data.opera == GUIDefine.OprateType.ADD then
+    elseif data.opera == GUIDefine.OperateType.ADD then
         for k, v in pairs(itemList) do
             CompoundItemData.OnCheckItemCount(v.item.Index, true)
         end
-    elseif data.opera == GUIDefine.OprateType.DEL then
+    elseif data.opera == GUIDefine.OperateType.DEL then
         for k, v in pairs(itemList) do
             CompoundItemData.OnCheckItemCount(v.item.Index, false)
         end
-    elseif data.opera == GUIDefine.OprateType.CHANGE then
+    elseif data.opera == GUIDefine.OperateType.CHANGE then
         for k, v in pairs(itemList) do
             local change = v.change or 0
             if change ~= 0 then
@@ -501,8 +501,8 @@ function CompoundItemData.OnUpdateQuickUseItem(data)
     end
 
     local operType = data.oper
-    if operType == GUIDefine.OprateType.CHANGE then
-        operType = data.isAdd and GUIDefine.OprateType.ADD or GUIDefine.OprateType.DEL
+    if operType == GUIDefine.OperateType.CHANGE then
+        operType = data.isAdd and GUIDefine.OperateType.ADD or GUIDefine.OperateType.DEL
     end
 
     local operData = {

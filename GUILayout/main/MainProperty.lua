@@ -209,13 +209,13 @@ end
 -- 快捷栏操作
 function MainProperty.OnQuickUseChange(data)
     local opera = data.opera
-    if opera == GUIDefine.OprateType.INIT then
+    if opera == GUIDefine.OperateType.INIT then
         MainProperty.UpdateQuickUseItem()
-    elseif opera == GUIDefine.OprateType.ADD then
+    elseif opera == GUIDefine.OperateType.ADD then
         MainProperty.AddQuickUseItem(data.param)
-    elseif opera == GUIDefine.OprateType.DEL then
+    elseif opera == GUIDefine.OperateType.DEL then
         MainProperty.DelQuickUseItem(data.param)
-    elseif opera == GUIDefine.OprateType.CHANGE then
+    elseif opera == GUIDefine.OperateType.CHANGE then
         MainProperty.ChangeQuickUseItem(data.param)
     end
 end

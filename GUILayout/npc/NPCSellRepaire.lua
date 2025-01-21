@@ -270,7 +270,7 @@ function NPCSellRepaire.OnBagDataChange(data)
         return
     end
 
-    if data.opera == GUIDefine.OprateType.DEL then
+    if data.opera == GUIDefine.OperateType.DEL then
         local itemList = data.operID or {}
         local makeIndex = BagData.GetOnSellOrRepaire()
         if makeIndex then

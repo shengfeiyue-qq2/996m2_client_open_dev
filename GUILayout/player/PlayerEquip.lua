@@ -400,7 +400,7 @@ function PlayerEquip.GetLooks(pos)
     local data = {}
 
 
-    if pos == EquipPosCfg.Equip_Type_Dress and equipData and equipData.shonourSell and tonumber(equipData.shonourSell) == 1 then -- shonourSell == 1 不显示裸模, 服务器下发字段
+    if pos == EquipPosCfg.Equip_Type_Dress and equipData and equipData.zblmtkz and tonumber(equipData.zblmtkz) == 1 then -- zblmtkz == 1 不显示裸模, 表配置字段
         PlayerEquip._feature.showNodeModel = false
     end
 
@@ -525,7 +525,7 @@ function PlayerEquip.UpdateEquipLayer(data)
     equipPanel._movingState = false
 
     local function onRefEquipNaikan()
-        if GUIDefine.OprateType.ADD == optType or GUIDefine.OprateType.DEL == optType or GUIDefine.OprateType.CHANGE == optType then
+        if GUIDefine.OperateType.ADD == optType or GUIDefine.OperateType.DEL == optType or GUIDefine.OperateType.CHANGE == optType then
             PlayerEquip.UpdateModelFeatureData()
             PlayerEquip.CreateUIModel()
             return false
@@ -533,7 +533,7 @@ function PlayerEquip.UpdateEquipLayer(data)
     end
 
     local function onRefEquipIcon()
-        if GUIDefine.OprateType.ADD == optType or GUIDefine.OprateType.CHANGE == optType then
+        if GUIDefine.OperateType.ADD == optType or GUIDefine.OperateType.CHANGE == optType then
             local itemNode = PlayerEquip.GetEquipPosNode(pos)
             local visible  = GUI:getVisible(equipPanel)
             GUI:setVisible(itemNode, visible)
@@ -541,7 +541,7 @@ function PlayerEquip.UpdateEquipLayer(data)
 
             local equipData = GUIFunction:GetEquipDataByMakeIndex(makeIndex, EDType)
             PlayerEquip.CreateEquipItem(itemNode, equipData)
-        elseif GUIDefine.OprateType.DEL == optType then
+        elseif GUIDefine.OperateType.DEL == optType then
             local itemNode = PlayerEquip.GetEquipPosNode(pos)
             GUI:removeAllChildren(itemNode)
         end

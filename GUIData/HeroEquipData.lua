@@ -71,7 +71,7 @@ function HeroEquipData.AddEquipData(item, isInit)
             MakeIndex = makeIndex,
             Where     = pos,
             ItemData  = item,
-            opera     = GUIDefine.OprateType.ADD
+            opera     = GUIDefine.OperateType.ADD
         }
         SL:onLUAEvent(LUA_EVENT_HERO_EQUIP_CHANGE, data)
     end
@@ -97,7 +97,7 @@ function HeroEquipData.DelEquipData(item)
         MakeIndex = makeIndex,
         Where     = pos,
         ItemData  = item,
-        opera     = GUIDefine.OprateType.DEL
+        opera     = GUIDefine.OperateType.DEL
     }
 
     SL:onLUAEvent(LUA_EVENT_HERO_EQUIP_CHANGE, data)
@@ -121,7 +121,7 @@ function HeroEquipData.ChangeEquipData(item, bagDelayUpdate, isChangeLook)
         Where          = pos,
         bagDelayUpdate = bagDelayUpdate,
         isChangeLook   = isChangeLook,
-        opera          = GUIDefine.OprateType.CHANGE
+        opera          = GUIDefine.OperateType.CHANGE
     }
 
     SL:onLUAEvent(LUA_EVENT_HERO_EQUIP_CHANGE, data)
@@ -183,7 +183,7 @@ function HeroEquipData.handle_MSG_SC_PLAYER_EQUIP_INFO(items)
         HeroEquipData.AddEquipData(items[i], true)
     end
     SL:OnHeroEquipInitAddRed()
-    SL:onLUAEvent(LUA_EVENT_HERO_EQUIP_CHANGE, {opera = GUIDefine.OprateType.INIT})
+    SL:onLUAEvent(LUA_EVENT_HERO_EQUIP_CHANGE, {opera = GUIDefine.OperateType.INIT})
 end
 
 function HeroEquipData.handle_MSG_SC_PLAYER_EQUIP_BEST_RINGS_STATE(state)

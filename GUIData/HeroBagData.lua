@@ -324,7 +324,7 @@ function HeroBagData.AddItemDataAndNotice(item)
     HeroBagData.AddItemData(item)
 
     local operator = {}
-    operator.opera = GUIDefine.OprateType.ADD
+    operator.opera = GUIDefine.OperateType.ADD
     operator.operID = {}
     tinsert(operator.operID, MAKE_OPER_DATA(item, false))
 
@@ -369,7 +369,7 @@ function HeroBagData.DelItemData(data, showTip, noCleanPos, noNotify, isBaitan)
         end
 
         local operator = {}
-        operator.opera = GUIDefine.OprateType.DEL
+        operator.opera = GUIDefine.OperateType.DEL
         operator.operID = {}
         operator.isBaitan = isBaitan
         local operitem = HeroBagData.BagOperItemByMakeIndex(makeIndex, itemHasPos)
@@ -576,7 +576,7 @@ function HeroBagData.ResponseBagItemData(data)
     
     local operator = {}
     operator.initbool = false
-    operator.opera = GUIDefine.OprateType.INIT
+    operator.opera = GUIDefine.OperateType.INIT
     operator.operID = {}
 
     for _, item in pairs(data) do
@@ -603,7 +603,7 @@ function HeroBagData.ResponseAddItem(data)
         end
         HeroBagData.AddItemData(data)
         local operator = {}
-        operator.opera = GUIDefine.OprateType.ADD
+        operator.opera = GUIDefine.OperateType.ADD
         operator.operID = {}
         tinsert(operator.operID, MAKE_OPER_DATA(data, false))
         SL:onLUAEvent(LUA_EVENT_HERO_BAG_ITEM_CHANGE, operator)
@@ -654,7 +654,7 @@ function HeroBagData.ResponseUpdateItem(data)
     end
     if GUIDefine.ItemBelong.HEROBAG == itemBelong then
         local operator = {}
-        operator.opera = GUIDefine.OprateType.CHANGE
+        operator.opera = GUIDefine.OperateType.CHANGE
         operator.operID = {}
         local diff = HeroBagData.ChangeItemData(data)
         tinsert(operator.operID, MAKE_OPER_DATA(data, true, diff))

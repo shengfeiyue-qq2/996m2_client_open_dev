@@ -349,7 +349,7 @@ function HeroSuperEquip.GetLooks(pos)
 
     local data = {}
 
-    if pos == EquipPosCfg.Equip_Type_Super_Dress and equipData and HeroSuperEquip._feature.showNodeModel and equipData.shonourSell and tonumber(equipData.shonourSell) == 1 then -- shonourSell == 1 不显示裸模, 服务器下发字段
+    if pos == EquipPosCfg.Equip_Type_Super_Dress and equipData and HeroSuperEquip._feature.showNodeModel and equipData.zblmtkz and tonumber(equipData.zblmtkz) == 1 then -- zblmtkz == 1 不显示裸模, 表配置字段
         HeroSuperEquip._feature.showNodeModel = false
     end
 
@@ -492,7 +492,7 @@ function HeroSuperEquip.UpdateEquipLayer(data)
     equipPanel._movingState = false
 
     local function onRefEquipNaikan()
-        if GUIDefine.OprateType.ADD == optType or GUIDefine.OprateType.DEL == optType or GUIDefine.OprateType.CHANGE == optType then
+        if GUIDefine.OperateType.ADD == optType or GUIDefine.OperateType.DEL == optType or GUIDefine.OperateType.CHANGE == optType then
             HeroSuperEquip.UpdateModelFeatureData()
             HeroSuperEquip.CreateUIModel()
             return false
@@ -500,7 +500,7 @@ function HeroSuperEquip.UpdateEquipLayer(data)
     end
 
     local function onRefEquipIcon()
-        if GUIDefine.OprateType.ADD == optType or GUIDefine.OprateType.CHANGE == optType then
+        if GUIDefine.OperateType.ADD == optType or GUIDefine.OperateType.CHANGE == optType then
             local itemNode = HeroSuperEquip.GetEquipPosNode(pos)
             local visible  = GUI:getVisible(equipPanel)
             GUI:setVisible(itemNode, visible)
@@ -508,7 +508,7 @@ function HeroSuperEquip.UpdateEquipLayer(data)
 
             local equipData =  GUIFunction:GetEquipDataByMakeIndex(makeIndex, EDType)
             HeroSuperEquip.CreateEquipItem(itemNode, equipData)
-        elseif GUIDefine.OprateType.DEL == optType then
+        elseif GUIDefine.OperateType.DEL == optType then
             local itemNode = HeroSuperEquip.GetEquipPosNode(pos)
             GUI:removeAllChildren(itemNode)
         end

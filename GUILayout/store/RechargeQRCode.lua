@@ -29,6 +29,7 @@ function RechargeQRCode.ShowQRCode(data)
     local fullPath = SL:GetFullPathForFilename(filename)
     if SL:IsFileExist(fullPath) then
         imageQRCode = GUI:Image_Create(-1, "QRCode", 0, 0, fullPath)
+        GUI:setAnchorPoint(imageQRCode, 0.5, 0.5)
         local imgSize = GUI:getContentSize(imageQRCode)
         if imgSize.width > 350 or imgSize.height > 350 then
             GUI:setIgnoreContentAdaptWithSize(imageQRCode, false)

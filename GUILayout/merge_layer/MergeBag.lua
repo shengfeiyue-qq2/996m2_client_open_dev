@@ -679,7 +679,7 @@ function MergeBag.ItemDataChange(data)
     local isBaitan = data.isBaitan
     local type = data.opera
     local bagDataDispose = MergeBag.IsHumBag() and BagData or HeroBagData
-    if type == GUIDefine.OprateType.ADD or type == GUIDefine.OprateType.INIT then
+    if type == GUIDefine.OperateType.ADD or type == GUIDefine.OperateType.INIT then
         for _, v in pairs(itemData) do
             local pos = bagDataDispose.GetBagPosByMakeIndex(v.item.MakeIndex)
             local startPos = MergeBagInfo._perPageNum * (MergeBagInfo._selPage - 1) + 1
@@ -690,7 +690,7 @@ function MergeBag.ItemDataChange(data)
             end
         end
 
-    elseif type == GUIDefine.OprateType.DEL then
+    elseif type == GUIDefine.OperateType.DEL then
         for _, v in pairs(itemData) do
             local item = GUI:getChildByStrTag(MergeBagInfo._ui.Panel_items, v.MakeIndex)
 
@@ -705,7 +705,7 @@ function MergeBag.ItemDataChange(data)
             end
         end
 
-    elseif type == GUIDefine.OprateType.CHANGE then
+    elseif type == GUIDefine.OperateType.CHANGE then
         for _, v in pairs(itemData) do
             local item = GUI:getChildByStrTag(MergeBagInfo._ui.Panel_items, v.MakeIndex)
             local thisItemData = bagDataDispose.GetItemDataByMakeIndex(v.MakeIndex)

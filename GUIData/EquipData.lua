@@ -170,7 +170,7 @@ function EquipData.AddEquipData(item, isInit)
             MakeIndex = makeIndex,
             Where     = pos,
             ItemData  = item,
-            opera     = GUIDefine.OprateType.ADD
+            opera     = GUIDefine.OperateType.ADD
         }
         SL:onLUAEvent(LUA_EVENT_PLAYER_EQUIP_CHANGE, data)
     end
@@ -200,7 +200,7 @@ function EquipData.DelEquipData(item)
         MakeIndex = makeIndex,
         Where     = pos,
         ItemData  = item,
-        opera     = GUIDefine.OprateType.DEL
+        opera     = GUIDefine.OperateType.DEL
     }
     SL:onLUAEvent(LUA_EVENT_PLAYER_EQUIP_CHANGE, data)
 end
@@ -222,7 +222,7 @@ function EquipData.ChangeEquipData(item, bagDelayUpdate, isChangeLook)
         Where          = pos,
         bagDelayUpdate = bagDelayUpdate,
         isChangeLook   = isChangeLook,
-        opera          = GUIDefine.OprateType.CHANGE
+        opera          = GUIDefine.OperateType.CHANGE
     }
 
     SL:onLUAEvent(LUA_EVENT_PLAYER_EQUIP_CHANGE, data)
@@ -284,7 +284,7 @@ function EquipData.handle_MSG_SC_PLAYER_EQUIP_INFO(items)
         EquipData.AddEquipData(items[i], true)
     end
     SL:OnPlayEquipInitAddRed()
-    SL:onLUAEvent(LUA_EVENT_PLAYER_EQUIP_CHANGE, {opera = GUIDefine.OprateType.INIT})
+    SL:onLUAEvent(LUA_EVENT_PLAYER_EQUIP_CHANGE, {opera = GUIDefine.OperateType.INIT})
     SL:onLUAEvent(LUA_EVENT_PLAYER_EQUIP_INIT)
 end
 

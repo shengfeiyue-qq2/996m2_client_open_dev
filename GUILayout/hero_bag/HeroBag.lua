@@ -360,7 +360,7 @@ function HeroBag.ItemDataChange(data)
         return
     end
 
-    if type == GUIDefine.OprateType.ADD or type == GUIDefine.OprateType.INIT then
+    if type == GUIDefine.OperateType.ADD or type == GUIDefine.OperateType.INIT then
         if not HeroBagInfo.initedLayer then
             return
         end
@@ -372,7 +372,7 @@ function HeroBag.ItemDataChange(data)
             end
         end
 
-    elseif type == GUIDefine.OprateType.DEL then
+    elseif type == GUIDefine.OperateType.DEL then
         for _, v in pairs(itemData) do
             local item = GUI:getChildByStrTag(HeroBagInfo._ui.Panel_items, v.MakeIndex)
             if item then
@@ -381,7 +381,7 @@ function HeroBag.ItemDataChange(data)
             end
         end
 
-    elseif type == GUIDefine.OprateType.CHANGE then
+    elseif type == GUIDefine.OperateType.CHANGE then
         for _, v in pairs(itemData) do
             local item = GUI:getChildByStrTag(HeroBagInfo._ui.Panel_items, v.MakeIndex)
             local thisItemData = HeroBagData.GetItemDataByMakeIndex(v.MakeIndex)
