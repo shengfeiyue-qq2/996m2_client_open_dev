@@ -81,6 +81,11 @@ end
 
 --------------------------------------------------------------------------------------------------------------------------------
 -- 数据处理
+local LUAEventEnum = {
+    [PLAYER] = LUA_EVENT_TITLE_REFRESH,
+    [HERO]   = LUA_EVENT_HERO_TITLE_REFRESH
+}
+local shareEventTab = {}
 function TitleData.handle_MSG_SC_TITLE_REPONSE(header, jsonData, type)
     if header.recog == 1 then
         -- 称号列表
@@ -147,11 +152,8 @@ function TitleData.handle_MSG_SC_TITLE_REPONSE(header, jsonData, type)
         TitleData._titleData[type] = {}
     end
 
-    local LUAEventEnum = {
-        [PLAYER] = LUA_EVENT_TITLE_REFRESH,
-        [HERO]   = LUA_EVENT_HERO_TITLE_REFRESH
-    }
-    SL:onLUAEvent(LUAEventEnum[type])
+    shareEventTab.oper = header.recog
+    SL:onLUAEvent(LUAEventEnum[type], shareEventTab)
 end
 
 return TitleData

@@ -451,7 +451,7 @@ function CompoundItem.SubmitCompoundItem()
         return
     end
 
-    local isCanCompound = CompoundItemData.CheckIsCanCompoud(config, false)
+    local isCanCompound = CompoundItemData.CheckIsCanCompoud(config, true)
     if not isCanCompound then
         return
     end

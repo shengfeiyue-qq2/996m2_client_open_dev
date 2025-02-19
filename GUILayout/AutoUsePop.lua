@@ -232,10 +232,10 @@ function AutoUsePop.DealEquip(data)
     end
 
     -- 道具在移动中停止
-    local movingData = SL:GetValue("ITEM_MOVE_DATA")
-    if movingData and MakeIndex == movingData.MakeIndex then
-        SL:ItemMoveCancel()
-    end
+    -- local movingData = SL:GetValue("ITEM_MOVE_DATA")
+    -- if movingData and MakeIndex == movingData.MakeIndex then
+    --     SL:ItemMoveCancel()
+    -- end
     
     local equipIntoPos = -1
     -- 是否有找到合适的位置 战力对比

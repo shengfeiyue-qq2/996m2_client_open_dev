@@ -154,7 +154,7 @@ function MoveEvent.CheckMoveEndPos(data)
     MoveEvent.RemoveChildrenAndCleanNode()
 end
 
-function MoveEvent.MoveItemUpDate(data)
+function MoveEvent.MoveItemUpdate(data)
     if not data or not next(data) then
         return
     end
@@ -236,7 +236,7 @@ function MoveEvent.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_LAYER_MOVED_MOVING,  "MoveEvent", MoveEvent.UpdatePostion)
     SL:RegisterLUAEvent(LUA_EVENT_LAYER_MOVED_END,     "MoveEvent", MoveEvent.CheckMoveEndPos)
     SL:RegisterLUAEvent(LUA_EVENT_LAYER_MOVED_CANCEL,  "MoveEvent", MoveEvent.OnMoveCancelEvent)
-    SL:RegisterLUAEvent(LUA_EVENT_LAYER_MOVED_UP_DATA, "MoveEvent", MoveEvent.MoveItemUpDate)
+    SL:RegisterLUAEvent(LUA_EVENT_LAYER_MOVED_UP_DATA, "MoveEvent", MoveEvent.MoveItemUpdate)
     SL:RegisterLUAEvent(LUA_EVENT_BAG_ITEM_CHANGE,     "MoveEvent", MoveEvent.CancelBagMove)
     SL:RegisterLUAEvent(LUA_EVENT_PLAYER_EQUIP_CHANGE, "MoveEvent", MoveEvent.CancelEquipMove)
     SL:RegisterLUAEvent(LUA_EVENT_HERO_EQUIP_CHANGE,   "MoveEvent", MoveEvent.CancelEquipMove)

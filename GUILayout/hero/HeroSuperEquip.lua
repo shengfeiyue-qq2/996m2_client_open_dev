@@ -433,9 +433,6 @@ function HeroSuperEquip.InitEquipCells()
 end
 
 function HeroSuperEquip.InitEquipSetting()
-    GUI:setVisible(HeroSuperEquip._ui["Text_shizhuang"],true)
-    GUI:setVisible(HeroSuperEquip._ui["CheckBox_shizhuang"],true)
-
     GUI:CheckBox_addOnEvent(HeroSuperEquip._ui["CheckBox_shizhuang"],function()
         FuncDockData.SetAllowShowHeroFashion(GUI:CheckBox_isSelected(HeroSuperEquip._ui["CheckBox_shizhuang"]) and 1 or 0)
     end)

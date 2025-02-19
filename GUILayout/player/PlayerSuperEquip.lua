@@ -430,7 +430,9 @@ function PlayerSuperEquip.UpdateModelFeatureData()
     SetFeature(EquipPosCfg.Equip_Type_Super_Shield, PlayerSuperEquip.GetLooks(EquipPosCfg.Equip_Type_Super_Shield))
     SetFeature(EquipPosCfg.Equip_Type_Super_Veil,   PlayerSuperEquip.GetLooks(EquipPosCfg.Equip_Type_Super_Veil))
 
-    PlayerSuperEquip._feature.hairID = PlayerSuperEquip._hairID
+    if PlayerSuperEquip._feature.showNodeModel then
+        PlayerSuperEquip._feature.hairID = PlayerSuperEquip._hairID
+    end
 
 end
 
@@ -467,9 +469,6 @@ function PlayerSuperEquip.InitEquipCells()
 end
 
 function PlayerSuperEquip.InitEquipSetting()
-    GUI:setVisible(PlayerSuperEquip._ui["Text_shizhuang"],true)
-    GUI:setVisible(PlayerSuperEquip._ui["CheckBox_shizhuang"],true)
-
     GUI:CheckBox_addOnEvent(PlayerSuperEquip._ui["CheckBox_shizhuang"],function()
         FuncDockData.SetAllowShowFashion(GUI:CheckBox_isSelected(PlayerSuperEquip._ui["CheckBox_shizhuang"]) and 1 or 0)
     end)

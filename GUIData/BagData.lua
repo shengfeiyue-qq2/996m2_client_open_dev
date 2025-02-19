@@ -302,7 +302,7 @@ end
 -- 设置正在交易或修理中
 function BagData.SetOnSellOrRepaire(makeIndex)
     BagData._onSellRepaire = makeIndex
-    SL:onLUAEvent(LUA_EVENT_BAG_ITEM_POS_CHANGE)
+    SL:onLUAEvent(LUA_EVENT_BAG_ITEM_POS_CHANGE, {makeIndex})
 end
 
 -- 获取是否在交易或修理
@@ -312,8 +312,11 @@ end
 
 -- 清理交易或修理
 function BagData.CleanOnSellOrRepaire()
+    local makeIndex = BagData._onSellRepaire
     BagData._onSellRepaire = nil
-    SL:onLUAEvent(LUA_EVENT_BAG_ITEM_POS_CHANGE)
+    
+    -- 刷新一遍背包 将隐藏的刷出来
+    SL:onLUAEvent(LUA_EVENT_BAG_ITEM_POS_CHANGE, makeIndex and {makeIndex})
 end
 
 --背包位置数据
@@ -770,7 +773,7 @@ function BagData.ResponseUpdateItem(data)
         EquipData.ChangeEquipData(data, true, true)
 
     elseif itemBelong == GUIDefine.ItemBelong.QUICKUSE then
-        QuickUseData.UpDateQuickUseItemData(data)
+        QuickUseData.UpdateQuickUseItemData(data)
     end
 
     -- for item update.

@@ -525,7 +525,7 @@ function CompoundItemData.OnCompoundItemResult(data)
             SL:ShowSystemTips(config.CGmessage)
         end
     elseif code == -1 or code == -2 then -- 失败
-        if config.CGmessage then
+        if config.SBmessage then
             SL:ShowSystemTips(config.SBmessage)
         end
     end

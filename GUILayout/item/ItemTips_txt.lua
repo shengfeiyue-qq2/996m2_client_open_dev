@@ -1616,6 +1616,9 @@ function ItemTips.AddEmbedWidget(widgetKey, tipsParam)
     elseif string.find(widgetKey, "desc(%d+)$") then
         local _, _, groupId = string.find(widgetKey, "desc(%d+)$")
         return ItemTips.CreateDescWidget(tonumber(groupId), tipsParam)
+    elseif string.find(widgetKey, "swordOfSoul(%d+)$") then
+        local _, _, index = string.find(widgetKey, "swordOfSoul(%d+)$")
+        return ItemTips.CreateSwordOfSoulWidget(tipsParam, tonumber(index))
     end
 end
 
@@ -1751,6 +1754,97 @@ function ItemTips.CreateStarWidget(param)
         local starPanel = ItemTips.GetStarPanel(star)
         return starPanel
     end
+end
+
+function ItemTips.CreateSwordOfSoulWidget(param, index)
+    local itemData = param and param.tip_itemData
+    if not itemData or not itemData.MakeIndex then
+        return nil
+    end
+    local data = GUIDefineEx.TipsSwordOfSoulTitle
+    local soulData = data and data[index]
+    if not soulData or not next(soulData) then
+        return
+    end
+    local switch        = soulData.switch or 0      -- 进度条是否关闭
+    local nameStr       = soulData.name or ""       -- 名称
+    local value         = soulData.value            -- 进度值
+    local showWay       = soulData.showWay or 0     -- 显示方式 0: 数值 1: 万分比
+    local color         = soulData.color or 255     -- 颜色
+    local maxValue      = soulData.maxValue or 100  -- 最大值
+    local loop          = soulData.loop or 0        -- 图片是否循环播放
+    
+    local itemMakeIndex = itemData.MakeIndex
+    if GUIFunction.ParseTitleHasCustomVar then
+        nameStr = GUIFunction:ParseTitleHasCustomVar(itemMakeIndex, nameStr)
+        value = tonumber(GUIFunction:ParseTitleHasCustomVar(itemMakeIndex, value or ""))
+        color = tonumber(GUIFunction:ParseTitleHasCustomVar(itemMakeIndex, color)) or 255
+        switch = tonumber(GUIFunction:ParseTitleHasCustomVar(itemMakeIndex, switch)) or 0
+        maxValue = tonumber(GUIFunction:ParseTitleHasCustomVar(itemMakeIndex, maxValue)) or 100
+        loop = tonumber(GUIFunction:ParseTitleHasCustomVar(itemMakeIndex, loop)) or 0
+    end
+    if switch == 1 then -- 1: 关闭
+        return nil
+    end
+    if not value then
+        return nil
+    end
+    local hexColor = SL:GetHexColorByStyleId(color or 255)
+    local swordSoulPanel = GUI:Layout_Create(-1, "swordSoulPanel_" .. index, 0, 0, 0, 0)
+    local swordSoulName = GUI:Text_Create(swordSoulPanel, "swordSoulName", 0, 0, fontSize, hexColor, nameStr) 
+    GUI:Text_enableOutline(swordSoulName, "#000000", 1)
+
+    local swordSoulNameSz = GUI:getContentSize(swordSoulName)
+    local nameW = swordSoulNameSz.width
+
+    local tipW = nameW
+    local tipH = swordSoulNameSz.height
+
+    local offX = 10
+    local basePath = (SL:GetMetaValue("WINPLAYMODE") and _resPathWin or _resPath) .. "sword_soul/"
+    local barImgPath = string.format(basePath .. "jdtbg_1.png")
+
+    local bgImg = GUI:Image_Create(swordSoulPanel, "bg_img", nameW + offX, 0, barImgPath)
+    local bgImgSz = GUI:getContentSize(bgImg)
+    local imgIndex = 1
+    local progressImgPath = string.format(basePath .. "jdt%d_1.png", imgIndex)
+    local slider = GUI:Slider_Create(swordSoulPanel, "slider", nameW + offX + 5, 1, "", progressImgPath, "")
+    GUI:setAnchorPoint(slider, 0, 0)
+    GUI:setContentSize(slider, bgImgSz.width - 10, bgImgSz.height - 2)
+
+    if loop == 1 then
+        SL:schedule(slider, function()
+            imgIndex = imgIndex + 1
+            if imgIndex > 3 then
+                imgIndex = 1
+            end
+            progressImgPath = string.format(basePath .. "jdt%d_1.png", imgIndex)
+            GUI:Slider_loadProgressBarTexture(slider, progressImgPath)
+        end, 0.3)
+    end
+
+    local percent = value / maxValue * 100
+    if percent > 100 then
+        percent = 100
+    end
+    GUI:Slider_setPercent(slider, percent)
+    local sliderSz = GUI:getContentSize(slider)
+
+    local progressStr = ""
+    if showWay == 1 then
+        progressStr = string.format("%.2f%%", value / 10000)
+    elseif showWay == 0 then
+        progressStr = string.format("%d/%d", value, maxValue)
+    end
+
+    local progress = GUI:Text_Create(swordSoulPanel, "progress_txt", nameW + offX + bgImgSz.width / 2, bgImgSz.height / 2, 10, hexColor, progressStr)
+    GUI:Text_enableOutline(progress, "#000000", 1)
+    GUI:setAnchorPoint(progress, 0.5, 0.5)
+
+    tipW = tipW + bgImgSz.width + offX
+    tipH = math.max(tipH, bgImgSz.height)
+    GUI:setContentSize(swordSoulPanel, tipW, tipH)
+    return swordSoulPanel
 end
 
 function ItemTips.CreateBaseAttrWidget(param)

@@ -156,7 +156,7 @@ function NPCSellRepaire.InitUI(data)
     })
 end
 
-function NPCSellRepaire.UpDateLayerParam(data)
+function NPCSellRepaire.UpdateLayerParam(data)
     if not data then
         return
     end
@@ -166,7 +166,7 @@ function NPCSellRepaire.UpDateLayerParam(data)
     end
 
     if data.itemData then
-        NPCSellRepaire.UpDateItems(data.itemData)
+        NPCSellRepaire.UpdateItems(data.itemData)
     end
 
     if data.reset then
@@ -184,7 +184,7 @@ function NPCSellRepaire.UpdateItemSellPrice(price, way)
     end
 end
 
-function NPCSellRepaire.UpDateItems(data)
+function NPCSellRepaire.UpdateItems(data)
     if not data and NPCSellRepaire._itemNode then
         return
     end
@@ -218,9 +218,6 @@ function NPCSellRepaire.CleanStateAndData(way)
     if NPCSellRepaire._textPrice then
         GUI:Text_setString(NPCSellRepaire._textPrice, "")
     end
-
-    -- 刷新一遍背包 将隐藏的刷出来
-    SL:onLUAEvent(LUA_EVENT_BAG_ITEM_POS_CHANGE)
 end
 
 function NPCSellRepaire.OnBeginMovingState()
@@ -288,7 +285,7 @@ end
 function NPCSellRepaire.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_CLOSEWIN, "NPCSellRepaire", NPCSellRepaire.OnClose) -- 关闭界面
     SL:RegisterLUAEvent(LUA_EVENT_NPC_TALK_CLOSE, "NPCSellRepaire", NPCSellRepaire.OnCloseLayer)
-    SL:RegisterLUAEvent(LUA_EVENT_NPC_SELL_REPAIRE_UPDATE, "NPCSellRepaire", NPCSellRepaire.UpDateLayerParam)
+    SL:RegisterLUAEvent(LUA_EVENT_NPC_SELL_REPAIRE_UPDATE, "NPCSellRepaire", NPCSellRepaire.UpdateLayerParam)
     SL:RegisterLUAEvent(LUA_EVENT_LAYER_MOVED_BEGIN, "NPCSellRepaire", NPCSellRepaire.OnItemBeginMoving)
     SL:RegisterLUAEvent(LUA_EVENT_BAG_ITEM_CHANGE, "NPCSellRepaire", NPCSellRepaire.OnBagDataChange)
 end

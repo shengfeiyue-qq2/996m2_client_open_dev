@@ -4,6 +4,8 @@
 
 function GUIInitPre()
     SL:Print("Hello World, This is GUIInitPre!")
+    -- 加载ShaderUtils.lua
+    SL:Require("GUILayout/ShaderUtils", true)
 end
 GUIInitPre()
 

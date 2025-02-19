@@ -407,7 +407,7 @@ function RobotAuto.AutoHpProtect(delta)
     RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_HP_PROTECT4] = RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_HP_PROTECT4] - delta
 
     -- 自动吃药相关
-    local hppercent     = SL:GetValue("ROLE_MP_PERCENT")
+    local hppercent     = SL:GetValue("ROLE_HP_PERCENT")
     local maxHP         = SL:GetValue("MAXHP")
 
     -- hp保护1

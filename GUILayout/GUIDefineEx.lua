@@ -314,6 +314,34 @@ GUIDefineEx.TipsTNCellGroupTitle = GUIDefineEx.TipsTNCellGroupTitle or (
     end
 )()
 
+-- 自定义刀魂配置显示
+GUIDefineEx.TipsSwordOfSoulTitle = GUIDefineEx.TipsSwordOfSoulTitle or (
+    function()
+        local arrays = {}
+        local value = SL:GetValue("GAME_DATA", "TipsSwordOfSoulTitle")
+        if value and STR_LEN(value) > 0 then
+            local valueList = STR_SPLIT(value, "|")
+            for _, v in ipairs(valueList) do
+                if v and STR_LEN(v) > 0 then
+                    local param = STR_SPLIT(v, "#")
+                    local index = TONUMBER(param[1])
+                    if index then
+                        arrays[index] = {}
+                        arrays[index].name = STR_LEN(param[2] or "") > 0 and param[2]   -- 刀魂名 支持变量
+                        arrays[index].value = param[3]
+                        arrays[index].showWay = TONUMBER(param[4]) or 0
+                        arrays[index].color = param[5] and TONUMBER(param[5]) or param[5]
+                        arrays[index].switch = TONUMBER(param[6]) or param[6]           -- 开关： 0显示 1关闭  支持变量
+                        arrays[index].loop = TONUMBER(param[7]) or param[7]             -- 图片是否循环播放： 0否 1循环 支持变量
+                        arrays[index].maxValue = TONUMBER(param[8]) or param[8]         -- 最大值 支持变量
+                    end
+                end
+            end
+        end
+        return arrays
+    end
+)()
+
 -- 配置不可挖怪物类型
 GUIDefineEx.NoDigMonsterTypeMap = GUIDefineEx.NoDigMonsterTypeMap or (
     function()

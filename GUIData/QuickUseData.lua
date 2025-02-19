@@ -167,7 +167,7 @@ function QuickUseData.GetQuickUseItemNum(index, famlilar)
     return totalCount
 end
 
-function QuickUseData.UpDateQuickUseItemData(item)
+function QuickUseData.UpdateQuickUseItemData(item)
     if not item then
         return
     end

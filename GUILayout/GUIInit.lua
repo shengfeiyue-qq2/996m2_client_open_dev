@@ -5,8 +5,10 @@ local _initedWorld = false
 -----------------------------------------------------------------------------
 -- 加载GUIUtil.lua
 SL:Require("GUILayout/GUIUtil", true)
--- 加载SkillUtil.lua
+-- 加载SkillUtils.lua
 SL:Require("GUILayout/SkillUtils", true)
+-- 加载BuffShaderBehavior.lua
+SL:Require("GUILayout/BuffShaderBehavior", true)
 
 -----------------------------------------------------------------------------
 -- 主界面UI

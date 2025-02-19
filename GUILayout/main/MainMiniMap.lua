@@ -171,7 +171,7 @@ function MainMiniMap.OnChangeScene()
 end
 
 function MainMiniMap.OnChangeStatus(show)
-    MainMiniMap.ChangShowState(not show)
+    MainMiniMap.ChangeShowState(not show)
 end
 
 function MainMiniMap.OnDownLoadSuccess(miniMapID)
