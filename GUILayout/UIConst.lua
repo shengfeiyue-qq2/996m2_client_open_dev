@@ -246,7 +246,9 @@ UIConst.LUAFile =
 
     LUA_FILE_GUIDE                              = "guide/Guide",                                                            -- 引导
 
-    LUA_FILE_LOADING_BAR                        = "loading_bar/LoadingBar"
+    LUA_FILE_LOADING_BAR                        = "loading_bar/LoadingBar",
+
+    LUA_FILE_ROLE_EFFECT                        = "GUILayout/RoleEffect",
 }
 
 UIConst.LAYERID = 

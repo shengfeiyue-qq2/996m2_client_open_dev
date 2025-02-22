@@ -1213,73 +1213,6 @@ function ItemTips.GetStarPanel(star)
     return panel
 end
 
------------------ 自定义描述 ------------------------
-local shareEffectTab = {}
-local function parseDescEffect(value)
-    local params = string.split(value or "", "#")
-    local effectId = tonumber(params[1])
-    if not effectId then
-        return
-    end
-    
-    shareEffectTab.effectId = effectId
-    shareEffectTab.type = tonumber(params[2]) or 0  -- 0:顶部 1:底部
-    shareEffectTab.mode = tonumber(params[3]) or 1  -- 1:前面 2:后面
-    shareEffectTab.x = tonumber(params[4]) or 0
-    shareEffectTab.y = tonumber(params[5]) or 0
-
-    return shareEffectTab
-end
-
-function ItemTips.GetDescList(itemData)
-    local desc = itemData.Desc
-    local descList = {}
-    local effectList = {}
-    if not desc or string.len(desc) == 0 then
-        return nil
-    end
-    local function parse(desc)
-        if tonumber(desc) then
-            local config = GUIDefineEx.ItemDescConfig[tonumber(desc)]
-            if not config or not next(config) then
-                return
-            end
-            if config.type == 1 then
-                if config.str and string.len(config.str) > 0 then
-                    if not descList[config.group_id] then
-                        descList[config.group_id] = {}
-                    end
-                    table.insert(descList[config.group_id], config.str)
-                end
-            else
-                local effect = parseDescEffect(config.str)
-                if effect then
-                    table.insert(effectList, effect)
-                end
-            end
-        end
-    end
-    
-    for i, v in ipairs(string.split(tostring(desc), "#")) do
-        parse(v)
-    end
-
-    return descList, effectList
-end
-
-function ItemTips.GetDescStrByGroup(list, groupId)
-    if not groupId or not list or not list[groupId] then
-        return
-    end
-    
-    local strList = list[groupId]
-    local str = ""
-    for i = 1, #strList do
-        str = string.format("%s%s%s", str, strList[i], i ~= #strList and "<br>" or "")
-    end
-    return str
-end
-
 ---------------------
 function ItemTips.AddTipLayout(parent, name)
     local node = GUI:Widget_Create(parent, "widget_" .. name, 0, 0)
@@ -1807,6 +1740,10 @@ function ItemTips.CreateSwordOfSoulWidget(param, index)
         end, 0.3)
     end
 
+    -- 万分比时最大值默认10000
+    if showWay == 1 then
+        maxValue = 10000
+    end
     local percent = value / maxValue * 100
     if percent > 100 then
         percent = 100
@@ -1816,7 +1753,7 @@ function ItemTips.CreateSwordOfSoulWidget(param, index)
 
     local progressStr = ""
     if showWay == 1 then
-        progressStr = string.format("%.2f%%", value / 10000)
+        progressStr = string.format("%.2f%%", percent)
     elseif showWay == 0 then
         progressStr = string.format("%d/%d", value, maxValue)
     end
@@ -2306,7 +2243,7 @@ function ItemTips.CreateDescWidget(groupId, param)
         richStr = param[string.format("tip_desc%sStr", groupId)]
     else
         local descList = param and param.tip_descList
-        richStr = ItemTips.GetDescStrByGroup(descList, groupId)
+        richStr = GUIFunction:GetItemDescStrByGroup(descList, groupId)
     end
     if richStr and string.len(richStr) > 0 then
         local rich_desc = GUI:RichText_Create(-1, "rich_desc_" .. groupId, 0, 0, richStr, ItemTips._richWid, fontSize, "#FFFFFF", vspace, nil, fontPath)
@@ -2609,7 +2546,7 @@ function ItemTips.CreateEquipPanel(data, itemData, isWear, panelInsertIndex)
     local color = (itemData.Color and itemData.Color > 0) and itemData.Color or 255
     local name = itemData.Name or ""
     local nameStr = string.format("<font color='%s' size='%s'>%s</font>", SL:GetHexColorByStyleId(color), _nameSize, name)
-    local descList, effectList = ItemTips.GetDescList(itemData)
+    local descList, effectList = GUIFunction:GetItemDescList(itemData)
 
     -- 套装显示开关
     local hideSuitTips = (tonumber(SL:GetValue("GAME_DATA", "hideSuitTips")) or 0) == 1
@@ -2720,7 +2657,7 @@ function ItemTips.CreateItemPanel(data, itemData)
     local color = (itemData.Color and itemData.Color > 0) and itemData.Color or 255
     local name = itemData.Name or ""
     local nameStr = string.format("<font color='%s' size='%s'>%s</font>", SL:GetHexColorByStyleId(color), _nameSize, name)
-    local descList, effectList = ItemTips.GetDescList(itemData)
+    local descList, effectList = GUIFunction:GetItemDescList(itemData)
 
     local tipsParam = {
         tip_isItem      = true,                                     -- 是否物品            

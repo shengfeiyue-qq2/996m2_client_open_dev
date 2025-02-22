@@ -21,7 +21,7 @@ function HeroTitle.main()
     HeroTitle.RegistEvent()
 
     -- 请求称号列表
-    SL:RequestTitleList()
+    SL:RequestTitleList_Hero()
 
     HeroTitle.InitUI()
 
@@ -68,7 +68,7 @@ function HeroTitle.InitUI()
             data.btnType = 2
             data.callback = function(type, custom)
                 if 1 == type then
-                    SL:RequestDisboardTitle()
+                    SL:RequestDisboardTitle_Hero()
                 end
             end
             UIOperator:OpenCommonTipsUI(data)
@@ -177,9 +177,10 @@ function HeroTitle.RefTitleList(activeID)
         end
     elseif curItemsCount < count then 
         local cellPath = isPC and "hero/title_cell_win32.lua" or "hero/title_cell.lua"
-        local cellSize = isPC and {width = 278, height = 42} or {width = 348, height = 55}
-        for i = curItemsCount+1,count  do
-            local widget = GUI:Widget_Create(HeroTitle._listView, "title_cell_" .. i, 0, 0, cellSize.width, cellSize.height)
+        local cellWid = isPC and 278 or 348
+        local cellHei = isPC and 42 or 55
+        for i = curItemsCount + 1, count do
+            local widget = GUI:Widget_Create(HeroTitle._listView, "title_cell_" .. i, 0, 0, cellWid, cellHei)
             GUI:LoadExport(widget, cellPath)
 
             local ui = GUI:ui_delegate(widget)
@@ -214,7 +215,7 @@ function HeroTitle.RefTitleList(activeID)
                 data.btnType = 2
                 data.callback = function(type, custom)
                     if 1 == type then
-                        SL:RequestActivateTitle(titleId)
+                        SL:RequestActivateTitle_Hero(titleId)
                     end
                 end
                 UIOperator:OpenCommonTipsUI(data)
@@ -264,7 +265,7 @@ function HeroTitle.RefTitleList(activeID)
     end
 
     for i = 1, count do
-        local widget = GUI:ListView_getItemByIndex(HeroTitle._listView,i-1)
+        local widget = GUI:ListView_getItemByIndex(HeroTitle._listView, i - 1)
         local ui = GUI:ui_delegate(widget)
         local buttonIcon = ui.Button_icon
         GUI:setTouchEnabled(buttonIcon, false)

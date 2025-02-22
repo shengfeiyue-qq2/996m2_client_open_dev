@@ -1111,355 +1111,73 @@ function GUIFunction:GetItemAttDesc(item)
     return nil
 end
 
-function GUIFunction:OldParseItemDescType(str)
-    if str and string.len(str) > 0 then
-        local pareses = {}
-        local textIndex = nil --文字不换行, 记录pareses的文字类型下标
-        local function checkParese(pareseStr)
-            if pareseStr and string.len(pareseStr) > 0 then
-                local parese   = {}
-                local descType = 1 --文字
-
-                local newPareseArray = string.split(pareseStr, "&")
-                pareseStr = newPareseArray[1] or ""
-                local sfind, efind = string.find(pareseStr, "#")
-                local descContent = nil
-                local pareseArray = {}
-                if sfind and efind then
-                    descContent = string.sub(pareseStr, 1, efind - 1)
-
-                    local paramStr = string.sub(pareseStr, efind + 1, -1)
-                    pareseArray = string.split(paramStr or "", "|")
-                else
-                    descContent = pareseStr
-                end
-
-                parese.tag = tonumber(newPareseArray[2]) or 0 -- 0: 中间   1: 顶部   2: 底部  3: 外框顶部  4：外框底部
-                parese.frameOrder = tonumber(newPareseArray[3]) or 1 -- 0: 下层 1: 上层
-                local fStar, fEnd = string.find(pareseStr, "IMG:")
-                if fStar and fEnd then
-                    descType = 2
-                    descContent = string.sub(descContent, fEnd + 1)
-                    parese.res = string.gsub(descContent, "\\", "/")
-                end
-
-                if descType == 1 then
-                    fStar, fEnd = string.find(descContent, "TEXIAO:")
-                    if fStar and fEnd then
-                        descType = 3
-                        descContent = string.sub(descContent, fEnd + 1)
-                        parese.res = tonumber(descContent) or nil
-                        parese.isSFX = true
-                    end
-                end
-
-                if descType == 1 then
-                    if descContent == "-" then
-                        parese.newLine = true
-                    else
-                        descContent = string.gsub(descContent, "TXT:", "")
-                        parese.text = descContent
-                        local starChar = string.sub(descContent or "", 1, 1)
-                        local endChar = string.sub(descContent or "", -1, -1)
-                        if starChar ~= "<" and endChar ~= ">" then
-                            local cStart, cEnd = string.find(parese.text, "/FCOLOR")
-                            if cStart and cEnd then
-                                parese.text = "<" .. descContent .. ">"
-                            end
-                        end
-
-                        if not textIndex then
-                            textIndex = #pareses + 1
-                        end
-                    end
-                end
-
-                if descType == 1 and textIndex and pareses[textIndex] then
-                    pareses[textIndex].text = pareses[textIndex].text .. parese.text
-                else
-                    local mobileParam = string.split(pareseArray[1] or "", "#")
-                    local pcParam = string.split(pareseArray[2] or "", "#")
-                    parese.x = tonumber(mobileParam[1]) or 0
-                    parese.y = tonumber(mobileParam[2]) or 0
-                    parese.width = tonumber(mobileParam[3]) or 0
-                    parese.height = tonumber(mobileParam[4]) or 0
-
-                    if SL:GetValue("IS_PC_OPER_MODE") then
-                        parese.x = tonumber(pcParam[1]) or parese.x
-                        parese.y = tonumber(pcParam[2]) or parese.y
-                        parese.width = tonumber(pcParam[3]) or parese.width
-                        parese.height = tonumber(pcParam[4]) or parese.height
-                    end
-
-                    table.insert(pareses, parese)
-                end
-            end
-        end
-
-        local fStar, fEnd = nil, nil
-        while str do
-            fStar, fEnd = string.find(str, "%b<>")
-            if fStar and fEnd then
-                local newDes = string.sub(str, fStar + 1, fEnd - 1)
-                checkParese(newDes)
-                str = string.sub(str, fEnd + 1, -1)
-            else
-                checkParese(str)
-            end
-
-            if not fStar or not fEnd then
-                break
-            end
-        end
-
-        return pareses
+----------------- 物品自定义描述 ----------------------
+local function parseDescEffect(value)
+    local params = SL:Split(value or "", "#")
+    local effectId = tonumber(params[1])
+    if not effectId then
+        return
     end
-    return nil
+    
+    local effectTab = {}
+    effectTab.effectId = effectId
+    effectTab.type = tonumber(params[2]) or 0  -- 0:顶部 1:底部
+    effectTab.mode = tonumber(params[3]) or 1  -- 1:前面 2:后面
+    effectTab.x = tonumber(params[4]) or 0
+    effectTab.y = tonumber(params[5]) or 0
+
+    return effectTab
 end
 
-function GUIFunction:ParseItemDecsType(signStr)
-    if signStr and string.len(signStr) > 0 then
-        local pareses = {}
-        local parese = {}
-        local isParese = false
-        local fStar, fEnd = string.find(signStr, "<ID")
-
-        if fStar and fEnd then
-            isParese = true
-            signStr = string.gsub(signStr, "^<*(.-)>*$", "%1")
-        end
-
-        local descContent = nil
-        local contentArray = {}
-        local descContentArray = {}
-        if isParese then
-            local sfind, efind = string.find(signStr, "|")
-            local id = 0
-            if sfind and efind then
-                id = string.sub(signStr, 1, efind)
-                id = tonumber(string.match(id or "", "%d+"))
-                signStr = string.sub(signStr, efind + 1, -1)
-            end
-            parese.id = id or 0
-            contentArray = string.split(signStr or "", "&")
-            signStr = contentArray[1] or ""
-            sfind, efind = string.find(signStr, "#")
-            if sfind and efind then
-                descContent = string.sub(signStr, 1, efind - 1)
-
-                local paramStr = string.sub(signStr, efind + 1, -1)
-                descContentArray = string.split(paramStr or "", "|")
-            else
-                descContent = signStr
-            end
-        else
-            descContent = signStr
-        end
-
-        parese.tag = tonumber(contentArray[2]) or 0 -- 0: 中间   1: 顶部   2: 底部  3: 外框顶部  4：外框底部
-        parese.frameOrder = tonumber(contentArray[3]) or 1 -- 0: 下层 1: 上层
-        if descContent and descContent ~= "" then
-            local descType = 1 --文字
-            fStar, fEnd = string.find(descContent, "IMG:")
-            if fStar and fEnd then
-                descType = 2
-                descContent = string.sub(descContent, fEnd + 1)
-                parese.res = string.gsub(descContent, "\\", "/")
-            end
-
-            if descType == 1 then
-                fStar, fEnd = string.find(descContent, "TEXIAO:")
-                if fStar and fEnd then
-                    descType = 3
-                    descContent = string.sub(descContent, fEnd + 1)
-                    parese.res = tonumber(descContent) or nil
-                    parese.isSFX = true
-                end
-            end
-
-            --EX
-            if descType == 1 then
-                fStar, fEnd = string.find(descContent, "IMGEX:")
-                if fStar and fEnd then
-                    descType = 4
-                    descContent = string.sub(descContent, fEnd + 1)
-                    parese.res = string.gsub(descContent, "\\", "/")
-                end
-            end
-
-            if descType == 1 then
-                fStar, fEnd = string.find(descContent, "TEXIAOEX:")
-                if fStar and fEnd then
-                    descType = 5
-                    descContent = string.sub(descContent, fEnd + 1)
-                    parese.res = tonumber(descContent) or nil
-                    parese.isSFX = true
-                end
-            end
-
-            if descType == 1 then
-                fStar, fEnd = string.find(descContent, "TXTEX:")
-                if fStar and fEnd then
-                    descType = 6
-                    descContent = string.gsub(descContent, "TXTEX:", "")
-                    parese.text = descContent
-                    local starChar = string.sub(descContent or "", 1, 1)
-                    local endChar = string.sub(descContent or "", -1, -1)
-                    if starChar ~= "<" and endChar ~= ">" then
-                        local cStart, cEnd = string.find(parese.text, "/FCOLOR")
-                        if cStart and cEnd then
-                            parese.text = "<" .. descContent .. ">"
-                        end
-                    end
-                end
-            end
-            ---
-
-            if descType == 1 then
-                if descContent == "-" then
-                    parese.newLine = true
-                else
-                    descContent = string.gsub(descContent, "TXT:", "")
-                    parese.text = descContent
-                    local starChar = string.sub(descContent or "", 1, 1)
-                    local endChar = string.sub(descContent or "", -1, -1)
-                    if starChar ~= "<" and endChar ~= ">" then
-                        local cStart, cEnd = string.find(parese.text, "/FCOLOR")
-                        if cStart and cEnd then
-                            parese.text = "<" .. descContent .. ">"
-                        end
-                    end
-                end
-            end
-
-            local mobileParam = string.split(descContentArray[1] or "", "#")
-            local pcParam = string.split(descContentArray[2] or "", "#")
-            parese.x = tonumber(mobileParam[1]) or 0
-            parese.y = tonumber(mobileParam[2]) or 0
-            if descType < 4 then
-                parese.width = tonumber(mobileParam[3]) or 0
-                parese.height = tonumber(mobileParam[4]) or 0
-            else
-                parese.width = 0
-                parese.height = 0
-            end
-
-            if (descType == 4 or descType == 5) then
-                parese.scale = tonumber(mobileParam[3]) or 0
-            elseif descType == 6 then
-                parese.fontsize = tonumber(mobileParam[3]) or 0
-            end
-
-            if SL:GetValue("IS_PC_OPER_MODE") then
-                parese.x = tonumber(pcParam[1]) or parese.x
-                parese.y = tonumber(pcParam[2]) or parese.y
-                if descType < 4 then
-                    parese.width = tonumber(pcParam[3]) or parese.width
-                    parese.height = tonumber(pcParam[4]) or parese.height
-                end
-                if (descType == 4 or descType == 5) then
-                    parese.scale = tonumber(pcParam[3]) or 0
-                elseif descType == 6 then
-                    parese.fontsize = tonumber(pcParam[3]) or 0
-                end
-            end
-
-            table.insert(pareses, parese)
-        end
-        return pareses
+function GUIFunction:GetItemDescList(itemData)
+    local desc = itemData.Desc
+    local descList = {}
+    local effectList = {}
+    if not desc or string.len(desc) == 0 then
+        return nil
     end
-    return nil
-end
-
-function GUIFunction:GetParseItemDesc(desc)
-    local descs = {}
-    if desc and string.len(desc) > 0 then
-        local fStar, fEnd = nil, nil
-        local lineDesc = ""
-        while true do
-            local parseData = nil
-            fStar, fEnd = string.find(desc, "%b<>", 1)
-            local isUnfixParam = false
-            if fStar and fStar ~= 1 then
-                isUnfixParam = true
-                local paramStr = string.sub(desc, 1, fStar - 1)
-                desc = string.sub(desc, fStar, -1)
-                if string.len(paramStr) > 0 then
-                    parseData = GUIFunction:ParseItemDecsType(paramStr)
-                end
+    local function parse(desc)
+        if tonumber(desc) then
+            local config = GUIDefineEx.ItemDescConfig[tonumber(desc)]
+            if not config or not next(config) then
+                return
             end
-
-            if not isUnfixParam and fStar and fEnd then
-                lineDesc = lineDesc .. string.sub(desc, fStar, fEnd)
-                desc = string.sub(desc, fEnd + 1, -1)
-
-                local isNewParse = false
-                if string.sub(lineDesc, 1, 3) == "<ID" then
-                    isNewParse = true
-                else
-                    local font_fStar, font_fEnd = string.find(lineDesc, "<font^*(.-)>*$", 1)
-                    if font_fStar and font_fEnd then
-                        isNewParse = true
-                        lineDesc = lineDesc .. desc
-                        desc = ""
+            if config.type == 1 then
+                if config.str and string.len(config.str) > 0 then
+                    if not descList[config.group_id] then
+                        descList[config.group_id] = {}
                     end
-                end
-
-                if isNewParse then
-                    parseData = GUIFunction:ParseItemDecsType(lineDesc)
-                    lineDesc = ""
-                else
-                    if string.sub(desc, 1, 1) == "\\" or string.len(desc or "") == 0 then
-                        desc = string.sub(desc, 2, -1)
-                        parseData = GUIFunction:OldParseItemDescType(lineDesc)
-                        lineDesc = ""
-                    end
+                    table.insert(descList[config.group_id], config.str)
                 end
             else
-                if not isUnfixParam and desc and string.len(desc) > 0 then
-                    parseData = GUIFunction:ParseItemDecsType(desc)
+                local effect = parseDescEffect(config.str)
+                if effect then
+                    table.insert(effectList, effect)
                 end
-            end
-
-            if parseData then
-                for i, parseStr in ipairs(parseData) do
-                    -- 0: 中间   1: 顶部   2: 底部  3: 外框顶部  4：外框底部
-                    if parseStr.tag == 0 then
-                        if not descs.desc then
-                            descs.desc = {}
-                        end
-                        table.insert(descs.desc, parseStr)
-                    elseif parseStr.tag == 1 then
-                        if not descs.top_desc then
-                            descs.top_desc = {}
-                        end
-                        table.insert(descs.top_desc, parseStr)
-                    elseif parseStr.tag == 2 then
-                        if not descs.bottom_desc then
-                            descs.bottom_desc = {}
-                        end
-                        table.insert(descs.bottom_desc, parseStr)
-                    elseif parseStr.tag == 3 then
-                        if not descs.frame_top_desc then
-                            descs.frame_top_desc = {}
-                        end
-                        table.insert(descs.frame_top_desc, parseStr)
-                    elseif parseStr.tag == 4 then
-                        if not descs.frame_bottom_desc then
-                            descs.frame_bottom_desc = {}
-                        end
-                        table.insert(descs.frame_bottom_desc, parseStr)
-                    end
-                end
-            end
-
-            if not fStar or not fEnd then
-                break
             end
         end
     end
-    return descs
+    
+    for i, v in ipairs(SL:Split(tostring(desc), "#")) do
+        parse(v)
+    end
+
+    return descList, effectList
 end
+
+function GUIFunction:GetItemDescStrByGroup(list, groupId)
+    if not groupId or not list or not list[groupId] then
+        return
+    end
+    
+    local strList = list[groupId]
+    local str = ""
+    for i = 1, #strList do
+        str = string.format("%s%s%s", str, strList[i], i ~= #strList and "<br>" or "")
+    end
+    return str
+end
+---------------------------------------------------
 
 -- 物品是否显示拍卖行物品栏
 function GUIFunction:CheckItemIsShowAuction(itemData)

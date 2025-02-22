@@ -459,6 +459,7 @@ function HeroState.OnHeroLogin()
     GUI:setVisible(HeroState._root, true)
     HeroState.Hero_Die(false)
     HeroState.OnUpdateProperty()
+    HeroState.OnUpdateLoyal()
 
     GUI:Button_loadTextureNormal(HeroState._heroBtn, string.format("%splayer_hero/btn_loginout1.png", GUIDefine.PATH_RES_PRIVATE))
     GUI:Button_loadTexturePressed(HeroState._heroBtn,string.format("%splayer_hero/btn_loginout2.png", GUIDefine.PATH_RES_PRIVATE))

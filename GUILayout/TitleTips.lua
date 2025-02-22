@@ -65,7 +65,7 @@ function TitleTips.CreateItemPanel(data)
     local typeId = data.id
     local itemConfig = SL:GetValue("ITEM_DATA", typeId)
     local name = itemConfig.Name or ""
-    local color = (itemConfig.Color and itemConfig.Color > 0) and SL:GetValue("ITEM_NAME_COLOR_VALUE",typeId) or "#FFFFFF"
+    local color = (itemConfig.Color and itemConfig.Color > 0) and SL:GetValue("ITEM_NAME_COLOR_VALUE", typeId) or "#FFFFFF"
     
     GUI:RichText_Create(listView, "rich_text", 0, 0, name, tipsWidth, textSize, color)
 
@@ -86,7 +86,7 @@ function TitleTips.CreateItemPanel(data)
     local stringAtt = GUIFunction:GetAttDataShow(attList, nil, true)
 
     local basicAttrShow = {}
-    for id,v in pairs(stringAtt) do
+    for id, v in pairs(stringAtt) do
         v.id = id
         local originId = getAttOriginId(id)
         local attConfig = SL:GetValue("ATTR_CONFIG", originId)  
@@ -99,7 +99,7 @@ function TitleTips.CreateItemPanel(data)
     end)
 
     local str = ""
-    for _,v in pairs(basicAttrShow) do
+    for _, v in pairs(basicAttrShow) do
         local oneStr = v.name .. getAddShow(v.id) .. v.value
         local color = v.color
         if color and color > 0 then
@@ -121,40 +121,18 @@ function TitleTips.CreateItemPanel(data)
         local richText = GUI:RichText_Create(listView, "rich_desc", 0, 0, desc, width, strSize, "#FFFFFF")
     end
 
-    local function pushDescItem(desc, descTag)
-        if not desc then
-            return
-        end
-
-        if desc and next(desc) then
-            for i,v in ipairs(desc) do
-                if v.text then
-                    local textSize 
-                    if v.fontsize and v.fontsize > 0 then
-                        textSize = v.fontsize
-                    end
-                    local richText = GUI:RichTextFCOLOR_Create(listView, "desc_" .. (descTag or "") .. i, 0, 0, v.text, width, textSize or SL:GetValue("GAME_DATA", "DEFAULT_FONT_SIZE"), "#FFFFFF")
-                    GUI:setAnchorPoint(richText, 0, 0)
-                end
-            end
+    -- 道具说明
+    local itemDescList = GUIFunction:GetItemDescList(itemConfig)
+    local groupIdTab = itemDescList and table.keys(itemDescList) or {}
+    table.sort(groupIdTab)
+    for _, groupId in ipairs(groupIdTab) do
+        local descStr = GUIFunction:GetItemDescStrByGroup(itemDescList, groupId)
+        if descStr and string.len(descStr) > 0 then
+            local rich_desc = GUI:RichText_Create(listView, "rich_desc_" .. groupId, 0, 0, descStr, width, SL:GetValue("GAME_DATA", "DEFAULT_FONT_SIZE"), "#FFFFFF")
         end
     end
 
-    --道具说明
-    local itemDescs = GUIFunction:GetParseItemDesc(itemConfig.Desc)
-    local topDescs = itemDescs.top_desc
-    if topDescs then
-        pushDescItem(topDescs, "top")
-    end
-    local desc = itemDescs.desc
-    if desc then
-        pushDescItem(desc)
-    end
-    local bottomDescs = itemDescs.bottom_desc
-    if bottomDescs then
-        pushDescItem(bottomDescs, "bottom")
-    end
-    GUI:setPosition(tips,data.pos)
+    GUI:setPosition(tips, data.pos)
     TitleTips.RefreshItemPosition(tips, listView)
     local anchorPoint, pos = TitleTips.GetTipsAnchorPoint(tips, data.pos, TitleTips._data.anchorPoint or GUI:p(0,1))
     GUI:setAnchorPoint(tips, anchorPoint)
@@ -168,11 +146,11 @@ function TitleTips.GetTipsAnchorPoint(widget, pos, ancPoint)
     local screenH = SL:GetValue("SCREEN_HEIGHT")
     local outScreenX = false
     local outScreenY = false
-    if pos.y + size.height*ancPoint.y > screenH then
+    if pos.y + size.height * ancPoint.y > screenH then
         ancPoint.y = 1
         outScreenY = true
     end
-    if pos.y - size.height*ancPoint.y < 0 then
+    if pos.y - size.height * ancPoint.y < 0 then
         if outScreenY then
             ancPoint.y = 0.5
             pos.y = screenH / 2
@@ -181,11 +159,11 @@ function TitleTips.GetTipsAnchorPoint(widget, pos, ancPoint)
         end
     end
     
-    if pos.x + size.width*(1-ancPoint.x) > screenW then
+    if pos.x + size.width * (1 - ancPoint.x) > screenW then
         ancPoint.x = 1
         outScreenX = true
     end
-    if pos.x - size.width*ancPoint.x < 0 then
+    if pos.x - size.width * ancPoint.x < 0 then
         if outScreenX then
             ancPoint.x = 0.5
             pos.x = screenW / 2
@@ -201,12 +179,12 @@ function TitleTips.RefreshItemPosition(tips, listView)
     local listHeight = GUI:ListView_getInnerContainerSize(listView).height
     local listWidth = 420
     local maxWidth = 0
-    for _,v in pairs(GUI:getChildren(listView)) do
+    for _, v in ipairs(GUI:getChildren(listView)) do
         maxWidth = math.max(maxWidth, GUI:getContentSize(v).width)
     end
     listWidth = math.min(listWidth, maxWidth)
 
-    GUI:setContentSize(listView,listWidth, listHeight)
+    GUI:setContentSize(listView, listWidth, listHeight)
     
     GUI:setContentSize(tips, listWidth + 20, listHeight + 20)
 end
