@@ -5,29 +5,29 @@ local SharedInputLaunchData = {}
 function RobotAuto.main()
     RobotAuto._items                 = {}
     RobotAuto._cdingTime             = {}
-
-    RobotAuto._cdingTime[51]         = 0
-
+    
     RobotAuto._launchTime            = 0
     RobotAuto._trainingTime          = 0
-
+    
     RobotAuto._spellScopeShowHide    = 0
-
+    
+    RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR] = 0
+    
     RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_HP_PROTECT1] = 0
     RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_HP_PROTECT2] = 0
     RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_HP_PROTECT3] = 0
     RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_HP_PROTECT4] = 0
-
+    
     RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_MP_PROTECT1] = 0
     RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_MP_PROTECT2] = 0
     RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_MP_PROTECT3] = 0
     RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_MP_PROTECT4] = 0
-
+    
     RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_PK_PROTECT] = 0
     RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_BESIEGE_FLEE] = 0
     RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_RED_BESIEGE_FLEE] = 0
     RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_ENEMY_ATTACK] = 0
-
+    
     SL:RegisterLUAEvent(LUA_EVENT_ROLE_PROPERTY_INITED, "RobotAuto", RobotAuto.Init)
     SL:RegisterLUAEvent(LUA_EVENT_BAG_ITEM_CHANGE,      "RobotAuto", RobotAuto.OnBagOperData)
     SL:RegisterLUAEvent(LUA_EVENT_QUICKUSE_DATA_OPER,   "RobotAuto", RobotAuto.OnQuickUseItemRmv)
@@ -62,7 +62,7 @@ end
 function RobotAuto.Init()
     RobotAuto.TimerBegan()
     -- 药品
-    RobotAuto._items[51] = SL:GetValue("GAME_DATA", "fixItemDrug")
+    RobotAuto._items[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR] = SL:GetValue("GAME_DATA", "fixItemDrug")
 end
 
 function RobotAuto.OnSpellScopeShowHide(type)
@@ -129,7 +129,7 @@ function RobotAuto.Tick(delta)
         --红名保护 
         RobotAuto.AutoPkProtect(delta)
         -- 逃脱保护   
-        RobotAuto.AutoBesiegeprotect(delta)
+        RobotAuto.AutoBesiegeProtect(delta)
         --主动攻击敌人
         RobotAuto.SelectEnemy(delta)
     end
@@ -249,7 +249,7 @@ function RobotAuto.SelectEnemy(delta)
     end
 end
 
-function RobotAuto.AutoBesiegeprotect(delta)
+function RobotAuto.AutoBesiegeProtect(delta)
     if SL:GetValue("MAP_IS_IN_SAFE_AREA") then
         return nil
     end
@@ -512,47 +512,46 @@ end
 
 -------------------------------------------------------
 -- 修复神水
+local function isInvalidEquip(item)
+    -- 祝福罐
+    if item.StdMode == 96 then
+        return true
+    end
+    -- 护身符
+    if item.StdMode == 25 then
+        return true
+    end
+
+    -- 气血石
+    if item.StdMode == 7 and item.Shape == 1 then
+        return true
+    end
+    -- 幻魔石
+    if item.StdMode == 7 and item.Shape == 2 then
+        return true
+    end
+    -- 魔血石
+    if item.StdMode == 7 and item.Shape == 3 then
+        return true
+    end
+end
+local checkFixArticleType = {[GUIDefine.ItemArticleType.TYPE_FIX] = true}
+
 function RobotAuto.AutoUseFIXItem(delta)
     if SL:GetValue("USER_IS_DIE") then
         return nil
     end
 
-    local function isInvalidEquip(item)
-        -- 祝福罐
-        if item.StdMode == 96 then
-            return true
-        end
-        -- 护身符
-        if item.StdMode == 25 then
-            return true
-        end
-
-        -- 气血石
-        if item.StdMode == 7 and item.Shape == 1 then
-            return true
-        end
-        -- 幻魔石
-        if item.StdMode == 7 and item.Shape == 2 then
-            return true
-        end
-        -- 魔血石
-        if item.StdMode == 7 and item.Shape == 3 then
-            return true
-        end
-    end
-
     -- cding
-    RobotAuto._cdingTime[51]    = RobotAuto._cdingTime[51] - delta
-    if RobotAuto._cdingTime[51] <= 0 then
-        if SL:GetValue("SETTING_ENABLED", 51) == 1 then
+    RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR] = RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR] - delta
+    if RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR] <= 0 then
+        if SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR) == 1 then
             -- 是否有损坏的装备
             local found             = false
             local equipData         = EquipData.GetEquipData()
-            local articleType       = GUIDefine.ItemArticleType
-            local checkArticleType  = {[articleType.TYPE_FIX] = true}
             for _, equip in pairs(equipData) do
                 if equip.Dura < 1000 and not isInvalidEquip(equip) then
-                    if not SL:GetValue("ITEM_ARTICLE", equip.Index, checkArticleType) then
+                    if not SL:GetValue("ITEM_ARTICLE", equip.Index, checkFixArticleType) then
                         local fixValue = equip.Bind or 0
                         found = not SL:CheckBit(fixValue, 3) --是否已经修复过了
                         if found then 
@@ -564,10 +563,10 @@ function RobotAuto.AutoUseFIXItem(delta)
 
             -- 是否有
             if found then
-                local items         = RobotAuto._items[51]
+                local items         = RobotAuto._items[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR]
                 local result        = RobotAuto.AutoUseItem(items)
                 local cdtime        = SL:GetValue("SERVER_OPTION", SW_KEY_EAT_ITEM_SPEED) or 1000
-                RobotAuto._cdingTime[51] = cdtime / 1000
+                RobotAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR] = cdtime / 1000
             end
         end
     end
@@ -604,7 +603,7 @@ end
 -------------------------------------------------------
 -- 自动练功
 function RobotAuto.AutoTraining(delta)
-    local value = SL:GetValue("SETTING_VALUE", 38)
+    local value = SL:GetValue("SETTING_VALUE", SLDefine.SETTINGID.SETTING_IDX_AUTO_LAUNCH)
     if not value[1] or value[1] == 0 then
         return false
     end

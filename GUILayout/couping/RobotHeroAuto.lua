@@ -4,34 +4,29 @@ function RobotHeroAuto.main()
     RobotHeroAuto._items                 = {}
     RobotHeroAuto._cdingTime             = {}
 
-    RobotHeroAuto._cdingTime[51]         = 0
-
     RobotHeroAuto._launchTime            = 0
     RobotHeroAuto._trainingTime          = 0
     RobotHeroAuto._loginHeroDelayTime    = 1--召唤英雄的间隔
     RobotHeroAuto._loginHeroTime         = 0
-
+    
     RobotHeroAuto._loginOutHeroDelayTime = 1--收回英雄的间隔
     RobotHeroAuto._loginOutHeroTime      = 0
     
-    RobotHeroAuto._cantips       = {}
-    RobotHeroAuto._cantips[3004] = true
-    RobotHeroAuto._cantips[3005] = true
-    RobotHeroAuto._cantips[3006] = true
-
     RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_HERO_HP_PROTECT1] = 0
     RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_HERO_HP_PROTECT2] = 0
     RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_HERO_HP_PROTECT3] = 0
     RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_HERO_HP_PROTECT4] = 0
-
+    
     RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_HERO_MP_PROTECT1] = 0
     RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_HERO_MP_PROTECT2] = 0
     RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_HERO_MP_PROTECT3] = 0
     RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_HERO_MP_PROTECT4] = 0
-
+    
+    RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR] = 0
+    
     SL:RegisterLUAEvent(LUA_EVENT_ROLE_PROPERTY_INITED, "RobotHeroAuto", RobotHeroAuto.Init)
     SL:RegisterLUAEvent(LUA_EVENT_BAG_ITEM_CHANGE,      "RobotHeroAuto", RobotHeroAuto.OnBagOperData)
-    SL:RegisterLUAEvent(LUA_EVENT_HERO_HPMP_CHANGE,      "RobotHeroAuto", RobotHeroAuto.OnHeroBeAttacked)
+    SL:RegisterLUAEvent(LUA_EVENT_HERO_HPMP_CHANGE,     "RobotHeroAuto", RobotHeroAuto.OnHeroBeAttacked)
 end
 
 function RobotHeroAuto.OnHeroBeAttacked()
@@ -42,7 +37,7 @@ function RobotHeroAuto.OnHeroBeAttacked()
     if not SL:GetValue("HERO_IS_ALIVE") then
         return
     end
-    local value =  SL:GetValue("SETTING_VALUE", SLDefine.SETTINGID.SETTING_IDX_HERO_AUTO_LOGINOUT)
+    local value = SL:GetValue("SETTING_VALUE", SLDefine.SETTINGID.SETTING_IDX_HERO_AUTO_LOGINOUT)
     local enable = value[1] == 1
     if not enable then
         return
@@ -52,8 +47,8 @@ function RobotHeroAuto.OnHeroBeAttacked()
         return
     end
 
-    local per   = (value[2] or 50)/100
-    local curHp = SL:GetValue("HP") or 1
+    local per   = (value[2] or 50) / 100
+    local curHp = SL:GetValue("H.HP") or 1
     local maxHp = SL:GetValue("H.MAXHP") or 1
     local percent = curHp / maxHp
     if RobotHeroAuto._loginOutHeroTime >= RobotHeroAuto._loginOutHeroDelayTime and percent < per and percent >= 0 then
@@ -70,7 +65,7 @@ end
 
 function RobotHeroAuto.Init()
     -- 药品
-    RobotHeroAuto._items[51] = SL:GetValue("GAME_DATA","fixItemDrug")
+    RobotHeroAuto._items[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR] = SL:GetValue("GAME_DATA", "fixItemDrug")
     RobotHeroAuto.TimerBegan()
 end
 
@@ -263,6 +258,30 @@ function RobotHeroAuto.AutoLogin(delay)
 end
 -----------------------
 -- 修复神水
+local function isInvalidEquip(item)
+    -- 祝福罐
+    if item.StdMode == 96 then
+        return true
+    end
+    -- 护身符
+    if item.StdMode == 25 then
+        return true
+    end
+    -- 气血石
+    if item.StdMode == 7 and item.Shape == 1 then
+        return true
+    end
+    -- 幻魔石
+    if item.StdMode == 7 and item.Shape == 2 then
+        return true
+    end
+    -- 魔血石
+    if item.StdMode == 7 and item.Shape == 3 then
+        return true
+    end
+end
+local checkFixArticleType = {[GUIDefine.ItemArticleType.TYPE_FIX] = true}
+
 function RobotHeroAuto.AutoUseFIXItem(delta)
     if SL:GetValue("USER_IS_DIE") then
         return nil
@@ -273,40 +292,16 @@ function RobotHeroAuto.AutoUseFIXItem(delta)
     if  not SL:GetValue("HERO_IS_ALIVE") then
         return
     end
-    local function isInvalidEquip(item)
-        -- 祝福罐
-        if item.StdMode == 96 then
-            return true
-        end
-        -- 护身符
-        if item.StdMode == 25 then
-            return true
-        end
-        -- 气血石
-        if item.StdMode == 7 and item.Shape == 1 then
-            return true
-        end
-        -- 幻魔石
-        if item.StdMode == 7 and item.Shape == 2 then
-            return true
-        end
-        -- 魔血石
-        if item.StdMode == 7 and item.Shape == 3 then
-            return true
-        end
-    end
     -- cding
-    RobotHeroAuto._cdingTime[51] = RobotHeroAuto._cdingTime[51] - delta
-    if RobotHeroAuto._cdingTime[51] <= 0 then
-        if SL:GetValue("SETTING_ENABLED", 51) == 1 then
+    RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR] = RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR] - delta
+    if RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR] <= 0 then
+        if SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR) == 1 then
             -- 是否有损坏的装备
             local found             = false
             local equipData         = HeroEquipData.GetEquipData()
-            local articleType       = GUIDefine.ItemArticleType
-            local checkArticleType  = {[articleType.TYPE_FIX] = true}
             for _, equip in pairs(equipData) do
                 if equip.Dura < 1000 and not isInvalidEquip(equip) then
-                    if not SL:GetValue("ITEM_ARTICLE", equip.Index, checkArticleType) then
+                    if not SL:GetValue("ITEM_ARTICLE", equip.Index, checkFixArticleType) then
                         local fixValue = equip.Bind or 0
                         found = not SL:CheckBit(fixValue, 3) --是否已经修复过了
                         if found then 
@@ -318,10 +313,10 @@ function RobotHeroAuto.AutoUseFIXItem(delta)
     
             -- 是否有
             if found then
-                local items         = RobotHeroAuto._items[51]
+                local items         = RobotHeroAuto._items[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR]
                 local result        = RobotHeroAuto.AutoUseItem(items)
                 local cdtime        = SL:GetValue("SERVER_OPTION", SW_KEY_EAT_ITEM_SPEED) or 1000
-                RobotHeroAuto._cdingTime[51] = cdtime/1000
+                RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR] = cdtime / 1000
             end
         end
     end
@@ -389,47 +384,6 @@ function RobotHeroAuto.AutoUseItem(items, isHpProtect)
     end
     return false
 end
-
-function RobotHeroAuto.CheckGoodItems(id)
-    local value     = SL:GetValue("SETTING_VALUE", id)
-    local enable    = value[1] == 1
-    if id == 3005 and not enable then
-        value     = SL:GetValue("SETTING_VALUE", 3007)
-        enable    = value[1] == 1
-    end
-    local have = RobotHeroAuto.CheckItem(RobotHeroAuto._items[id])
-    return enable,have
-end
-
-function RobotHeroAuto.CheckItem(items)---检测有没有
-    for _, itemIndex in ipairs(items) do
-        local unpack = SL:UnpackDrugByIndexHero(itemIndex, false, true)
-        if unpack then
-            return true
-        end
-        local item = RobotHeroAuto.FindItemByIndex_Hero(itemIndex)
-        if item then
-            return true
-        end
-    end
-    return false
-end
--------------------------------------------------------
-
-function RobotHeroAuto.CheckAndTipsGoodItems(id)
-    if not RobotHeroAuto._cantips[id] then
-        return
-    end
-    function getString(itemName)
-        local name = SL:GetValue("H.USERNAME")
-        return  string.format("英雄[%s]的%s已经用完!",name,itemName)
-    end
-    local enable,have = RobotHeroAuto.CheckGoodItems(id)
-    if not have then 
-        SL:ShowSystemTips(getString(SL:GetValue("I18N_STRING", 600000251+id-3004)))
-        RobotHeroAuto._cantips[id] = false
-    end
-end
 -------------------------------------------------------
 
 -------------------------------------------------------
@@ -446,22 +400,22 @@ function RobotHeroAuto.AutoLaunch(delta)
         return
     end
 
-    local TargetID = SL:GetValue("SELECT_TARGET_ID")
-    if not TargetID then
+    local targetID = SL:GetValue("SELECT_TARGET_ID")
+    if not targetID then
         return nil
     end
 
-    if not SL:GetValue("ACTOR_IS_VALID", TargetID) then
+    if not SL:GetValue("ACTOR_IS_VALID", targetID) then
         return
     end
 
     if SL:GetValue("MAP_IS_IN_SAFE_AREA")
-    and (not SL:GetValue("ACTOR_IS_MONSTER", TargetID) and not SL:GetValue("ACTOR_IS_HUMAN", TargetID))
+    and (not SL:GetValue("ACTOR_IS_MONSTER", targetID) and not SL:GetValue("ACTOR_IS_HUMAN", targetID))
     then --安全区不打人 可以打怪
         return nil
     end
     
-    if not SL:GetValue("TARGET_ATTACK_ENABLE", TargetID) then
+    if not SL:GetValue("TARGET_ATTACK_ENABLE", targetID) then
         return nil
     end
 

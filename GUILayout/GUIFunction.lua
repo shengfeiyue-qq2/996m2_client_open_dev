@@ -3430,3 +3430,35 @@ function GUIFunction:CheckAutoMining()
 end
 
 -------------------------------------------------------------------------
+-- 新建条件红点控件
+local conditionRedID = 0
+function GUIFunction:InitConditionRedWidget(parent, conditionStr, isTxt)
+    if not parent then
+        return
+    end
+    if not conditionStr or string.len(tostring(conditionStr)) <= 0 then
+        return
+    end
+    local conditionList = SL:Split(conditionStr, "#")
+    local conditionID = tonumber(conditionList[1])
+    if not conditionID then
+        return
+    end
+    local x = tonumber(conditionList[2]) or 0
+    local y = tonumber(conditionList[3]) or 0
+    local type = tonumber(conditionList[4]) or 0
+    local param = conditionList[5]
+    if isTxt then
+        local parentSize = GUI:getContentSize(parent)
+        y = parentSize.height - y
+    end
+
+    conditionRedID = conditionRedID + 1
+    local name = type == 0 and string.format("red_img_%s", conditionRedID) or string.format("red_sfx_%s", conditionRedID)
+    local widget = GUI:RedDot_Create(parent, name, x, y, type, param)
+    if widget then
+        GUI:RedDot_setGID(widget, conditionRedID)
+        GUI:RedDot_setBindConditionID(widget, conditionID)
+    end
+end
+-------------------------------------------

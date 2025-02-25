@@ -75,6 +75,8 @@ function PlayerSuperEquip_Look_TradingBank.main()
     PlayerSuperEquip_Look_TradingBank._hairID = GUIFunction:GetRoleHair(GUIDefine.RoleUIType.TRADE_PLAYER)
     -- 性别
     PlayerSuperEquip_Look_TradingBank._sex = GUIFunction:GetRoleSex(GUIDefine.RoleUIType.TRADE_PLAYER)
+    -- 职业
+    PlayerSuperEquip_Look_TradingBank._job = GUIFunction:GetRoleJob(GUIDefine.RoleUIType.TRADE_PLAYER)
 
     -- 额外装备位
     PlayerSuperEquip_Look_TradingBank.InitEquipCells()
@@ -229,9 +231,6 @@ function PlayerSuperEquip_Look_TradingBank.GetLooks(pos)
     -- 通过唯一ID MakeIndex 获取装备数据
     if pos == EquipPosCfg.Equip_Type_Super_Dress and equipData and PlayerSuperEquip_Look_TradingBank._feature.showNodeModel and equipData.zblmtkz and tonumber(equipData.zblmtkz) == 1 then -- zblmtkz == 1 不显示裸模, 表配置字段
         PlayerSuperEquip_Look_TradingBank._feature.showNodeModel = false
-    end
-
-    if pos == EquipPosCfg.Equip_Type_Super_Cap and equipData.AniCount == 0 then
         PlayerSuperEquip_Look_TradingBank._feature.showHair = false
     end
 
@@ -266,6 +265,7 @@ function PlayerSuperEquip_Look_TradingBank.UpdateModelFeatureData()
     }
 
     PlayerSuperEquip_Look_TradingBank._feature.showNodeModel = tonumber(SL:GetValue("GAME_DATA", "Fashionfx") or 0) ~= 1
+    PlayerSuperEquip_Look_TradingBank._feature.showHair = PlayerSuperEquip_Look_TradingBank._feature.showNodeModel
 
     SetFeature(EquipPosCfg.Equip_Type_Super_Dress,  PlayerSuperEquip_Look_TradingBank.GetLooks(EquipPosCfg.Equip_Type_Super_Dress))
     SetFeature(EquipPosCfg.Equip_Type_Super_Helmet, PlayerSuperEquip_Look_TradingBank.GetLooks(EquipPosCfg.Equip_Type_Super_Helmet))
@@ -341,7 +341,7 @@ end
 function PlayerSuperEquip_Look_TradingBank.CreateUIModel()
     local NodeModel = PlayerSuperEquip_Look_TradingBank._ui["Node_playerModel"]
     GUI:removeAllChildren(NodeModel)
-    GUI:UIModel_Create(NodeModel, "Model", 0, 0, PlayerSuperEquip_Look_TradingBank._sex, PlayerSuperEquip_Look_TradingBank._feature, nil, {showHelmet = PlayerSuperEquip_Look_TradingBank._feature.showHair})
+    GUI:UIModel_Create(NodeModel, "Model", 0, 0, PlayerSuperEquip_Look_TradingBank._sex, PlayerSuperEquip_Look_TradingBank._feature, nil, true, PlayerSuperEquip_Look_TradingBank._job)
 end
 
 function PlayerSuperEquip_Look_TradingBank.OnClose()

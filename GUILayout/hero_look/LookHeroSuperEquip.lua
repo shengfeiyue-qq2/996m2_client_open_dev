@@ -79,6 +79,8 @@ function LookHeroSuperEquip.main()
     LookHeroSuperEquip._hairID = GUIFunction:GetRoleHair(GUIDefine.RoleUIType.HERO_OTHER)
     -- 性别
     LookHeroSuperEquip._sex = GUIFunction:GetRoleSex(GUIDefine.RoleUIType.HERO_OTHER)
+    -- 职业
+    LookHeroSuperEquip._job = GUIFunction:GetRoleJob(GUIDefine.RoleUIType.HERO_OTHER)
 
     -- 额外装备位
     LookHeroSuperEquip.InitEquipCells()
@@ -242,9 +244,6 @@ function LookHeroSuperEquip.GetLooks(pos)
     -- 通过唯一ID MakeIndex 获取装备数据
     if pos == EquipPosCfg.Equip_Type_Super_Dress and equipData and LookHeroSuperEquip._feature.showNodeModel and equipData.zblmtkz and tonumber(equipData.zblmtkz) == 1 then -- zblmtkz == 1 不显示裸模, 表配置字段
         LookHeroSuperEquip._feature.showNodeModel = false
-    end
-
-    if pos == EquipPosCfg.Equip_Type_Super_Cap and equipData.AniCount == 0 then
         LookHeroSuperEquip._feature.showHair = false
     end
 
@@ -279,6 +278,7 @@ function LookHeroSuperEquip.UpdateModelFeatureData()
     }
 
     LookHeroSuperEquip._feature.showNodeModel = tonumber(SL:GetValue("GAME_DATA", "Fashionfx") or 0) ~= 1
+    LookHeroSuperEquip._feature.showHair = LookHeroSuperEquip._feature.showNodeModel
 
     SetFeature(EquipPosCfg.Equip_Type_Super_Dress,  LookHeroSuperEquip.GetLooks(EquipPosCfg.Equip_Type_Super_Dress))
     SetFeature(EquipPosCfg.Equip_Type_Super_Helmet, LookHeroSuperEquip.GetLooks(EquipPosCfg.Equip_Type_Super_Helmet))
@@ -362,7 +362,7 @@ end
 function LookHeroSuperEquip.CreateUIModel()
     local NodeModel = LookHeroSuperEquip._ui["Node_playerModel"]
     GUI:removeAllChildren(NodeModel)
-    GUI:UIModel_Create(NodeModel, "Model", 0, 0, LookHeroSuperEquip._sex, LookHeroSuperEquip._feature, nil, {showHelmet = LookHeroSuperEquip._feature.showHair})
+    GUI:UIModel_Create(NodeModel, "Model", 0, 0, LookHeroSuperEquip._sex, LookHeroSuperEquip._feature, nil, true, LookHeroSuperEquip._job)
 end
 
 LookHeroSuperEquip.main()

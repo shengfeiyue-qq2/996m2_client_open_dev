@@ -19,7 +19,8 @@ LookPlayerEquip._feature = {
     embattlesID     = nil,      -- 光环
 
     showNodeModel   = true,     -- 裸模
-    showHair        = true      -- 头发
+    showHair        = true,     -- 头发
+    showHelmet      = false
 }
 
 local Typefunc = {
@@ -295,10 +296,11 @@ function LookPlayerEquip.GetLooks(pos)
 
     if pos == EquipPosCfg.Equip_Type_Dress and equipData and equipData.zblmtkz and tonumber(equipData.zblmtkz) == 1 then -- zblmtkz == 1 不显示裸模, 表配置字段
         LookPlayerEquip._feature.showNodeModel = false
+        LookPlayerEquip._feature.showHair = false
     end
 
     if pos == EquipPosCfg.Equip_Type_Cap and equipData.AniCount == 0 then
-        LookPlayerEquip._feature.showHair = false
+        LookPlayerEquip._feature.showHelmet = true
     end
 
     if equipData then
@@ -329,7 +331,8 @@ function LookPlayerEquip.UpdateModelFeatureData()
         embattlesID     = nil,      -- 光环
 
         showNodeModel   = true,     -- 裸模
-        showHair        = true      -- 头发
+        showHair        = true,     -- 头发
+        showHelmet      = false
     }
 
     SetFeature(EquipPosCfg.Equip_Type_Dress,  LookPlayerEquip.GetLooks(EquipPosCfg.Equip_Type_Dress))
@@ -449,7 +452,7 @@ end
 function LookPlayerEquip.CreateUIModel()
     local NodeModel = LookPlayerEquip._ui["Node_playerModel"]
     GUI:removeAllChildren(NodeModel)
-    GUI:UIModel_Create(NodeModel, "Model", 0, 0, LookPlayerEquip._sex, LookPlayerEquip._feature, nil, {showHelmet = LookPlayerEquip._feature.showHair})
+    GUI:UIModel_Create(NodeModel, "Model", 0, 0, LookPlayerEquip._sex, LookPlayerEquip._feature, nil, true, SL:GetValue("L.M.JOB"))
 end
 
 LookPlayerEquip.main()

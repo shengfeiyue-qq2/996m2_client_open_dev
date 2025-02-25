@@ -75,6 +75,8 @@ function HeroSuperEquip_Look_TradingBank.main()
     HeroSuperEquip_Look_TradingBank._hairID = GUIFunction:GetRoleHair(GUIDefine.RoleUIType.TRADE_HERO)
     -- 性别
     HeroSuperEquip_Look_TradingBank._sex = GUIFunction:GetRoleSex(GUIDefine.RoleUIType.TRADE_HERO)
+    -- 职业
+    HeroSuperEquip_Look_TradingBank._job = GUIFunction:GetRoleJob(GUIDefine.RoleUIType.TRADE_HERO)
 
     -- 额外装备位
     HeroSuperEquip_Look_TradingBank.InitEquipCells()
@@ -229,9 +231,6 @@ function HeroSuperEquip_Look_TradingBank.GetLooks(pos)
     -- 通过唯一ID MakeIndex 获取装备数据
     if pos == EquipPosCfg.Equip_Type_Super_Dress and equipData and HeroSuperEquip_Look_TradingBank._feature.showNodeModel and equipData.zblmtkz and tonumber(equipData.zblmtkz) == 1 then -- zblmtkz == 1 不显示裸模, 表配置字段
         HeroSuperEquip_Look_TradingBank._feature.showNodeModel = false
-    end
-
-    if pos == EquipPosCfg.Equip_Type_Super_Cap and equipData.AniCount == 0 then
         HeroSuperEquip_Look_TradingBank._feature.showHair = false
     end
 
@@ -266,6 +265,7 @@ function HeroSuperEquip_Look_TradingBank.UpdateModelFeatureData()
     }
 
     HeroSuperEquip_Look_TradingBank._feature.showNodeModel = tonumber(SL:GetValue("GAME_DATA", "Fashionfx") or 0) ~= 1
+    HeroSuperEquip_Look_TradingBank._feature.showHair = HeroSuperEquip_Look_TradingBank._feature.showNodeModel
 
     SetFeature(EquipPosCfg.Equip_Type_Super_Dress,  HeroSuperEquip_Look_TradingBank.GetLooks(EquipPosCfg.Equip_Type_Super_Dress))
     SetFeature(EquipPosCfg.Equip_Type_Super_Helmet, HeroSuperEquip_Look_TradingBank.GetLooks(EquipPosCfg.Equip_Type_Super_Helmet))
@@ -341,7 +341,7 @@ end
 function HeroSuperEquip_Look_TradingBank.CreateUIModel()
     local NodeModel = HeroSuperEquip_Look_TradingBank._ui["Node_playerModel"]
     GUI:removeAllChildren(NodeModel)
-    GUI:UIModel_Create(NodeModel, "Model", 0, 0, HeroSuperEquip_Look_TradingBank._sex, HeroSuperEquip_Look_TradingBank._feature, nil, {showHelmet = HeroSuperEquip_Look_TradingBank._feature.showHair})
+    GUI:UIModel_Create(NodeModel, "Model", 0, 0, HeroSuperEquip_Look_TradingBank._sex, HeroSuperEquip_Look_TradingBank._feature, nil, true, HeroSuperEquip_Look_TradingBank._job)
 end
 
 function HeroSuperEquip_Look_TradingBank.OnClose()

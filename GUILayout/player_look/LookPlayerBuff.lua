@@ -172,8 +172,10 @@ function LookPlayerBuff.OnUpdateBuff(data)
 
     if not LookPlayerBuff.IsAutoSortBuff(data) then
         local cell = LookPlayerBuff._qCells[data.buffID]
-        GUI:QuickCell_Exit(LookPlayerBuff._qCells[data.buffID])
-        GUI:QuickCell_Refresh(LookPlayerBuff._qCells[data.buffID])
+        if cell then
+            GUI:QuickCell_Exit(cell)
+            GUI:QuickCell_Refresh(cell)
+        end
         return
     end
     

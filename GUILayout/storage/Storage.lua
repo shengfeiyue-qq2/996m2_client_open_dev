@@ -31,7 +31,7 @@ function Storage.main()
 
     Storage._ui = GUI:ui_delegate(parent)
     Storage._openedCount = SL:GetValue("STROAGE_OPEN_SIZE")
-    Storage._PerPageNum = Storage._PerPageNum or SLDefine.NPC_STORAGE_MAX_PAGE
+    Storage._PerPageNum = Storage._PerPageNum or GUIDefine.STORAGE_PER_PAGE_MAX
 
     local screenH = SL:GetValue("SCREEN_HEIGHT")
     local pSizeH = GUI:getContentSize(Storage._ui["Panel_1"]).height
@@ -44,7 +44,7 @@ function Storage.main()
 
     local storage_row_col = SL:GetValue("GAME_DATA", "bag_storage_row_col_max")
     if isWinMode and storage_row_col then
-        local slices = string.split(storage_row_col, "|")
+        local slices = SL:Split(storage_row_col, "|")
         Storage._PerRowItemNum = tonumber(slices[1]) or 8
         Storage._PerColItemNum = tonumber(slices[2]) or 6
         Storage._PerPageNum = Storage._PerRowItemNum * Storage._PerColItemNum
@@ -226,10 +226,10 @@ function Storage.UpdateItemList(page)
     local storage_row_col = SL:GetValue("GAME_DATA", "bag_storage_row_col_max")
     local bBig = false -- 是否大仓库
     if isWinMode and storage_row_col then
-        local slices = string.split(storage_row_col, "|")
+        local slices = SL:Split(storage_row_col, "|")
         local row = tonumber(slices[1]) or 8
         local col = tonumber(slices[2]) or 6
-        if row * col > SLDefine.NPC_STORAGE_MAX_PAGE then
+        if row * col > GUIDefine.STORAGE_PER_PAGE_MAX then
             bBig = true
         end
     end

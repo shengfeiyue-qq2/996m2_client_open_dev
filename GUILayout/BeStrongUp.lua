@@ -1,5 +1,9 @@
 BeStrongUp = {}
 
+BeStrongUp._btnPosNormal = SL:GetValue("IS_PC_OPER_MODE") and {x = -300, y = 400} or {x = -300, y = 300}
+BeStrongUp._btnPosPetAlive = SL:GetValue("IS_PC_OPER_MODE") and {x = -370, y = 400} or {x = -370, y = 300}
+BeStrongUp._defaultBtnSize = {width = 120, height = 40}
+
 BeStrongUpInfo = BeStrongUpInfo or {}
 function BeStrongUp.main()
     if not BeStrongUpInfo._layer then
@@ -15,7 +19,7 @@ function BeStrongUp.InitUI()
     BeStrongUpInfo._ui = GUI:ui_delegate(BeStrongUpInfo._parent)
     BeStrongUpInfo._layer = BeStrongUpInfo._ui.Node
 
-    GUI:addOnClickEvent(BeStrongUpInfo._ui["Button_up"], function ()
+    GUI:addOnClickEvent(BeStrongUpInfo._ui["Button_up"], function()
         local panelBg = BeStrongUpInfo._ui["Panel_bg"]
         local isShow = GUI:getVisible(panelBg)
         GUI:setVisible(panelBg, not isShow)
@@ -31,28 +35,17 @@ end
 
 -- 提升按钮位置
 function BeStrongUp.ShowBtnAction()
-    local btn_up =  BeStrongUpInfo._ui["Button_up"]
+    local btn_up = BeStrongUpInfo._ui["Button_up"]
     local action = GUI:ActionRepeatForever(GUI:ActionSequence(GUI:ActionFadeTo(0.4, 125), GUI:ActionFadeTo(0.4, 255), GUI:DelayTime(0.6)))
     GUI:runAction(btn_up, action)
 end 
 
 -- 提升按钮位置刷新
 function BeStrongUp.RefreshBtnPos()
-    local posBtn = nil 
-    local posBg = nil
     local isAlived = SL:GetValue("PET_ALIVE")
-    local isWinMode = SL:GetValue("IS_PC_OPER_MODE")
-
-    if isAlived then 
-        posBtn = isWinMode and {x = -370, y = 400} or {x = -370, y = 300}
-        posBg = isWinMode and {x = -370 - 65, y = 400 + 30} or {x = -370 - 65, y = 300 + 30}     
-    else 
-        posBtn = isWinMode and {x = -300, y = 400} or {x = -300, y = 300}
-        posBg = isWinMode and {x = -300 - 65, y = 400 + 30} or {x = -300 - 65, y = 300 + 30}
-    end 
-
+    local posBtn = isAlived and BeStrongUp._btnPosPetAlive or BeStrongUp._btnPosNormal
     GUI:setPosition(BeStrongUpInfo._ui["Button_up"], posBtn.x, posBtn.y)
-    GUI:setPosition(BeStrongUpInfo._ui["Panel_bg"], posBg.x, posBg.y)
+    GUI:setPosition(BeStrongUpInfo._ui["Panel_bg"], posBtn.x - 65, posBtn.y + 30)
 end
 
 function BeStrongUp.CreateCellBtn(i, data)
@@ -97,7 +90,7 @@ function BeStrongUp.RefreshBeStrongList()
     end
 
     local count = GUI:ListView_getItemCount(listview)
-    local btnSize = btnSize or {width = 120, height = 40}
+    local btnSize = btnSize or BeStrongUp._defaultBtnSize
     local bgSize = GUI:getContentSize(panel)
     local listSize = GUI:getContentSize(listview)
     local margin = GUI:ListView_getItemsMargin(listview)

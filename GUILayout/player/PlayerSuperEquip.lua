@@ -85,6 +85,7 @@ function PlayerSuperEquip.main()
 
     -- 是否显示裸模 0开启  1关闭
     PlayerSuperEquip._feature.showNodeModel = tonumber(SL:GetValue("GAME_DATA", "Fashionfx") or 0) ~= 1
+    PlayerSuperEquip._feature.showHair = PlayerSuperEquip._feature.showNodeModel
 
     -- 注册事件
     PlayerSuperEquip.RegistEvent()
@@ -385,9 +386,6 @@ function PlayerSuperEquip.GetLooks(pos)
 
     if pos == EquipPosCfg.Equip_Type_Super_Dress and equipData and PlayerSuperEquip._feature.showNodeModel and equipData.zblmtkz and tonumber(equipData.zblmtkz) == 1 then -- zblmtkz == 1 不显示裸模, 表配置字段
         PlayerSuperEquip._feature.showNodeModel = false
-    end
-
-    if pos == EquipPosCfg.Equip_Type_Super_Cap and equipData.AniCount == 0 then
         PlayerSuperEquip._feature.showHair = false
     end
 
@@ -422,6 +420,7 @@ function PlayerSuperEquip.UpdateModelFeatureData()
     }
 
     PlayerSuperEquip._feature.showNodeModel = tonumber(SL:GetValue("GAME_DATA", "Fashionfx") or 0) ~= 1
+    PlayerSuperEquip._feature.showHair = PlayerSuperEquip._feature.showNodeModel
 
     SetFeature(EquipPosCfg.Equip_Type_Super_Dress,  PlayerSuperEquip.GetLooks(EquipPosCfg.Equip_Type_Super_Dress))
     SetFeature(EquipPosCfg.Equip_Type_Super_Helmet, PlayerSuperEquip.GetLooks(EquipPosCfg.Equip_Type_Super_Helmet))
@@ -651,7 +650,7 @@ end
 function PlayerSuperEquip.CreateUIModel()
     local NodeModel = PlayerSuperEquip._ui["Node_playerModel"]
     GUI:removeAllChildren(NodeModel)
-    GUI:UIModel_Create(NodeModel, "Model", 0, 0, PlayerSuperEquip._sex, PlayerSuperEquip._feature, nil, {showHelmet = PlayerSuperEquip._feature.showHair})
+    GUI:UIModel_Create(NodeModel, "Model", 0, 0, PlayerSuperEquip._sex, PlayerSuperEquip._feature, nil, true, SL:GetValue("JOB"))
 end
 
 PlayerSuperEquip.main()

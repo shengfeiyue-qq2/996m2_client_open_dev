@@ -19,7 +19,8 @@ LookHeroEquip._feature = {
     embattlesID     = nil,      -- 光环
 
     showNodeModel   = true,     -- 裸模
-    showHair        = true      -- 头发
+    showHair        = true,     -- 头发
+    showHelmet      = false
 }
 
 local Typefunc = {
@@ -81,6 +82,8 @@ function LookHeroEquip.main()
     LookHeroEquip._hairID = GUIFunction:GetRoleHair(GUIDefine.RoleUIType.HERO_OTHER)
     -- 性别
     LookHeroEquip._sex = GUIFunction:GetRoleSex(GUIDefine.RoleUIType.HERO_OTHER)
+    -- 职业
+    LookHeroEquip._job = GUIFunction:GetRoleJob(GUIDefine.RoleUIType.HERO_OTHER)
 
     -- 首饰盒按钮
     local BestRingBox = LookHeroEquip._ui["Best_ringBox"]
@@ -262,10 +265,11 @@ function LookHeroEquip.GetLooks(pos)
 
     if pos == EquipPosCfg.Equip_Type_Dress and equipData and equipData.zblmtkz and tonumber(equipData.zblmtkz) == 1 then -- zblmtkz == 1 不显示裸模, 表配置字段
         LookHeroEquip._feature.showNodeModel = false
+        LookHeroEquip._feature.showHair = false
     end
 
     if pos == EquipPosCfg.Equip_Type_Cap and equipData.AniCount == 0 then
-        LookHeroEquip._feature.showHair = false
+        LookHeroEquip._feature.showHelmet = true
     end
 
     if equipData then
@@ -296,7 +300,8 @@ function LookHeroEquip.UpdateModelFeatureData()
         embattlesID     = nil,      -- 光环
 
         showNodeModel   = true,     -- 裸模
-        showHair        = true      -- 头发
+        showHair        = true,     -- 头发
+        showHelmet      = false
     }
 
     SetFeature(EquipPosCfg.Equip_Type_Dress,  LookHeroEquip.GetLooks(EquipPosCfg.Equip_Type_Dress))
@@ -415,7 +420,7 @@ end
 function LookHeroEquip.CreateUIModel()
     local NodeModel = LookHeroEquip._ui["Node_playerModel"]
     GUI:removeAllChildren(NodeModel)
-    GUI:UIModel_Create(NodeModel, "Model", 0, 0, LookHeroEquip._sex, LookHeroEquip._feature, nil, {showHelmet = LookHeroEquip._feature.showHair})
+    GUI:UIModel_Create(NodeModel, "Model", 0, 0, LookHeroEquip._sex, LookHeroEquip._feature, nil, true, LookHeroEquip._job)
 end
 
 LookHeroEquip.main()

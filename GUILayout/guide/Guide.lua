@@ -1,5 +1,11 @@
 Guide = {}
 
+Guide._dirMoveByDisX = {-10, -10, 0, 10, 10, 10, 0, -10}
+Guide._dirMoveByDisY = {0, 10, 10, 10, 0, -10, -10, -10}
+
+Guide._rimXPosScale = {-1, 1, -1, 1}
+Guide._rimYPosScale = {1, 1, -1, -1}
+
 function Guide.main()
     Guide._GuideWidgetConfig = SL:RequireFile(GUIDefine.PATH_GUIDE_CONFIG)
     Guide._data              = GUI:GetLayerOpenParam()
@@ -213,7 +219,9 @@ function Guide.OnGuideEventEnded(data)
 end
 
 function Guide.Exit()
-    GUI:removeFromParent(Guide._layer)
+    if Guide._layer and not tolua.isnull(Guide._layer) then
+        GUI:removeFromParent(Guide._layer)
+    end
     GUI:Win_CloseByID(UIConst.LAYERID.GuideGUI)
     Guide._active = false
     Guide._layer = nil
@@ -232,6 +240,26 @@ function Guide.CreateGuide()
     GUI:removeAllChildren(Guide._layer)
 
     Guide.ShowForceGuide()
+end
+
+local function getRootPosDis(wid, hei, dir)
+    if dir == 1 then
+        return - wid / 2, 0
+    elseif dir == 2 then
+        return - (wid / 2 + 10), hei / 2 + 10
+    elseif dir == 3 then
+        return 0, hei / 2
+    elseif dir == 4 then
+        return wid / 2 + 10, hei / 2 + 10
+    elseif dir == 5 then
+        return wid / 2, 0
+    elseif dir == 6 then
+        return wid / 2 + 10, - (hei / 2 + 10)
+    elseif dir == 7 then
+        return 0, - hei / 2
+    elseif dir == 8 then
+        return - (wid / 2 + 10), - (hei / 2 + 10)
+    end
 end
 
 function Guide.ShowDesc(wid, hei, pos, desc)
@@ -263,7 +291,7 @@ function Guide.ShowDesc(wid, hei, pos, desc)
         end
 
         local pWpos = GUI:convertToNodeSpace(Guide._layer, pos.x, pos.y)
-        GUI:setPosition(root["Node"], pWpos.x + (isleft and -wid / 2 or wid / 2), pWpos.y)
+        GUI:setPosition(root["Node"], pWpos.x + (isleft and - wid / 2 or wid / 2), pWpos.y)
 
         local disX = isleft and 10 or -10
         local disY = 0
@@ -285,20 +313,18 @@ function Guide.ShowDesc(wid, hei, pos, desc)
         local path = string.format("guide/desc_dir_%s", Guide._dir)
         GUI:LoadExport(Guide._layer, path)
         local root = GUI:ui_delegate(Guide._layer)
-
         local nodeDesc = root["Node_desc"]
         local richText = GUI:RichText_Create(nodeDesc, "richText", 0, 0, desc or "", 400, 16, "#ffffff")
         GUI:setAnchorPoint(richText, 0.5, 0.5)
-        -- 2 4 6 8
-        local rootPosDisX = {-wid/2, -(wid/2+10), 0, wid/2+10, wid/2, wid/2+10, 0, -(wid/2+10)}
-        local rootPosDisY = {0, hei/2+10, hei/2, hei/2+10, 0, -(hei/2+10), -hei/2, -(hei/2+10)}
-        local endedPos = GUI:pAdd(pos, {x = rootPosDisX[Guide._dir], y = rootPosDisY[Guide._dir]})
+
+        local endedPos = GUI:convertToNodeSpace(Guide._layer, pos.x, pos.y)
+        local rootPosDisX, rootPosDisY = getRootPosDis(wid, hei, Guide._dir)
+        endedPos.x = endedPos.x + rootPosDisX
+        endedPos.y = endedPos.y + rootPosDisY
         GUI:setPosition(root["Node"], endedPos)
 
-        local moveByDisX = {-10, -10, 0, 10, 10, 10, 0, -10}
-        local moveByDisY = {0, 10, 10, 10, 0, -10, -10, -10}
-        local disX = moveByDisX[Guide._dir]
-        local disY = moveByDisY[Guide._dir]
+        local disX = Guide._dirMoveByDisX[Guide._dir]
+        local disY = Guide._dirMoveByDisY[Guide._dir]
         GUI:runAction(root["Node"],
             GUI:ActionRepeatForever(
                 GUI:ActionSequence(
@@ -319,8 +345,7 @@ end
 function Guide.ShowRim(wid, hei, pos)
     -- 外框
     local moveDis = 5
-    local xPosScale = { -1, 1, -1, 1 }
-    local yPosScale = { 1, 1, -1, -1 }
+    
     for i = 1, 4 do
         local image = GUI:Image_Create(-1, "layerImage", 0, 0, Guide._path .. "dec_else_3.png")
         GUI:setAnchorPoint(image, 0.5, 0.5)
@@ -334,9 +359,9 @@ function Guide.ShowRim(wid, hei, pos)
             GUI:setFlippedX(image, true)
         end
         local pWpos = GUI:convertToNodeSpace(Guide._layer, pos.x, pos.y)
-        GUI:setPosition(image, pWpos.x + xPosScale[i] * (wid / 2), pWpos.y + yPosScale[i] * (hei / 2))
-        local disX = xPosScale[i] * moveDis
-        local disY = yPosScale[i] * moveDis
+        GUI:setPosition(image, pWpos.x + Guide._rimXPosScale[i] * (wid / 2), pWpos.y + Guide._rimYPosScale[i] * (hei / 2))
+        local disX = Guide._rimXPosScale[i] * moveDis
+        local disY = Guide._rimYPosScale[i] * moveDis
         GUI:runAction(image,
             GUI:ActionRepeatForever(
                 GUI:ActionSequence(

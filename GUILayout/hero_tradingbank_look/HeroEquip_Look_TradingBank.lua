@@ -19,7 +19,8 @@ HeroEquip_Look_TradingBank._feature = {
     embattlesID     = nil,      -- 光环
 
     showNodeModel   = true,     -- 裸模
-    showHair        = true      -- 头发
+    showHair        = true,     -- 头发
+    showHelmet      = false
 }
 
 local Typefunc = {
@@ -78,6 +79,8 @@ function HeroEquip_Look_TradingBank.main()
     HeroEquip_Look_TradingBank._hairID = GUIFunction:GetRoleHair(GUIDefine.RoleUIType.TRADE_HERO)
     -- 性别
     HeroEquip_Look_TradingBank._sex = GUIFunction:GetRoleSex(GUIDefine.RoleUIType.TRADE_HERO)
+    -- 职业
+    HeroEquip_Look_TradingBank._job = GUIFunction:GetRoleJob(GUIDefine.RoleUIType.TRADE_HERO)
 
     -- 首饰盒按钮
     local BestRingBox = HeroEquip_Look_TradingBank._ui["Best_ringBox"]
@@ -255,10 +258,11 @@ function HeroEquip_Look_TradingBank.GetLooks(pos)
 
     if pos == EquipPosCfg.Equip_Type_Dress and equipData and equipData.zblmtkz and tonumber(equipData.zblmtkz) == 1 then -- zblmtkz == 1 不显示裸模, 表配置字段
         HeroEquip_Look_TradingBank._feature.showNodeModel = false
+        HeroEquip_Look_TradingBank._feature.showHair = false
     end
 
     if pos == EquipPosCfg.Equip_Type_Cap and equipData.AniCount == 0 then
-        HeroEquip_Look_TradingBank._feature.showHair = false
+        HeroEquip_Look_TradingBank._feature.showHelmet = true
     end
 
     if equipData then
@@ -289,7 +293,8 @@ function HeroEquip_Look_TradingBank.UpdateModelFeatureData()
         embattlesID     = nil,      -- 光环
 
         showNodeModel   = true,     -- 裸模
-        showHair        = true      -- 头发
+        showHair        = true,     -- 头发
+        showHelmet      = false
     }
 
     SetFeature(EquipPosCfg.Equip_Type_Dress,  HeroEquip_Look_TradingBank.GetLooks(EquipPosCfg.Equip_Type_Dress))
@@ -384,7 +389,7 @@ end
 function HeroEquip_Look_TradingBank.CreateUIModel()
     local NodeModel = HeroEquip_Look_TradingBank._ui["Node_playerModel"]
     GUI:removeAllChildren(NodeModel)
-    GUI:UIModel_Create(NodeModel, "Model", 0, 0, HeroEquip_Look_TradingBank._sex, HeroEquip_Look_TradingBank._feature, nil, {showHelmet = HeroEquip_Look_TradingBank._feature.showHair})
+    GUI:UIModel_Create(NodeModel, "Model", 0, 0, HeroEquip_Look_TradingBank._sex, HeroEquip_Look_TradingBank._feature, nil, true, HeroEquip_Look_TradingBank._job)
 end
 
 HeroEquip_Look_TradingBank.main()

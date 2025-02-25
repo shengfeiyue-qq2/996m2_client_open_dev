@@ -20,7 +20,8 @@ HeroEquip._feature = {
     embattlesID     = nil,      -- 光环
 
     showNodeModel   = true,     -- 裸模
-    showHair        = true      -- 头发
+    showHair        = true,     -- 头发
+    showHelmet      = false
 }
 
 local Typefunc = {
@@ -368,10 +369,11 @@ function HeroEquip.GetLooks(pos)
 
     if pos == EquipPosCfg.Equip_Type_Dress and equipData and equipData.zblmtkz and tonumber(equipData.zblmtkz) == 1 then -- zblmtkz == 1 不显示裸模, 表配置字段
         HeroEquip._feature.showNodeModel = false
+        HeroEquip._feature.showHair = false
     end
 
     if pos == EquipPosCfg.Equip_Type_Cap and equipData.AniCount == 0 then
-        HeroEquip._feature.showHair = false
+        HeroEquip._feature.showHelmet = true
     end
 
     if equipData then
@@ -402,7 +404,8 @@ function HeroEquip.UpdateModelFeatureData()
         embattlesID     = nil,      -- 光环
 
         showNodeModel   = true,     -- 裸模
-        showHair        = true      -- 头发
+        showHair        = true,     -- 头发
+        showHelmet      = false
     }
 
     SetFeature(EquipPosCfg.Equip_Type_Dress,  HeroEquip.GetLooks(EquipPosCfg.Equip_Type_Dress))
@@ -420,7 +423,7 @@ end
 -- 额外的装备位置
 function HeroEquip.InitEquipCells()
     -- 请求通知脚本查看uid的珍宝
-    SL:RequestLookZhenBao(SL:GetValue("USER_ID"))
+    SL:RequestLookZhenBao(SL:GetValue("HERO_ID"))
     
     local showExtra = SL:GetValue("SERVER_OPTION", SW_KEY_EQUIP_EXTRA_POS) == 1
     if showExtra then
@@ -652,7 +655,7 @@ end
 function HeroEquip.CreateUIModel()
     local NodeModel = HeroEquip._ui["Node_playerModel"]
     GUI:removeAllChildren(NodeModel)
-    GUI:UIModel_Create(NodeModel, "Model", 0, 0, HeroEquip._sex, HeroEquip._feature, nil, {showHelmet = HeroEquip._feature.showHair})
+    GUI:UIModel_Create(NodeModel, "Model", 0, 0, HeroEquip._sex, HeroEquip._feature, nil, true, SL:GetValue("H.JOB"))
 end
 
 HeroEquip.main()

@@ -202,7 +202,7 @@ function MainTarget.UpdateTargetHP()
     -- 血量刷新
     local curHP = SL:GetValue("ACTOR_HP", MainTarget._targetID)
     local maxHP = SL:GetValue("ACTOR_MAXHP", MainTarget._targetID)
-    local percent = math.ceil(curHP / maxHP * 100)
+    local percent = math.min(math.ceil(curHP / maxHP * 100), 100)
     GUI:LoadingBar_setPercent(MainTarget._ui["hpLoadingBar"], percent)
     GUI:Text_setString(MainTarget._ui["hpText"], percent .. "%")
 end
@@ -232,7 +232,7 @@ function MainTarget.UpdateTargetName()
     local ownerName = SL:GetValue("ACTOR_OWNER_NAME", MainTarget._targetID) or ""
     local name      = SL:GetValue("ACTOR_NAME", MainTarget._targetID) .. (ownerName ~= "" and string.format("(%s)", ownerName) or "")
 
-    if (tonumber(SL:GetValue("GAME_DATA", "Monsterlevel")) or 0) >= 1 and SL:GetValue("SETTING_ENABLED", 34) == 1 and not SL:GetValue("MAP_FORBID_LEVEL_AND_JOB") then
+    if (tonumber(SL:GetValue("GAME_DATA", "Monsterlevel")) or 0) >= 1 and SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_PLAYER_JOB_LEVEL) == 1 and not SL:GetValue("MAP_FORBID_LEVEL_AND_JOB") then
         name = name .. "/J" .. (SL:GetValue("ACTOR_LEVEL", MainTarget._targetID) or "")
     end
     GUI:ScrollText_setString(MainTarget._scrollNameText, name)

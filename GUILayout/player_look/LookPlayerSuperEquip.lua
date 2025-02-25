@@ -274,9 +274,6 @@ function LookPlayerSuperEquip.GetLooks(pos)
     -- 通过唯一ID MakeIndex 获取装备数据
     if pos == EquipPosCfg.Equip_Type_Super_Dress and equipData and LookPlayerSuperEquip._feature.showNodeModel and equipData.zblmtkz and tonumber(equipData.zblmtkz) == 1 then -- zblmtkz == 1 不显示裸模, 表配置字段
         LookPlayerSuperEquip._feature.showNodeModel = false
-    end
-
-    if pos == EquipPosCfg.Equip_Type_Super_Cap and equipData.AniCount == 0 then
         LookPlayerSuperEquip._feature.showHair = false
     end
 
@@ -311,6 +308,7 @@ function LookPlayerSuperEquip.UpdateModelFeatureData()
     }
 
     LookPlayerSuperEquip._feature.showNodeModel = tonumber(SL:GetValue("GAME_DATA", "Fashionfx") or 0) ~= 1
+    LookPlayerSuperEquip._feature.showHair = LookPlayerSuperEquip._feature.showNodeModel
 
     SetFeature(EquipPosCfg.Equip_Type_Super_Dress,  LookPlayerSuperEquip.GetLooks(EquipPosCfg.Equip_Type_Super_Dress))
     SetFeature(EquipPosCfg.Equip_Type_Super_Helmet, LookPlayerSuperEquip.GetLooks(EquipPosCfg.Equip_Type_Super_Helmet))
@@ -398,7 +396,7 @@ end
 function LookPlayerSuperEquip.CreateUIModel()
     local NodeModel = LookPlayerSuperEquip._ui["Node_playerModel"]
     GUI:removeAllChildren(NodeModel)
-    GUI:UIModel_Create(NodeModel, "Model", 0, 0, LookPlayerSuperEquip._sex, LookPlayerSuperEquip._feature, nil, {showHelmet = LookPlayerSuperEquip._feature.showHair})
+    GUI:UIModel_Create(NodeModel, "Model", 0, 0, LookPlayerSuperEquip._sex, LookPlayerSuperEquip._feature, nil, true, SL:GetValue("L.M.JOB"))
 end
 
 LookPlayerSuperEquip.main()
