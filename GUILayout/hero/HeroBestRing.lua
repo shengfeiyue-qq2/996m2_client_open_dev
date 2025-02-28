@@ -204,7 +204,7 @@ end
 function HeroBestRing.CreateEquipItem(parent, data)
     local info = {}
     info.showModelEffect = true
-    info.from            = GUIDefine.ItemFrom.BEST_RINGS
+    info.from            = GUIDefine.ItemFrom.HERO_BEST_RINGS
     info.itemData        = data
     info.index           = data.Index
     info.noMouseTips     = true     -- 此处不在注册鼠标经过事件
@@ -273,7 +273,7 @@ function HeroBestRing.OnOpenItemTips(widget, pos)
     local data = {}
     data.itemData   = itemData
     data.pos        = GUI:getWorldPosition(widget)
-    data.from       = GUIDefine.ItemFrom.BEST_RINGS
+    data.from       = GUIDefine.ItemFrom.HERO_BEST_RINGS
     data.lookPlayer = false
 
     UIOperator:OpenItemTips(data)
@@ -284,7 +284,7 @@ function HeroBestRing.InitEquipLayerEvent()
     local InitPanel = function (widget, pos)
         local params = {
             pos       = pos,
-            from      = GUIDefine.ItemFrom.BEST_RINGS,
+            from      = GUIDefine.ItemFrom.HERO_BEST_RINGS,
             dataType  = EDType,
             moveCallBack = HeroBestRing.UpdateMoveState,
             onClick   = HeroBestRing.OnClickEvent,

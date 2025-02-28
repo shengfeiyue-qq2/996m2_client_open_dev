@@ -105,7 +105,7 @@ function HeroSuperEquip.main()
     HeroSuperEquip.CreateUIModel()
 
     -- 自定义组件挂接
-    SL:AttachTXTSUI({root = parent, index = SLDefine.SUIComponentTable.PlayerSuperEquip_hero})
+    SL:AttachTXTSUI({root = HeroSuperEquip._ui["EquipUI"], index = SLDefine.SUIComponentTable.PlayerSuperEquip_hero})
 end
 
 -- 初始化装备框装备

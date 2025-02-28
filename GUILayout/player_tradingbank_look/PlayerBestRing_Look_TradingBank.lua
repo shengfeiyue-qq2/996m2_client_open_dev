@@ -107,27 +107,6 @@ function PlayerBestRing_Look_TradingBank.SetIconVisible(widget, visible)
     end
 end
 
--- 注册鼠标经过事件
-function PlayerBestRing_Look_TradingBank.OnRegisterMouseMoveEvent(widget, pos)
-    local function onShowItemTips()
-        local isMoving = SL:GetValue("ITEM_MOVE_STATE")
-        if isMoving then
-            return false
-        end
-        PlayerBestRing_Look_TradingBank.OnOpenItemTips(widget, pos)
-    end
-
-    local function onLeaveFunc() 
-        UIOperator:CloseItemTips()
-    end
-
-    local function onEnterFunc()
-        SL:scheduleOnce(widget, onShowItemTips, 0.2)
-    end
-
-    GUI:addMouseMoveEvent(widget, {onEnterFunc = onEnterFunc, onLeaveFunc = onLeaveFunc})
-end
-
 function PlayerBestRing_Look_TradingBank.GetPanel(pos)
     return PlayerBestRing_Look_TradingBank._ui["PanelPos"..pos]
 end

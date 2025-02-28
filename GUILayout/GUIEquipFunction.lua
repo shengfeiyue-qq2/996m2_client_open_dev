@@ -245,14 +245,13 @@ function GUIFunction:GetEquipDataByName(name, type)
 end
 
 -- 检测装备所需性别
-function GUIFunction:CheckEquipNeedSex(item, sex, type)
+function GUIFunction:CheckEquipNeedSex(item, type, sex)
     if not item or not next(item) then
         return false
     end
 
     local stdMode = item.StdMode
     local sexOk = true
-    local needSex = sex
 
     if not sex then
         if type == GUIDefine.EquipDataType.EQUIP then
@@ -263,7 +262,7 @@ function GUIFunction:CheckEquipNeedSex(item, sex, type)
     end
 
     local equipNeedSexConfig = GUIDefine.EquipSexNeed or {}
-    if equipNeedSexConfig[stdMode] and equipNeedSexConfig[stdMode] ~= needSex then
+    if equipNeedSexConfig[stdMode] and equipNeedSexConfig[stdMode] ~= sex then
         sexOk = false
     end
     
@@ -565,6 +564,14 @@ end
 
 -- PC注册鼠标经过装备框事件
 function GUIFunction:InitMouseMoveToEquipEvent(widget, pos, callback)
+    local enterDelayTimer = nil
+    local function CleanupTimer()
+        if enterDelayTimer then
+            GUI:stopAllActions(widget)
+            enterDelayTimer = nil
+        end
+    end
+
     local function onShowItemTips()
         local isMoving = SL:GetValue("ITEM_MOVE_STATE")
         if isMoving then
@@ -578,10 +585,14 @@ function GUIFunction:InitMouseMoveToEquipEvent(widget, pos, callback)
 
     local function onLeaveFunc() 
         UIOperator:CloseItemTips()
+        CleanupTimer()
     end
 
     local function onEnterFunc()
-        SL:scheduleOnce(widget, onShowItemTips, 0.2)
+        if enterDelayTimer then
+            return
+        end
+        enterDelayTimer = SL:scheduleOnce(widget, onShowItemTips, 0.05)
     end
 
     GUI:addMouseMoveEvent(widget, {onEnterFunc = onEnterFunc, onLeaveFunc = onLeaveFunc})

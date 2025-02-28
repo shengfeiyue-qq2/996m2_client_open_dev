@@ -2,6 +2,14 @@ AutoUsePop = {}
 
 local WinID = UIConst.LAYERID.AutoUsePopGUI
 
+AutoUsePop._lastCheckEquipPos = nil
+AutoUsePop._exchangeEquipPos = {
+    [GUIDefine.EquipPosUI.Equip_Type_ArmRingL]  = GUIDefine.EquipPosUI.Equip_Type_ArmRingR,
+    [GUIDefine.EquipPosUI.Equip_Type_ArmRingR]  = GUIDefine.EquipPosUI.Equip_Type_ArmRingL,
+    [GUIDefine.EquipPosUI.Equip_Type_RingL]     = GUIDefine.EquipPosUI.Equip_Type_RingR,
+    [GUIDefine.EquipPosUI.Equip_Type_RingR]     = GUIDefine.EquipPosUI.Equip_Type_RingL,
+}
+
 function AutoUsePop.main()
     local parent = GUI:GetWindow(nil, WinID)
     if not parent then
@@ -250,6 +258,13 @@ function AutoUsePop.DealEquip(data)
         equipIntoPos = minPowerPos
     end
 
+    if AutoUsePop._lastCheckEquipPos == equipIntoPos and AutoUsePop._exchangeEquipPos[equipIntoPos] then
+        local minPowerPos1, onEquipMinPower1, hasEquip1 = GUIFunction:GetMinPowerPosByStdMode(itemData.StdMode, param, nil, isHero, equipIntoPos)
+        if minPowerPos1 >= 0 and (not hasEquip1 or onEquipMinPower1 < myPower) then
+            equipIntoPos = minPowerPos1
+        end
+    end
+
     if equipIntoPos < 0 then
         return AutoUsePop.OnClose(MakeIndex, targetPos, isHero)
     end
@@ -259,6 +274,7 @@ function AutoUsePop.DealEquip(data)
         return AutoUsePop.OnClose(MakeIndex, targetPos, isHero)
     end
 
+    AutoUsePop._lastCheckEquipPos = equipIntoPos
     -- 穿装备
     if isHero then
         SL:RequestHeroTakeOnEquip(itemData, equipIntoPos, not isFromHeroBag)

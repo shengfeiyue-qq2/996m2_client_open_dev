@@ -95,9 +95,9 @@ function LookPlayerSuperEquip.main()
     LookPlayerSuperEquip.CreateUIModel()
 
     -- 自定义组件挂接
-    SL:AttachTXTSUI({root = LookPlayerSuperEquip._ui["Panel_1"], index = SLDefine.SUIComponentTable.PlayerSuperEquipO})
+    SL:AttachTXTSUI({root = LookPlayerSuperEquip._ui["EquipUI"], index = SLDefine.SUIComponentTable.PlayerSuperEquipO})
 
-    SL:AttachTXTSUI({root = isPC and LookPlayerSuperEquip._ui["Image_equippanel"] or LookPlayerSuperEquip._ui["Image_20"], index = SLDefine.SUIComponentTable.PlayerSuperEquipBO})
+    SL:AttachTXTSUI({root = LookPlayerSuperEquip._ui["BG"], index = SLDefine.SUIComponentTable.PlayerSuperEquipBO})
 
     LookPlayerSuperEquip.InitJJSplit()
 end
@@ -213,15 +213,14 @@ function LookPlayerSuperEquip.SetSamePosEquip()
     if not LookPlayerSuperEquip._SamePos then
         return false
     end
-    
-    local Is = false
-    for belongPos,v in pairs(GUIDefine.EquipPosMappingEx or {}) do
-        for k,pos in ipairs(v) do
+
+    for belongPos, v in pairs(GUIDefine.EquipPosMappingEx or {}) do
+        for k, pos in ipairs(v) do
             local equipPanel = LookPlayerSuperEquip.GetEquipPosPanel(pos)
             if equipPanel then
-                if Is == false and GUIFunction:GetEquipDataByPos(pos, nil, EDType) then
+                if GUIFunction:GetEquipDataByPos(pos, nil, EDType) then
                     GUI:setVisible(equipPanel, true)
-                    Is = true
+                    GUI:setTouchEnabled(equipPanel, true)
                 else
                     GUI:setVisible(equipPanel, false)
                 end

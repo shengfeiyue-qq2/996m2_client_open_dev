@@ -175,7 +175,7 @@ function LookHeroEquip.InitEquipLayerEvent()
         local widget = LookHeroEquip.GetEquipPosPanel(pos)
         if widget then     
             GUI:setTouchEnabled(widget, true)
-            GUI:addOnTouchEvent(widget, function (sender, eventType) LookHeroEquip.OnClickEvent() end)
+            GUI:addOnTouchEvent(widget, function() LookHeroEquip.OnClickEvent(widget, pos) end)
 
             if isPC then
                 GUIFunction:InitItemTipsScrollEvent(widget, "LookHeroEquip")
@@ -210,14 +210,13 @@ function LookHeroEquip.SetSamePosEquip()
         return false
     end
     
-    local Is = false
-    for belongPos,v in pairs(GUIDefine.EquipPosMappingEx or {}) do
-        for k,pos in ipairs(v) do
+    for belongPos, v in pairs(GUIDefine.EquipPosMappingEx or {}) do
+        for k, pos in ipairs(v) do
             local equipPanel = LookHeroEquip.GetEquipPosPanel(pos)
             if equipPanel then
-                if Is == false and GUIFunction:GetEquipDataByPos(pos, nil, EDType) then
+                if GUIFunction:GetEquipDataByPos(pos, nil, EDType) then
                     GUI:setVisible(equipPanel, true)
-                    Is = true
+                    GUI:setTouchEnabled(equipPanel, true)
                 else
                     GUI:setVisible(equipPanel, false)
                 end

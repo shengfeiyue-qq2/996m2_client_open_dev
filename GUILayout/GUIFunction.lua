@@ -63,13 +63,13 @@ function GUIFunction:CompareEquipOnBody(equipData, from)
     end
 
     -- 通过stdmode 获取装备位
-    local pos = GUIDefine.EquipPosByStdMode[equipData.StdMode]
-    if not pos or next(pos) == nil then 
+    local posList = GUIDefine.EquipPosByStdMode[equipData.StdMode]
+    if not posList or next(posList) == nil then 
         return false
     end 
 
     -- 是否是该性别装备
-    local sexOk = SL:GetValue("IS_SAMESEX_EQUIP", equipData) 
+    local sexOk = SL:GetValue("IS_SAMESEX_EQUIP", equipData, isHero) 
     if not sexOk then 
         return false
     end 
@@ -86,7 +86,7 @@ function GUIFunction:CompareEquipOnBody(equipData, from)
     local targetInfo = nil
     local targetParam = {jobPower = true, power = myPower, comparison = myComparison, powerSortIndex = powerSortIndex}
     local targetMinPower = 0 -- 身上穿戴最小战力
-    for i, pos in ipairs(pos) do
+    for i, pos in ipairs(posList) do
         if isHero then
             targetInfo = SL:GetValue("H.EQUIP_DATA", pos)
         else
@@ -194,7 +194,7 @@ function GUIFunction:GetMinPowerPosByStdMode(stdMode, param, checkPosData, isHer
     local onEquipMinPower = 0
     local minPowerPos = -1
     local hasEquip = true
-    local pos = checkPosData or GUIDefine.EquipPosByStdMode[stdMode]
+    local pos = checkPosData or SL:CopyData(GUIDefine.EquipPosByStdMode[stdMode])
     if not pos or next(pos) == nil then
         SL:Print("this StdMode is not a equip")
         return minPowerPos, onEquipMinPower, false
@@ -700,6 +700,7 @@ function GUIFunction:GetDiffEquip(itemData, isHero)
 end
 
 -- Tips获取属性数据显示
+local custTypeMap = {[0] = 1, [1] = 3, [2] = 2}
 function GUIFunction:GetAttDataShow(att, stars, tipsShow)
     if not att or not next(att) then
         return {}
@@ -738,14 +739,13 @@ function GUIFunction:GetAttDataShow(att, stars, tipsShow)
             local changeName = nil
             local custMap = SL:GetValue("CUST_ABIL_MAP")
             if custMap[id] and next(custMap[id]) then
-                local typeMap = {[0] = 1, [1] = 3, [2] = 2}
                 local type = custMap[id].type or 0
                 if custMap[id].showCustomName then
                     changeName = config.name
                 end
                 id = custMap[id].id
                 config = SL:GetValue("ATTR_CONFIG", id) or {}
-                attNumType = typeMap[type] or 1
+                attNumType = custTypeMap[type] or 1
             end
 
             if id == AttTypeTable.Lucky then

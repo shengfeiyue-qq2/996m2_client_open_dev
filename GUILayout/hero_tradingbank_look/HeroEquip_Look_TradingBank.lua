@@ -203,14 +203,13 @@ function HeroEquip_Look_TradingBank.SetSamePosEquip()
         return false
     end
     
-    local Is = false
-    for belongPos,v in pairs(GUIDefine.EquipPosMappingEx or {}) do
-        for k,pos in ipairs(v) do
+    for belongPos, v in pairs(GUIDefine.EquipPosMappingEx or {}) do
+        for k, pos in ipairs(v) do
             local equipPanel = HeroEquip_Look_TradingBank.GetEquipPosPanel(pos)
             if equipPanel then
-                if Is == false and GUIFunction:GetEquipDataByPos(pos, nil, EDType) then
+                if GUIFunction:GetEquipDataByPos(pos, nil, EDType) then
                     GUI:setVisible(equipPanel, true)
-                    Is = true
+                    GUI:setTouchEnabled(equipPanel, true)
                 else
                     GUI:setVisible(equipPanel, false)
                 end

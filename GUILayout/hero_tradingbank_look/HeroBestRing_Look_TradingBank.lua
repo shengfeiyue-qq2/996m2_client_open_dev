@@ -38,7 +38,7 @@ function HeroBestRing_Look_TradingBank.CreateEquipItem(parent, data)
     local info = {}
 
     info.showModelEffect = true
-    info.from      = GUIDefine.ItemFrom.BEST_RINGS
+    info.from      = GUIDefine.ItemFrom.HERO_BEST_RINGS
     info.itemData  = data
     info.index     = data.Index
     
@@ -69,7 +69,7 @@ function HeroBestRing_Look_TradingBank.OnOpenItemTips(widget, pos)
     local data = {}
     data.itemData   = itemData
     data.pos        = GUI:getWorldPosition(widget)
-    data.from       = GUIDefine.ItemFrom.BEST_RINGS
+    data.from       = GUIDefine.ItemFrom.HERO_BEST_RINGS
     data.lookPlayer = false
 
     UIOperator:OpenItemTips(data)
@@ -105,27 +105,6 @@ function HeroBestRing_Look_TradingBank.SetIconVisible(widget, visible)
     if itemNode then
         GUI:setVisible(itemNode, not visible)
     end
-end
-
--- 注册鼠标经过事件
-function HeroBestRing_Look_TradingBank.OnRegisterMouseMoveEvent(widget, pos)
-    local function onShowItemTips()
-        local isMoving = SL:GetValue("ITEM_MOVE_STATE")
-        if isMoving then
-            return false
-        end
-        HeroBestRing_Look_TradingBank.OnOpenItemTips(widget, pos)
-    end
-
-    local function onLeaveFunc() 
-        UIOperator:CloseItemTips()
-    end
-
-    local function onEnterFunc()
-        SL:scheduleOnce(widget, onShowItemTips, 0.2)
-    end
-
-    GUI:addMouseMoveEvent(widget, {onEnterFunc = onEnterFunc, onLeaveFunc = onLeaveFunc})
 end
 
 function HeroBestRing_Look_TradingBank.GetPanel(pos)

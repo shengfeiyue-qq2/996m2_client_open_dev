@@ -97,7 +97,7 @@ function LookHeroSuperEquip.main()
     LookHeroSuperEquip.CreateUIModel()
 
     -- 自定义组件挂接
-    SL:AttachTXTSUI({root = parent, index = SLDefine.SUIComponentTable.PlayerSuperEquipO_hero})
+    SL:AttachTXTSUI({root = LookHeroSuperEquip._ui["EquipUI"], index = SLDefine.SUIComponentTable.PlayerSuperEquipO_hero})
 end
 
 -- 初始化装备框装备
@@ -153,7 +153,7 @@ function LookHeroSuperEquip.InitEquipLayerEvent()
         local widget = LookHeroSuperEquip.GetEquipPosPanel(pos)
         if widget then
             GUI:setTouchEnabled(widget, true)
-            GUI:addOnTouchEvent(widget, function (sender, eventType) LookHeroSuperEquip.OnClickEvent() end)
+            GUI:addOnTouchEvent(widget, function() LookHeroSuperEquip.OnClickEvent(widget, pos) end)
 
             if isPC then
                 GUIFunction:InitItemTipsScrollEvent(widget, "LookHeroSuperEquip")
@@ -188,14 +188,13 @@ function LookHeroSuperEquip.SetSamePosEquip()
         return false
     end
     
-    local Is = false
-    for belongPos,v in pairs(GUIDefine.EquipPosMappingEx or {}) do
-        for k,pos in ipairs(v) do
+    for belongPos, v in pairs(GUIDefine.EquipPosMappingEx or {}) do
+        for k, pos in ipairs(v) do
             local equipPanel = LookHeroSuperEquip.GetEquipPosPanel(pos)
             if equipPanel then
-                if Is == false and GUIFunction:GetEquipDataByPos(pos, nil, EDType) then
+                if GUIFunction:GetEquipDataByPos(pos, nil, EDType) then
                     GUI:setVisible(equipPanel, true)
-                    Is = true
+                    GUI:setTouchEnabled(equipPanel, true)
                 else
                     GUI:setVisible(equipPanel, false)
                 end

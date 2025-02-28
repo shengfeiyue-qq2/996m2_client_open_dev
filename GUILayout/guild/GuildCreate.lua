@@ -65,7 +65,7 @@ function GuildCreate.InitData()
             local cost = costs[i]
             if cost and cost ~= "" then
                 local info = string.split(cost, "#")
-                local id = SL:GetValue("ITEM_INDEX_BY_NAME", info[1])
+                local id = tonumber(info[1]) and tonumber(info[1]) or SL:GetValue("ITEM_INDEX_BY_NAME", info[1])
                 local num = tonumber(info[2])
                 if id and num and num > 0 then
                     table.insert(GuildCreate._costItems, {id = id, num = num})

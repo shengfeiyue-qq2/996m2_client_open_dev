@@ -234,11 +234,12 @@ function Notice.ShowServerEventNotice_11(data)
         local FColorRGB     = SL:GetColorByStyleId(item.FColor)
         local BColorRGB     = SL:GetColorByStyleId(item.BColor)
         local visibleSize   = SL:GetValue("SCREEN_SIZE")
-        local capacitySize  = {width = visibleSize.width * 0.5, height = 30}
+        local capacitySizeW = math.floor(visibleSize.width * 0.5)
+        local capacitySizeH = 30
 
         -- layout
         Notice._serverIndex11 = Notice._serverIndex11 + 1
-        local layout = GUI:Layout_Create(Notice._rootServerTips, "layout11"..Notice._serverIndex11, visibleSize.width/2, -30, capacitySize.width, capacitySize.height, false)
+        local layout = GUI:Layout_Create(Notice._rootServerTips, "layout11" .. Notice._serverIndex11, visibleSize.width / 2, -30, capacitySizeW, capacitySizeH, false)
         GUI:Layout_setBackGroundColor(layout, "#000000")
         GUI:Layout_setBackGroundColorType(layout, 1)
         GUI:Layout_setBackGroundColorOpacity(layout, 80)
@@ -256,7 +257,7 @@ function Notice.ShowServerEventNotice_11(data)
 
         -- action
         local contentSize = GUI:getContentSize(richText)
-        local actionTime = 10 + (contentSize.width / capacitySize.width * 10)
+        local actionTime = 10 + (contentSize.width / capacitySizeW * 10)
         local function callback()
             Notice._serverNoticeStatus_11 = false
             GUI:removeFromParent(layout)
@@ -264,8 +265,8 @@ function Notice.ShowServerEventNotice_11(data)
             showServerEvent()
         end
 
-        local move1 = GUI:ActionMoveTo(0, capacitySize.width, capacitySize.height/2)
-        local move2 = GUI:ActionMoveTo(actionTime, 0 - capacitySize.width, capacitySize.height/2)
+        local move1 = GUI:ActionMoveTo(0, capacitySizeW, capacitySizeH / 2)
+        local move2 = GUI:ActionMoveTo(actionTime, - capacitySizeW, capacitySizeH / 2)
         local sequence = GUI:ActionSequence(move1, move2, GUI:CallFunc(callback))
         GUI:runAction(richText, sequence)
     end
@@ -298,11 +299,12 @@ function Notice.OnShowSystemNotice(data)
         local FColorRGB = SL:GetColorByStyleId(item.FColor)
         local BColorRGB = SL:GetColorByStyleId(item.BColor)
         local visibleSize = SL:GetValue("SCREEN_SIZE")
-        local capacitySize = {width = math.floor(visibleSize.width * 0.6), height = 30}
+        local capacitySizeW = math.floor(visibleSize.width * 0.6)
+        local capacitySizeH = 30
 
         -- layout
         Notice._systemIndex = Notice._systemIndex + 1
-        local layout = GUI:Layout_Create(Notice._rootSystem, "layout"..Notice._systemIndex, 0, 0 - item.Y, capacitySize.width, capacitySize.height, true)
+        local layout = GUI:Layout_Create(Notice._rootSystem, "layout" .. Notice._systemIndex, 0, - item.Y, capacitySizeW, capacitySizeH, true)
         GUI:Layout_setBackGroundColor(layout, "#000000")
         GUI:Layout_setBackGroundColorType(layout, 1)
         GUI:Layout_setBackGroundColorOpacity(layout, 80)
@@ -314,19 +316,19 @@ function Notice.OnShowSystemNotice(data)
             outlineSize = 1, 
             outlineColor = BColorRGB
         }
-        local richText = GUI:RichTextFCOLOR_Create(layout, "richText", capacitySize.width, capacitySize.height / 2, item.Msg, 10000, fontSize, FColorRGB, nil, nil, nil, outlineParam)
+        local richText = GUI:RichTextFCOLOR_Create(layout, "richText", capacitySizeW, capacitySizeH / 2, item.Msg, 10000, fontSize, FColorRGB, nil, nil, nil, outlineParam)
         GUI:setAnchorPoint(richText, 0, 0.5)
 
         -- action
         local contentSize = GUI:getContentSize(richText) 
-        local actionTime    = math.ceil(10 + (contentSize.width / capacitySize.width * 10))
+        local actionTime    = math.ceil(10 + (contentSize.width / capacitySizeW * 10))
         local function callback()
             Notice._systemNoticeFlag[posY] = false
             GUI:removeFromParent(layout)
             showSystemNotice()
         end
-        local move1 = GUI:ActionMoveTo(0, capacitySize.width, capacitySize.height/2)
-        local move2 = GUI:ActionMoveTo(actionTime, 0 - contentSize.width, capacitySize.height/2)
+        local move1 = GUI:ActionMoveTo(0, capacitySizeW, capacitySizeH / 2)
+        local move2 = GUI:ActionMoveTo(actionTime, - contentSize.width, capacitySizeH / 2)
         local sequence = GUI:ActionSequence(move1, move2)
         local acRepeat = GUI:ActionRepeat(sequence, item.Count)
         local action = GUI:ActionSequence(acRepeat, GUI:CallFunc(callback))
@@ -361,7 +363,8 @@ function Notice.OnShowSystemScaleNotice(data)
         local FColorRGB     = SL:GetColorByStyleId(item.FColor)
         local BColorRGB     = SL:GetColorByStyleId(item.BColor)
         local visibleSize   = SL:GetValue("SCREEN_SIZE")
-        local capacitySize  = {visibleSize.width * 0.6, 30} 
+        local capacitySizeW = math.floor(visibleSize.width * 0.6)
+        local capacitySizeH = 30
 
         -- bg
         Notice._sysScaleIndex = Notice._sysScaleIndex + 1
@@ -466,8 +469,9 @@ function Notice.OnShowSystemTips(str)
     local text = GUI:RichText_Create(node, "text", 0, 0, str, 0xffffff, 16, "#ffffff")
     GUI:setCascadeOpacityEnabled(text, true)
     GUI:setAnchorPoint(text, 0.5, 0.5)
-    local size = {width = GUI:getContentSize(text).width, height = 30}
-    GUI:setContentSize(imageBG, size.width + 20, size.height)
+    local sizeW = GUI:getContentSize(text).width
+    local sizeH = 30
+    GUI:setContentSize(imageBG, sizeW + 20, sizeH)
 
     table.insert(Notice._systemTips, node)
     -- 最多7条
@@ -489,8 +493,8 @@ function Notice.OnShowSystemTips(str)
     for i = 1, #Notice._systemTips do
         local cell = Notice._systemTips[i]
         if cell then 
-            GUI:setPositionY(cell, size.height * (#Notice._systemTips - i - 0.5))
-            local action  = GUI:ActionMoveTo(0.15, 0, size.height * (#Notice._systemTips - i + 0.5))
+            GUI:setPositionY(cell, sizeH * (#Notice._systemTips - i - 0.5))
+            local action  = GUI:ActionMoveTo(0.15, 0, sizeH * (#Notice._systemTips - i + 0.5))
             GUI:setTag(action, actionTag)
             GUI:stopActionByTag(cell, actionTag)
             GUI:runAction(cell, action)
@@ -509,17 +513,18 @@ function Notice.OnShowTimerNotice(data)
     local FColorRGB     = SL:GetColorByStyleId(data.FColor)
     local BColorRGB     = SL:GetColorByStyleId(data.BColor)
     local visibleSize   = SL:GetValue("SCREEN_SIZE")
-    local capacitySize  = {width = math.floor(visibleSize.width), height = (Notice.isPC and 20 or 30) + data.Y}
+    local capacitySizeW = math.floor(visibleSize.width * 0.6)
+    local capacitySizeH = Notice.isPC and 20 or 30
 
     -- layout
     local function resetListview()
         local count = GUI:ListView_getItemCount(Notice._listviewTimerTips)
-        local height = count * capacitySize.height
-        GUI:setContentSize(Notice._listviewTimerTips, capacitySize.width, height)
+        local height = count * capacitySizeH
+        GUI:setContentSize(Notice._listviewTimerTips, capacitySizeW, height)
     end
 
     Notice._timerIndex = Notice._timerIndex + 1
-    local layout = GUI:Layout_Create(Notice._listviewTimerTips, "layoutTimer"..Notice._timerIndex, 0, 0, capacitySize.width, capacitySize.height, false)
+    local layout = GUI:Layout_Create(Notice._listviewTimerTips, "layoutTimer" .. Notice._timerIndex, 0, 0, capacitySizeW, capacitySizeH, false)
     layout.tag = data.Label
     resetListview()
 
@@ -548,7 +553,7 @@ function Notice.OnShowTimerNotice(data)
         }
         local richText = GUI:RichTextFCOLOR_Create(layout, "richText", 0, 0, str, 1000, fontSize, FColorRGB, nil, nil, nil, outlineParam)
         GUI:setAnchorPoint(richText, 0.5, 0.5)
-        GUI:setPosition(richText, capacitySize.width/2 + data.X, capacitySize.height/2 + data.Y)
+        GUI:setPosition(richText, capacitySizeW / 2 + data.X, capacitySizeH / 2 + data.Y)
 
         if remaining < 0 then
             if data.Label and string.len(data.Label) > 0 then
@@ -566,7 +571,8 @@ end
 
 function Notice.OnDeleteTimerNotice(tag)
     local visibleSize = SL:GetValue("SCREEN_SIZE")
-    local capacitySize = {width = visibleSize.width * 0.6, height = Notice.isPC and 20 or 30}
+    local capacitySizeW = math.floor(visibleSize.width * 0.6)
+    local capacitySizeH = Notice.isPC and 20 or 30
     if tag then
         local items = GUI:ListView_getItems(Notice._listviewTimerTips)
         for i, item in ipairs(items) do
@@ -578,8 +584,8 @@ function Notice.OnDeleteTimerNotice(tag)
         GUI:ListView_removeAllItems(Notice._listviewTimerTips)
     end
     local count = GUI:ListView_getItemCount(Notice._listviewTimerTips)
-    local height = count * capacitySize.height
-    GUI:setContentSize(Notice._listviewTimerTips, capacitySize.width, height)
+    local height = count * capacitySizeH
+    GUI:setContentSize(Notice._listviewTimerTips, capacitySizeW, height)
 end
 
 function Notice.OnShowTimerXYNotice(data)
@@ -593,7 +599,8 @@ function Notice.OnShowTimerXYNotice(data)
     local BColorRGB     = SL:GetColorByStyleId(data.BColor)
 
     local visibleSize   = SL:GetValue("SCREEN_SIZE")
-    local capacitySize  = {width = visibleSize.width * 0.6, height = Notice.isPC and 20 or 30}
+    local capacitySizeW = math.floor(visibleSize.width * 0.6)
+    local capacitySizeH = Notice.isPC and 20 or 30
 
     GUI:removeAllChildren(Notice._rootTimerTipsXY)
 
@@ -604,7 +611,7 @@ function Notice.OnShowTimerXYNotice(data)
     end
 
     Notice._timerXYIndex = Notice._timerXYIndex + 1
-    local layout = GUI:Layout_Create(Notice._rootTimerTipsXY, "layoutXYTimer"..Notice._timerXYIndex, 0, 0, capacitySize.width, capacitySize.height, false)
+    local layout = GUI:Layout_Create(Notice._rootTimerTipsXY, "layoutXYTimer" .. Notice._timerXYIndex, 0, 0, capacitySizeW, capacitySizeH, false)
     if data.X == 0 then
         GUI:setAnchorPoint(layout, 0.5, 0)
     else
@@ -631,14 +638,14 @@ function Notice.OnShowTimerXYNotice(data)
             outlineSize = 1, 
             outlineColor = BColorRGB
         }
-        local richText = GUI:RichTextFCOLOR_Create(layout, "richText", capacitySize.width/2, capacitySize.height/2, str, 1000, fontSize, FColorRGB, nil, nil, nil, outlineParam)
+        local richText = GUI:RichTextFCOLOR_Create(layout, "richText", capacitySizeW / 2, capacitySizeH / 2, str, 1000, fontSize, FColorRGB, nil, nil, nil, outlineParam)
         GUI:setAnchorPoint(richText, 0.5, 0.5)
 
         local text =  GUI:Text_Create(layout, "text", 0, 0, fontSize, "#ffffff", str)
         GUI:setVisible(text, false)
         local textWidth = GUI:getContentSize(text).width
         if data.X ~= 0 then 
-            GUI:setPositionX(Notice._rootTimerTipsXY, data.X - (capacitySize.width/2 - textWidth/2))
+            GUI:setPositionX(Notice._rootTimerTipsXY, data.X - (capacitySizeW / 2 - textWidth / 2))
         end
 
         if remaining < 0 then
@@ -695,7 +702,7 @@ function Notice.ParseCostItemTipsStr(info)
 end
 
 function Notice.OnShowItemTips(info)
-    local size = {width = 170, height = 20}
+    local sizeH = 20
     
     if info.type == 1 then -- 获得
         info = Notice.ParseGetItemTipsStr(info)
@@ -720,7 +727,7 @@ function Notice.OnShowItemTips(info)
 
         -- node
         Notice._itemIndex = Notice._itemIndex + 1
-        local node = GUI:Node_Create(Notice._rootItemTips, "nodeItem"..Notice._itemIndex, 0, 0)
+        local node = GUI:Node_Create(Notice._rootItemTips, "nodeItem" .. Notice._itemIndex, 0, 0)
         table.insert(Notice._itemTipsCells, node)
 
         -- richText
@@ -755,8 +762,8 @@ function Notice.OnShowItemTips(info)
         local actionTag = 999
         for i = 1, #Notice._itemTipsCells do
             if Notice._itemTipsCells[i] then 
-                GUI:setPositionY(Notice._itemTipsCells[i], size.height * (#Notice._itemTipsCells - i - 0.5))
-                local action  = GUI:ActionMoveTo(0.15, 0, size.height * (#Notice._itemTipsCells - i + 0.5))
+                GUI:setPositionY(Notice._itemTipsCells[i], sizeH * (#Notice._itemTipsCells - i - 0.5))
+                local action = GUI:ActionMoveTo(0.15, 0, sizeH * (#Notice._itemTipsCells - i + 0.5))
                 GUI:setTag(action, actionTag)
                 GUI:stopActionByTag(Notice._itemTipsCells[i], actionTag)
                 GUI:runAction(Notice._itemTipsCells[i], action)

@@ -55,7 +55,7 @@ end
 function LookHeroBestRing.CreateEquipItem(parent, data)
     local info = {}
     info.showModelEffect = true
-    info.from            = GUIDefine.ItemFrom.BEST_RINGS
+    info.from            = GUIDefine.ItemFrom.HERO_BEST_RINGS
     info.itemData        = data
     info.index           = data.Index
     info.noMouseTips     = true     -- 此处不在注册鼠标经过事件
@@ -87,7 +87,7 @@ function LookHeroBestRing.OnOpenItemTips(widget, pos)
     local data = {}
     data.itemData   = itemData
     data.pos        = GUI:getWorldPosition(widget)
-    data.from       = GUIDefine.ItemFrom.BEST_RINGS
+    data.from       = GUIDefine.ItemFrom.HERO_BEST_RINGS
     data.lookPlayer = true
 
     UIOperator:OpenItemTips(data)
@@ -97,7 +97,7 @@ end
 function LookHeroBestRing.InitEquipLayerEvent()
     local InitPanel = function (widget, pos)
         GUI:addOnTouchEvent(widget, function (sender, eventType) 
-            LookHeroBestRing.OnClickEvent() 
+            LookHeroBestRing.OnClickEvent(widget, pos) 
         end)
 
         if isPC then
@@ -128,27 +128,6 @@ function LookHeroBestRing.SetIconVisible(widget, visible)
     if itemNode then
         GUI:setVisible(itemNode, not visible)
     end
-end
-
--- 注册鼠标经过事件
-function LookHeroBestRing.OnRegisterMouseMoveEvent(widget, pos)
-    local function onShowItemTips()
-        local isMoving = SL:GetValue("ITEM_MOVE_STATE")
-        if isMoving then
-            return false
-        end
-        LookHeroBestRing.OnOpenItemTips(widget, pos)
-    end
-
-    local function onLeaveFunc() 
-        UIOperator:CloseItemTips()
-    end
-
-    local function onEnterFunc()
-        SL:scheduleOnce(widget, onShowItemTips, 0.2)
-    end
-
-    GUI:addMouseMoveEvent(widget, {onEnterFunc = onEnterFunc, onLeaveFunc = onLeaveFunc})
 end
 
 function LookHeroBestRing.GetPanel(pos)

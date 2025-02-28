@@ -98,7 +98,7 @@ end
 function LookPlayerBestRing.InitEquipLayerEvent()
     local InitPanel = function (widget, pos)
         GUI:addOnTouchEvent(widget, function (sender, eventType) 
-            LookPlayerBestRing.OnClickEvent() 
+            LookPlayerBestRing.OnClickEvent(widget, pos) 
         end)
 
         if isPC then
@@ -129,27 +129,6 @@ function LookPlayerBestRing.SetIconVisible(widget, visible)
     if itemNode then
         GUI:setVisible(itemNode, not visible)
     end
-end
-
--- 注册鼠标经过事件
-function LookPlayerBestRing.OnRegisterMouseMoveEvent(widget, pos)
-    local function onShowItemTips()
-        local isMoving = SL:GetValue("ITEM_MOVE_STATE")
-        if isMoving then
-            return false
-        end
-        LookPlayerBestRing.OnOpenItemTips(widget, pos)
-    end
-
-    local function onLeaveFunc() 
-        UIOperator:CloseItemTips()
-    end
-
-    local function onEnterFunc()
-        SL:scheduleOnce(widget, onShowItemTips, 0.2)
-    end
-
-    GUI:addMouseMoveEvent(widget, {onEnterFunc = onEnterFunc, onLeaveFunc = onLeaveFunc})
 end
 
 function LookPlayerBestRing.GetPanel(pos)

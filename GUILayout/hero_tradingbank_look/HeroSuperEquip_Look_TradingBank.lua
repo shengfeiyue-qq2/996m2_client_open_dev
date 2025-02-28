@@ -118,7 +118,7 @@ end
 function HeroSuperEquip_Look_TradingBank.CreateEquipItem(parent, data)
     local info = {}
     info.showModelEffect = not HeroSuperEquip_Look_TradingBank.IsShowAll(data.Where)
-    info.from       = GUIDefine.ItemFrom.PLAYER_EQUIP
+    info.from       = GUIDefine.ItemFrom.HERO_EQUIP
     info.itemData   = data
     info.index      = data.Index
     info.lookPlayer = true
@@ -175,14 +175,13 @@ function HeroSuperEquip_Look_TradingBank.SetSamePosEquip()
         return false
     end
     
-    local Is = false
-    for belongPos,v in pairs(GUIDefine.EquipPosMappingEx or {}) do
-        for k,pos in ipairs(v) do
+    for belongPos, v in pairs(GUIDefine.EquipPosMappingEx or {}) do
+        for k, pos in ipairs(v) do
             local equipPanel = HeroSuperEquip_Look_TradingBank.GetEquipPosPanel(pos)
             if equipPanel then
-                if Is == false and GUIFunction:GetEquipDataByPos(pos, nil, EDType) then
+                if GUIFunction:GetEquipDataByPos(pos, nil, EDType) then
                     GUI:setVisible(equipPanel, true)
-                    Is = true
+                    GUI:setTouchEnabled(equipPanel, true)
                 else
                     GUI:setVisible(equipPanel, false)
                 end
@@ -333,7 +332,7 @@ function HeroSuperEquip_Look_TradingBank.OnOpenItemTips(widget, pos)
         data.itemData3 = itemData[1]
     end
     data.lookPlayer = true
-    data.from = GUIDefine.ItemFrom.PLAYER_EQUIP
+    data.from = GUIDefine.ItemFrom.HERO_EQUIP
 
     UIOperator:OpenItemTips(data)
 end
