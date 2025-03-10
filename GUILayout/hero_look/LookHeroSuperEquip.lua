@@ -149,33 +149,15 @@ end
 
 -- 初始化点击（包含鼠标）事件
 function LookHeroSuperEquip.InitEquipLayerEvent()
-    for _,pos in pairs(LookHeroSuperEquip._EquipPosSet) do
+    for _, pos in ipairs(LookHeroSuperEquip._EquipPosSet) do
         local widget = LookHeroSuperEquip.GetEquipPosPanel(pos)
-        if widget then
+        if widget and GUI:getVisible(widget) then
             GUI:setTouchEnabled(widget, true)
             GUI:addOnTouchEvent(widget, function() LookHeroSuperEquip.OnClickEvent(widget, pos) end)
 
             if isPC then
                 GUIFunction:InitItemTipsScrollEvent(widget, "LookHeroSuperEquip")
                 GUIFunction:InitMouseMoveToEquipEvent(widget, pos, LookHeroSuperEquip.OnOpenItemTips)
-            end
-
-            -- 斗笠、头盔内装备特殊处理
-            local isNaikan = GUIDefine.EquipNaikanShow and GUIDefine.EquipNaikanShow[pos]
-            GUI:setVisible(widget, true)
-            local DefaultIcon = GUI:getChildByName(widget, "DefaultIcon")
-            if DefaultIcon then
-                GUI:setVisible(DefaultIcon, not isNaikan)
-            end
-
-            local PanelBg = GUI:getChildByName(widget, "PanelBg")
-            if PanelBg then
-                GUI:setVisible(PanelBg, not isNaikan)
-            end
-
-            local Node = LookHeroSuperEquip.GetEquipPosNode(pos)
-            if Node then
-                GUI:setVisible(Node, not isNaikan)
             end
         end
     end
@@ -320,15 +302,21 @@ function LookHeroSuperEquip.InitEquipCells()
             GUI:setVisible(LookHeroSuperEquip._ui["Panel_pos44"], false)
         end
     end
+
+    if SL:GetValue("GAME_DATA", "isSeparateSuperHelmetAndCap") == 1 then
+        LookHeroSuperEquip._SamePos = false
+    else
+        LookHeroSuperEquip._SamePos = true
+    end
 end
 
--- 装备为内观时显示同部位多件装备tips，否则显示单件
+-- 装备为内观且使用相同位置时显示同部位多件装备tips，否则显示单件
 function LookHeroSuperEquip.OnOpenItemTips(widget, pos)
     if GUI:Win_IsNull(widget) then
         return false
     end
 
-    local itemData = LookHeroSuperEquip.IsNaikan(pos) and GUIFunction:GetEquipDataListByPos(pos, EDType) or {GUIFunction:GetEquipDataByPos(pos, nil, EDType)}
+    local itemData = (LookHeroSuperEquip.IsNaikan(pos) and LookHeroSuperEquip._SamePos) and GUIFunction:GetEquipDataListByPos(pos, EDType) or {GUIFunction:GetEquipDataByPos(pos, nil, EDType)}
     if not (itemData and next(itemData)) then
         return false
     end

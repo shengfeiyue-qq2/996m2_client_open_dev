@@ -745,6 +745,14 @@ function BagData.ResponseDelItem(data)
     elseif itemBelong == GUIDefine.ItemBelong.STALL then
         local item = SL:StallRmvMySellItem(makeIndex)
         SL:onLUAEvent(LUA_EVENT_STALL_SELF_ITEM_CHANGE, item)
+
+    elseif itemBelong == GUIDefine.ItemBelong.STORAGE then
+        local item = SL:GetValue("STORAGE_DATA_BY_MAKEINDEX", makeIndex)
+        if not item then
+            SL:Print("delete item error, can't find item")
+            return
+        end
+        SL:DeleteStorageData(item)
     end
 end
 
@@ -774,6 +782,9 @@ function BagData.ResponseUpdateItem(data)
 
     elseif itemBelong == GUIDefine.ItemBelong.QUICKUSE then
         QuickUseData.UpdateQuickUseItemData(data)
+
+    elseif itemBelong == GUIDefine.ItemBelong.STORAGE then
+        SL:UpdateStorageData(data)
     end
 
     -- for item update.

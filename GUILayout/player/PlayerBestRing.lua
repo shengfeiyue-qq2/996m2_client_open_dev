@@ -303,7 +303,7 @@ function PlayerBestRing.InitEquipLayerEvent()
         end
     end
 
-    for _,pos in ipairs(PlayerBestRing._EquipPosSet) do
+    for _, pos in ipairs(PlayerBestRing._EquipPosSet) do
         local widget = PlayerBestRing.GetPanel(pos)
         local iconVisible = true
         local data = GUIFunction:GetEquipDataByPos(pos, nil, EDType)

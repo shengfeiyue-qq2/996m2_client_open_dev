@@ -112,7 +112,6 @@ function PlayerSuperEquip.main()
 
     SL:AttachTXTSUI({root = PlayerSuperEquip._ui["BG"], index = SLDefine.SUIComponentTable.PlayerSuperEquipB})
 
-    PlayerSuperEquip.InitJJSplit()
 end
 
 -- 剑甲分离
@@ -246,12 +245,12 @@ end
 
 -- 初始化点击（包含鼠标）事件
 function PlayerSuperEquip.InitEquipLayerEvent()
-    for _,pos in pairs(PlayerSuperEquip._EquipPosSet) do
+    for _, pos in ipairs(PlayerSuperEquip._EquipPosSet) do
         local widget = PlayerSuperEquip.GetEquipPosPanel(pos)
         if type(GUIDefine.EquipAllShow[pos]) == "boolean" then
             widget = GUIDefine.EquipAllShow[pos] and PlayerSuperEquip.GetEquipPosPanel(pos) or PlayerSuperEquip.GetEquipPosExPanel(pos)
         end
-        if widget then
+        if widget and GUI:getVisible(widget) then
             local params = {
                 pos       = pos,
                 from      = GUIDefine.ItemFrom.PLAYER_EQUIP,
@@ -296,26 +295,6 @@ function PlayerSuperEquip.InitEquipLayerEvent()
                 GUIFunction:InitMouseMoveToEquipEvent(widget, pos, PlayerSuperEquip.OnOpenItemTips)
             end
 
-            -- 斗笠、头盔内装备特殊处理
-            local isNaikan = GUIDefine.EquipNaikanShow and GUIDefine.EquipNaikanShow[pos]
-
-            local isSpeDeal = isNaikan == true or isNaikan == false
-            GUI:setVisible(widget, true)
-
-            local DefaultIcon = GUI:getChildByName(widget, "DefaultIcon")
-            if DefaultIcon and isSpeDeal then
-                GUI:setVisible(DefaultIcon, not isNaikan)
-            end
-
-            local PanelBg = GUI:getChildByName(widget, "PanelBg")
-            if PanelBg and isSpeDeal then
-                GUI:setVisible(PanelBg, not isNaikan)
-            end
-    
-            local Node = PlayerSuperEquip.GetEquipPosNode(pos)
-            if Node then
-                GUI:setVisible(Node, not isNaikan)
-            end
         end
     end
     PlayerSuperEquip.SetSamePosEquip()
@@ -465,6 +444,14 @@ function PlayerSuperEquip.InitEquipCells()
             GUI:setVisible(PlayerSuperEquip._ui["Panel_pos44"], false)
         end
     end
+
+    PlayerSuperEquip.InitJJSplit()
+
+    if SL:GetValue("GAME_DATA", "isSeparateSuperHelmetAndCap") == 1 then
+        PlayerSuperEquip._SamePos = false
+    else
+        PlayerSuperEquip._SamePos = true
+    end
 end
 
 function PlayerSuperEquip.InitEquipSetting()
@@ -476,13 +463,13 @@ function PlayerSuperEquip.InitEquipSetting()
     GUI:CheckBox_setSelected(PlayerSuperEquip._ui["CheckBox_shizhuang"], showSetting)
 end
 
--- 装备为内观时显示同部位多件装备tips，否则显示单件
+-- 装备为内观且使用相同位置时显示同部位多件装备tips，否则显示单件
 function PlayerSuperEquip.OnOpenItemTips(widget, pos)
     if GUI:Win_IsNull(widget) then
         return false
     end
 
-    local itemData = PlayerSuperEquip.IsNaikan(pos) and GUIFunction:GetEquipDataListByPos(pos, EDType) or {GUIFunction:GetEquipDataByPos(pos, nil, EDType)}
+    local itemData = (PlayerSuperEquip.IsNaikan(pos) and PlayerSuperEquip._SamePos) and GUIFunction:GetEquipDataListByPos(pos, EDType) or {GUIFunction:GetEquipDataByPos(pos, nil, EDType)}
     if not (itemData and next(itemData)) then
         return false
     end

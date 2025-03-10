@@ -88,12 +88,14 @@ function SocialFrame.InitUI(layerID)
 
     for i, layerId in ipairs(SocialInfo._pageIDVec) do
         local btnName = "page_cell_"..i
-        local page = SocialInfo._ui[btnName]
-        GUI:Win_SetParam(page, layerId)
-        GUI:addOnClickEvent(GUI:getChildByName(page, "TouchSize"), function()
-            SocialFrame.PageTo(layerId)
-        end)
-        SocialInfo._Pages[btnName] = page
+        local pageBtn = SocialInfo._ui[btnName]
+        if pageBtn then
+            GUI:Win_SetParam(pageBtn, layerId)
+            GUI:addOnClickEvent(GUI:getChildByName(pageBtn, "TouchSize"), function()
+                SocialFrame.PageTo(layerId)
+            end)
+            SocialInfo._Pages[btnName] = pageBtn
+        end
     end
 
     -- 默认跳到第一个

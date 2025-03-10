@@ -79,6 +79,7 @@ local SETTING_SKILL = {
     SKILL_ID_HuoYanBing,
     SKILL_ID_BSQunYu,
     SKILL_ID_LieHuo,
+    SKILL_ID_ShiZiHou,
 }
 
 local sharedQuickSelTab = {}
@@ -236,7 +237,7 @@ SkillUtils.CHECK_SKILL = {
         if lastLaunchTime and currTime - lastLaunchTime < 3 then
             return nil
         end
-       SL:SetValue("SKILL_CUSTOM_DATA", skillID, currTime)
+        SL:SetValue("SKILL_CUSTOM_DATA", skillID, currTime)
 
         return skillID, dstX, dstY
     end,

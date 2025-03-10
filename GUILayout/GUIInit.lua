@@ -871,7 +871,7 @@ SL:RegisterLUAEvent(LUA_EVENT_EXP_CHANGE, "GUIInit", function(data)
     end
 
     local changed = data.changed or 0
-    if changed < 1 then
+    if changed < 1 or data.isInit then
         return false
     end
     
@@ -1673,6 +1673,11 @@ SL:RegisterLUAEvent(LUA_EVENT_ACTOR_IN_OF_VIEW, "GUIInit", function(data)
     end
 
     if not SL:GetValue("ACTOR_IS_NPC", actorID) then
+        return
+    end
+
+    if not SL:GetValue("MAIN_PLAYER_IS_VALID") then
+        SL:Print("error: mainPlayer is invalid! when npc in of view.", actorID, SL:GetValue("ACTOR_NAME", actorID))
         return
     end
 

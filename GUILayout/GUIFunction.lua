@@ -1462,6 +1462,9 @@ function GUIFunction:ChatItemOnMouseRightEvent(data, richText)
             return 0
         end
         GUI:addMouseButtonEvent(richText, {
+            onSpecialRFunc = function()
+                return -1
+            end,
             onRightDownFunc = OpenFuncDock,
             needTouchPos = true,
         })

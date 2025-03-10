@@ -99,7 +99,6 @@ function LookPlayerSuperEquip.main()
 
     SL:AttachTXTSUI({root = LookPlayerSuperEquip._ui["BG"], index = SLDefine.SUIComponentTable.PlayerSuperEquipBO})
 
-    LookPlayerSuperEquip.InitJJSplit()
 end
 
 -- 剑甲分离
@@ -168,41 +167,21 @@ end
 
 -- 初始化点击（包含鼠标）事件
 function LookPlayerSuperEquip.InitEquipLayerEvent()
-    for _,pos in pairs(LookPlayerSuperEquip._EquipPosSet) do
+    for _, pos in ipairs(LookPlayerSuperEquip._EquipPosSet) do
         local widget = LookPlayerSuperEquip.GetEquipPosPanel(pos)
         if type(GUIDefine.EquipAllShow[pos]) == "boolean" then
             widget = GUIDefine.EquipAllShow[pos] and LookPlayerSuperEquip.GetEquipPosPanel(pos) or LookPlayerSuperEquip.GetEquipPosExPanel(pos)
         end
 
-        if widget then
+        if widget and GUI:getVisible(widget) then
             GUI:setTouchEnabled(widget, true)
-            GUI:addOnTouchEvent(widget, function (sender, eventType) LookPlayerSuperEquip.OnClickEvent(widget, pos) end)
+            GUI:addOnTouchEvent(widget, function() LookPlayerSuperEquip.OnClickEvent(widget, pos) end)
 
             if isPC then
                 GUIFunction:InitItemTipsScrollEvent(widget, "LookPlayerSuperEquip")
                 GUIFunction:InitMouseMoveToEquipEvent(widget, pos, LookPlayerSuperEquip.OnOpenItemTips)
             end
 
-            -- 斗笠、头盔内装备特殊处理
-            local isNaikan = GUIDefine.EquipNaikanShow and GUIDefine.EquipNaikanShow[pos]
-            
-            local isSpeDeal = isNaikan == true or isNaikan == false
-            GUI:setVisible(widget, true)
-
-            local DefaultIcon = GUI:getChildByName(widget, "DefaultIcon")
-            if DefaultIcon and isSpeDeal then
-                GUI:setVisible(DefaultIcon, not isNaikan)
-            end
-
-            local PanelBg = GUI:getChildByName(widget, "PanelBg")
-            if PanelBg and isSpeDeal then
-                GUI:setVisible(PanelBg, not isNaikan)
-            end
-
-            local Node = LookPlayerSuperEquip.GetEquipPosNode(pos)
-            if Node then
-                GUI:setVisible(Node, not isNaikan)
-            end
         end
     end
     LookPlayerSuperEquip.SetSamePosEquip()
@@ -350,15 +329,23 @@ function LookPlayerSuperEquip.InitEquipCells()
             GUI:setVisible(LookPlayerSuperEquip._ui["Panel_pos44"], false)
         end
     end
+
+    LookPlayerSuperEquip.InitJJSplit()
+
+    if SL:GetValue("GAME_DATA", "isSeparateSuperHelmetAndCap") == 1 then
+        LookPlayerSuperEquip._SamePos = false
+    else
+        LookPlayerSuperEquip._SamePos = true
+    end
 end
 
--- 装备为内观时显示同部位多件装备tips，否则显示单件
+-- 装备为内观且使用相同位置时显示同部位多件装备tips，否则显示单件
 function LookPlayerSuperEquip.OnOpenItemTips(widget, pos)
     if GUI:Win_IsNull(widget) then
         return false
     end
 
-    local itemData = LookPlayerSuperEquip.IsNaikan(pos) and GUIFunction:GetEquipDataListByPos(pos, EDType) or {GUIFunction:GetEquipDataByPos(pos, nil, EDType)}
+    local itemData = (LookPlayerSuperEquip.IsNaikan(pos) and LookPlayerSuperEquip._SamePos) and GUIFunction:GetEquipDataListByPos(pos, EDType) or {GUIFunction:GetEquipDataByPos(pos, nil, EDType)}
     if not (itemData and next(itemData)) then
         return false
     end

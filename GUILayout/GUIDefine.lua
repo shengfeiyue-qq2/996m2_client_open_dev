@@ -346,32 +346,45 @@ GUIDefine.TipsEquipPosByStdMode = {
 }
 
 -- 是否展示内观（玩家和英雄目前是通用的）
-GUIDefine.IsNaikanEquip = function (equipPos)
-    local items = {
-        [EquipPosUI.Equip_Type_Dress]           = true, -- 衣服
-        [EquipPosUI.Equip_Type_Weapon]          = true, -- 武器
-        [EquipPosUI.Equip_Type_Helmet]          = true, -- 头盔
-        [EquipPosUI.Equip_Type_Cap]             = true, -- 斗笠
-        [EquipPosUI.Equip_Type_Shield]          = true, -- 盾牌
-        [EquipPosUI.Equip_Type_Veil]            = true, -- 面纱
+local showNaikanEquips = {
+    [EquipPosUI.Equip_Type_Dress]           = true, -- 衣服
+    [EquipPosUI.Equip_Type_Weapon]          = true, -- 武器
+    [EquipPosUI.Equip_Type_Helmet]          = true, -- 头盔
+    [EquipPosUI.Equip_Type_Cap]             = true, -- 斗笠
+    [EquipPosUI.Equip_Type_Shield]          = true, -- 盾牌
+    [EquipPosUI.Equip_Type_Veil]            = true, -- 面纱
 
-        [EquipPosUI.Equip_Type_Super_Dress]     = true, -- 神装衣服
-        [EquipPosUI.Equip_Type_Super_Weapon]    = true, -- 神装武器
-        [EquipPosUI.Equip_Type_Super_Helmet]    = true, -- 神装头盔
-        [EquipPosUI.Equip_Type_Super_Cap]       = true, -- 神装斗笠
-        [EquipPosUI.Equip_Type_Super_Shield]    = true, -- 神装盾牌
-        [EquipPosUI.Equip_Type_Super_Veil]      = true, -- 神装面巾
+    [EquipPosUI.Equip_Type_Super_Dress]     = true, -- 神装衣服
+    [EquipPosUI.Equip_Type_Super_Weapon]    = true, -- 神装武器
+    [EquipPosUI.Equip_Type_Super_Helmet]    = true, -- 神装头盔
+    [EquipPosUI.Equip_Type_Super_Cap]       = true, -- 神装斗笠
+    [EquipPosUI.Equip_Type_Super_Shield]    = true, -- 神装盾牌
+    [EquipPosUI.Equip_Type_Super_Veil]      = true, -- 神装面巾
 
-        [EquipPosUI.Equip_Fashion_Dress]        = true, -- 时装衣服
-        [EquipPosUI.Equip_Fashion_Weapon]       = true, -- 时装武器
-    }
-    return items[equipPos or 0]
+    [EquipPosUI.Equip_Fashion_Dress]        = true, -- 时装衣服
+    [EquipPosUI.Equip_Fashion_Weapon]       = true, -- 时装武器
+}
+GUIDefine.IsNaikanEquip = function(equipPos)
+
+    if equipPos == EquipPosUI.Equip_Type_Cap or equipPos == EquipPosUI.Equip_Type_Helmet then
+        if SL:GetValue("GAME_DATA", "isSeparateHelmetAndCap") == 1 then
+            showNaikanEquips[equipPos] = false
+        else
+            showNaikanEquips[equipPos] = true
+        end
+    end
+
+    if equipPos == EquipPosUI.Equip_Type_Super_Cap or equipPos == EquipPosUI.Equip_Type_Super_Helmet then
+        if SL:GetValue("GAME_DATA", "isSeparateSuperHelmetAndCap") == 1 then
+            showNaikanEquips[equipPos] = false
+        else
+            showNaikanEquips[equipPos] = true
+        end
+    end
+
+    return showNaikanEquips[equipPos or 0]
 end
 
-GUIDefine.EquipNaikanShow = {
-    [EquipPosUI.Equip_Type_Helmet] = true,      -- 头盔是否展示内观
-    [EquipPosUI.Equip_Type_Cap]    = true       -- 斗笠是否内观
-}
 
 -- 剑甲分离配置
 GUIDefine.EquipAllShow = {
@@ -543,6 +556,7 @@ GUIDefine.ItemBelong = {
     BAG                 = 2,
     QUICKUSE            = 3,
     STALL               = 4,
+    STORAGE             = 5,
     HEROBAG             = 66,
     HEROEQUIP           = 67,
 }

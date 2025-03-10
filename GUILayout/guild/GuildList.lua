@@ -48,7 +48,6 @@ function GuildList.OnRefreshGuildList()
     GuildList._qCells = {}
     GUI:ListView_removeAllItems(GuildList._ui.ListView)
 
-    local guildMain = SL:GetValue("GUILD_INFO")
     local listData = SL:GetValue("GUILD_WORLD_LIST")
     for i, info in ipairs(listData) do
         local function createCell(parent)

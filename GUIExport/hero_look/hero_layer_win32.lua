@@ -18,7 +18,7 @@ function ui.init(parent)
 	local Text_Name = GUI:Text_Create(Panel_1, "Text_Name", 150.00, 392.00, 18.0, "#ffe400", [[]])
 	GUI:setChineseName(Text_Name, "玩家面板_玩家昵称_文本")
 	GUI:setAnchorPoint(Text_Name, 0.50, 0.50)
-	GUI:setTouchEnabled(Text_Name, false)
+	GUI:setTouchEnabled(Text_Name, true)
 	GUI:setTag(Text_Name, 132.0)
 	GUI:Text_enableOutline(Text_Name, "#0e0e0e", 1.0)
 

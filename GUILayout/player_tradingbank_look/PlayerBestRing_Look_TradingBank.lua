@@ -77,19 +77,15 @@ end
 
 -- 初始化点击（包含鼠标）事件
 function PlayerBestRing_Look_TradingBank.InitEquipLayerEvent()
-    local InitPanel = function (widget, pos)
-        GUI:addOnTouchEvent(widget, function (sender, eventType) 
-            PlayerBestRing_Look_TradingBank.OnClickEvent() 
-        end)
-    end
-
-    for _,pos in ipairs(PlayerBestRing_Look_TradingBank._EquipPosSet) do
+    for _, pos in ipairs(PlayerBestRing_Look_TradingBank._EquipPosSet) do
         local widget = PlayerBestRing_Look_TradingBank.GetPanel(pos)
         local iconVisible = true
         local data =  GUIFunction:GetEquipDataByPos(pos, nil, EDType)
         if data then
             PlayerBestRing_Look_TradingBank.CreateEquipItem(GUI:getChildByName(widget, "Node"), data)
-            InitPanel(widget, pos)
+            GUI:addOnTouchEvent(widget, function() 
+                PlayerBestRing_Look_TradingBank.OnClickEvent(widget, pos) 
+            end)
             iconVisible = false
         end
         PlayerBestRing_Look_TradingBank.SetIconVisible(widget, iconVisible)

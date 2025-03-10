@@ -281,12 +281,11 @@ function Bag.UpdateItems()
 end
 
 function Bag.ResetItemPos(item)
-    local worldPos  = GUI:convertToWorldSpace(item, GUI:p(0,0))
-    local newPos    = GUI:p(math.floor(worldPos.x), math.floor(worldPos.y))
-    local pos       = GUI:p(GUI:getPosition(item))
-    local size      = GUI:getContentSize(item)
-    local posVec    = GUI:pAdd(pos,GUI:pSub(newPos, worldPos))     
-    GUI:setPosition(item, posVec.x+size.width/2, posVec.y+size.height/2)
+    local worldPos  = GUI:convertToWorldSpace(item, 0, 0)
+    local pos       = GUI:getPosition(item)
+    pos.x           = pos.x + (math.floor(worldPos.x) - worldPos.x)
+    pos.y           = pos.y + (math.floor(worldPos.y) - worldPos.y)
+    GUI:setPosition(item, pos.x + BagInfo._iWidth / 2, pos.y + BagInfo._iHeight / 2)
 end
 
 function Bag.OnRemoveBaiTanTag(data)

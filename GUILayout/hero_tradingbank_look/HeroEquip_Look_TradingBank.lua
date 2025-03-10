@@ -169,29 +169,11 @@ end
 
 -- 初始化点击（包含鼠标）事件
 function HeroEquip_Look_TradingBank.InitEquipLayerEvent()
-    for _,pos in pairs(HeroEquip_Look_TradingBank._EquipPosSet) do
+    for _, pos in ipairs(HeroEquip_Look_TradingBank._EquipPosSet) do
         local widget = HeroEquip_Look_TradingBank.GetEquipPosPanel(pos)
-        if widget then     
+        if widget and GUI:getVisible(widget) then     
             GUI:setTouchEnabled(widget, true)
-            GUI:addOnTouchEvent(widget, function (sender, eventType) HeroEquip_Look_TradingBank.OnClickEvent() end)
-
-            -- 斗笠、头盔内装备特殊处理
-            local isNaikan = GUIDefine.EquipNaikanShow and GUIDefine.EquipNaikanShow[pos]
-            GUI:setVisible(widget, true)
-            local DefaultIcon = GUI:getChildByName(widget, "DefaultIcon")
-            if DefaultIcon then
-                GUI:setVisible(DefaultIcon, not isNaikan)
-            end
-
-            local PanelBg = GUI:getChildByName(widget, "PanelBg")
-            if PanelBg then
-                GUI:setVisible(PanelBg, not isNaikan)
-            end
-
-            local Node = HeroEquip_Look_TradingBank.GetEquipPosNode(pos)
-            if Node then
-                GUI:setVisible(Node, not isNaikan)
-            end
+            GUI:addOnTouchEvent(widget, function() HeroEquip_Look_TradingBank.OnClickEvent(widget, pos) end)
         end
     end
     HeroEquip_Look_TradingBank.SetSamePosEquip()
@@ -319,6 +301,12 @@ function HeroEquip_Look_TradingBank.InitEquipCells()
         GUI:setVisible(HeroEquip_Look_TradingBank._ui["Node_14"], false)
         GUI:setVisible(HeroEquip_Look_TradingBank._ui["Node_15"], false)
     end
+
+    if SL:GetValue("GAME_DATA", "isSeparateHelmetAndCap") == 1 then
+        HeroEquip_Look_TradingBank._SamePos = false
+    else
+        HeroEquip_Look_TradingBank._SamePos = true
+    end
 end
 
 function HeroEquip_Look_TradingBank.InitBestRingsBox()
@@ -336,13 +324,13 @@ function HeroEquip_Look_TradingBank.InitBestRingsBox()
     end
 end
 
--- 装备为内观时显示同部位多件装备tips，否则显示单件
+-- 装备为内观且使用相同位置时显示同部位多件装备tips，否则显示单件
 function HeroEquip_Look_TradingBank.OnOpenItemTips(widget, pos)
     if GUI:Win_IsNull(widget) then
         return false
     end
 
-    local itemData = HeroEquip_Look_TradingBank.IsNaikan(pos) and GUIFunction:GetEquipDataListByPos(pos, EDType) or {GUIFunction:GetEquipDataByPos(pos, nil, EDType)}
+    local itemData = (HeroEquip_Look_TradingBank.IsNaikan(pos) and HeroEquip_Look_TradingBank._SamePos) and GUIFunction:GetEquipDataListByPos(pos, EDType) or {GUIFunction:GetEquipDataByPos(pos, nil, EDType)}
     if not (itemData and next(itemData)) then
         return false
     end

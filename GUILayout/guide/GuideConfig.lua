@@ -81,7 +81,7 @@ local config = {
             return nil
         end
 
-        local layer = isMergePanelMode and MergeBagInfo._ui or BagInfo._ui
+        local layer = isMergePanelMode and MergeBag._ui or Bag._ui
         if isMergePanelMode then
             if not layer or not layer.Panel_items or MergeBagInfo._selType ~= 1 then
                 return nil
@@ -132,16 +132,16 @@ local config = {
     [3] = function(config)
         local isMergePanelMode = GUIDefineEx.IsMergeMode
 
-        local parent = isMergePanelMode and GUI:GetWindow(nil, UIConst.LAYERID.MergeBagLayerGUI) or GUI:GetWindow(nil, UIConst.LAYERID.BagLayerGUI)
+        local parent = isMergePanelMode and GUI:GetWindow(nil, UIConst.LAYERID.MergeBagLayerGUI) or GUI:GetWindow(nil, UIConst.LAYERID.HeroBagLayerGUI)
         if not parent then
             return nil
         end
 
-        local layer = isMergePanelMode and MergeBagInfo._layer or BagInfo._layer
+        local layer = isMergePanelMode and MergeBag._layer or HeroBag._layer
         local isMergeMode = false
         if isMergePanelMode then
             isMergeMode = true
-            if not layer or not layer.Panel_items or layer:getShowType() ~= 2 then
+            if not layer or not layer.Panel_items or MergeBagInfo._selType ~= 2 then
                 return nil
             end
         else
@@ -174,9 +174,9 @@ local config = {
             return nil
         end
 
-        local layer = isMergePanelMode and MergeBagInfo._layer or BagInfo._layer
+        local layer = isMergePanelMode and MergeBag._layer or Bag._layer
         if isMergePanelMode then
-            if not layer or layer:getShowType() ~= 1 then
+            if not layer or MergeBagInfo._selType ~= 1 then
                 return nil
             end
         else

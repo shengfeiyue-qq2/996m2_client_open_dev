@@ -308,6 +308,9 @@ function HeroState.InitUI()
     end)
 
     local function addItemIntoBag()
+        if not GUI:getVisible(HeroState._root) then
+            return -1
+        end
         local state = SL:GetValue("ITEM_MOVE_STATE") 
         if not state then
             return -1

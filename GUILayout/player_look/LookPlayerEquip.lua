@@ -119,7 +119,6 @@ function LookPlayerEquip.main()
 
     SL:AttachTXTSUI({root = LookPlayerEquip._ui["BG"], index = SLDefine.SUIComponentTable.PlayerEquipBO})
 
-    LookPlayerEquip.InitJJSplit()
 end
 
 -- 剑甲分离
@@ -188,13 +187,13 @@ end
 
 -- 初始化点击（包含鼠标）事件
 function LookPlayerEquip.InitEquipLayerEvent()
-    for _,pos in pairs(LookPlayerEquip._EquipPosSet) do
+    for _, pos in ipairs(LookPlayerEquip._EquipPosSet) do
         local widget = LookPlayerEquip.GetEquipPosPanel(pos)
         if type(GUIDefine.EquipAllShow[pos]) == "boolean" then
             widget = GUIDefine.EquipAllShow[pos] and LookPlayerEquip.GetEquipPosPanel(pos) or LookPlayerEquip.GetEquipPosExPanel(pos)
         end
 
-        if widget then     
+        if widget and GUI:getVisible(widget) then     
             GUI:setTouchEnabled(widget, true)
             GUI:addOnTouchEvent(widget, function (sender, eventType) 
                 LookPlayerEquip.OnClickEvent(widget, pos) 
@@ -203,28 +202,6 @@ function LookPlayerEquip.InitEquipLayerEvent()
             if isPC then
                 GUIFunction:InitItemTipsScrollEvent(widget, "LookPlayerEquip")
                 GUIFunction:InitMouseMoveToEquipEvent(widget, pos, LookPlayerEquip.OnOpenItemTips)
-            end
-
-            -- 斗笠、头盔内装备特殊处理
-            local isNaikan = GUIDefine.EquipNaikanShow and GUIDefine.EquipNaikanShow[pos]
-            GUI:setVisible(widget, true)
-
-            local isSpeDeal = isNaikan == true or isNaikan == false
-            GUI:setVisible(widget, true)
-
-            local DefaultIcon = GUI:getChildByName(widget, "DefaultIcon")
-            if DefaultIcon and isSpeDeal then
-                GUI:setVisible(DefaultIcon, not isNaikan)
-            end
-
-            local PanelBg = GUI:getChildByName(widget, "PanelBg")
-            if PanelBg and isSpeDeal then
-                GUI:setVisible(PanelBg, not isNaikan)
-            end
-
-            local Node = LookPlayerEquip.GetEquipPosNode(pos)
-            if Node then
-                GUI:setVisible(Node, not isNaikan)
             end
         end
     end
@@ -361,6 +338,14 @@ function LookPlayerEquip.InitEquipCells()
         GUI:setVisible(LookPlayerEquip._ui["Node_14"], false)
         GUI:setVisible(LookPlayerEquip._ui["Node_15"], false)
     end
+
+    LookPlayerEquip.InitJJSplit()
+
+    if SL:GetValue("GAME_DATA", "isSeparateHelmetAndCap") == 1 then
+        LookPlayerEquip._SamePos = false
+    else
+        LookPlayerEquip._SamePos = true
+    end
 end
 
 function LookPlayerEquip.InitBestRingsBox()
@@ -377,13 +362,13 @@ function LookPlayerEquip.InitBestRingsBox()
     end
 end
 
--- 装备为内观时显示同部位多件装备tips，否则显示单件
+-- 装备为内观且使用相同位置时显示同部位多件装备tips，否则显示单件
 function LookPlayerEquip.OnOpenItemTips(widget, pos)
     if GUI:Win_IsNull(widget) then
         return false
     end
 
-    local itemData = LookPlayerEquip.IsNaikan(pos) and GUIFunction:GetEquipDataListByPos(pos, EDType) or {GUIFunction:GetEquipDataByPos(pos, nil, EDType)}
+    local itemData = (LookPlayerEquip.IsNaikan(pos) and LookPlayerEquip._SamePos) and GUIFunction:GetEquipDataListByPos(pos, EDType) or {GUIFunction:GetEquipDataByPos(pos, nil, EDType)}
     if not (itemData and next(itemData)) then
         return false
     end
@@ -409,11 +394,9 @@ end
 -- 更新所属行会信息
 function LookPlayerEquip.UpdateGuildInfo()
     local textGuildInfo = LookPlayerEquip._ui["Text_guildinfo"]
-    -- 行会数据
-    local guildData   = LookPlayerData.GetPlayerGuildName()
 
     -- 行会名字
-    local guildName   = guildData.guildName
+    local guildName = LookPlayerData.GetPlayerGuildName()
     guildName = guildName or ""
 
     -- 行会官职

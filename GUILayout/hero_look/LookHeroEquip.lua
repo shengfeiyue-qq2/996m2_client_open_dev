@@ -171,33 +171,15 @@ end
 
 -- 初始化点击（包含鼠标）事件
 function LookHeroEquip.InitEquipLayerEvent()
-    for _,pos in pairs(LookHeroEquip._EquipPosSet) do
+    for _, pos in ipairs(LookHeroEquip._EquipPosSet) do
         local widget = LookHeroEquip.GetEquipPosPanel(pos)
-        if widget then     
+        if widget and GUI:getVisible(widget) then     
             GUI:setTouchEnabled(widget, true)
             GUI:addOnTouchEvent(widget, function() LookHeroEquip.OnClickEvent(widget, pos) end)
 
             if isPC then
                 GUIFunction:InitItemTipsScrollEvent(widget, "LookHeroEquip")
                 GUIFunction:InitMouseMoveToEquipEvent(widget, pos, LookHeroEquip.OnOpenItemTips)
-            end
-
-            -- 斗笠、头盔内装备特殊处理
-            local isNaikan = GUIDefine.EquipNaikanShow and GUIDefine.EquipNaikanShow[pos]
-            GUI:setVisible(widget, true)
-            local DefaultIcon = GUI:getChildByName(widget, "DefaultIcon")
-            if DefaultIcon then
-                GUI:setVisible(DefaultIcon, not isNaikan)
-            end
-
-            local PanelBg = GUI:getChildByName(widget, "PanelBg")
-            if PanelBg then
-                GUI:setVisible(PanelBg, not isNaikan)
-            end
-
-            local Node = LookHeroEquip.GetEquipPosNode(pos)
-            if Node then
-                GUI:setVisible(Node, not isNaikan)
             end
         end
     end
@@ -330,6 +312,12 @@ function LookHeroEquip.InitEquipCells()
         GUI:setVisible(LookHeroEquip._ui["Node_14"], false)
         GUI:setVisible(LookHeroEquip._ui["Node_15"], false)
     end
+
+    if SL:GetValue("GAME_DATA", "isSeparateHelmetAndCap") == 1 then
+        LookHeroEquip._SamePos = false
+    else
+        LookHeroEquip._SamePos = true
+    end
 end
 
 function LookHeroEquip.InitBestRingsBox()
@@ -346,13 +334,13 @@ function LookHeroEquip.InitBestRingsBox()
     end
 end
 
--- 装备为内观时显示同部位多件装备tips，否则显示单件
+-- 装备为内观且使用相同位置时显示同部位多件装备tips，否则显示单件
 function LookHeroEquip.OnOpenItemTips(widget, pos)
     if GUI:Win_IsNull(widget) then
         return false
     end
 
-    local itemData = LookHeroEquip.IsNaikan(pos) and GUIFunction:GetEquipDataListByPos(pos, EDType) or {GUIFunction:GetEquipDataByPos(pos, nil, EDType)}
+    local itemData = (LookHeroEquip.IsNaikan(pos) and LookHeroEquip._SamePos) and GUIFunction:GetEquipDataListByPos(pos, EDType) or {GUIFunction:GetEquipDataByPos(pos, nil, EDType)}
     if not (itemData and next(itemData)) then
         return false
     end
@@ -378,11 +366,9 @@ end
 -- 更新所属行会信息
 function LookHeroEquip.UpdateGuildInfo()
     local textGuildInfo = LookHeroEquip._ui["Text_guildinfo"]
-    -- 行会数据
-    local guildData   = LookPlayerData.GetPlayerGuildName()
 
     -- 行会名字
-    local guildName   = guildData.guildName
+    local guildName = LookPlayerData.GetPlayerGuildName()
     guildName = guildName or ""
 
     -- 行会官职
