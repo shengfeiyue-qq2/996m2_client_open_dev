@@ -7,7 +7,7 @@ local STORE_MODE = {
 }
 
 function Storage.Init(isWin32)
-    Storage.lockImg        = "res/public/icon_tyzys_01.png"
+    Storage._lockImg       = "res/public/icon_tyzys_01.png"
     Storage._PWidth        = isWin32 and 336 or 508   -- 容器可见区域 宽
     Storage._PHeight       = isWin32 and 254.4 or 384 -- 容器可见区域 高
     Storage._PerPageNum    = 48
@@ -17,6 +17,7 @@ function Storage.Init(isWin32)
     Storage._selPage       = 0  -- 当前选中的页签
     Storage._pageBtns      = {}
     Storage._defaultNum    = 48 -- 官方默认仓库格子数量
+    Storage._isBig         = false -- 是否单页大仓库
 end
 
 function Storage.main()
@@ -32,6 +33,9 @@ function Storage.main()
     Storage._ui = GUI:ui_delegate(parent)
     Storage._openedCount = SL:GetValue("STROAGE_OPEN_SIZE")
     Storage._PerPageNum = Storage._PerPageNum or GUIDefine.STORAGE_PER_PAGE_MAX
+    -- 取实际容器大小
+    Storage._PHeight = GUI:getContentSize(Storage._ui["Panel_items"]).height
+    Storage._PWidth = GUI:getContentSize(Storage._ui["Panel_items"]).width
 
     local screenH = SL:GetValue("SCREEN_HEIGHT")
     local pSizeH = GUI:getContentSize(Storage._ui["Panel_1"]).height
@@ -51,6 +55,7 @@ function Storage.main()
 
         -- 隐藏页签
         if Storage._PerPageNum > Storage._defaultNum then
+            Storage._isBig = true
             for i = 1, Storage._MaxPage do
                 local pageBtn = Storage._ui["Button_page" .. i]
                 GUI:setVisible(pageBtn, false)
@@ -214,7 +219,7 @@ function Storage.UpdateItemList(page)
             local posY = maxHeight - itemHeight / 2 - itemHeight * gridY
 
             local clockImage = GUI:Image_Create(Storage._panelItems, "clock" .. i, posX, posY,
-                Storage.lockImg or SLDefine.PATH_RES_PUBLIC .. "icon_tyzys_01.png")
+                Storage._lockImg or SLDefine.PATH_RES_PUBLIC .. "icon_tyzys_01.png")
             GUI:setScale(clockImage, SL:GetValue("IS_PC_OPER_MODE") and 0.7 or 1)
             GUI:setAnchorPoint(clockImage, 0.5, 0.5)
 
@@ -222,33 +227,21 @@ function Storage.UpdateItemList(page)
         end
     end
 
-    local isWinMode = SL:GetValue("IS_PC_OPER_MODE")
-    local storage_row_col = SL:GetValue("GAME_DATA", "bag_storage_row_col_max")
-    local bBig = false -- 是否大仓库
-    if isWinMode and storage_row_col then
-        local slices = SL:Split(storage_row_col, "|")
-        local row = tonumber(slices[1]) or 8
-        local col = tonumber(slices[2]) or 6
-        if row * col > GUIDefine.STORAGE_PER_PAGE_MAX then
-            bBig = true
-        end
-    end
-
-    local itemData = {}
-    if bBig then
-        itemData = SL:GetValue("NPC_STORAGE_DATA")
+    local itemDataList = {}
+    if Storage._isBig then
+        itemDataList = SL:GetValue("NPC_STORAGE_DATA")
     else
-        itemData = SL:GetValue("NPC_STORAGE_DATA_BY_PAGE", Storage._selPage)
+        itemDataList = SL:GetValue("NPC_STORAGE_DATA_BY_PAGE", Storage._selPage)
     end
 
-    if not itemData or next(itemData) == nil then
+    if not itemDataList or next(itemDataList) == nil then
         return
     end
 
     Storage._resetList = false
 
     local pos = 1
-    for _, data in pairs(itemData) do
+    for _, data in pairs(itemDataList) do
         if pos > Storage._selPage * Storage._PerPageNum then
             break
         end

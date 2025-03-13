@@ -214,6 +214,13 @@ function PlayerFrame.RefreshPlayerName()
     if color and color > 0 then
         GUI:Text_setTextColor(Text_Name, SL:GetHexColorByStyleId(color))
     end
+
+    -- PC 点击私聊
+    if isPC then
+        GUI:addOnClickEvent(Text_Name, function()
+            SL:onLUAEvent(LUA_EVENT_CHAT_PRIVATE_TARGET, {name = SL:GetMetaValue("USER_NAME"), uid = SL:GetMetaValue("USER_ID")})
+        end)
+    end
 end
 
 function PlayerFrame.RefreshBtnState()

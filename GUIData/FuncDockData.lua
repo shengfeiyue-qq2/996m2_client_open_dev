@@ -308,7 +308,7 @@ function FuncDockData.InitFunction()
     end
     FuncDockData._typeFunction[BtnType.send_position] = function()
         -- 发送坐标
-        SL:RequestSendChatPosMsg(5)
+        SL:RequestSendChatPosMsg(GUIDefine.ChatChannel.TEAM)
     end
     FuncDockData._typeFunction[BtnType.exit_team] = function()
         -- 退出队伍

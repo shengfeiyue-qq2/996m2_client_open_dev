@@ -166,6 +166,8 @@ local attTypeTable = {
     Internal_LEVEL                  = 157,          -- 内功等级
     Rein_LEVEL                      = 158,          -- 转生
     BagMaxNum                       = 159,          -- 背包最大格子
+    PKPoint                         = 160,          -- PK值
+    SuperPower                      = 161,          -- 战力
 }
 
 GUIDefine.AttTypeTable = attTypeTable

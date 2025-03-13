@@ -927,6 +927,7 @@ function MainProperty.SendChatMsg(msg, channelID)
     local channel, content, targetName = GUIFunction:GetChannelByChatMsg(msg)
     if channel then
         channelID = channel
+        msg = content 
     end
 
     -- 敏感词
