@@ -2397,20 +2397,20 @@ function ItemTips.FillTipsContent(tipsLayout, cellView, tipsParam)
         ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
     end
 
-    -- 物品来源
-    local itemSrcWidget = ItemTips.CreateItemSrcWidget(tipsParam)
-    if itemSrcWidget then
-        removeLastLine()
-        ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
-        ItemTips.PushItem(cellView, itemSrcWidget)
-    end
-
     -- 描述2
     local desc2Widget = ItemTips.CreateDescWidget(2, tipsParam)
     if desc2Widget then
         removeLastLine()
         ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
         ItemTips.PushItem(cellView, desc2Widget)
+    end
+
+    -- 物品来源
+    local itemSrcWidget = ItemTips.CreateItemSrcWidget(tipsParam)
+    if itemSrcWidget then
+        removeLastLine()
+        ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
+        ItemTips.PushItem(cellView, itemSrcWidget)
     end
 
     -- 属性提升标识
