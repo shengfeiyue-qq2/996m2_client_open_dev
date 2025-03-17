@@ -1264,7 +1264,7 @@ end
 -- 打开快捷使用框
 function UIOperator:OpenAutoUsePopUI(data)
     GUI:SetLayerOpenParam(data)
-    SL:RequireFile(UIConst.LUAFile.LUA_FILE_AUTO_USE_POP)
+    GUI:Win_Open(UIConst.LUAFile.LUA_FILE_AUTO_USE_POP)
 end
 
 -- 关闭快捷使用框

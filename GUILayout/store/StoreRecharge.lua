@@ -45,6 +45,7 @@ function StoreRecharge.main()
         root  = StoreRecharge._ui.Panel_input,
         index = SLDefine.SUIComponentTable.Recharge
     })
+    StoreRecharge.RegisterEvent()
 end
 
 function StoreRecharge.InitProducts()
@@ -366,11 +367,11 @@ function StoreRecharge.OnClose()
 end
 
 function StoreRecharge.RegisterEvent()
-    SL:RegisterLUAEvent(LUA_EVENT_CLOSEWIN, "StoreRecharge", StoreRecharge.OnClose)
+    SL:RegisterLUAEvent(LUA_EVENT_STORE_RECHARGE_LAYER_CLOSE, "StoreRecharge", StoreRecharge.OnClose)
 end
 
 function StoreRecharge.UnRegisterEvent()
-    SL:UnRegisterLUAEvent(LUA_EVENT_CLOSEWIN, "StoreRecharge")
+    SL:UnRegisterLUAEvent(LUA_EVENT_STORE_RECHARGE_LAYER_CLOSE, "StoreRecharge")
 end
 
 StoreRecharge.main()

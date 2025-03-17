@@ -187,7 +187,7 @@ UIConst.LUAFile =
     LUA_FILE_STORE_DETAIL                       = "store/StoreDetail",                                                      -- 商城快捷购买
     LUA_FILE_RECHARGE_QRCODE                    = "store/RechargeQRCode",                                                   -- 充值二维码
 
-    LUA_FILE_AUTO_USE_POP                       = "GUILayout/AutoUsePop",                                                   -- 自动使用
+    LUA_FILE_AUTO_USE_POP                       = "AutoUsePop",                                                             -- 自动使用
 
     LUA_FILE_COMMON_BUBBLE_INFO                 = "common/CommonBubbleInfo",                                                -- 被多人邀请组队、交易
     LUA_FILE_COMMON_TIPS_POP                    = "common/CommonTipsPop",                                                   -- 通用弹窗
@@ -195,7 +195,7 @@ UIConst.LUAFile =
     LUA_FILE_COMMON_SELECT_LIST                 = "common/CommonSelectList",                                                -- 选择下拉栏
     LUA_FILE_COMMON_REDDOT                      = "common/RedDot",                                                          -- 红点
 
-    LUA_FILE_ITEM_SPLIT_POP                     = "item/ItemSplitPop",                                            -- 道具拆分弹窗
+    LUA_FILE_ITEM_SPLIT_POP                     = "item/ItemSplitPop",                                                      -- 道具拆分弹窗
 
     LUA_FILE_TREASURE_BOX                       = "treasure_box/TreasureBox",                                               -- 宝箱道具
     LUA_FILE_GOLD_BOX                           = "treasure_box/GoldBox",                                                   -- 宝箱

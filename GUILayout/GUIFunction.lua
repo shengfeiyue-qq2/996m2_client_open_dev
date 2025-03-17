@@ -424,7 +424,7 @@ function GUIFunction:OnAutoUseCheckItem(item)
         if equipIntoPos then
             -- 已有自动使用装备
             local tipsMakeIndex = AutoUseItemData.GetMakeIndexByPos(type, equipIntoPos)
-            UIOperator:CloseAutoUsePopUI(tipsMakeIndex)
+            UIOperator:CloseAutoUsePopUI(tipsMakeIndex, equipIntoPos)
             AutoUseItemData.SetMakeIndexByPos(type, equipIntoPos, item.MakeIndex)
         end
 
@@ -526,7 +526,7 @@ function GUIFunction:OnAutoUseCheckItem_Hero(item)
         if equipIntoPos then
             -- 已有自动使用装备
             local tipsMakeIndex = AutoUseItemData.GetMakeIndexByPos(type, equipIntoPos)
-            UIOperator:CloseAutoUsePopUI(tipsMakeIndex, nil, true)
+            UIOperator:CloseAutoUsePopUI(tipsMakeIndex, equipIntoPos, true)
             AutoUseItemData.SetMakeIndexByPos(type, equipIntoPos, item.MakeIndex)
         end
 
@@ -3442,7 +3442,8 @@ function GUIFunction:InitConditionRedWidget(parent, conditionStr, isTxt)
     if not conditionStr or string.len(tostring(conditionStr)) <= 0 then
         return
     end
-    local conditionList = SL:Split(conditionStr, "#")
+    local data = SL:Split(conditionStr, "&")
+    local conditionList = SL:Split(SL:GetValue("IS_PC_OPER_MODE") and data[2] or data[1], "#")
     local conditionID = tonumber(conditionList[1])
     if not conditionID then
         return
@@ -3451,9 +3452,23 @@ function GUIFunction:InitConditionRedWidget(parent, conditionStr, isTxt)
     local y = tonumber(conditionList[3]) or 0
     local type = tonumber(conditionList[4]) or 0
     local param = conditionList[5]
+    local anP = tonumber(conditionList[6]) or 0 -- txt显示位置基点: 0:左上角, 1:右上角, 2:左下角, 3:右下角, 4:居中
     if isTxt then
         local parentSize = GUI:getContentSize(parent)
-        y = parentSize.height - y
+        if anP == 0 then
+            y = parentSize.height - y
+        elseif anP == 1 then
+            x = parentSize.width + x
+            y = parentSize.height - y
+        elseif anP == 2 then
+            y = - y
+        elseif anP == 3 then
+            x = parentSize.width + x
+            y = - y
+        elseif anP == 4 then
+            x = math.floor(parentSize.width / 2) + x
+            y = math.floor(parentSize.height / 2) - y
+        end
     end
 
     conditionRedID = conditionRedID + 1
