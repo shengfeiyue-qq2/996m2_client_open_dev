@@ -258,7 +258,7 @@ function QuickUseData.SetQuickUseSize(num)
     end
 end
 
-function QuickUseData.GetQuickUseSize(num)
+function QuickUseData.GetQuickUseSize()
     return QuickUseData._quickUseSize
 end
 

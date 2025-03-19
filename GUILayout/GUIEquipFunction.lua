@@ -64,14 +64,15 @@ function GUIFunction:GetEquipTakeOnPosByStdMode(stdMode, param, type)
                 choosePos = 1
             end
             _G.LastTakeOnPosMask[pos] = choosePos
+            pos = posArray[choosePos]
 
-            local equipData = GUIFunction:GetEquipDataByPos(choosePos, nil, type)
+            local equipData = GUIFunction:GetEquipDataByPos(pos, nil, type)
             if equipData then
                 local equipPower = GUIFunction:GetEquipPower(equipData, param)
                 minWearPower = equipPower
-                minPowerPos = choosePos
+                minPowerPos = pos
             else
-                minPowerPos = choosePos
+                minPowerPos = pos
                 minWearPower = 0
                 hasEquip = false
             end

@@ -297,13 +297,10 @@ function HeroState.InitUI()
                 end
             end)
         end
-    else
-        local screenH = SL:GetValue("SCREEN_HEIGHT")
-        GUI:setPosition(HeroState._panel, 250, screenH - 10)
     end
     ---------------点头像------------------------------------
     GUI:setTouchEnabled(HeroState._ui.Image_head, true)
-    GUI:addOnClickEvent(HeroState._ui.Image_head,function()
+    GUI:addOnClickEvent(HeroState._ui.Image_head, function()
         UIOperator:OpenMyHeroUI({page = UIConst.LayerTable.PlayerEquip})
     end)
 

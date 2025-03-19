@@ -3479,4 +3479,119 @@ function GUIFunction:InitConditionRedWidget(parent, conditionStr, isTxt)
         GUI:RedDot_setBindConditionID(widget, conditionID)
     end
 end
--------------------------------------------
+-------------------------------------------------------------------------
+local function getAttOriginId(id)
+    return id >= 10000 and math.floor(id / 10000) or id
+end
+
+local attTypeT = GUIDefine.AttTypeTable
+local function getAddShow(id, value)
+    if tonumber(value) and tonumber(value) < 0 then
+        return ""
+    end
+    if id == attTypeT.HP or id == attTypeT.MP or id == attTypeT.Hit_Point or id == attTypeT.Speed_Point or id == attTypeT.Anti_Magic or id == attTypeT.Anti_Posion or
+    id == attTypeT.Posion_Recover or id == attTypeT.Health_Recover or id == attTypeT.Spell_Recover or id == attTypeT.Hit_Speed or id == attTypeT.God_Damage or id == attTypeT.Lucky then
+        return "+"
+    end
+    return ""
+end
+
+-- 获取BUFF添加属性文本显示
+function GUIFunction:GetBuffAddAttrShow(buffID)
+    local config = SL:GetValue("BUFF_CONFIG", buffID)
+    if not buffID or not config then
+        return ""
+    end
+
+    local att = config.param
+    local attList = {}
+    if not att or att == "" or att == "0" or att == 0 then
+        return ""
+    end
+    local attArray = SL:Split(att, "|")
+    for k, v in ipairs(attArray) do
+        local attData = SL:Split(v, "#")
+        local attId = tonumber(attData[1])
+        local attValue = tonumber(attData[2])
+        table.insert(attList, {
+            id = attId,
+            value = attValue
+        })
+    end
+
+    -- 基础属性
+    local attrAlignment         = SL:GetValue("IS_PC_OPER_MODE") and tonumber(SL:GetValue("GAME_DATA", "pc_tips_attr_alignment")) or 0
+    local attrCoefficient       = SL:GetValue("IS_PC_OPER_MODE") and -1 or 1
+    attrAlignment               = math.ceil(attrAlignment / 3)
+
+    -- 属性显示队列
+    local stringAtt = GUIFunction:GetAttDataShow(attList, nil, true)
+    -- 把基础属性和元素属性分开
+    local basicAttrShow = {}
+    local yuansuAttrShow = {}
+    for id, v in pairs(stringAtt) do
+        v.id = id
+        local originId = getAttOriginId(id)
+        local attConfig = SL:GetMetaValue("ATTR_CONFIG", originId)
+        v.sort = attConfig and attConfig.sort or originId + 1000
+
+        if attConfig and attConfig.ys == 1 then
+            table.insert(yuansuAttrShow, v)
+        else
+            table.insert(basicAttrShow, v)
+        end
+    end
+
+    table.sort(basicAttrShow, function(a, b)
+        return a.sort < b.sort
+    end)
+    table.sort(yuansuAttrShow, function(a, b)
+        return a.sort < b.sort
+    end)
+
+    local attrStr = ""
+    local wrapFormat = "%s\\%s"
+    if basicAttrShow and next(basicAttrShow) then
+        local titleStr = string.format("<%s/FCOLOR=%s>", "[基础属性]：", 154)
+        attrStr = string.format(wrapFormat, attrStr, titleStr)
+        for _, v in ipairs(basicAttrShow) do
+            local name = string.gsub(v.name, " ", "")
+            name = string.gsub(name, "　", "")
+            local value  = getAddShow(v.id, v.value) .. v.value
+            local nameLen, chineseLen = SL:GetUTF8ByteLen(name)  
+            local newLen = math.max(attrAlignment - nameLen - chineseLen * attrCoefficient + SL:GetUTF8ByteLen(value), 0)
+            local lenStr = string.format("%%%ds", newLen)
+            value        = string.format(lenStr, value)
+    
+            local oneStr = name .. value
+            local color = v.color
+            if color and color > 0 then
+                oneStr = string.format("<%s/FCOLOR=%s>", oneStr, color)
+            end
+            attrStr = string.format(wrapFormat, attrStr, oneStr)
+        end
+    end
+
+    if yuansuAttrShow and next(yuansuAttrShow) then
+        local yuansuTitle = string.format("<%s/FCOLOR=%s>", "[元素属性]：", 154)
+        attrStr = string.format(wrapFormat, attrStr, yuansuTitle)
+        for _, v in ipairs(yuansuAttrShow) do
+            local name = string.gsub(v.name, " ", "")
+            name = string.gsub(name, "　", "")
+            local value = getAddShow(v.id, v.value) .. v.value
+            local nameLen, chineseLen = SL:GetUTF8ByteLen(name)
+            local newLen = math.max(attrAlignment - nameLen - chineseLen * attrCoefficient + SL:GetUTF8ByteLen(value), 0)
+            local lenStr = string.format("%%%ds", newLen)
+            value        = string.format(lenStr, value)
+
+            local oneStr = name .. value
+            local color = v.color
+            if color and color > 0 then
+                oneStr = string.format("<%s/FCOLOR=%s>", oneStr, color)
+            end
+            attrStr = string.format(wrapFormat, attrStr, oneStr)
+        end
+    end
+
+    return attrStr
+end

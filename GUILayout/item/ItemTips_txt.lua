@@ -1616,7 +1616,7 @@ function ItemTips.CreateIconWidget(param)
     local res = _resPath .. (SL:GetValue("IS_PC_OPER_MODE") and "1900025000.png" or "1900025001.png")
     local iconBg = GUI:Image_Create(-1, "icon_bg", 0, 0, res)
     local size = GUI:getContentSize(iconBg)
-    local item = GUI:ItemShow_Create(iconBg, "item_", size.width / 2, size.height / 2, {itemData = itemData, index = itemData.Index, disShowCount = true, notShowEquipRedMask = true})
+    local item = GUI:ItemShow_Create(iconBg, "item_", size.width / 2, size.height / 2, {itemData = itemData, index = itemData.Index, disShowCount = true, notShowEquipRedMask = true, noMouseTips = true})
     GUI:setAnchorPoint(item, 0.5, 0.5)
 
     local iconMoveY = SL:GetValue("IS_PC_OPER_MODE") and -2 or 0
@@ -2019,7 +2019,7 @@ function ItemTips.CreateInlayCell(itemId, inlayStrList, index)
     local res = _resPath .. (SL:GetValue("IS_PC_OPER_MODE") and "1900025000.png" or "1900025001.png")
     local iconBg = GUI:Image_Create(cell, "icon_bg", 0, 0, res)
     local size = GUI:getContentSize(iconBg)
-    local item = GUI:ItemShow_Create(iconBg, "item_", size.width / 2, size.height / 2, {itemData = itemData, index = itemData.Index, disShowCount = true, notShowEquipRedMask = true})
+    local item = GUI:ItemShow_Create(iconBg, "item_", size.width / 2, size.height / 2, {itemData = itemData, index = itemData.Index, disShowCount = true, notShowEquipRedMask = true, noMouseTips = true})
     GUI:setAnchorPoint(item, 0.5, 0.5)
 
     local color = (itemData.Color and itemData.Color > 0) and itemData.Color or 255

@@ -50,6 +50,7 @@ function MainTargetBelong.main()
     MainTargetBelong._scrollNameText = MainTargetBelong.CreateScrollText()
 
     MainTargetBelong._targetID = targetID
+    MainTargetBelong._targetOwnID = nil
 
     MainTargetBelong.ShowUI()
     

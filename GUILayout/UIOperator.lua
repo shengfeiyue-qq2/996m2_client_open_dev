@@ -1244,7 +1244,7 @@ end
 -- 打开目标归属
 function UIOperator:OpenTargetBelongUI(data)
     GUI:SetLayerOpenParam(data)
-    SL:RequireFile(UIConst.LUAFile.LUA_FILE_MAIN_TARGET_BELONG)
+    GUI:Win_Open(UIConst.LUAFile.LUA_FILE_MAIN_TARGET_BELONG)
 end
 -- 附近展示页
 function UIOperator:OpenMainNearUI()

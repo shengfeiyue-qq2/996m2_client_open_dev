@@ -59,7 +59,8 @@ function LookPlayerBuff.UpdateBuffCell(layout, data)
         GUI:setTouchEnabled(ui.Button_icon, true)
         GUI:addOnClickEvent(ui.Button_icon, function(sender)
             local pos = GUI:getTouchEndPosition(sender)
-            local str = (data.name or "") .. "\\" .. tips
+            local str = (data.name or "") .. GUIFunction:GetBuffAddAttrShow(data.id)
+            str = str .. "\\" .. tips
             str = string.gsub(str, "%^", "\\")
             local openData = {
                 str         = str,
