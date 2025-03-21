@@ -107,6 +107,8 @@ function ItemTips.main()
     ItemTips._ysAttrs = nil
     ItemTips._upAttrs = nil
 
+    ItemTips.fromTrading = nil
+
     -- 是否是英雄装备
     _isHero     = data.from and FromHero[data.from] or false
     _lookPlayer = data.lookPlayer
@@ -114,7 +116,7 @@ function ItemTips.main()
 
     local itemData = data.itemData or (data.typeId and SL:GetValue("ITEM_DATA", data.typeId))
     ItemTips._data.itemData = itemData
-
+    ItemTips.fromTrading = data and data.fromTrading or nil
     -- 字号、行距
     local param = GUIDefineEx.TipsFontSizeVspace
     _nameSize = param.fontSize or _nameSize
@@ -660,7 +662,11 @@ function ItemTips.GetPowerStr(itemData)
     if not _lookPlayer then
         job = _isHero and SL:GetValue("H.JOB") or SL:GetValue("JOB")
     else
-        job = SL:GetValue("L.M.JOB")
+        if ItemTips.fromTrading then
+            job = SL:GetValue("T.M.JOB")
+        else
+            job = SL:GetValue("L.M.JOB")
+        end
     end
 
     -- 合并
@@ -986,7 +992,11 @@ function ItemTips.GetSuitStr(suit)
     if not _lookPlayer then
         job = _isHero and SL:GetValue("H.JOB") or SL:GetValue("JOB")
     else
-        job = SL:GetValue("L.M.JOB")
+        if ItemTips.fromTrading then
+            job = SL:GetValue("T.M.JOB")
+        else
+            job = SL:GetValue("L.M.JOB")
+        end
     end
     local function getJobDesc(desc)
         if not desc or desc == "" then

@@ -149,7 +149,7 @@ function PlayerEquip_Look_TradingBank.CreateEquipItem(parent, data)
     info.itemData   = data
     info.index      = data.Index
     info.lookPlayer = true
-
+    info.fromTrading = true
     local itemShow = GUI:ItemShow_Create(parent, "item", 0, 0, info)
     GUI:setAnchorPoint(itemShow, 0.5, 0.5)
 
@@ -349,7 +349,7 @@ function PlayerEquip_Look_TradingBank.OnOpenItemTips(widget, pos)
     end
     data.lookPlayer = true
     data.from = GUIDefine.ItemFrom.PLAYER_EQUIP
-
+    data.fromTrading = true
     UIOperator:OpenItemTips(data)
 end
 

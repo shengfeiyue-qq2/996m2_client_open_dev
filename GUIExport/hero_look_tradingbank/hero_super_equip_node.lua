@@ -26,13 +26,6 @@ function ui.init(parent)
 	GUI:setTouchEnabled(Panel_pos17, true)
 	GUI:setTag(Panel_pos17, 32)
 
-	-- Create Panel_pos21
-	local Panel_pos21 = GUI:Layout_Create(Panel_1, "Panel_pos21", 174.00, 322.00, 50.00, 50.00, false)
-	GUI:setChineseName(Panel_pos21, "英雄时装_头盔位置")
-	GUI:setAnchorPoint(Panel_pos21, 0.50, 0.50)
-	GUI:setTouchEnabled(Panel_pos21, true)
-	GUI:setTag(Panel_pos21, 33)
-
 	-- Create Panel_pos45
 	local Panel_pos45 = GUI:Layout_Create(Panel_1, "Panel_pos45", 244.00, 208.00, 85.00, 140.00, false)
 	GUI:setChineseName(Panel_pos45, "英雄时装_盾牌位置")
@@ -46,6 +39,62 @@ function ui.init(parent)
 	GUI:setAnchorPoint(Panel_pos18, 0.50, 0.50)
 	GUI:setTouchEnabled(Panel_pos18, true)
 	GUI:setTag(Panel_pos18, 31)
+
+	-- Create Panel_pos19
+	local Panel_pos19 = GUI:Layout_Create(Panel_1, "Panel_pos19", 174.00, 322.00, 50.00, 50.00, false)
+	GUI:setChineseName(Panel_pos19, "英雄时装_斗笠位置")
+	GUI:setAnchorPoint(Panel_pos19, 0.50, 0.50)
+	GUI:setTouchEnabled(Panel_pos19, true)
+	GUI:setTag(Panel_pos19, 33)
+
+	-- Create Image_bg
+	local Image_bg = GUI:Image_Create(Panel_pos19, "Image_bg", 25.00, 25.00, "res/private/player_main_layer_ui/player_main_layer_ui_mobile/icon_chenghd_03.png")
+	GUI:Image_setScale9Slice(Image_bg, 17, 17, 16, 14)
+	GUI:setContentSize(Image_bg, 52, 52)
+	GUI:setIgnoreContentAdaptWithSize(Image_bg, false)
+	GUI:setChineseName(Image_bg, "英雄时装_斗笠_物品框")
+	GUI:setAnchorPoint(Image_bg, 0.50, 0.50)
+	GUI:setTouchEnabled(Image_bg, false)
+	GUI:setTag(Image_bg, 50)
+	GUI:setVisible(Image_bg, false)
+
+	-- Create Image_icon
+	local Image_icon = GUI:Image_Create(Panel_pos19, "Image_icon", 25.00, 25.00, "res/private/gui_edit/ImageFile.png")
+	GUI:setContentSize(Image_icon, 35, 36)
+	GUI:setIgnoreContentAdaptWithSize(Image_icon, false)
+	GUI:setChineseName(Image_icon, "英雄时装_斗笠_图标")
+	GUI:setAnchorPoint(Image_icon, 0.50, 0.50)
+	GUI:setTouchEnabled(Image_icon, false)
+	GUI:setTag(Image_icon, 72)
+	GUI:setVisible(Image_icon, false)
+
+	-- Create Panel_pos21
+	local Panel_pos21 = GUI:Layout_Create(Panel_1, "Panel_pos21", 174.00, 322.00, 50.00, 50.00, false)
+	GUI:setChineseName(Panel_pos21, "英雄时装_头盔位置")
+	GUI:setAnchorPoint(Panel_pos21, 0.50, 0.50)
+	GUI:setTouchEnabled(Panel_pos21, true)
+	GUI:setTag(Panel_pos21, 33)
+
+	-- Create Image_bg
+	local Image_bg = GUI:Image_Create(Panel_pos21, "Image_bg", 25.00, 25.00, "res/private/player_main_layer_ui/player_main_layer_ui_mobile/icon_chenghd_03.png")
+	GUI:Image_setScale9Slice(Image_bg, 17, 17, 16, 14)
+	GUI:setContentSize(Image_bg, 52, 52)
+	GUI:setIgnoreContentAdaptWithSize(Image_bg, false)
+	GUI:setChineseName(Image_bg, "英雄时装_头盔_物品框")
+	GUI:setAnchorPoint(Image_bg, 0.50, 0.50)
+	GUI:setTouchEnabled(Image_bg, false)
+	GUI:setTag(Image_bg, 50)
+	GUI:setVisible(Image_bg, false)
+
+	-- Create Image_icon
+	local Image_icon = GUI:Image_Create(Panel_pos21, "Image_icon", 25.00, 25.00, "res/private/gui_edit/ImageFile.png")
+	GUI:setContentSize(Image_icon, 47, 37)
+	GUI:setIgnoreContentAdaptWithSize(Image_icon, false)
+	GUI:setChineseName(Image_icon, "英雄时装_头盔_图标")
+	GUI:setAnchorPoint(Image_icon, 0.50, 0.50)
+	GUI:setTouchEnabled(Image_icon, false)
+	GUI:setTag(Image_icon, 72)
+	GUI:setVisible(Image_icon, false)
 
 	-- Create Node_playerModel
 	local Node_playerModel = GUI:Node_Create(Panel_1, "Node_playerModel", 174.00, 219.00)
@@ -369,6 +418,16 @@ function ui.init(parent)
 	GUI:setTouchEnabled(Image_icon, false)
 	GUI:setTag(Image_icon, 81)
 
+	-- Create Node_19
+	local Node_19 = GUI:Node_Create(Panel_1, "Node_19", 174.00, 324.00)
+	GUI:setAnchorPoint(Node_19, 0.50, 0.50)
+	GUI:setTag(Node_19, 51)
+
+	-- Create Node_21
+	local Node_21 = GUI:Node_Create(Panel_1, "Node_21", 174.00, 324.00)
+	GUI:setAnchorPoint(Node_21, 0.50, 0.50)
+	GUI:setTag(Node_21, 51)
+
 	-- Create Node_23
 	local Node_23 = GUI:Node_Create(Panel_1, "Node_23", 36.00, 156.00)
 	GUI:setChineseName(Node_23, "英雄时装_右手镯_位置")
@@ -440,21 +499,5 @@ function ui.init(parent)
 	GUI:setChineseName(Node_43, "英雄时装_护身符_位置")
 	GUI:setAnchorPoint(Node_43, 0.50, 0.50)
 	GUI:setTag(Node_43, 71)
-
-	-- Create Text_shizhuang
-	local Text_shizhuang = GUI:Text_Create(Panel_1, "Text_shizhuang", 264.00, 453.00, 16, "#ffe400", [[时装外显示]])
-	GUI:setChineseName(Text_shizhuang, "英雄时装_外显_文本")
-	GUI:setAnchorPoint(Text_shizhuang, 0.00, 0.50)
-	GUI:setTouchEnabled(Text_shizhuang, false)
-	GUI:setTag(Text_shizhuang, 352)
-	GUI:Text_enableOutline(Text_shizhuang, "#111111", 1)
-
-	-- Create CheckBox_shizhuang
-	local CheckBox_shizhuang = GUI:CheckBox_Create(Panel_1, "CheckBox_shizhuang", 250.00, 453.00, "res/public/1900000550.png", "res/public/1900000551.png")
-	GUI:CheckBox_setSelected(CheckBox_shizhuang, true)
-	GUI:setChineseName(CheckBox_shizhuang, "英雄时装_外显_勾选框")
-	GUI:setAnchorPoint(CheckBox_shizhuang, 0.50, 0.50)
-	GUI:setTouchEnabled(CheckBox_shizhuang, true)
-	GUI:setTag(CheckBox_shizhuang, 351)
 end
 return ui

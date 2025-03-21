@@ -44,7 +44,7 @@ function MainMiniMap.main()
     end
 
     local _, rect = SL:GetValue("NOTCH_PHONE_INFO")
-    GUI:setPosition(MainMiniMap._root, SL:GetValue("SCREEN_WIDTH") - rect.x, SL:GetValue("SCREEN_HEIGHT") - 30)
+    GUI:setPosition(MainMiniMap._root, rect.width, SL:GetValue("SCREEN_HEIGHT") - 30)
 
     MainMiniMap._Image_minimap = MainMiniMap._ui["Image_minimap"]
     MainMiniMap._miniScaleX = GUI:getScaleX(MainMiniMap._Image_minimap)

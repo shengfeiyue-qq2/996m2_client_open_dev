@@ -34,11 +34,11 @@ function AuctionWorld.main()
     end
 
     -- 品阶
-    AuctionWorld.qualities = clone(SL:GetValue("AUCTION_QUALITIES"))
+    AuctionWorld.qualities = SL:CopyData(SL:GetValue("AUCTION_QUALITIES"))
     table.insert(AuctionWorld.qualities, 1, {id = 0, name = "全部"})
 
     -- 货币
-    AuctionWorld.currencies = clone(SL:GetValue("AUCTION_CURRENCIES"))
+    AuctionWorld.currencies = SL:CopyData(SL:GetValue("AUCTION_CURRENCIES"))
     table.insert(AuctionWorld.currencies, 1, {id = 0, name = "全部"})
 
     -- 价格

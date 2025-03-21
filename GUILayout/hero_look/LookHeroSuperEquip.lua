@@ -51,7 +51,7 @@ local SetFeature = function (pos, data)
     if Typefunc[pos] then Typefunc[pos](data) end
 end
 
-local EquipPosSet = {17, 18, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 43, 45}
+local EquipPosSet = {17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 43, 45}
 
 -- 斗笠和头盔是否在相同的位置
 LookHeroSuperEquip._SamePos = true
