@@ -371,7 +371,7 @@ end
 
 -- 显示获得或消耗物品
 function BagData.ShowGetOrCostItems(diff, name)
-    if not BagData._isInit then
+    if BagData._isInit then
         return
     end
 
@@ -546,9 +546,6 @@ function BagData.ClearItemData(isReconnect)
     BagData._bagNoPosItems = {}-- {makeindex = {}}
     BagData._itemCountByIndex = {}
     BagData._isInit = false
-    if not isReconnect then 
-        self:CleanBagPosData()
-    end
 end
 
 -- 换位
@@ -631,6 +628,11 @@ end
 -- 背包数据初始化
 function BagData.ResponseBagItemData(data)
     local data = data.data
+
+    if BagData._isInit then
+        BagData.ClearItemData()
+    end
+
     -- 修正本地位置信息数据
     BagData.AmendHistoryPos(false, data)
     

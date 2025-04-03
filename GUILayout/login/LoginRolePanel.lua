@@ -95,7 +95,7 @@ function LoginRolePanel.InitUI()
     GUI:Text_setString(LoginRolePanel._ui.Text_server_name, SL:GetValue("SERVER_NAME"))
 
     -- role
-    local function selectRole(index) 
+    local function selectRole(index)
         -- 创角/恢复中
         if LoginRolePanel._createUI or LoginRolePanel._restoreUI then
             return
@@ -296,16 +296,6 @@ end
 function LoginRolePanel.UpdateRolesShow()
     local roles = SL:GetValue("LOGIN_ROLE_DATAS")
     -- level 等级 name 昵称 job 职业 012
-    local jobName = {"战士", "法师", "道士"}
-    local function getJobName(job)
-        if job >= 5 and job <= 15 then
-            local jobData   = LoginRolePanel._multiJobData[job]
-            local str       = jobData and jobData.name or string.format("未命名%s", job)
-            return str
-        end
-        return jobName[job + 1]
-    end
-    --
     for i = 1, 2 do
         GUI:Text_setString(LoginRolePanel._ui["Text_level_"..i], "")
         GUI:Text_setString(LoginRolePanel._ui["Text_name_"..i], "")
@@ -314,7 +304,7 @@ function LoginRolePanel.UpdateRolesShow()
         if roles[i] then
             GUI:Text_setString(LoginRolePanel._ui["Text_level_"..i], roles[i].level .. "级")
             GUI:Text_setString(LoginRolePanel._ui["Text_name_"..i], roles[i].name)
-            GUI:Text_setString(LoginRolePanel._ui["Text_job_"..i], getJobName(roles[i].job))
+            GUI:Text_setString(LoginRolePanel._ui["Text_job_"..i], GUIFunction:GetJobNameByID(roles[i].job))
         end
     end 
 end
@@ -344,7 +334,7 @@ function LoginRolePanel.OnSelectRole(index, isInit)
     local animID = LoginRolePanel._animLightID
     local animGID = LoginRolePanel._animGToLID
     local position = LoginRolePanel._animPos
-    local _animScale = LoginRolePanel._animScale or {1, 1}
+    local _animScale = LoginRolePanel._animScale
     if animID and animGID and position then
         for i = 1, 2 do
             local scale = _animScale[i]

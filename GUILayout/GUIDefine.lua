@@ -18,9 +18,9 @@ GUIDefine.DESIGN_SIZE_MOBILE    = {width = 1136, height = 640}
 -- 仓库单页可存数量
 GUIDefine.STORAGE_PER_PAGE_MAX  = 48
 
-GUIDefine.AUTO_FIND_TARGET_NONE = -1              -- 自动寻路目标 - 无
+GUIDefine.AUTO_FIND_TARGET_NONE = -1            -- 自动寻路目标 - 无
 
-GUIDefine.MAX_COST              = 0xFFFFFFFF
+GUIDefine.MAX_COST              = 400           -- 0xFFFFFFFF
 
 -- 属性类型
 local attTypeTable = {
@@ -977,6 +977,15 @@ GUIDefine.LaunchType = {
 	AUTO            = 2,            -- 挂机释放
 	LOCK            = 3,            -- 锁定目标释放
 	ATTACK          = 4,            -- 强攻释放
+}
+
+----------------------------------------------------------------------------------------------------------
+-- 黑夜状态
+GUIDefine.DarkState = {
+    DAYTIME     = 0,        -- 白天
+    NIGHT       = 1,        -- 晚上
+    SUNRISE     = 2,        -- 日出  
+    EVENING     = 3         -- 傍晚
 }
 
 ----------------------------------------------------------------------------------------------------------

@@ -176,7 +176,7 @@ function AuctionBidding.CreateItemCell(parent, data)
     end)
 
     -- 领取or拍卖
-    if data.btFlag == 1 and tonumber(data.sCurUser) == mainPlayerID then
+    if data.btFlag == 1 and data.sCurUser == mainPlayerID then
         GUI:setVisible(ui.Text_acquire, true)
         GUI:setVisible(ui.Button_acquire, true)
         GUI:setPositionX(ui.Node_bid_price, SL:GetValue("IS_PC_OPER_MODE") and 430 or 520)

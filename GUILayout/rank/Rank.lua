@@ -403,9 +403,9 @@ function Rank.UpdateChooseModel(data)
     end
 end
 
+local fashionStdMode = {[66] = true, [67] = true, [68] = true, [69] = true}
 local function isFashionEquip(item)
     if item and item.StdMode then
-        local fashionStdMode = {[66] = true, [67] = true, [68] = true, [69] = true}
         if fashionStdMode[item.StdMode] then
             return true
         end

@@ -192,10 +192,10 @@ function ChatExtend.ShowItems()
 
                 local good_image = GUI:Image_Create(layout, "good_image", itemWid / 2, itemHei / 2, "res/public/1900000651.png")
                 GUI:setAnchorPoint(good_image, 0.5, 0.5)
-                local item = GUI:ItemShow_Create(parent, "good_item", itemWid / 2, itemHei / 2, {index = item.Index, itemData = item})
-                local buttonIcon = GUI:ItemShow_GetItemIcon(item)
+                local itemShow = GUI:ItemShow_Create(parent, "good_item", itemWid / 2, itemHei / 2, {index = item.Index, itemData = item})
+                local buttonIcon = GUI:ItemShow_GetItemIcon(itemShow)
                 GUI:setTouchEnabled(buttonIcon, false)
-                GUI:setAnchorPoint(item, 0.5, 0.5)
+                GUI:setAnchorPoint(itemShow, 0.5, 0.5)
 
                 -- 显示已装备图片
                 if item.wore then

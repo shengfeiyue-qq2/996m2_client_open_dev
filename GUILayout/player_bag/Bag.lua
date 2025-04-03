@@ -48,6 +48,9 @@ function Bag.InitData()
 
     BagInfo._bagPageBtns        = {}
     BagInfo._chooseTagList      = {} -- 回收设定勾选的物品
+
+    BagInfo._is_load_finish     = false     -- 背包是否加载完成
+    BagInfo._is_retrieve_finsh  = true      -- 是否回收加载完成
 end
 
 function Bag.InitUI(page)
@@ -252,6 +255,10 @@ function Bag.UpdateItems()
             Bag.OnRefreshBagRedDot()
             Bag.OnRefreshChooseList()
             Bag.InitStallTag(sIndex, eIndex)
+            BagInfo._is_load_finish = true
+            if not BagInfo._is_retrieve_finsh then
+                Bag.UpdateEquipRetrieveState()
+            end
             SL:onLUAEvent(LUA_EVENT_BAG_LOAD_SUCCESS)
             SL:onLUAEvent(LUA_EVENT_GUIDE_EVENT_BEGAN, { name = GUIDefine.GuideEvent[GUIDefine.GuideType.BAG].start })
             return

@@ -28,10 +28,6 @@ function MainAssist.main()
         MainAssist.ChangeHideStatus({status = not MainAssist._hideAssist})
     end)
 
-    GUI:addOnClickEvent(MainAssist._ui["Button_near"], function()
-        MainAssist.ChangeHideStatus({status = not MainAssist._hideAssist})
-    end)
-
     local btnNear = MainAssist._ui["Button_near"]
     GUI:addOnClickEvent(btnNear, function()
         if tonumber(SL:GetValue("GAME_DATA", "UIOpenMethod")) == 1 then

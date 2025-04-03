@@ -37,7 +37,26 @@ MainProperty._pkModeStrList = {
     [PKType.HAM_NATION] = "[国家攻击模式]",
     [PKType.HAM_CAMP]   = "[阵营攻击模式]",
     [PKType.HAM_SERVER] = "[区服攻击模式]"
-} 
+}
+
+local DarkState = GUIDefine.DarkState or {}
+MainProperty._darkImgList = {
+    [DarkState.DAYTIME or 0]    = "00000044.png",   -- 白天
+    [DarkState.NIGHT or 1]      = "00000046.png",   -- 晚上
+    [DarkState.SUNRISE or 2]    = "00000045.png",   -- 日出
+    [DarkState.EVENING or 3]    = "00000047.png"    -- 傍晚
+}
+
+MainProperty._mhpPrefixList     = {"hp_", "mp_", "fhp_"}
+MainProperty._mhpTagList        = {"HPSFX", "MPSFX", "FHPSFX"}
+
+MainProperty._quitTimeTips = {
+    [1] = "<outline size='1'><font color = '#00ff00'>%s秒后将返回选角界面</font></outline>",
+    [2] = "<outline size='1'><font color = '#ff0000'>%s秒后将退出游戏</font></outline>",
+}
+
+local reinAddIcons      = {"1900011003.png", "1900011007.png"}
+local comboShowIcons    = {"01121.png", "01122.png"}
 
 MainProperty._ChatItemWidth = 500
 
@@ -1043,12 +1062,12 @@ function MainProperty.ShowChannels()
     end
 
     MainProperty._channelCells = {}
-    local channels = {6} 
+    local channels = {CHANNEL.NEAR} 
     if PCShowSelectChannels and string.len(PCShowSelectChannels) > 0 then
         local list = string.split(PCShowSelectChannels, "#")
         for _, index in ipairs(list) do
             if index and tonumber(index) then
-                if tonumber(index) == 6 then
+                if tonumber(index) == CHANNEL.NEAR then
                     table.remove(channels, 1)
                 end
                 table.insert(channels, tonumber(index))
@@ -1279,14 +1298,7 @@ end
 function MainProperty.OnDarkStateChange()
     -- 0-白天，1-黑夜，2-日出，3-傍晚
     local darkState = SL:GetValue("DARK_STATE")
-    local strs = {
-        [0] = "00000044.png",
-        [1] = "00000046.png",
-        [2] = "00000045.png",
-        [3] = "00000047.png"
-    }
-    GUI:Image_loadTexture(MainProperty._ui["Image_time"],MainProperty._path .. strs[darkState])
-    
+    GUI:Image_loadTexture(MainProperty._ui["Image_time"], MainProperty._path .. MainProperty._darkImgList[darkState])
 end
 
 function MainProperty.OnRefreshPropertyShow()
@@ -1393,11 +1405,10 @@ function MainProperty.OnReinAttrChange()
     GUI:setVisible(btnReinAdd, isshow)
     GUI:stopAllActions(btnReinAdd)
     if isshow then
-        local icon = {"1900011003.png", "1900011007.png"}
         local blink = false
         local function playBlink()
             blink = not blink
-            GUI:Button_loadTextureNormal(btnReinAdd, MainProperty._path .. icon[blink and 2 or 1])
+            GUI:Button_loadTextureNormal(btnReinAdd, MainProperty._path .. reinAddIcons[blink and 2 or 1])
         end
         SL:schedule(btnReinAdd, playBlink, 0.2)
     end
@@ -1570,15 +1581,12 @@ end
 
 -- 脚本添加魔血球动画
 function MainProperty.OnPlayMagicBallEffect(data)
-    local prefixL = {"hp_", "mp_", "fhp_"}
-    local tagList = {"HPSFX", "MPSFX", "FHPSFX"}
-
     if data.type < 0 or data.type > 2 or data.count < 0 or data.interval < 0 then
         return
     end
     local scale = data.scale == 0 and 1 or (data.scale / 100)
     local timeval = data.interval / 1000
-    local prefix = prefixL[data.type + 1] or ""
+    local prefix = MainProperty._mhpPrefixList[data.type + 1] or ""
 
     local ani = GUI:Animation_Create()
     local pSize = {width = 0, height = 0}
@@ -1594,13 +1602,14 @@ function MainProperty.OnPlayMagicBallEffect(data)
     GUI:Animation_setLoops(ani, 1)
     GUI:Animation_setRestoreOriginalFrame(ani, true)
 
-    local contentSize = {width = pSize.width * scale, height = pSize.height * scale}
-    local tag = tagList[data.type + 1]
+    pSize.width = pSize.width * scale
+    pSize.height = pSize.height * scale
+    local tag = MainProperty._mhpTagList[data.type + 1]
     local widget = MainProperty._ui[string.format("Panel_%ssfx", prefix)]
     local sprite
     if tag and widget then
-        MainProperty._pSize[tag] = contentSize
-        GUI:setContentSize(widget, contentSize.width, contentSize.height)
+        MainProperty._pSize[tag] = pSize
+        GUI:setContentSize(widget, pSize.width, pSize.height)
         if not GUI:getChildByName(widget, tag) then
             sprite = GUI:Sprite_Create(widget, tag, 0, 0)
             GUI:setScale(sprite, scale)
@@ -1665,10 +1674,8 @@ function MainProperty.RefreshSfxShowPercent()
         end
     end
 
-    local prefixL = {"hp_", "mp_", "fhp_"}
-    local tagList = {"HPSFX", "MPSFX", "FHPSFX"}
-    for i, tag in ipairs(tagList) do
-        local widget = MainProperty._ui[string.format("Panel_%ssfx", prefixL[i])]
+    for i, tag in ipairs(MainProperty._mhpTagList) do
+        local widget = MainProperty._ui[string.format("Panel_%ssfx", MainProperty._mhpPrefixList[i])]
         if widget and GUI:getChildByName(widget, tag) then
             local pSize = MainProperty._pSize[tag]
             local drawHWay = MainProperty._drawHWay[tag]
@@ -1698,7 +1705,7 @@ function MainProperty.OnRefreshNGShow()
     if curDZValue and maxDZValue and maxDZValue > 0 then
         per = curDZValue / maxDZValue
     end
-    GUI:setContentSize(MainProperty._ui["Panel_bar_dz"], {width = wid, height = MainProperty._dzPanelHei * per})
+    GUI:setContentSize(MainProperty._ui["Panel_bar_dz"], wid, MainProperty._dzPanelHei * per)
     
     -- 醉酒值
     if not MainProperty._zjPanelHei then
@@ -1706,7 +1713,7 @@ function MainProperty.OnRefreshNGShow()
     end
     local wid = GUI:getContentSize(MainProperty._ui["Panel_bar_zj"]).width
     local per = 0
-    GUI:setContentSize(MainProperty._ui["Panel_bar_zj"], {width = wid, height = MainProperty._zjPanelHei * per})
+    GUI:setContentSize(MainProperty._ui["Panel_bar_zj"], wid, MainProperty._zjPanelHei * per)
 
     MainProperty._NGShow = tonumber(SL:GetValue("GAME_DATA", "OpenNGUI")) == 1 and SL:GetValue("IS_LEARNED_INTERNAL")
     MainProperty.InitNGShow()
@@ -1729,11 +1736,10 @@ function MainProperty.OnRefreshComboShow(state)
     GUI:stopAllActions(MainProperty._ui["Image_ng_shan"])
     GUI:setVisible(MainProperty._ui["Image_ng_shan"], state)
     if state then
-        local icon = {"01121.png", "01122.png"}
         local blink = false
         local function playBlink()
             blink = not blink
-            GUI:Image_loadTexture(MainProperty._ui["Image_ng_shan"], MainProperty._path .. icon[blink and 2 or 1])
+            GUI:Image_loadTexture(MainProperty._ui["Image_ng_shan"], MainProperty._path .. comboShowIcons[blink and 2 or 1])
         end
         SL:schedule(MainProperty._ui["Image_ng_shan"], playBlink, 0.2)
     end
@@ -2093,15 +2099,10 @@ function MainProperty.OnAddQuitTimeTips(data)
         return false
     end
 
-    local tips = {
-        [1] = "<outline size='1'><font color = '#00ff00'>%s秒后将返回选角界面</font></outline>",
-        [2] = "<outline size='1'><font color = '#ff0000'>%s秒后将退出游戏</font></outline>",
-    }
-
     local function refreshTime()
         time = time and time - 1 or data.time
 
-        local str = string.format(tips[type], time)
+        local str = string.format(MainProperty._quitTimeTips[type], time)
 
         GUI:removeAllChildren(Node_quit_tip)
         local width = SL:GetValue("SCREEN_WIDTH")
