@@ -153,7 +153,7 @@ end
 
 function Notice.createAttribute(parent)
     GUI:LoadExport(parent, "notice/attribute_cell")
-    local ui = ui_delegate(parent)
+    local ui = GUI:ui_delegate(parent)
     local cell = ui["cell"]
     return cell
 end
@@ -881,7 +881,9 @@ function Notice.ShowAttributes(attrs)
             GUI:ActionScaleTo(0.2, 0.8), 
             GUI:ActionMoveBy(0.2, 100, 20)
         )
-        local sequence = GUI:ActionSequence(GUI:DelayTime(delay), spawn1, GUI:DelayTime(1.5), spawn2, GUI:ActionRemoveSelf())
+        local sequence = GUI:ActionSequence(GUI:DelayTime(delay), spawn1, GUI:DelayTime(1.5), spawn2, GUI:CallFunc(function()
+           GUI:removeFromParent(widget)
+        end))
         GUI:runAction(cell, sequence)
     end
 end

@@ -391,6 +391,7 @@ function MainSkill.CreateSkillCell(data)
         -- 开始
         if 0 == state then
             isInSideButton = true
+            skill_icon._clicked = false
             local spacePos      = GUI:convertToWorldSpace(skill_icon, GUI:getPositionX(skill_icon), GUI:getPositionY(skill_icon))
             rectButton          = {
                 x = spacePos.x - sizeButton.width * anchorPoint.x,
@@ -411,6 +412,10 @@ function MainSkill.CreateSkillCell(data)
                     return false
                 end
 
+                if skill_icon._clicked then
+                    return false
+                end
+
                 if SL:GetValue("USER_IS_DIE") then
                     return false
                 end
@@ -420,6 +425,7 @@ function MainSkill.CreateSkillCell(data)
                 end
 
                 -- 技能点击逻辑
+                skill_icon._clicked = true
                 MainSkill.OnClickSkillEvent(skillID)
                 return true
             end, 0.1)
@@ -430,7 +436,12 @@ function MainSkill.CreateSkillCell(data)
             return true
         -- 结束
         elseif 2 == state then
+            GUI:delayTouchEnabled(skill_icon, 0.1)
             GUI:unSchedule(skill_icon)
+            if skill_icon._clicked then
+                return
+            end
+            skill_icon._clicked = true
             MainSkill.OnClickSkillEvent(skillID)
         -- 取消
         elseif 3 == state then

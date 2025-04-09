@@ -50,12 +50,13 @@ function RobotAuto.FindBagCountByIndex(index)
 end
 
 function RobotAuto.OnQuickUseItemRmv(data)
-    if data.opra ~= GUIDefine.OperateType.DEL then
+    if data.opera ~= GUIDefine.OperateType.DEL then
         return false
     end
 
-    if data.itemData and RobotAuto.FindBagCountByIndex(data.itemData.Index) <= 0 then
-        SL:UnpackDrugByIndex(data.itemData.Index, true)
+    local itemData = data.param and data.param.itemData
+    if itemData and RobotAuto.FindBagCountByIndex(itemData.Index) <= 0 then
+        SL:UnpackDrugByIndex(itemData.Index, true)
     end
 end
 

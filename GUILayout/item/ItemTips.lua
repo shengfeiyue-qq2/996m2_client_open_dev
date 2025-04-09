@@ -539,21 +539,7 @@ function ItemTips.GetDiyAttStr(itemData)
     local strAttShowList = {}
     if attList and next(attList) then
         for type, attrs in pairs(attList) do
-            local attShow = GUIFunction:GetAttDataShow(attrs, false, true)
-            local showList = {}
-            for id, v in pairs(attShow) do
-                v.id = id
-                local originId = getAttOriginId(id)
-                local attConfig = SL:GetValue("ATTR_CONFIG", originId)
-                v.sort = attConfig and attConfig.sort or originId + 1000
-                v.excolor = attConfig.excolor
-                table.insert(showList, v)
-            end
-
-            table.sort(showList, function(a, b)
-                return a.sort < b.sort
-            end)
-
+            local showList = GUIFunction:GetSeqAttDataShow(attrs, false, true)
             local strList = {}
             if showList and next(showList) then
                 local config = GUIDefineEx.TipsDiyAttrTypeTitle and GUIDefineEx.TipsDiyAttrTypeTitle[type]
@@ -1159,9 +1145,12 @@ function ItemTips.GetStarPanel(star)
         for i, v in ipairs(starPattern.starRes) do
             if v and next(v) then
                 if v.img then
-                    v.img = string.gsub(string.format("%s%s.png", _resPath, v.img), "\\", "/") 
+                    local tempRes = SL:CopyData(v)
+                    tempRes.img = string.gsub(string.format("%s%s", _resPath, v.img), "\\", "/")
+                    starRes[i] = tempRes
+                else
+                    starRes[i] = v
                 end
-                starRes[i] = v
             end
         end
     end

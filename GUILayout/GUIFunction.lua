@@ -588,16 +588,17 @@ function GUIFunction:CheckTargetDigAble(targetID)
 end
 
 -- ItemTips 相关
+-- 组合属性ID
+local function GetMergeAttID(min, max)
+    if min and max then
+        return min * 10000 + max
+    else
+        return min or max or 0
+    end
+end
+
 local function MergeAtts(list)
     local newList = {}
-    -- 组合属性ID
-    local function GetMergeAttID(min, max)
-        if min and max then
-            return min * 10000 + max
-        else
-            return min or max or 0
-        end
-    end
     for i, v in pairs(list) do
         local merges = GUIDefine.MergeAttrConfig[v.id]
         if merges then
@@ -678,6 +679,10 @@ local function GetAttScaleType(id)
     return list[id]
 end
 
+local function GetAttOriginId(id)
+    return id >= 10000 and math.floor(id / 10000) or id
+end
+
 -- Tips获取不同装备对比
 function GUIFunction:GetDiffEquip(itemData, isHero)
     local posList = itemData and SL:GetValue("TIP_POSLIST_BY_STDMODE", itemData.StdMode, isHero)
@@ -701,6 +706,105 @@ end
 
 -- Tips获取属性数据显示
 local custTypeMap = {[0] = 1, [1] = 3, [2] = 2}
+
+local function GetAttNumShow(id, min, max, maxID, stars)
+    local name = ""
+    local valueStr = ""
+    min = tonumber(min) or 0
+    max = tonumber(max) or 0
+    if id > 10000 then
+        name = GetSpecialAttrName(100000000 + id)
+        if maxID then
+            local config = SL:GetValue("ATTR_CONFIG", maxID) or {}
+            name = config.name or ""
+        end
+        local type = GetAttValueShowType(id, maxID)
+        local strWay = type == 2 and "%s-%s" or "%s/%s"
+        valueStr = string.format(strWay, SL:HPUnit(min), SL:HPUnit(max))
+        if stars then
+            valueStr = min > 0 and valueStr or "+" .. SL:HPUnit(max)
+        end
+    else
+        local config = SL:GetValue("ATTR_CONFIG", id) or {}
+        local attNumType = config.type or 1
+        --[[
+            type == 1 正常值 == 2 万分比 == 3 百分比
+            目前服务器发送过来的万分比的数值 基本是 10% 中的 10/10
+        ]]
+        local changeName = nil
+        local custMap = SL:GetValue("CUST_ABIL_MAP")
+        if custMap[id] and next(custMap[id]) then
+            local type = custMap[id].type or 0
+            if custMap[id].showCustomName then
+                changeName = config.name
+            end
+            id = custMap[id].id
+            config = SL:GetValue("ATTR_CONFIG", id) or {}
+            attNumType = custTypeMap[type] or 1
+        end
+
+        if id == AttTypeTable.Lucky then
+            if min < 0 then
+                changeName = GetSpecialAttrName(100000000 + AttTypeTable.Curse)
+                min = math.abs(min)
+            end
+        end
+        valueStr = min .. ""
+        valueStr = stars and "+" .. valueStr or valueStr
+
+        if attNumType == 2 or attNumType == 3 then
+            local percent = attNumType == 2 and 100 or 1
+            local showValue = min / percent
+            if GetAttScaleType(id) then
+                showValue = showValue * 10
+            end
+            if attNumType == 2 then --万分比都支持小数点后两位
+                showValue = string.format("%.2f", showValue) * 100 / 100
+                valueStr = string.format("%s%%", showValue)
+            else
+                valueStr = string.format("%d%%", showValue)
+            end
+        else
+            if GUIDefine.HPUnitAttrs[id] then
+                valueStr = SL:HPUnit(min) .. ""
+                if stars then
+                    valueStr = "+" .. valueStr
+                end
+            end
+        end
+
+        local showName = config.name
+        if changeName then
+            name = changeName
+        elseif id == AttTypeTable.Strength or id == AttTypeTable.Curse then
+            name = GetSpecialAttrName(100000000 + id)
+        else
+            name = showName
+        end
+    end
+
+    name = name or ""
+    local lens = string.len(name)
+    if lens == 6 then
+        local addStr = "　　"
+        local str1 = string.sub(name, 1, 3)
+        local str2 = string.sub(name, 4, 6)
+        local newStr = str1 .. addStr .. str2
+        name = newStr
+    elseif lens == 9 then
+        local addStr = SL:GetValue("IS_PC_OPER_MODE") and " " or "  "
+        local addStr2 = SL:GetValue("IS_PC_OPER_MODE") and " " or "  "
+        local str1 = string.sub(name, 1, 3)
+        local str2 = string.sub(name, 4, 6)
+        local str3 = string.sub(name, 7, 9)
+        local newStr = str1 .. addStr .. str2 .. addStr2 .. str3
+        name = newStr
+    end
+
+    name = name .. "："
+    return name, valueStr
+end
+
 function GUIFunction:GetAttDataShow(att, stars, tipsShow)
     if not att or not next(att) then
         return {}
@@ -710,104 +814,6 @@ function GUIFunction:GetAttDataShow(att, stars, tipsShow)
         table.insert(attList, att)
     else
         attList = att
-    end
-
-    local function GetAttNumShow(id, min, max, maxID)
-        local name = ""
-        local valueStr = ""
-        min = tonumber(min) or 0
-        max = tonumber(max) or 0
-        if id > 10000 then
-            name = GetSpecialAttrName(100000000 + id)
-            if maxID then
-                local config = SL:GetValue("ATTR_CONFIG", maxID) or {}
-                name = config.name or ""
-            end
-            local type = GetAttValueShowType(id, maxID)
-            local strWay = type == 2 and "%s-%s" or "%s/%s"
-            valueStr = string.format(strWay, SL:HPUnit(min), SL:HPUnit(max))
-            if stars then
-                valueStr = min > 0 and valueStr or "+" .. SL:HPUnit(max)
-            end
-        else
-            local config = SL:GetValue("ATTR_CONFIG", id) or {}
-            local attNumType = config.type or 1
-            --[[
-                type == 1 正常值 == 2 万分比 == 3 百分比
-                目前服务器发送过来的万分比的数值 基本是 10% 中的 10/10
-            ]]
-            local changeName = nil
-            local custMap = SL:GetValue("CUST_ABIL_MAP")
-            if custMap[id] and next(custMap[id]) then
-                local type = custMap[id].type or 0
-                if custMap[id].showCustomName then
-                    changeName = config.name
-                end
-                id = custMap[id].id
-                config = SL:GetValue("ATTR_CONFIG", id) or {}
-                attNumType = custTypeMap[type] or 1
-            end
-
-            if id == AttTypeTable.Lucky then
-                if min < 0 then
-                    changeName = GetSpecialAttrName(100000000 + AttTypeTable.Curse)
-                    min = math.abs(min)
-                end
-            end
-            valueStr = min .. ""
-            valueStr = stars and "+" .. valueStr or valueStr
-
-            if attNumType == 2 or attNumType == 3 then
-                local percent = attNumType == 2 and 100 or 1
-                local showValue = min / percent
-                if GetAttScaleType(id) then
-                    showValue = showValue * 10
-                end
-                if attNumType == 2 then --万分比都支持小数点后两位
-                    showValue = string.format("%.2f", showValue) * 100 / 100
-                    valueStr = string.format("%s%%", showValue)
-                else
-                    valueStr = string.format("%d%%", showValue)
-                end
-            else
-                if GUIDefine.HPUnitAttrs[id] then
-                    valueStr = SL:HPUnit(min) .. ""
-                    if stars then
-                        valueStr = "+" .. valueStr
-                    end
-                end
-            end
-
-            local showName = config.name
-            if changeName then
-                name = changeName
-            elseif id == AttTypeTable.Strength or id == AttTypeTable.Curse then
-                name = GetSpecialAttrName(100000000 + id)
-            else
-                name = showName
-            end
-        end
-
-        name = name or ""
-        local lens = string.len(name)
-        if lens == 6 then
-            local addStr = "　　"
-            local str1 = string.sub(name, 1, 3)
-            local str2 = string.sub(name, 4, 6)
-            local newStr = str1 .. addStr .. str2
-            name = newStr
-        elseif lens == 9 then
-            local addStr = SL:GetValue("IS_PC_OPER_MODE") and " " or "  "
-            local addStr2 = SL:GetValue("IS_PC_OPER_MODE") and " " or "  "
-            local str1 = string.sub(name, 1, 3)
-            local str2 = string.sub(name, 4, 6)
-            local str3 = string.sub(name, 7, 9)
-            local newStr = str1 .. addStr .. str2 .. addStr2 .. str3
-            name = newStr
-        end
-
-        name = name .. "："
-        return name, valueStr
     end
 
     attList = MergeAtts(attList)
@@ -827,7 +833,7 @@ function GUIFunction:GetAttDataShow(att, stars, tipsShow)
         end
         if v.id > 10000 or configShow then
             local min = tonumber(v.min or v.value) or 0
-            local name, value = GetAttNumShow(v.id, min, v.max, v.maxID)
+            local name, value = GetAttNumShow(v.id, min, v.max, v.maxID, stars)
             attStrs[v.id] = {
                 name = name,
                 value = value,
@@ -872,6 +878,91 @@ function GUIFunction:GetAttShowOrder(att, stars, tipsShow)
         end
     )
     return orderList
+end
+
+function GUIFunction:GetSeqAttDataShow(att, stars, tipsShow)
+    if not att or not next(att) then
+        return {}
+    end
+    local attList = {}
+    if att.id then -- 单条
+        table.insert(attList, att)
+    else
+        attList = att
+    end
+
+    local newList = {}
+    for i, v in ipairs(attList) do
+        local merges = GUIDefine.MergeAttrConfig[v.id]
+        if merges then
+            local mergedId = GetMergeAttID(merges[1], merges[2])
+            local data = {}
+            local isFind = false
+            for _, att in ipairs(newList) do
+                if att.id == mergedId then
+                    if v.id == merges[2] then
+                        att.max = v.value or 0
+                    else
+                        att.min = v.value or 0
+                    end
+                    isFind = true
+                    break
+                end
+            end
+
+            if not isFind then
+                local data = {
+                    id = mergedId,
+                    min = 0,
+                    max = 0,
+                }
+                if merges[1] and merges[1] >= GUIFunction:PShowAttType().Min_CustJobAttr_5 and merges[1] <= GUIFunction:PShowAttType().Max_CustJobAttr_15 then
+                    data.maxID = merges[2]
+                end
+                if v.id == merges[2] then
+                    data.max = v.value or 0
+                else
+                    data.min = v.value or 0
+                end
+                table.insert(newList, data)
+            end
+        else
+            table.insert(newList, v)
+        end
+    end
+
+    attList = newList
+
+    local attStrs = {}
+    for k, v in pairs(attList) do
+        local attId = v.id
+        local custMap = SL:GetValue("CUST_ABIL_MAP")
+        if custMap[attId] and next(custMap[attId]) then
+            attId = custMap[attId].id or attId
+        end
+        local config = SL:GetValue("ATTR_CONFIG", attId)
+        local configShow = config
+        if tipsShow and configShow then
+            configShow = config.noshowtips ~= 1
+        end
+        if v.id > 10000 or configShow then
+            local min = tonumber(v.min or v.value) or 0
+            local name, value = GetAttNumShow(v.id, min, v.max, v.maxID, stars)
+            local originId = GetAttOriginId(v.id)
+            local attConfig = SL:GetValue("ATTR_CONFIG", originId)
+            table.insert(attStrs, {
+                name = name,
+                value = value,
+                id = v.id,
+                color = config and config.color or nil,
+                isCurse = v.id == GUIDefine.AttTypeTable.Lucky and min < 0,
+                sort = attConfig and attConfig.sort or originId + 1000,
+                excolor = attConfig.excolor
+            })
+        end
+    end
+
+    return attStrs
 end
 
 function GUIFunction:GetDuraStr(dura, maxdura, one)
@@ -3480,9 +3571,6 @@ function GUIFunction:InitConditionRedWidget(parent, conditionStr, isTxt)
     end
 end
 -------------------------------------------------------------------------
-local function getAttOriginId(id)
-    return id >= 10000 and math.floor(id / 10000) or id
-end
 
 local attTypeT = GUIDefine.AttTypeTable
 local function getAddShow(id, value)
@@ -3531,7 +3619,7 @@ function GUIFunction:GetBuffAddAttrShow(buffID)
     local yuansuAttrShow = {}
     for id, v in pairs(stringAtt) do
         v.id = id
-        local originId = getAttOriginId(id)
+        local originId = GetAttOriginId(id)
         local attConfig = SL:GetMetaValue("ATTR_CONFIG", originId)
         v.sort = attConfig and attConfig.sort or originId + 1000
 

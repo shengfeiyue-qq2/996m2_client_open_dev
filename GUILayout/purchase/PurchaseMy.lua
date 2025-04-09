@@ -363,8 +363,8 @@ function PurchaseMy.CreateMyReceiveCell(parent, item)
    GUI:Text_setString(ui.Text_coin, coinName)
    -- 剩余数量
    GUI:Text_setString(ui.Text_remain, item.remainqty)
-   -- 已收数量
-   GUI:Text_setString(ui.Text_receive, item.recedqty)
+   -- 待提取数量
+   GUI:Text_setString(ui.Text_receive, item.waitrecqty)
     -- 取出
     GUI:addOnClickEvent(ui.Button_oper, function(sender)
         GUI:delayTouchEnabled(sender)

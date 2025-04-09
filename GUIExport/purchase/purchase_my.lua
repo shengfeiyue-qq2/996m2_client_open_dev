@@ -152,7 +152,7 @@ function ui.init(parent)
 	GUI:Text_enableOutline(Text_4, "#000000", 1)
 
 	-- Create Text_5
-	local Text_5 = GUI:Text_Create(Panel_title_2, "Text_5", 476.00, 23.00, 16, "#ffffff", [[已收数量]])
+	local Text_5 = GUI:Text_Create(Panel_title_2, "Text_5", 476.00, 23.00, 16, "#ffffff", [[待提取数量]])
 	GUI:setAnchorPoint(Text_5, 0.50, 0.50)
 	GUI:setTouchEnabled(Text_5, false)
 	GUI:setTag(Text_5, 103)

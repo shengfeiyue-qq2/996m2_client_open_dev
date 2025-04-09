@@ -41,7 +41,7 @@ function ui.init(parent)
 	GUI:Text_enableOutline(Text_remain, "#000000", 1)
 
 	-- Create Text_receive
-	local Text_receive = GUI:Text_Create(Panel_cell, "Text_receive", 476.00, 40.00, 16, "#ffffff", [[已收数量]])
+	local Text_receive = GUI:Text_Create(Panel_cell, "Text_receive", 476.00, 40.00, 16, "#ffffff", [[待提取数量]])
 	GUI:setAnchorPoint(Text_receive, 0.50, 0.50)
 	GUI:setTouchEnabled(Text_receive, false)
 	GUI:setTag(Text_receive, 103)

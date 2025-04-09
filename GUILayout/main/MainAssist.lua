@@ -207,7 +207,7 @@ function MainAssist.InitEnemy()
     GUI:ListView_removeAllItems(MainAssist._ui["ListView_monster"])
 
     -- 1s检测一次
-    SL:ScheduleOnce(function ()
+    SL:schedule(MainAssist._ui["Panel_enemy"], function()
         MainAssist.CheckAllEnemy()
     end, 1)
 end

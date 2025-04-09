@@ -262,10 +262,7 @@ end
 -- 初始化点击（包含鼠标）事件
 function PlayerEquip.InitEquipLayerEvent()
     for _, pos in ipairs(PlayerEquip._EquipPosSet) do
-        local widget = PlayerEquip.GetEquipPosPanel(pos)
-        if type(GUIDefine.EquipAllShow[pos]) == "boolean" then
-            widget = GUIDefine.EquipAllShow[pos] and PlayerEquip.GetEquipPosPanel(pos) or PlayerEquip.GetEquipPosExPanel(pos)
-        end
+        local widget = PlayerEquip.GetEquipPosValidPanel(pos)
         if widget and GUI:getVisible(widget) then
             local params = {
                 pos       = pos,
@@ -346,6 +343,14 @@ end
 
 function PlayerEquip.GetEquipPosExPanel(pos)
     return PlayerEquip._ui["Panel_posEx"..pos]
+end
+
+function PlayerEquip.GetEquipPosValidPanel(pos)
+    local equipPanel = PlayerEquip.GetEquipPosPanel(pos)
+    if type(GUIDefine.EquipAllShow[pos]) == "boolean" then
+        equipPanel = GUIDefine.EquipAllShow[pos] and PlayerEquip.GetEquipPosPanel(pos) or PlayerEquip.GetEquipPosExPanel(pos)
+    end
+    return equipPanel
 end
 
 -- 装备位置节点
@@ -508,7 +513,7 @@ function PlayerEquip.UpdateEquipLayer(data)
     local makeIndex = data.MakeIndex
 
     local pos = data.Where
-    local equipPanel = PlayerEquip.GetEquipPosPanel(pos)
+    local equipPanel = PlayerEquip.GetEquipPosValidPanel(pos)
     if not equipPanel then
         return false
     end
@@ -566,7 +571,7 @@ function PlayerEquip.UpdateEquipPanelState(data)
     end
     
     local pos = itemData.Where
-    local equipPanel = PlayerEquip.GetEquipPosPanel(pos)
+    local equipPanel = PlayerEquip.GetEquipPosValidPanel(pos)
     if not equipPanel then
         return false
     end

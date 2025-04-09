@@ -60,6 +60,11 @@ function Mail.InitUI()
         GUI:delayTouchEnabled(sender)
         SL:RequestDelMail(Mail._currMailID)
     end)
+
+    SL:AttachTXTSUI({
+        root  = MailInfo._ui.bg,
+        index = SLDefine.SUIComponentTable.Mail
+    })
 end
 
 -- 默认显示
@@ -385,6 +390,9 @@ end
 function Mail.OnClose()
     if MailInfo and MailInfo._layer then 
         Mail.UnRegisterEvent()
+        SL:UnAttachTXTSUI({
+            index = SLDefine.SUIComponentTable.Mail
+        })
         MailInfo = nil
     end
 end

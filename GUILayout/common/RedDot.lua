@@ -2,8 +2,9 @@ RedDot = {}
 
 function RedDot.main()
     RedDot._GuideWidgetConfig = SL:RequireFile(GUIDefine.PATH_GUIDE_CONFIG)
-    RedDot._data = GUI:GetLayerOpenParam()
+    local data = GUI:GetLayerOpenParam()
     local function func()
+        RedDot._data = data
         if RedDot._data.add == 1 then
             RedDot.addRedDot()
         else

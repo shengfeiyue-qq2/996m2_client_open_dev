@@ -213,7 +213,7 @@ function CompoundItemData.CheckStrCondition(condition)
         return true
     end
 
-    return SL:CheckCondition(condition)
+    return SL:GetValue("CONDITION", condition)
 end
 
 -- 检查页签是否可展示
