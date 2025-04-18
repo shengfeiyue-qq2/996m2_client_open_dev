@@ -23,40 +23,6 @@ local GetFileFunc = function (looks)
     return string.format("%06d", looks % 10000), math.floor(looks / 10000)
 end
 
--- 解析特效配置
-local function ParseModelEffect(effect)
-    local effectSet = {}
-    if not effect then
-        return effectSet
-    end
-
-    if type(effect) == "number" then
-        effect = effect .. "#0"
-    end
-    
-    local effectArry = string.split(effect or "", "&")
-    local effectList = string.split(effectArry[1] or "", "|")
-    local isShowLook = tonumber(effectArry[2]) ~= 0
-    for i = 1, #effectList do
-        local effectParam = effectList[i]
-        local effectParamPar = string.split(effectParam or "", "#")
-        local effectData = {
-            effectId = tonumber(effectParamPar[1]) or 0,
-            zOrder   = tonumber(effectParamPar[2]) or 0,
-            offX     = tonumber(effectParamPar[3]) or 0,
-            offY     = tonumber(effectParamPar[4]) or 0,
-            scale    = tonumber(effectParamPar[6]) or 1 --"PC缩放#手机缩放"
-        }
-        if IsPcModel then
-            effectData.scale = tonumber(effectParamPar[5]) or 1
-            effectData.offX  = tonumber(effectParamPar[7]) or effectData.offX or 0
-            effectData.offY  = tonumber(effectParamPar[8]) or effectData.offY or 0
-        end
-        table.insert(effectSet, effectData)
-    end
-    return effectSet, isShowLook
-end
-
 function UIModel.main(sex, feature, scale, params)
     local parent = GUI:Attach_LeftBottom()
     if not parent then
@@ -252,7 +218,7 @@ function UIModel.CreateModel(node, id, effect, name, order)
 
     -- 特效
     if effect and effect ~= "0" and effect ~= "" then
-        local effectList = ParseModelEffect(effect)
+        local effectList = SL:ParseModelEffect(effect)
         for i, v in ipairs(effectList) do
             local anim = GUI:Effect_Create(node, "Effect_" .. name, v.offX, - v.offY, 0, v.effectId)
             if anim then

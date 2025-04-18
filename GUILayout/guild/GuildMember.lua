@@ -171,7 +171,7 @@ function GuildMember.ShowFilterOfficial()
             local tag = GUI:getTag(v)
             GUI:setVisible(selectImg, GuildMember._filterRank == tag)
             if tag > 0 then
-                GUI:Text_setString(v:getChildByName("Text"), SL:GetValue("GUILD_OFFICIAL_NAME_BY_RANK", tag - 1))
+                GUI:Text_setString(GUI:getChildByName(v, "Text"), SL:GetValue("GUILD_OFFICIAL_NAME_BY_RANK", tag - 1))
             end
         end
     end

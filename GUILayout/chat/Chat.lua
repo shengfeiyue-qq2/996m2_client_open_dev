@@ -396,7 +396,7 @@ function Chat.InitInput()
 
         local isAutoShout = ChatData.GetAutoShoutSwitch()
         GUI:addOnClickEvent(ChatInfo._ui.Layout_check_auto_shout, function()
-            local input = ChatInfo._ui.TextField_input:getString()
+            local input = GUI:TextInput_getString(ChatInfo._ui.TextField_input)
             checkInputContent(input)
         end)
 
@@ -760,7 +760,7 @@ function Chat.OnPushChatItem(item)
             GUI:ListView_removeItemByIndex(ChatInfo._ui.ListView_cells, 0)
         end
         GUI:ListView_jumpToBottom(ChatInfo._ui.ListView_cells)
-    end, 0)
+    end, 1 / 60)
 end
 
 function Chat.OnAddChatItem(data)

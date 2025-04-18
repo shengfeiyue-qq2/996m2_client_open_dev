@@ -70,9 +70,7 @@ end
 
 function MainTargetBigHp.InitUI()
     local hpTipText = MainTargetBigHp._ui["Text_hp_tip"]
-    local posx, posy = GUI:getPosition(hpTipText)
-    MainTargetBigHp._tubeTipOringPos.x = posx
-    MainTargetBigHp._tubeTipOringPos.y = posy
+    MainTargetBigHp._tubeTipOringPos = GUI:getPosition(hpTipText)
 
     GUI:Text_setString(MainTargetBigHp._ui["Text_belong_name"], "")
     GUI:Text_setString(MainTargetBigHp._ui["Text_monster_name"], "")
@@ -352,7 +350,7 @@ function MainTargetBigHp.OnRefreshHP(data)
     local actionT = MainTargetBigHp._hpActions[#MainTargetBigHp._hpActions]
 
     -- 读取记录开始的bar的百分比
-    local fristP = hpBar:getPercent()
+    local fristP = GUI:LoadingBar_getPercent(hpBar)
     if actionT and actionT.endP then
         fristP = actionT.endP
     end
@@ -479,7 +477,7 @@ function MainTargetBigHp.ChangeHPBarTX(parentNode, animID, func)
 
     anim.frameScale = {}
     SL:scheduleOnce(anim, function()
-        local boundBox = anim:GetFrameBox()
+        local boundBox = GUI:getBoundingBox(anim)
         GUI:setScaleX(anim, boundBox.width / sz.width)
         GUI:setScaleY(anim, boundBox.height / sz.height)
         GUI:setVisible(anim, true)

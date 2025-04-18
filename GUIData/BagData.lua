@@ -540,9 +540,11 @@ function BagData.ClearItemData(isReconnect)
     for k,v in pairs(BagData._bagItems) do
         BagData.DelItemData(v, nil, true, isReconnect)
     end
+    if isReconnect then
+        BagData._bagMax = SLDefine.MAX_ITEM_NUMBER + SLDefine.QUICK_USE_SIZE
+    end
     BagData._bagItems = {}-- {makeindex = {}}
     BagData._bagItemsCount = 0
-    BagData._bagMax = SLDefine.MAX_ITEM_NUMBER + SLDefine.QUICK_USE_SIZE
     BagData._bagNoPosItems = {}-- {makeindex = {}}
     BagData._itemCountByIndex = {}
     BagData._isInit = false

@@ -937,12 +937,6 @@ function MainProperty.SendChatMsg(msg, channelID)
         GUIFunction:SendChatMsg(sendData)
     end
 
-    local sIdx, eIdx = string.find(msg, "^@传 .-")
-    local special_Str = nil
-    if sIdx and eIdx then
-        special_Str = string.sub(msg, eIdx + 1, string.len(msg))
-    end
-
     local channel, content, targetName = GUIFunction:GetChannelByChatMsg(msg)
     if channel then
         channelID = channel
@@ -950,7 +944,7 @@ function MainProperty.SendChatMsg(msg, channelID)
     end
 
     -- 敏感词
-    if not (string.find(msg, "^@.-") and not special_Str) then
+    if not string.find(msg, "^@.-") then
         -- 后台控制不可聊天
         if SL:GetValue("M2_FORBID_SAY", true) then
             return false
@@ -961,9 +955,7 @@ function MainProperty.SendChatMsg(msg, channelID)
                 return SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
             end
 
-            if special_Str then
-                str = "@传 " .. str
-            elseif targetName then
+            if targetName then
                 str = string.format("/%s %s", targetName, str)
             end
 
@@ -982,7 +974,7 @@ function MainProperty.SendChatMsg(msg, channelID)
             msg = content
         end
     
-        SL:RequestCheckSensitiveWord(special_Str or msg, 2, handle_Func, data)
+        SL:RequestCheckSensitiveWord(msg, 2, handle_Func, data)
     else
         toSendMsg(msg)
     end

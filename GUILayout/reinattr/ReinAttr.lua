@@ -70,8 +70,9 @@ end
 function ReinAttr.InitData()
     local addData = SL:GetValue("NEW_BOUNS_ADD_DATA")
     addData = addData and addData.Bonus or {}
-    ReinAttr._addReinPoint = {}
+    ReinAttr._addReinPoint = {}     -- 总加点数
     ReinAttr._oriAddReinPoint = {}
+    ReinAttr._showCurAddPoint = {}  -- 本次打开展示属性点
     for _, data in ipairs(addData) do
         if data.id and data.value then
             ReinAttr._addReinPoint[data.id] = data.value
@@ -121,82 +122,153 @@ function ReinAttr.CreateNewAttrItemCell(parent, config)
     end
 
     local cell = GUI:getChildByName(parent, "Panel_cell_new")
-    local ui = GUI:ui_delegate(parent)
+    local ui = GUI:ui_delegate(cell)
 
     local id = config.nId
     -- 属性名
     GUI:Text_setString(ui.Text_title, config.sName)
     -- 属性值
-    GUI:Text_setString(ui.Text_data, SL:GetValue("CUR_ABIL_BY_ID", id) or 0)
+    GUI:Text_setString(ui.Text_data, SL:GetValue("MAX_ABIL_BY_ID", id) or 0)
     
     local addValue = ReinAttr._addReinPoint[id] or 0
     local rate = config.nRate
     local showAdd = addValue % rate
+    if not ReinAttr._showCurAddPoint[id] then
+        ReinAttr._showCurAddPoint[id] = showAdd
+    end
     GUI:Text_setString(ui.Text_num, string.format("%s/%s", showAdd, rate))
 
-    local maxAdd = config.nMax
-    GUI:delayTouchEnabled(ui.btn_add)
-    GUI:addOnClickEvent(ui.btn_add, function()
-        local addValue = ReinAttr._addReinPoint[id] or 0
-        local addShow = addValue % rate
-        local curAdd = 0
-        if ReinAttr._canAttrPointNew >= 10 and ReinAttr._isWinMode and SL:GetValue("CTRL_PRESSED") then --CTRL +10
-            addShow = addShow + 10
-            curAdd = 10
-        else
-            addShow = addShow + 1
-            curAdd = 1
+    GUI:addOnTouchEvent(ui.btn_add, function(sender, type)
+        if type == GUIDefine.TouchEventType.BEGAN then
+            sender._noTouch = false
+            if not sender._clicking then
+                sender._clicking = true
+                SL:schedule(sender, function()
+                    if sender._noTouch then
+                        GUI:stopAllActions(sender)
+                    else
+                        sender._clicking = false
+                        ReinAttr.OnAddPoint(cell, config)
+                    end
+                end, 0.2)
+            end
+        elseif type == GUIDefine.TouchEventType.ENDED or type == GUIDefine.TouchEventType.CANCALED then
+            if sender._clicking then
+                GUI:stopAllActions(sender)
+                sender._clicking = false
+                ReinAttr.OnAddPoint(cell, config)
+            end
+            sender._noTouch = true
         end
-        if ReinAttr._canAttrPointNew < 1 then
-            return
-        end
-        -- 超出能使用的最大转生点
-        if addValue + curAdd > maxAdd then
-            return
-        end
-        
-        addValue = addValue + curAdd
-        ReinAttr._addReinPoint[id] = addValue
-        ReinAttr._canAttrPointNew = ReinAttr._canAttrPointNew - curAdd
-
-        if addShow >= rate then
-            local lastAddP = (ReinAttr._oriAddReinPoint[id] or 0) % rate
-            local value = addValue - (ReinAttr._oriAddReinPoint[id] or 0) + lastAddP
-            local addAttrValue = math.floor(value / rate)
-            addShow = addValue % rate
-            local value = (SL:GetValue("CUR_ABIL_BY_ID", id) or 0) + addAttrValue
-            GUI:Text_setString(ui.Text_data, value)
-        end
-
-        GUI:Text_setString(ui.Text_num, string.format("%s/%s", addShow, rate))
-        GUI:Text_setString(ReinAttr._ui.attr_pointN, ReinAttr._canAttrPointNew)
     end)
 
-    GUI:delayTouchEnabled(ui.btn_sub)
-    GUI:addOnClickEvent(ui.btn_sub, function()
-        local addValue = ReinAttr._addReinPoint[id] or 0
-        local addShow = addValue % rate
-        local curSub = 0
-        if addShow >= 10 and ReinAttr._isWinMode and SL:GetValue("CTRL_PRESSED") then --CTRL -10
-            addShow = addShow - 10
-            curSub = 10
-        else
-            addShow = addShow - 1
-            curSub = 1
+    GUI:addOnTouchEvent(ui.btn_sub, function(sender, type)
+        if type == GUIDefine.TouchEventType.BEGAN then
+            sender._noTouch = false
+            if not sender._clicking then
+                sender._clicking = true
+                SL:schedule(sender, function()
+                    if sender._noTouch then
+                        GUI:stopAllActions(sender)
+                    else
+                        sender._clicking = false
+                        ReinAttr.OnSubPoint(cell, config)
+                    end
+                end, 0.2)
+            end
+        elseif type == GUIDefine.TouchEventType.ENDED or type == GUIDefine.TouchEventType.CANCALED then
+            if sender._clicking then
+                GUI:stopAllActions(sender)
+                sender._clicking = false
+                ReinAttr.OnSubPoint(cell, config)
+            end
+            sender._noTouch = true
         end
-        if addShow < 0 then
-            return
-        end
-        
-        addValue = addValue - curSub
-        ReinAttr._addReinPoint[id] = addValue
-        ReinAttr._canAttrPointNew = ReinAttr._canAttrPointNew + curSub
-
-        GUI:Text_setString(ui.Text_num, string.format("%s/%s", addShow, rate))
-        GUI:Text_setString(ReinAttr._ui.attr_pointN, ReinAttr._canAttrPointNew)
     end)
 
     return cell
+end
+
+function ReinAttr.RefreshCellAttrShow(cell, config)
+    local id = config.nId
+    local rate = config.nRate
+
+    local ui = GUI:ui_delegate(cell)
+
+    local addValue = ReinAttr._addReinPoint[id] or 0
+    local lastAddP = (ReinAttr._oriAddReinPoint[id] or 0) % rate
+    local value = addValue - (ReinAttr._oriAddReinPoint[id] or 0) + lastAddP
+    local addAttrValue = math.floor(value / rate)
+    local value = (SL:GetValue("MAX_ABIL_BY_ID", id) or 0) + addAttrValue
+    GUI:Text_setString(ui.Text_data, value)
+
+    GUI:Text_setString(ui.Text_num, string.format("%s/%s", ReinAttr._showCurAddPoint[id] or 0, rate))
+    GUI:Text_setString(ReinAttr._ui.attr_pointN, ReinAttr._canAttrPointNew)
+end
+
+function ReinAttr.OnAddPoint(cell, config)
+    if not cell or not config or not next(config) then
+        return
+    end
+
+    local id = config.nId
+    local maxAdd = config.nMax
+    if not id or not maxAdd then
+        return
+    end
+
+    local addValue = ReinAttr._addReinPoint[id] or 0
+    local curAdd = 0
+    if ReinAttr._canAttrPointNew >= 10 and ReinAttr._isWinMode and SL:GetValue("CTRL_PRESSED") then --CTRL +10
+        curAdd = 10
+    else
+        curAdd = 1
+    end
+    if ReinAttr._canAttrPointNew < 1 then
+        return
+    end
+    -- 超出能使用的最大转生点
+    if addValue + curAdd > maxAdd then
+        SL:ShowSystemTips("该属性已达最高限制!")
+        return
+    end
+    
+    addValue = addValue + curAdd
+    ReinAttr._addReinPoint[id] = addValue
+    ReinAttr._canAttrPointNew = ReinAttr._canAttrPointNew - curAdd
+    ReinAttr._showCurAddPoint[id] = ReinAttr._showCurAddPoint[id] + curAdd
+
+    ReinAttr.RefreshCellAttrShow(cell, config)
+end
+
+function ReinAttr.OnSubPoint(cell, config)
+    if not cell or not config or not next(config) then
+        return
+    end
+
+    local id = config.nId
+    if not id then
+        return
+    end
+
+    local addValue = ReinAttr._addReinPoint[id] or 0
+    local showNum = ReinAttr._showCurAddPoint[id] or 0
+    local curSub = 0
+    if addValue >= 10 and ReinAttr._isWinMode and SL:GetValue("CTRL_PRESSED") then --CTRL -10
+        curSub = 10
+    else
+        curSub = 1
+    end
+    if showNum - curSub < 0 then
+        return
+    end
+    
+    addValue = addValue - curSub
+    ReinAttr._addReinPoint[id] = addValue
+    ReinAttr._canAttrPointNew = ReinAttr._canAttrPointNew + curSub
+    ReinAttr._showCurAddPoint[id] = showNum - curSub
+
+    ReinAttr.RefreshCellAttrShow(cell, config)
 end
 
 function ReinAttr.OnUpdateData()

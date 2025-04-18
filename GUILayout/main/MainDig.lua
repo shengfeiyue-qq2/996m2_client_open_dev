@@ -34,6 +34,7 @@ function MainDig.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_PLAYER_OUT_OF_VIEW, "MainDig", MainDig.OnActorOutOfView)
     SL:RegisterLUAEvent(LUA_EVENT_ACTOR_REVIVE, "MainDig", MainDig.OnActorRevive)
     SL:RegisterLUAEvent(LUA_EVENT_MONSTER_DIE, "MainDig", MainDig.OnActorMonsterDie)
+    SL:RegisterLUAEvent(LUA_EVENT_NET_PLAYER_DIE, "MainDig", MainDig.OnActorPlayerDie)
     SL:RegisterLUAEvent(LUA_EVENT_PLAYER_ACTION_BEGIN, "MainDig", MainDig.OnPlayerActorBegin)
 end
 
@@ -59,6 +60,13 @@ end
 -- 怪物死亡
 function MainDig.OnActorMonsterDie(data)
     MainDig.AddDigTarget(data.actorID)
+end
+
+-- 人物死亡
+function  MainDig.OnActorPlayerDie(data)
+    if data.actorID and SL:GetValue("ACTOR_IS_HUMAN", data.actorID) then -- 人形怪
+        MainDig.OnActorMonsterDie(data)
+    end
 end
 
 -- 出视野

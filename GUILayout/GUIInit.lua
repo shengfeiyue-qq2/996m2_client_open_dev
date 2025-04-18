@@ -402,6 +402,12 @@ SL:RegisterLUAEvent(LUA_EVENT_GUILD_APPLY_ALLY_LIST, "GUIInit", function()
     local applyList = SL:GetValue("GUILD_ALLY_APPLY_LIST")
     if #applyList == 0 then
         SL:DelBubbleTips(GUIDefine.BubbleType.GUILD_ALLY_APPLY) 
+    elseif #applyList > 0 then
+        -- 主界面气泡
+        local function callback()
+            UIOperator:OpenGuildAllyApplyUI()
+        end
+        SL:AddBubbleTips(GUIDefine.BubbleType.GUILD_ALLY_APPLY, "res/private/main/bubble_tips/1900012562_1.png", callback)
     end
 end)
 

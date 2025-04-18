@@ -41,7 +41,7 @@ function LookPlayerData.handle_MSG_SC_ROLE_INFO_RESPONSE(data)
     LookPlayerData.SetPlayerUID(data.userID)
 
     -- 禁止查看玩家
-    if SL:GetValue("GAME_DATA","ForbidShowLookLayer") then
+    if tonumber(SL:GetValue("GAME_DATA","ForbidShowLookLayer")) == 1 then
         return false
     end
 

@@ -23,7 +23,7 @@ function UIRotateView.main(parent, ID, x, y, width, height, scrollGap, param)
 
     local items = {}
     local itemCount = #param or 3
-    local bgSize = rotateView:getContentSize()
+    local bgSize = GUI:getContentSize(rotateView)
     local itemSizeW = math.floor(bgSize.width / itemCount)
     local itemSizeH = bgSize.height
 

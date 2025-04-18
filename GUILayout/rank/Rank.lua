@@ -364,6 +364,10 @@ function Rank.ResetSelectItem(data)
     end
     local rk = tonumber(data.rank)
 
+    if Rank._selectItemRk then
+        SL:RequestNotifyClickRankValue(rk)
+    end
+
     Rank._selectItemRk = rk
 
     local childs = GUI:ListView_getItems(Rank._rankList)

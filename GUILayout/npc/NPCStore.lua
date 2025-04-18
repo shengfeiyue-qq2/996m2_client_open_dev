@@ -142,7 +142,7 @@ function NPCStore.CreateItemsListCell(data, key, select_data)
     end
 
     if data.Price then
-        GUI:Text_setString(textItemPrice, data.Price)
+        GUI:Text_setString(textItemPrice, string.format("%s 金币", data.Price))
     end
 
     local Index = data.Index or SL:GetValue("ITEM_INDEX_BY_NAME", name)
@@ -264,6 +264,9 @@ function NPCStore.RemoveItems(MakeIndex)
 
         if removeTBIndex then
             table.remove(NPCStore.itemList, removeTBIndex)
+            NPCStore.maxPage = math.ceil(#NPCStore.itemList / NPCStore._pageMaxNums)
+            NPCStore.listPage = math.min(NPCStore.listPage, NPCStore.maxPage)
+            GUI:Text_setString(NPCStore.pagesText, NPCStore.listPage .. "/" .. NPCStore.maxPage)
         end
 
         if NPCStore.GetSelectItemData() then

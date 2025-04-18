@@ -395,8 +395,9 @@ function CompoundItem.UpdateCompoundLayer(id)
                     look = true,
                     bgVisible = true
                 }
-                local item = CompoundItem.CreateItemIcon(itemData)
+                local item = CompoundItem.CreateItemIcon()
                 GUI:ListView_pushBackCustomItem(materialList, item)
+                CompoundItem.InitItemIconShow(item, itemData)
                 resetSize = true
             end
 
@@ -415,8 +416,9 @@ function CompoundItem.UpdateCompoundLayer(id)
                 bgVisible = true,
                 look = true
             }
-            local item = CompoundItem.CreateItemIcon(itemData)
+            local item = CompoundItem.CreateItemIcon()
             GUI:ListView_pushBackCustomItem(productList, item)
+            CompoundItem.InitItemIconShow(item, itemData)
             CompoundItem.CalcListWidth(productList, CompoundItem._defaultWidth)
         end
 
@@ -428,8 +430,9 @@ function CompoundItem.UpdateCompoundLayer(id)
             local resetSize = false
             for i, data in ipairs(money) do
                 if data and data.id then
-                    local moneyCost = CompoundItem.CreateCostCell(data)
+                    local moneyCost = CompoundItem.CreateCostCell()
                     GUI:ListView_pushBackCustomItem(moneyList, moneyCost)
+                    CompoundItem.InitCostCellShow(moneyCost, data)
                     resetSize = true
                 end
             end
@@ -610,7 +613,7 @@ function CompoundItem.CreateMenuCellLevel3(index)
 end
 
 -- 创建Icon
-function CompoundItem.CreateItemIcon(data)
+function CompoundItem.CreateItemIcon()
     local parent = GUI:Widget_Create(-1, "widget", 0, 0, 0, 0)
     if CompoundItem._isWin32 then 
         GUI:LoadExport(parent, "compound_item_layer_win32/compound_item_cell")
@@ -619,10 +622,13 @@ function CompoundItem.CreateItemIcon(data)
     end
     
     local cell = GUI:getChildByName(parent, "Panel_icon")
+    GUI:removeFromParent(cell)
+    return cell
+end
 
+function CompoundItem.InitItemIconShow(cell, data)
     if not data or not next(data) then 
-        GUI:removeFromParent(cell)
-        return cell
+        return
     end 
 
     local uiNode = GUI:getChildByName(cell, "Node_icon")
@@ -664,12 +670,9 @@ function CompoundItem.CreateItemIcon(data)
         GUI:setPositionX(needText, iconWid - 2)
         GUI:setPositionX(haveText, iconWid - needWid - 2)
     end 
-
-    GUI:removeFromParent(cell)
-    return cell
 end
 
-function CompoundItem.CreateCostCell(data)
+function CompoundItem.CreateCostCell()
     local parent = GUI:Widget_Create(-1, "widget", 0, 0, 0, 0)
     if CompoundItem._isWin32 then 
         GUI:LoadExport(parent, "compound_item_layer_win32/compound_cost_cell")
@@ -678,7 +681,11 @@ function CompoundItem.CreateCostCell(data)
     end
     
     local cell = GUI:getChildByName(parent, "item_money")
+    GUI:removeFromParent(cell)
+    return cell
+end
 
+function CompoundItem.InitCostCellShow(cell, data)
     local costNode = GUI:getChildByName(cell, "Node_cost")
     local numText = GUI:getChildByName(cell, "Text_num")
 
@@ -706,9 +713,6 @@ function CompoundItem.CreateCostCell(data)
     needNum = SL:GetSimpleNumber(needNum)
     GUI:Text_setTextColor(numText, color)
     GUI:Text_setString(numText, haveNum .. "/" .. needNum)
-
-    GUI:removeFromParent(cell)
-    return cell
 end
 
 function CompoundItem.RefreshCompoundRedPoint(upData)

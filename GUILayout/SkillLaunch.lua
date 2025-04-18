@@ -418,9 +418,9 @@ function SkillLaunch.CheckAttackRange(skillID, param)
                     if not SL:GetValue("ACTOR_IS_PAUSE_IGNORED", targetID) and not SL:GetValue("ACTOR_IS_IGNORED", targetID) then
                         if SL:GetValue("BATTLE_IS_AUTO_FIGHT_STATE")
                         and SL:GetValue("IS_ACTOR_LIMIT_OBSTACLE", SL:GetValue("X"), SL:GetValue("Y"), SL:GetValue("ACTOR_MAP_X", targetID), SL:GetValue("ACTOR_MAP_Y", targetID)) then
-                            SL:SetValue("ACTOR_IS_PAUSE_IGNORED", true)
+                            SL:SetValue("ACTOR_IS_PAUSE_IGNORED", targetID, true)
                         else
-                            SL:SetValue("ACTOR_IS_IGNORED", false)
+                            SL:SetValue("ACTOR_IS_IGNORED", targetID, true)
                         end
                     end
                 end
@@ -459,7 +459,7 @@ function SkillLaunch.CheckAttackRange(skillID, param)
     local targetID = param.targetID
     if targetID and SL:GetValue("ACTOR_IS_VALID", targetID) then
         if SL:GetValue("ACTOR_IS_PAUSE_IGNORED", targetID) then
-            SL:SetValue("ACTOR_IS_PAUSE_IGNORED", false)
+            SL:SetValue("ACTOR_IS_PAUSE_IGNORED", targetID, false)
         end
     end
 

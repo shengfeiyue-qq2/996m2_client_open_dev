@@ -377,7 +377,7 @@ function Item:SetItemEffect()
     local showEffect = string.len(newEffect) > 0 and newEffect or (self._showModelEffect and sEffect or bEffect)
 
     if showEffect and showEffect ~= "0" and showEffect ~= "" then
-        local effectList, showLook = ParseModelEffect(showEffect)
+        local effectList, showLook = SL:ParseModelEffect(showEffect)
         for i, v in ipairs(effectList) do
             -- 添加个特效
             local effectID = v.effectId

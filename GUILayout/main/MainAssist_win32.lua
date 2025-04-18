@@ -38,11 +38,6 @@ function MainAssist.main()
         GUI:setClickDelay(btnNear)
     end)
 
-    -- mission
-    local ListView_task = MainAssist._ui["ListView_task"]
-    MainAssist.ListView_task = ListView_task
-    GUI:ListView_autoPaintItems(ListView_task)
-
     -- reset pos PCAssistNearShow:是否显示附近按钮
     local isShow = (SL:GetValue("GAME_DATA", "PCAssistNearShow") or 0) == 1
     GUI:setVisible(MainAssist._ui["Panel_group"], isShow)

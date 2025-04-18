@@ -718,7 +718,7 @@ local config = {
         local idx = tonumber(config.typeassist)
         if PlayerInternalMeridian._ui.Panel_content and idx then
             local name = idList[idx] and string.format("Button_%s", idList[idx])
-            local widget = name and PlayerInternalMeridian._ui.Panel_content:getChildByName(name)
+            local widget = name and GUI:getChildByName(PlayerInternalMeridian._ui.Panel_content, name)
             if widget then
                 return widget, PlayerInternalMeridian._ui
             end
@@ -738,7 +738,7 @@ local config = {
         local idx = tonumber(config.typeassist)
         if HeroInternalMeridian._ui.Panel_content and idx then
             local name = idList[idx] and string.format("Button_%s", idList[idx])
-            local widget = name and HeroInternalMeridian._ui.Panel_content:getChildByName(name)
+            local widget = name and GUI:getChildByName(HeroInternalMeridian._ui.Panel_content, name)
             if widget then
                 return widget, HeroInternalMeridian._ui
             end

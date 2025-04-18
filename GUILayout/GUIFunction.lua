@@ -2564,7 +2564,7 @@ function GUIFunction:CheckLaunchEnableByID(actorID)
         return false
     end
     
-    local actorMasterID = SL:GetValue("ACTOR_MASTER_ID", actorID)
+    local actorMasterID = SL:GetValue("ACTOR_HAVE_MASTER", actorID) and SL:GetValue("ACTOR_MASTER_ID", actorID)
     
     if SL:GetValue("BATTLE_IS_AUTO_FIGHT_STATE") then
         ---- hero player / master is main hero
@@ -2609,6 +2609,11 @@ function GUIFunction:CheckLaunchEnableByID(actorID)
 
     -- 采集物
     if SL:GetValue("ACTOR_IS_COLLECTION", actorID) then
+        return false
+    end
+
+    -- 石化怪
+    if SL:GetValue("ACTOR_STOME_MODE", actorID) then
         return false
     end
 
@@ -2787,7 +2792,7 @@ function GUIFunction:OnAutoFightBackFunc(attackActorID, actorID)
     end
 
     local attackMasterID = SL:GetValue("ACTOR_MASTER_ID", attackActorID)
-    if (SL:GetValue("ACTOR_IS_HUMAN", attackActorID) or SL:GetValue("ACTOR_IS_MONSTER", attackActorID)) and not (attackMasterID and attackMasterID ~= "") then
+    if (SL:GetValue("ACTOR_IS_HUMAN", attackActorID) or SL:GetValue("ACTOR_IS_MONSTER", attackActorID)) and not SL:GetValue("ACTOR_HAVE_MASTER", attackActorID) then
         return 
     end
 
@@ -2815,7 +2820,7 @@ function GUIFunction:OnAutoFightBackFunc(attackActorID, actorID)
 
     if setValues[1] == 2 then
         local attackBackID = nil -- 要反击的对象id
-        if attackMasterID and attackMasterID ~= "" and SL:GetValue("ACTOR_IS_VALID", attackMasterID) then
+        if attackMasterID and attackMasterID ~= "0" and SL:GetValue("ACTOR_IS_VALID", attackMasterID) then
             local value = SL:GetValue("SETTING_VALUE", SLDefine.SETTINGID.SETTING_IDX_FIRST_ATTACK_MASTER)  -- 优先打主人
             if value[1] == 1 and SL:GetValue("ACTOR_IS_PLAYER", attackMasterID) and not SL:GetValue("ACTOR_IS_HUMAN", attackMasterID) then 
                 attackBackID = attackMasterID
@@ -2849,7 +2854,7 @@ end
 -- 检查NPC气泡显示
 local npcTalkNode = nil
 function GUIFunction:CheckNpcTalkTips()
-    if not SL:GetValue("MAIN_PLAYER_IS_VALID") then
+    if not SL:GetValue("MAIN_PLAYER_IS_VALID") or SL:GetValue("IS_PC_OPER_MODE") then
         return
     end
 

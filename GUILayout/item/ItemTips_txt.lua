@@ -1985,7 +1985,7 @@ function ItemTips.CreateEmptyInlayCell(index)
     local width = ItemTips._richWid
 
     local cell = GUI:Layout_Create(-1, "inlay_cell", 0, 0, width, 0)
-    local res = _resPath .. (SL:GetValue("IS_PC_OPER_MODE") and "1900025000.png" or "1900025001.png")
+    local res = _resPath .. (SL:GetValue("IS_PC_OPER_MODE") and "inlay_bg_1.png" or "inlay_bg_0.png")
     local iconBg = GUI:Image_Create(cell, "icon_bg", 0, 0, res)
     local size = GUI:getContentSize(iconBg)
     local maxHei = size.height
@@ -2015,11 +2015,13 @@ function ItemTips.CreateInlayCell(itemId, inlayStrList, index)
 
     local cell = GUI:Layout_Create(-1, "inlay_cell", 0, 0, width, 0)
     
-    local res = _resPath .. (SL:GetValue("IS_PC_OPER_MODE") and "1900025000.png" or "1900025001.png")
+    local res = _resPath .. (SL:GetValue("IS_PC_OPER_MODE") and "inlay_bg_1.png" or "inlay_bg_0.png")
     local iconBg = GUI:Image_Create(cell, "icon_bg", 0, 0, res)
     local size = GUI:getContentSize(iconBg)
     local item = GUI:ItemShow_Create(iconBg, "item_", size.width / 2, size.height / 2, {itemData = itemData, index = itemData.Index, disShowCount = true, notShowEquipRedMask = true, noMouseTips = true})
     GUI:setAnchorPoint(item, 0.5, 0.5)
+    local itemScale = size.width / GUI:getContentSize(item).width
+    GUI:setScale(item, itemScale)
 
     local color = (itemData.Color and itemData.Color > 0) and itemData.Color or 255
     local nameStr = string.format("<font color='%s' size='%s'>%s</font>", SL:GetHexColorByStyleId(color), fontSize, itemData.Name or "")
@@ -2115,6 +2117,9 @@ function ItemTips.CreateInlayAttrWidget(param)
                 end
                 local titleName = params.name
                 if titleName then
+                    if GUIFunction.ParseTitleHasCustomVar then
+                        titleName = GUIFunction:ParseTitleHasCustomVar(itemData.MakeIndex, titleName)
+                    end
                     local titleColor = params.color or 154
                     local titleStr = string.format("<font color='%s'>%s</font>", SL:GetHexColorByStyleId(titleColor), titleName)
                     local rich_title = GUI:RichText_Create(widget, string.format("rich_att_inlay_title_%s", groupId), 0, 0, titleStr, width, fontSize, "#FFFFFF", vspace, nil, fontPath) 
