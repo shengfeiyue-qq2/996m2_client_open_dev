@@ -135,6 +135,7 @@ function Guide.Init()
     elseif Guide._ssrWidget and Guide._ssrParent and Guide._active then
         Guide._widget = Guide._ssrWidget
         Guide._parent = Guide._ssrParent
+        GUI:removeChildByName(Guide._parent, "Guide")
 
         if GUI:Widget_IsNull(Guide._widget) or GUI:Widget_IsNull(Guide._parent) then
             Guide._widget = nil
@@ -220,6 +221,7 @@ end
 
 function Guide.Exit()
     if Guide._layer and not tolua.isnull(Guide._layer) then
+        GUI:stopAllActions(Guide._layer)
         GUI:removeFromParent(Guide._layer)
     end
     GUI:Win_CloseByID(UIConst.LAYERID.GuideGUI)

@@ -18,6 +18,7 @@ end
 
 function QuickUseData.SetHistoryQuickyUseList(list)
     QuickUseData._quickUseList = list
+    QuickUseData.SaveQuickPosData()
 end
 
 function QuickUseData.CheckIsInQuickUseList(item)

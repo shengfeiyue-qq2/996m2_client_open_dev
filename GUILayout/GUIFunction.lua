@@ -2647,6 +2647,19 @@ function GUIFunction.CheckAutoTargetEnableByID(actorID)
         return false
     end
 
+    -- 4. 过滤弓箭手、卫士、练功师
+    if SL:GetValue("ACTOR_RACE_SERVER", actorID) == 112 and SL:GetValue("ACTOR_RACE_IMG", actorID) == 45 then -- 弓箭手
+        return false
+    end
+
+    if SL:GetValue("ACTOR_RACE_SERVER", actorID) == 11 and SL:GetValue("ACTOR_RACE_IMG", actorID) == 12 then -- 卫士
+        return false
+    end
+
+    if SL:GetValue("ACTOR_RACE_SERVER", actorID) == 55 and SL:GetValue("ACTOR_RACE_IMG", actorID) == 19 then -- 练功师
+        return false
+    end
+
     -- 内挂忽略的怪
     local ignoreNames = SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_IGNORE_MONSTER)
     local name = SL:GetValue("ACTOR_NAME", actorID)
@@ -2887,7 +2900,7 @@ end
 
 -- NPC气泡显示
 function GUIFunction:OnShowNpcTalkTips(npcID)
-    if not SL:GetValue("MAIN_PLAYER_IS_VALID") then
+    if not SL:GetValue("MAIN_PLAYER_IS_VALID") or SL:GetValue("IS_PC_OPER_MODE") then
         return
     end
 
@@ -3530,7 +3543,6 @@ end
 
 -------------------------------------------------------------------------
 -- 新建条件红点控件
-local conditionRedID = 0
 function GUIFunction:InitConditionRedWidget(parent, conditionStr, isTxt)
     if not parent then
         return
@@ -3567,7 +3579,8 @@ function GUIFunction:InitConditionRedWidget(parent, conditionStr, isTxt)
         end
     end
 
-    conditionRedID = conditionRedID + 1
+    GUI._conditionRedID = GUI._conditionRedID + 1
+    local conditionRedID = GUI._conditionRedID
     local name = type == 0 and string.format("red_img_%s", conditionRedID) or string.format("red_sfx_%s", conditionRedID)
     local widget = GUI:RedDot_Create(parent, name, x, y, type, param)
     if widget then

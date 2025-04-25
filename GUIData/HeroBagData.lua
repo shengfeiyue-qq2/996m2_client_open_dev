@@ -137,7 +137,6 @@ end
 function HeroBagData.AmendHistoryPos(sort, data)
     local items = data or {}
     local newBagPos = {}
-    local newQuickPos = {}
     local newItems = {}
     ----------------------------
     for i,item in pairs(items) do
@@ -146,12 +145,7 @@ function HeroBagData.AmendHistoryPos(sort, data)
         if bagPos and not sort then 
             newBagPos[makeIndex] = bagPos
         else
-            local quickPos = QuickUseData.GetQuickUsePosByMakeIndex(makeIndex)
-            if quickPos then 
-                newQuickPos[quickPos] = makeIndex
-            else
-                tinsert(newItems, item)
-            end
+            tinsert(newItems, item)
         end
     end
     -----------------------------
@@ -159,7 +153,6 @@ function HeroBagData.AmendHistoryPos(sort, data)
     for makeIndex, pos in pairs(newBagPos) do
         HeroBagData.SetBagPosByMakeIndex(makeIndex, pos)
     end
-    QuickUseData.SetHistoryQuickyUseList(newQuickPos)
 
     if sort then
         if newItems and next(newItems) and #newItems > 1 then

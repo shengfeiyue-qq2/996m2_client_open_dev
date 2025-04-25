@@ -99,7 +99,7 @@ function RobotHeroAuto.Tick(delta)
     RobotHeroAuto.AutoLoginOut(delta)--改成被攻击触发
     -- 自动释放相关
     RobotHeroAuto.AutoLaunch(delta)
-    -- -- 自动使用修复神水
+    -- 自动使用修复神水
     RobotHeroAuto.AutoUseFIXItem(delta)
     --hp保护
     RobotHeroAuto.AutoHpProtect(delta)
@@ -326,20 +326,6 @@ function RobotHeroAuto.AutoLoginOut(delay)
     RobotHeroAuto._loginOutHeroTime = RobotHeroAuto._loginOutHeroTime + delay
 end
 -----------------------
-function RobotHeroAuto.FindItemByIndex(index)
-    local itemData = QuickUseData.GetQuickUseDataByIndex(index)
-    if itemData and itemData[1] then
-        return itemData[1]
-    end
-
-    local itemData = BagData.GetItemDataByItemIndex(index)
-    if itemData and itemData[1] then
-        return itemData[1]
-    end
-
-    return nil
-end
-
 function RobotHeroAuto.FindItemByIndex_Hero(index)
     local itemData = HeroBagData.GetItemDataByItemIndex(index)
     if itemData and itemData[1] then
@@ -362,7 +348,7 @@ function RobotHeroAuto.AutoUseItem(items, isHpProtect)
                         break
                     end
                 end
-                local item = RobotHeroAuto.FindItemByIndex(itemIndex) -- 回城/随机保护不生效 得人物用
+                local item = RobotAuto.FindItemByIndex(itemIndex) -- 回城/随机保护不生效 得人物用
                 if item then
                     SL:RequestUseItem(item)
                     return true
@@ -373,7 +359,7 @@ function RobotHeroAuto.AutoUseItem(items, isHpProtect)
                 if unpack then
                     return true
                 end
-                local item = RobotHeroAuto.FindItemByIndex(itemIndex)
+                local item = RobotHeroAuto.FindItemByIndex_Hero(itemIndex)
                 if item then
                     SL:RequestUseHeroItem(item)
                     return true
