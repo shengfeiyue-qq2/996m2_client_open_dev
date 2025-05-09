@@ -81,7 +81,7 @@ local config = {
             return nil
         end
 
-        local layer = isMergePanelMode and MergeBag._ui or Bag._ui
+        local layer = isMergePanelMode and MergeBagInfo._ui or BagInfo._ui
         if isMergePanelMode then
             if not layer or not layer.Panel_items or MergeBagInfo._selType ~= 1 then
                 return nil
@@ -137,7 +137,7 @@ local config = {
             return nil
         end
 
-        local layer = isMergePanelMode and MergeBag._layer or HeroBag._layer
+        local layer = isMergePanelMode and MergeBagInfo._ui or HeroBagInfo._ui
         local isMergeMode = false
         if isMergePanelMode then
             isMergeMode = true
@@ -163,7 +163,7 @@ local config = {
                 end
             end
         end
-        return widget, layer
+        return widget, parent
     end,
     -- 背包挂接组件
     [7] = function(config)

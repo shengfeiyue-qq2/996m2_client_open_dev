@@ -663,7 +663,6 @@ end
 
 local function GetAttScaleType(id)
     local list = {
-        [AttTypeTable.Anti_Posion]      = 1,
         [AttTypeTable.Health_Recover]   = 1,
         [AttTypeTable.Spell_Recover]    = 1
     }
@@ -1108,7 +1107,7 @@ function GUIFunction:CombineAttList(list1, list2)
 end
 
 -- 道具属性描述
-function GUIFunction:GetItemAttDesc(item)
+function GUIFunction:GetItemAttDesc(item, job)
     local sFormat = string.format
     local equipMap = GUIDefine.EquipMapByStdMode
     local showLasting = SL:GetValue("EX_SHOWLAST_MAP")
@@ -1141,7 +1140,7 @@ function GUIFunction:GetItemAttDesc(item)
         local pos =  GUIFunction:GetEmptyPosByStdMode(item.StdMode)
         if pos then
             -- 基础属性
-            local attList = GUIFunction:ParseItemBaseAtt(item.Attribute)
+            local attList = GUIFunction:ParseItemBaseAtt(item.Attribute, job)
 
             -- 极品属性
             local qualityAttrs = GUIFunction:GetItemQualityAttr(item)
@@ -1204,7 +1203,8 @@ end
 
 ----------------- 物品自定义描述 ----------------------
 local function parseDescEffect(value)
-    local params = SL:Split(value or "", "#")
+    local tParams = SL:Split(value or "", "|")
+    local params = SL:Split(tParams[1] or "", "#")
     local effectId = tonumber(params[1])
     if not effectId then
         return
@@ -1214,8 +1214,14 @@ local function parseDescEffect(value)
     effectTab.effectId = effectId
     effectTab.type = tonumber(params[2]) or 0  -- 0:顶部 1:底部
     effectTab.mode = tonumber(params[3]) or 1  -- 1:前面 2:后面
-    effectTab.x = tonumber(params[4]) or 0
-    effectTab.y = tonumber(params[5]) or 0
+    local pcParams = {}
+    if SL:GetValue("IS_PC_OPER_MODE") and string.len(tParams[2] or "") > 0 then
+        pcParams = SL:Split(tParams[2] or "", "#")
+    end
+    effectTab.x = tonumber(pcParams[1]) or tonumber(params[4]) or 0
+    effectTab.y = tonumber(pcParams[2]) or tonumber(params[5]) or 0
+    effectTab.scaleX = tonumber(pcParams[3]) or tonumber(params[6])
+    effectTab.scaleY = tonumber(pcParams[4]) or tonumber(params[7])
 
     return effectTab
 end
@@ -3701,3 +3707,112 @@ function GUIFunction:GetBuffAddAttrShow(buffID)
 
     return attrStr
 end
+
+------------------------------ UI 控件相关 -------------------------------
+-- 给ScrollView/ListView添加垂直滑动条
+function GUIFunction:SetScrollViewVerticalBar(parent, param)
+    if not parent then
+        return false
+    end
+    
+    local bgPic     = SL:FixFilePath(param.bgPic)
+    local barPic    = SL:FixFilePath(param.barPic)
+    local arr1PicN  = SL:FixFilePath(param.Arr1PicN)
+    local arr1PicP  = SL:FixFilePath(param.Arr1PicP)
+    local arr2PicN  = SL:FixFilePath(param.Arr2PicN)
+    local arr2PicP  = SL:FixFilePath(param.Arr2PicP)
+    local default   = param.default or 0
+    local x         = param.x
+    local y         = param.y
+    local list      = param.list
+    local callFunc  = param.callFunc
+
+    -- 背景
+    local barBg = GUI:Image_Create(parent, "barBg", x, y, bgPic)
+    local bgWidth = GUI:getContentSize(barBg).width
+    local bgHeight = GUI:getContentSize(list).height
+
+    GUI:setContentSize(barBg, bgWidth, bgHeight)
+
+    -- 上
+    local btnArr_1 = GUI:Button_Create(barBg, "btnArr_1", bgWidth / 2, bgHeight, arr1PicN)
+    if arr1PicP then
+        GUI:Button_loadTexturePressed(btnArr_1, arr1PicP)
+    end
+    GUI:setAnchorPoint(btnArr_1, 0.5, 1)
+    -- 下
+    local btnArr_2 = GUI:Button_Create(barBg, "btnArr_2", bgWidth / 2, 0, arr2PicN)
+    if arr2PicP then
+        GUI:Button_loadTexturePressed(btnArr_2, arr2PicP)
+    end
+    GUI:setAnchorPoint(btnArr_2, 0.5, 0)
+    -- bar
+    local sliderBar = GUI:Slider_Create(barBg, "sliderBar", bgWidth / 2, bgHeight / 2, "res/public/0.png", "res/public/0.png", barPic)
+    local btnArr1H = GUI:getContentSize(btnArr_1).height
+    local btnArr2H = GUI:getContentSize(btnArr_2).height
+    local barImgSize = GUI:getImageContentSize(barPic)
+    GUI:setContentSize(sliderBar, bgHeight - btnArr1H - btnArr2H - barImgSize.height, barImgSize.width)
+
+    GUI:setAnchorPoint(sliderBar, 0.5, 0.5)
+    GUI:setRotation(sliderBar, 90)
+    GUI:Slider_setPercent(sliderBar, default)
+
+    -- 计算偏移
+    local function getListOffY()
+        return GUI:ScrollView_getInnerContainerSize(list).height - GUI:getContentSize(list).height
+    end
+
+    -- list_cells
+    local function listCallback(sender, eventType)
+        if callFunc then
+            callFunc(sender, eventType)
+        end
+
+        SL:scheduleOnce(sliderBar, function()
+            local posY = GUI:ScrollView_getInnerContainerPosition(list).y
+            local offY = getListOffY()
+            local percent = 100
+            if offY > 0 then
+                percent = math.min(math.max(0, (offY + posY) / offY * 100), 100)
+            end
+            sliderBar:setPercent(percent)    
+        end, 0.01)
+    end
+
+    if tolua.type(list) == "ccui.ListView" then
+        GUI:ListView_addOnScrollEvent(list, listCallback)
+    else
+        GUI:ScrollView_addOnScrollEvent(list, listCallback)
+    end
+    GUI:ListView_addMouseScrollPercent(list)
+
+    -- Slider_bar
+    GUI:Slider_addOnEvent(sliderBar, function()
+        local offY = getListOffY()
+        if offY > 0 then
+            GUI:ScrollView_scrollToPercentVertical(list, GUI:Slider_getPercent(sliderBar), 0.03, false)
+        else
+            GUI:Slider_setPercent(sliderBar, 100)
+        end
+    end)
+
+    local function upOrDown(percent)
+        GUI:Slider_setPercent(sliderBar, percent)
+        GUI:ScrollView_scrollToPercentVertical(list, percent, 0.03, false)
+    end
+    
+    GUI:addOnClickEvent(btnArr_1, function()
+        local offY = getListOffY()
+        if offY > 0 then
+            upOrDown(0)
+        end
+    end)
+
+    GUI:addOnClickEvent(btnArr_2, function()
+        local offY = getListOffY()
+        if offY > 0 then
+            upOrDown(100)
+        end
+    end)
+end
+--------------------------------------------------------------------------

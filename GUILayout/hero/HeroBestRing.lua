@@ -196,7 +196,7 @@ function HeroBestRing.RegisterMouseEvent()
 
     GUI:setSwallowTouches(HeroBestRing._ui["PanelTouch"], false)
 
-    -- 注册从其他地方拖到玩家装备部位事件、PC右键点击移动
+    -- 注册从其他地方拖到玩家装备部位事件
     GUI:addMouseButtonEvent(HeroBestRing._ui["PanelTouch"], {onSpecialRFunc = addItemIntoEquip})
 end
 
@@ -298,6 +298,37 @@ function HeroBestRing.InitEquipLayerEvent()
         end)
 
         if isPC then
+            local function addItemIntoEquip()
+                return -1
+            end
+            local function onRightDownFunc(touchPos)
+                if not isPC or widget._movingState then
+                    return false
+                end
+                local itemData = GUIFunction:GetEquipDataByPos(pos, nil, EDType)
+                if not itemData then
+                    return false
+                end
+
+                if SL:GetValue("ITEM_MOVE_STATE") then
+                    return false
+                end
+            
+                UIOperator:CloseItemTips()
+                -- 开始
+                HeroBestRing.UpdateMoveState(widget, true, pos)
+                SL:onLUAEvent(LUA_EVENT_LAYER_MOVED_BEGIN, {
+                    from = GUIDefine.ItemFrom.HERO_BEST_RINGS,
+                    pos  = touchPos,
+                    itemData = itemData,
+                    cancelCallBack = function ()
+                        widget.__hasEventCallOnTouchBegin = false
+                        widget.__lastClickTime = false
+                        HeroBestRing.UpdateMoveState(widget, false, pos)
+                    end
+                })
+            end
+            GUI:addMouseButtonEvent(widget, {onSpecialRFunc = addItemIntoEquip, onRightDownFunc = onRightDownFunc, checkIsVisible = true})
             GUIFunction:InitItemTipsScrollEvent(widget, "HeroBestRing")
             GUIFunction:InitMouseMoveToEquipEvent(widget, pos, HeroBestRing.OnOpenItemTips)
         end

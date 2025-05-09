@@ -1,10 +1,13 @@
 MainSummons = {}
 
+MainSummons._modePath = {"word_zhaohuanwu_02.png", "word_zhaohuanwu_01.png", "word_zhaohuanwu_03.png", "word_zhaohuanwu_04.png"}
+
 function MainSummons.main()
-    local parent = GUI:Attach_Center()
+    local parent = GUI:Attach_RightBottom()
     GUI:LoadExport(parent, "main/main_summons")
 
-    MainSummons._ui = GUI:ui_delegate(parent)
+    MainSummons._root = GUI:getChildByName(parent, "Main_Summons")
+    MainSummons._ui = GUI:ui_delegate(MainSummons._root)
     if not MainSummons._ui then
         return false
     end
@@ -33,16 +36,15 @@ function MainSummons.OnChangePKMode()
 end
 
 function MainSummons.UpdatePKMode()
-    local modePath = {"word_zhaohuanwu_02.png", "word_zhaohuanwu_01.png", "word_zhaohuanwu_03.png", "word_zhaohuanwu_04.png"}
     local mode     = SL:GetValue("PET_PKMODE")
-    local path     = "res/private/main/summons/" .. modePath[mode]
+    local path     = "res/private/main/summons/" .. MainSummons._modePath[mode]
     GUI:Image_loadTexture(MainSummons._ui["Image_mode"], path)
 end
 
 function MainSummons.UpdateAlive()
     local status  = SL:GetValue("PET_ALIVE")
     local visible = status == true
-    GUI:setVisible(MainSummons._ui["Node"], visible)
+    GUI:setVisible(MainSummons._root, visible)
     GUI:setTouchEnabled(MainSummons._ui["Image_icon"], visible)
 end
 

@@ -330,7 +330,8 @@ function MainJoyStick.UpdateJoystickMode(MainJoyStickNode)
 end
 
 function MainJoyStick.OnShowDistanceChange(MainJoyStickNode)
-    local distance = SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_ROCKER_SHOW_DISTANCE) or 0
+    local value = SL:GetValue("SETTING_VALUE", SLDefine.SETTINGID.SETTING_IDX_ROCKER_SHOW_DISTANCE)
+    local distance = value and value[1] or 0
     GUI:setPosition(MainJoyStickNode, distance, 0)
 end
 

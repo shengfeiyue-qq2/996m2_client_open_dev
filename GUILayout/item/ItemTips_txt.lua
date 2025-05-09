@@ -117,6 +117,17 @@ function ItemTips.main()
     local itemData = data.itemData or (data.typeId and SL:GetValue("ITEM_DATA", data.typeId))
     ItemTips._data.itemData = itemData
     ItemTips.fromTrading = data and data.fromTrading or nil
+    -- 职业
+    ItemTips._job = nil
+    if not _lookPlayer then
+        ItemTips._job = _isHero and SL:GetValue("H.JOB") or SL:GetValue("JOB")
+    else
+        if ItemTips.fromTrading then
+            ItemTips._job = SL:GetValue("T.M.JOB")
+        else
+            ItemTips._job = SL:GetValue("L.M.JOB")
+        end
+    end
     -- 字号、行距
     local param = GUIDefineEx.TipsFontSizeVspace
     _nameSize = param.fontSize or _nameSize
@@ -326,7 +337,7 @@ function ItemTips.GetAttStr(itemData, diff)
     local strList = {}
 
     -- 基础属性
-    local attList           = GUIFunction:ParseItemBaseAtt(itemData.Attribute)
+    local attList           = GUIFunction:ParseItemBaseAtt(itemData.Attribute, ItemTips._job)
 
     -- 极品属性
     local qualityAttrs      = GUIFunction:GetItemQualityAttr(itemData)
@@ -551,7 +562,8 @@ function ItemTips.GetDiyAttStr(itemData)
                     local titleColor = config.color or 154
                     local titleStr = string.format("<font color='%s'>%s</font>", SL:GetHexColorByStyleId(titleColor), titleName)
                     table.insert(strList, {
-                        str = titleStr
+                        str = titleStr,
+                        isTitle = true
                     })
                 end
             end
@@ -588,7 +600,7 @@ function ItemTips.GetInlayAttStr(itemData)
         local itemId = cell[i]
         if itemId > 0 then
             local item = SL:GetValue("ITEM_DATA", itemId)
-            local attList = GUIFunction:ParseItemBaseAtt(item and item.Attribute)
+            local attList = GUIFunction:ParseItemBaseAtt(item and item.Attribute, ItemTips._job)
             local attShow = GUIFunction:GetAttDataShow(attList, false, true)
             local showList = {}
             for id, v in pairs(attShow) do
@@ -621,7 +633,7 @@ end
 function ItemTips.GetPowerStr(itemData)
     if not ItemTips._baseAttList then
         -- 基础属性
-        local attList = GUIFunction:ParseItemBaseAtt(itemData.Attribute)
+        local attList = GUIFunction:ParseItemBaseAtt(itemData.Attribute, ItemTips._job)
         -- 极品属性
         local qualityAttrs = GUIFunction:GetItemQualityAttr(itemData)
         -- 合并极品属性
@@ -644,16 +656,7 @@ function ItemTips.GetPowerStr(itemData)
         end
     end
 
-    local job = nil
-    if not _lookPlayer then
-        job = _isHero and SL:GetValue("H.JOB") or SL:GetValue("JOB")
-    else
-        if ItemTips.fromTrading then
-            job = SL:GetValue("T.M.JOB")
-        else
-            job = SL:GetValue("L.M.JOB")
-        end
-    end
+    local job = ItemTips._job or SL:GetValue("JOB")
 
     -- 合并
     local allAttList = GUIFunction:CombineAttList(ItemTips._baseAttList, diyAttList)
@@ -889,7 +892,7 @@ end
 
 -- 物品属性描述
 function ItemTips.GetItemAttDescStr(itemData)
-    local itemStrList = GUIFunction:GetItemAttDesc(itemData) or {}
+    local itemStrList = GUIFunction:GetItemAttDesc(itemData, ItemTips._job) or {}
     if next(itemStrList) then
         local attrStr = ""
         for i, line in ipairs(itemStrList) do
@@ -905,6 +908,27 @@ function ItemTips.GetItemAttDescStr(itemData)
         return attrStr
     end
     return false
+end
+
+-- 获取职业匹配的属性描述
+local function getJobDesc(desc)
+    if not desc or desc == "" then
+        return
+    end
+    local str = ""
+    local descs = string.split(desc or "", "&")
+    for i, v in ipairs(descs) do
+        local strs = string.split(v, "#")
+        if strs[2] then
+            local jobNum = tonumber(strs[1])
+            if jobNum == 3 or (ItemTips._job and jobNum == ItemTips._job) then
+                str = str .. (strs[2] or "")
+            end
+        else
+            str = str .. (strs[1] or "")
+        end
+    end
+    return str
 end
 
 -- 新套装
@@ -973,36 +997,6 @@ function ItemTips.GetSuitStr(suit)
         return meet, equipName
     end
 
-    -- 获取职业匹配的属性描述
-    local job = nil
-    if not _lookPlayer then
-        job = _isHero and SL:GetValue("H.JOB") or SL:GetValue("JOB")
-    else
-        if ItemTips.fromTrading then
-            job = SL:GetValue("T.M.JOB")
-        else
-            job = SL:GetValue("L.M.JOB")
-        end
-    end
-    local function getJobDesc(desc)
-        if not desc or desc == "" then
-            return
-        end
-        local str = ""
-        local descs = string.split(desc or "", "&")
-        for i, v in ipairs(descs) do
-            local strs = string.split(v, "#")
-            if strs[2] then
-                local jobNum = tonumber(strs[1])
-                if jobNum == 3 or (job and jobNum == job) then
-                    str = str .. (strs[2] or "")
-                end
-            else
-                str = str .. (strs[1] or "")
-            end
-        end
-        return str
-    end
 
     local posCheckSwitch = tonumber(SL:GetValue("GAME_DATA", "suitCheckPos")) == 1 --做个开关， 是由装备位还是装备名作为检测key（默认是装备名）
     local suitStr = ""
@@ -1489,7 +1483,14 @@ function ItemTips.AddFrameEffect(parent, effectList)
                 if mode == 2 then
                     GUI:setLocalZOrder(sfx, -1)
                 end
-                
+
+                if param.scaleX and param.scaleX > 0 then
+                    GUI:setScaleX(sfx, param.scaleX)
+                end
+                if param.scaleY and param.scaleY > 0 then
+                    GUI:setScaleY(sfx, param.scaleY)
+                end
+
                 local tipsPanelHei = GUI:getContentSize(parent).height
                 local offsetX, offsetY = param.x or 0, param.y or 0
                 local oriPos = GUI:getPosition(sfx)
@@ -1956,12 +1957,62 @@ function ItemTips.CreateDiyAttrWidget(param)
                 cellHei = cellHei + GUI:getContentSize(line).height
                 table.insert(cells, line)
             end
-            for k, v in ipairs(attStrs) do
-                local rich_att_diy = nil
-                if v.str then
-                    rich_att_diy = GUI:RichText_Create(widget, string.format("rich_att_diy_%s_%s", i, k), 0, 0, v.str, width, fontSize, "#FFFFFF", vspace, nil, fontPath) 
-                    cellHei = cellHei + toEven(GUI:getContentSize(rich_att_diy).height)
-                    table.insert(cells, rich_att_diy)
+            local customDiyShow = itemData.MakeIndex and SL:GetValue("ITEM_CUSTOM_DIYSHOW_BY_TYPE", itemData.MakeIndex, type)
+            if customDiyShow and string.len(customDiyShow) > 0 then -- 自定义属性组内容显示
+                -- 属性组标题
+                local attStr = attStrs[1]
+                if attStr and attStr.isTitle then
+                    if attStr.str then
+                        local rich_att_diy = GUI:RichText_Create(widget, string.format("rich_att_diy_%s_1", i), 0, 0, attStr.str, width, fontSize, "#FFFFFF", vspace, nil, fontPath) 
+                        cellHei = cellHei + toEven(GUI:getContentSize(rich_att_diy).height)
+                        table.insert(cells, rich_att_diy)
+                    end
+                end
+
+                local showList = SL:Split(customDiyShow, "|")
+                local sizeW, sizeH = nil, nil
+                if showList[1] and string.len(showList[1]) > 0 then
+                    local data = SL:Split(showList[1], ":")
+                    sizeW = tonumber(data[1])
+                    sizeH = tonumber(data[2])
+                end
+
+                if sizeW and sizeH then
+                    local layout = GUI:Layout_Create(widget, "custom_panel_" .. type, 0, 0, sizeW, sizeH)
+                    for i = 2, #showList do
+                        if showList[i] and string.len(showList[i]) > 0 then
+                            local params = SL:Split(showList[i], ":")
+                            if params[1] == "IMG" then
+                                local path = params[2] and string.format("res/custom/tiptitle/%s.png", params[2])
+                                if path then
+                                    local img = GUI:Image_Create(layout, "img_" .. i, tonumber(params[3]) or 0, tonumber(params[4]) or 0, path)
+                                    if tonumber(params[5]) and tonumber(params[5]) > 0 then
+                                        GUI:setScale(img, tonumber(params[5]))
+                                    end
+                                end
+
+                            elseif params[1] == "SFX" then
+                                local sfxID = tonumber(params[2])
+                                if sfxID then
+                                    local sfx = GUI:Effect_Create(layout, "sfx_" .. i, tonumber(params[3]) or 0, tonumber(params[4]) or 0, 0, sfxID)
+                                    if tonumber(params[5]) and tonumber(params[5]) > 0 then
+                                        GUI:setScale(sfx, tonumber(params[5]))
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    cellHei = cellHei + sizeH
+                    table.insert(cells, layout)
+                end
+            else
+                for k, v in ipairs(attStrs) do
+                    local rich_att_diy = nil
+                    if v.str then
+                        rich_att_diy = GUI:RichText_Create(widget, string.format("rich_att_diy_%s_%s", i, k), 0, 0, v.str, width, fontSize, "#FFFFFF", vspace, nil, fontPath) 
+                        cellHei = cellHei + toEven(GUI:getContentSize(rich_att_diy).height)
+                        table.insert(cells, rich_att_diy)
+                    end
                 end
             end
         end
@@ -2584,7 +2635,7 @@ function ItemTips.CreateEquipPanel(data, itemData, isWear, panelInsertIndex)
         for k, v in ipairs(suitArry) do
             local id = v and tonumber(v)
             if id then
-                suitStr = suitStr .. (k ~= 1 and "<br>" or "") .. ItemTips.GetSuitStr(id)
+                suitStr = suitStr .. (k ~= 1 and "<br>" or "") .. (ItemTips.GetSuitStr(id) or "")
             end
         end
         if string.len(suitStr) > 0 then

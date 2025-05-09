@@ -498,11 +498,11 @@ function MainProperty.InitActPanel()
 
     -- 音效
     GUI:addOnClickEvent(MainProperty._ui["Button_voice"], function()
-        local value27 = SL:GetValue("SETTING_ENABLED", 27) or 0
-        local value52 = SL:GetValue("SETTING_ENABLED", 52) or 0
+        local value27 = SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_BGMUSIC) or 0
+        local value52 = SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_EFFECTMUSIC) or 0
         local enable = value27 > 0 and value52 > 0
-        SL:SetValue("SETTING_VALUE", 27, { enable and 0 or 100 })
-        SL:SetValue("SETTING_VALUE", 52, { enable and 0 or 100 })
+        SL:SetValue("SETTING_VALUE", SLDefine.SETTINGID.SETTING_IDX_BGMUSIC, { enable and 0 or 100 })
+        SL:SetValue("SETTING_VALUE", SLDefine.SETTINGID.SETTING_IDX_EFFECTMUSIC, { enable and 0 or 100 })
         SL:PlayBtnClickAudio()
     end)
     GUI:addMouseOverTips(MainProperty._ui["Button_voice"], "音效开关", {x = 0, y = 0}, {x = 0.7, y = 0.5})

@@ -275,10 +275,34 @@ function HeroEquip.InitEquipLayerEvent()
             end
 
             local function onRightDownFunc(touchPos)
-                return -1
+                if not isPC or widget._movingState then
+                    return false
+                end
+                local itemData = GUIFunction:GetEquipDataByPos(pos, nil, EDType)
+                if not itemData then
+                    return false
+                end
+
+                if SL:GetValue("ITEM_MOVE_STATE") then
+                    return false
+                end
+            
+                UIOperator:CloseItemTips()
+                -- 开始
+                HeroEquip.UpdateMoveState(widget, true, pos)
+                SL:onLUAEvent(LUA_EVENT_LAYER_MOVED_BEGIN, {
+                    from = GUIDefine.ItemFrom.HERO_EQUIP,
+                    pos  = touchPos,
+                    itemData = itemData,
+                    cancelCallBack = function ()
+                        widget.__hasEventCallOnTouchBegin = false
+                        widget.__lastClickTime = false
+                        HeroEquip.UpdateMoveState(widget, false, pos)
+                    end
+                })
             end
             -- 注册从其他地方拖到玩家装备部位事件、PC右键点击移动
-            GUI:addMouseButtonEvent(widget, {onSpecialRFunc = addItemIntoEquip, onRightDownFunc = onRightDownFunc})
+            GUI:addMouseButtonEvent(widget, {onSpecialRFunc = addItemIntoEquip, onRightDownFunc = onRightDownFunc, checkIsVisible = true})
 
             if isPC then
                 GUIFunction:InitItemTipsScrollEvent(widget, "HeroEquip")

@@ -1187,6 +1187,9 @@ end
 -----------------------------------
 -- 摇色子
 function UIOperator:OpenPlayDiceUI(data)
+    if GUI:GetWindow(nil, UIConst.LAYERID.PlayDiceGUI) then
+        return
+    end
     GUI:SetLayerOpenParam(data)
     GUI:Win_Open(UIConst.LUAFile.LUA_FILE_PLAY_DICE)
 end

@@ -97,8 +97,8 @@ function MainSkill.ClickLockBtn()
     if SL:GetValue("HERO_IS_ALIVE") then
         local selectID = MainSkill._selectID
         if selectID and selectID ~= -1 then
-            local actorID = SL:GetValue("ACTOR_ID", selectID)
-            if actorID and SL:GetValue("ACTOR_CAN_LOCK_BY_HERO", actorID) then
+            local actorID = selectID
+            if SL:GetValue("ACTOR_IS_VALID", actorID) and SL:GetValue("ACTOR_CAN_LOCK_BY_HERO", actorID) then
                 local isPlayer = SL:GetValue("ACTOR_IS_PLAYER", actorID) and not SL:GetValue("ACTOR_IS_HERO", actorID)
                 SL:RequestLockTargetByHero(actorID, isPlayer)
             end
@@ -622,9 +622,8 @@ function MainSkill.OnRefreshHeroLockIcon()
     local selectID = SL:GetValue("SELECT_TARGET_ID")
     local lockWay = 0 -- 不显示
     if selectID and SL:GetValue("HERO_IS_ALIVE") then
-        local actorID = SL:GetValue("ACTOR_ID", selectID)
-        if actorID and SL:GetValue("ACTOR_CAN_LOCK_BY_HERO", actorID) then
-            if SL:GetValue("HERO_LOCK_TARGET_ID") == actorID then
+        if SL:GetValue("ACTOR_IS_VALID", selectID) and SL:GetValue("ACTOR_CAN_LOCK_BY_HERO", selectID) then
+            if SL:GetValue("H.LOCK_TARGET_ID") == selectID then
                 lockWay = 1 -- 显示锁定
             else
                 lockWay = 2 -- 显示未锁定

@@ -18,6 +18,7 @@ function CompoundItemData.Init()
 
     CompoundItemData._onCompoundID = nil    -- 当前合成ID
     CompoundItemData._compoundRedState = {} -- 对应合成ID红点状态
+    CompoundItemData._compoundShowState = {}-- 对应合成ID检测红点时的显示状态
 
     CompoundItemData._moneyChangeList = {}
     CompoundItemData._lastCheckMoneyList = {}
@@ -411,6 +412,7 @@ function CompoundItemData.OnRefreshMoney(id, isAdd)
                 local showConditionStr = config.showcondition
                 if isCanCompound and showConditionStr then
                     isCanCompound = CompoundItemData.CheckStrCondition(showConditionStr)
+                    CompoundItemData._compoundShowState[compoundID] = isCanCompound
                 end
 
                 if isCanCompound then
@@ -476,6 +478,7 @@ function CompoundItemData.OnCheckItemCount(index, isAdd)
                 local showConditionStr = config.showcondition
                 if isCanCompound and showConditionStr then
                     isCanCompound = CompoundItemData.CheckStrCondition(showConditionStr)
+                    CompoundItemData._compoundShowState[compoundID] = isCanCompound
                 end
 
                 if isCanCompound then
@@ -512,6 +515,26 @@ function CompoundItemData.OnUpdateQuickUseItem(data)
     table.insert(operData.operID, {item = data.itemData})
     CompoundItemData.OnUpdateItemChange(operData)
 
+end
+
+function CompoundItemData.OnCheckShowItemRedPoint(compoundID)
+    -- 上次检测显示状态切换
+    local lastShowState = CompoundItemData._compoundShowState[compoundID] == true
+    local config = CompoundItemData.GetConfigByID(compoundID)
+    local showConditionStr = config.showcondition
+    local nowShowState = lastShowState 
+    if showConditionStr then
+        nowShowState = CompoundItemData.CheckStrCondition(showConditionStr)
+    end
+    if lastShowState ~= nowShowState then
+        local isCanCompound = nowShowState
+        CompoundItemData._compoundShowState[compoundID] = isCanCompound
+
+        if isCanCompound then
+            isCanCompound = CompoundItemData.CheckIsCanCompoud(config, false)
+        end
+        CompoundItemData._compoundRedState[compoundID] = isCanCompound
+    end
 end
 
 -- 合成物品结果

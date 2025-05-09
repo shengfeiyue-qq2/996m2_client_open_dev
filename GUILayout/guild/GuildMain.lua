@@ -30,8 +30,26 @@ end
 function GuildMain.InitEvent()
     local function editEvent(ref, eventType)
         if eventType == 1 then
+            if SL:GetValue("M2_FORBID_NAME", true) then
+                return
+            end
+
             local notice = GUI:Text_getString(GuildMain._ui.EditInput)
-            SL:RequestGuildEditNotice(notice)
+            if not notice or string.len(notice) == 0 then
+                SL:RequestGuildEditNotice(notice)
+                return
+            end
+
+            SL:RequestCheckSensitiveWord(notice, 3, function(state, content)
+                if not content then
+                    SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
+                    local guildInfo = SL:GetValue("GUILD_INFO")
+                    local oriNotice = guildInfo and guildInfo.notice or ""
+                    SL:onLUAEvent(LUA_EVENT_GUILD_NOTICE_UPDATE, oriNotice)
+                    return
+                end
+                SL:RequestGuildEditNotice(content)
+            end)
         end
     end
 

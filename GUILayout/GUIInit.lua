@@ -29,8 +29,7 @@ local MainUIFiles = SL:GetValue("IS_PC_OPER_MODE") and {
     UIConst.LUAFile.LUA_FILE_MAIN_COLLECT,                  -- 采集物
     UIConst.LUAFile.LUA_FILE_MAIN_PROPERTY                  -- 主界面
 }
-SL:RegisterLUAEvent(LUA_EVENT_ENTER_WORLD, "GUIInit", function()
-    _initedWorld = true
+SL:RegisterLUAEvent(LUA_EVENT_MAIN_INIT, "GUIInit", function()
     for i = 1, #MainUIFiles do
         SL:RequireFile(MainUIFiles[i])
     end
@@ -919,6 +918,7 @@ end)
 -----------------------------------------------------------------------------
 -- 键盘事件
 SL:RegisterLUAEvent(LUA_EVENT_ENTER_WORLD, "GUIInit_KeyBoard", function()
+    _initedWorld = true
     if not SL:GetValue("IS_PC_OPER_MODE") then
         return
     end
@@ -1476,12 +1476,11 @@ end)
 SL:RegisterLUAEvent(LUA_EVENT_OPEN_PROGRESSBAR, "GUIInit", function (data)
     UIOperator:CloseProgressBarUI()
 
-    local jsonData = ParseRawMsgToJson(data)
-    if not jsonData then
+    if not data then
         return nil
     end
 
-    UIOperator:OpenProgressBarUI(jsonData)
+    UIOperator:OpenProgressBarUI(data)
 end)
 
 ------------------------------------------------------------------------------

@@ -213,6 +213,7 @@ function CompoundItem.RefreshInfoMenu()
                     local isShow = CompoundItemData.CheckStrCondition(item.showcondition)
                     if isShow then
                         local compoundID = item.id
+                        CompoundItemData.OnCheckShowItemRedPoint(compoundID)
                         local itemRedState = CompoundItemData.GetCompoundStateByID(compoundID)
                         if itemRedState and CompoundItem._chooseCompoundID == 0 then
                             CompoundItem._chooseCompoundID = compoundID
@@ -245,6 +246,7 @@ function CompoundItem.RefreshInfoMenu()
                         CompoundItem.ChangeChooseID(compoundID)
                     end)
 
+                    CompoundItemData.OnCheckShowItemRedPoint(compoundID)
                     GUI:setVisible(cellUI.Image_red, CompoundItemData.GetCompoundStateByID(compoundID))
                     if index ~= 1 and CompoundItem._chooseCompoundID == compoundID then
                         jumpChildCell = cell

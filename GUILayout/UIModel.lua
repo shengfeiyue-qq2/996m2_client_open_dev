@@ -125,7 +125,7 @@ function UIModel.main(sex, feature, scale, params)
     local shieldEffect  = feature.shieldEffectID
     local tDressID      = feature.tDressID
     local tDressEffect  = feature.tDressEffectID
-    local tweaponID     = feature.tweaponID
+    local tWeaponID     = feature.tWeaponID
     local tWeaponEffect = feature.tWeaponEffectID
     local capEffect     = feature.capEffectID
     local veilID        = feature.veilID
@@ -170,7 +170,7 @@ function UIModel.main(sex, feature, scale, params)
     UIModel.CreateModel(node, tDressID or clothID, tDressEffect or clothEffect, "Cloth", NGOrders.MODEL_LAYER_Z_CLOTH)
 
     -- 武器
-    UIModel.CreateModel(node, tweaponID or weaponID, tWeaponEffect or weaponEffect, "Weapon", NGOrders.MODEL_LAYER_Z_WEAPON)
+    UIModel.CreateModel(node, tWeaponID or weaponID, tWeaponEffect or weaponEffect, "Weapon", NGOrders.MODEL_LAYER_Z_WEAPON)
 
     -- 面巾
     UIModel.CreateModel(node, veilID, veilEffect, "Veil", NGOrders.MODEL_LAYER_Z_VEIL)

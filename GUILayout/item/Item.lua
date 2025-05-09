@@ -152,7 +152,7 @@ function Item:InitData(data)
 
     
     -- 是否显示特效、false时不显示特效
-    self._isShowEff = data.isShowEff
+    self._isShowEff = data.isShowEff == nil and true or data.isShowEff
 
     -- 是否显示Model特效
     self._showModelEffect = data.showModelEffect
@@ -364,7 +364,7 @@ function Item:SetItemEffect()
     GUI:removeAllChildren(ui["Node_sfx_under"])
     GUI:removeAllChildren(ui["Node_sfx"])
 
-    if not (self._itemData or self._isShowEff) then
+    if not self._itemData or not self._isShowEff then
         if self._btnIcon_delay then
             GUI:setVisible(ui["Button_icon"], true)
         end

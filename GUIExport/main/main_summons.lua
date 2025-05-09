@@ -1,13 +1,13 @@
 local ui = {}
 function ui.init(parent)
-	-- Create Node
-	local Node = GUI:Node_Create(parent, "Node", -225.00, 345.00)
-	GUI:setChineseName(Node, "宠物节点")
-	GUI:setAnchorPoint(Node, 0.50, 0.50)
-	GUI:setTag(Node, -1)
+	-- Create Main_Summons
+	local Main_Summons = GUI:Node_Create(parent, "Main_Summons", -225.00, 345.00)
+	GUI:setChineseName(Main_Summons, "宠物节点")
+	GUI:setAnchorPoint(Main_Summons, 0.50, 0.50)
+	GUI:setTag(Main_Summons, -1)
 
 	-- Create Panel_1
-	local Panel_1 = GUI:Layout_Create(Node, "Panel_1", 0.00, 0.00, 60.00, 60.00, false)
+	local Panel_1 = GUI:Layout_Create(Main_Summons, "Panel_1", 0.00, 0.00, 60.00, 60.00, false)
 	GUI:setChineseName(Panel_1, "宠物战斗_组合")
 	GUI:setAnchorPoint(Panel_1, 0.50, 0.50)
 	GUI:setTouchEnabled(Panel_1, false)

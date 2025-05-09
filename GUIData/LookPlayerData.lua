@@ -45,6 +45,12 @@ function LookPlayerData.handle_MSG_SC_ROLE_INFO_RESPONSE(data)
         return false
     end
 
+    -- 已打开 关闭
+    local layerID = data.isHero and UIConst.LAYERID.LookHeroMainGUI or UIConst.LAYERID.LookPlayerMainGUI
+    if GUI:GetWindow(nil, layerID) then
+        GUI:Win_CloseByID(layerID)
+    end
+
     -- 打开界面
     GUI:SetLayerOpenParam({page = data.pageID})
     GUI:Win_Open(data.isHero and UIConst.LUAFile.LUA_FILE_HERO_LOOK_FRAME or UIConst.LUAFile.LUA_FILE_PLAYER_LOOK_FRAME)

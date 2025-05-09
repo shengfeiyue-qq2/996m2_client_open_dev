@@ -731,7 +731,7 @@ function SettingAuto.CreateListPanel(parent, data)
     GUI:setTouchEnabled(Button_del, true)
 
 
-    local value = SL:GetValue("SETTING_ENABLED", (data.id))
+    local value = SL:GetValue("SETTING_VALUE", data.id)[1]
     if not value or (type(value) ~= "table") then
         value = {}
     end
@@ -764,7 +764,7 @@ function SettingAuto.CreateListPanel(parent, data)
             local name = GUI:Text_getString(selText_name)
             GUI:ListView_removeChild(ListView, Panel_Layout.selectItem)
             Panel_Layout.selectItem = nil
-            local value = SL:GetValue("SETTING_ENABLED", (data.id))
+            local value = SL:GetValue("SETTING_VALUE", data.id)[1]
             if not value or type(value) ~= "table" then
                 value = {}
             end
@@ -848,7 +848,7 @@ function SettingAuto.OnAddIgnoreList(name)
     local Panel_Set = SettingAuto._ui["Panel_" .. SLDefine.SETTINGID.SETTING_IDX_IGNORE_MONSTER]
     local Panel_UI = GUI:ui_delegate(Panel_Set)
     if Panel_UI then
-        local value = SL:GetValue("SETTING_ENABLED", (SLDefine.SETTINGID.SETTING_IDX_IGNORE_MONSTER))
+        local value = SL:GetValue("SETTING_VALUE", SLDefine.SETTINGID.SETTING_IDX_IGNORE_MONSTER)[1]
         if not value or (type(value) ~= "table") then
             value = {}
         end

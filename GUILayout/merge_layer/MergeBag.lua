@@ -538,6 +538,13 @@ function MergeBag.CreateBagItem(data)
 
         -- 单击
         GUI:ItemShow_addReplaceClickEvent(goodItem, function()
+            if not SL:GetValue("IS_PC_OPER_MODE") and GUIGlobal_BagItemChooseEx then
+                local isContinue = GUIGlobal_BagItemChooseEx(data.MakeIndex)
+                if not isContinue then
+                    return false
+                end
+            end
+
             if MergeBagInfo._changeStoreMode then  -- 人物和英雄背包互取
                 if MergeBag.IsHeroBag() then
                     SL:RequestHeroBagToHumBag({ itemData = data })

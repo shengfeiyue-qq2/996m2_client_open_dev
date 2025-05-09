@@ -26,6 +26,9 @@ function Guide.main()
     Guide._autoExcute        = Guide._data and tonumber(Guide._data.autoExcute)
     Guide._clickCallback     = Guide._data and Guide._data.clickCB
     Guide._dir               = Guide._data and tonumber(Guide._data.dir)
+    Guide._mainID            = Guide._data and tonumber(Guide._data.mainId) or tonumber(Guide._data.id)
+    Guide._uiID              = Guide._data and tonumber(Guide._data.uiId) or tonumber(Guide._data.param)
+    Guide._uiIDStr           = Guide._data and Guide._data.uiId or Guide._data.param
 
     -- 审核服屏蔽
     if SL:GetValue("REVIEW_STATUS") then
@@ -47,10 +50,8 @@ function Guide.main()
 end
 
 function Guide.Init()
-    local idx = tonumber(Guide._data.mainId)
-    local id = tonumber(Guide._data.uiId)
-    Guide._mainID = idx
-    Guide._uiID = id
+    local idx = Guide._mainID
+    local id = Guide._uiID
     ---------------------创建个吞噬触摸的
     local parent = Guide._mainType and GUI.ATTACH_GUIDE or
         GUI:Win_Create(UIConst.LAYERID.GuideGUI, 0, 0, 0, 0, false, false, false, false, true, nil,
@@ -74,7 +75,7 @@ function Guide.Init()
             GUI:Win_Close(parent)
             return
         end
-        local temp = { typeassist = Guide._data.uiId }
+        local temp = { typeassist = Guide._uiIDStr }
         Guide._widget, Guide._parent = getNodesFunc(temp)
         Guide._StartEventName = GUIDefine.GuideEvent[idx] and GUIDefine.GuideEvent[idx].start
         Guide._EndEventName = GUIDefine.GuideEvent[idx] and GUIDefine.GuideEvent[idx].close
@@ -85,7 +86,7 @@ function Guide.Init()
             SL:onLUAEvent(LUA_EVENT_GUIDE_ENTER_TRANSITION, { name = "GUIDE_BEGIN_SKILL_BUTTON" })
         elseif idx == 1 or idx == 47 then -- 背包 英雄背包 的双击使用
             if idx == 1 then
-                Guide._BagPage = BagData.GetBagPageByMakeIndex(Guide._data.uiId)
+                Guide._BagPage = BagData.GetBagPageByMakeIndex(Guide._uiIDStr)
                 if Guide._BagPage and Guide._parent then --页数不对  得切换 一下
                     local curPage = Guide._parent.GetSelectPage and Guide._parent:GetSelectPage() or BagData.GetCurPage()
                     if curPage ~= Guide._BagPage then
@@ -95,9 +96,8 @@ function Guide.Init()
             end
 
             if id ~= -1 then
-                Guide._uiID = tostring(Guide._uiID)
                 Guide._clickCallback = function()
-                    local nowItemData = BagData.GetItemDataByMakeIndex(Guide._data.uiId)
+                    local nowItemData = BagData.GetItemDataByMakeIndex(Guide._uiIDStr)
                     if idx == 1 then
                         nowItemData.from = GUIDefine.ItemGoTo.BAG
                         SL:RequestUseItem(nowItemData)
