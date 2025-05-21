@@ -31,7 +31,7 @@ function Storage.main()
     Storage.Init(isWin32)
 
     Storage._ui = GUI:ui_delegate(parent)
-    Storage._openedCount = SL:GetValue("STROAGE_OPEN_SIZE")
+    Storage._openedCount = SL:GetValue("STORAGE_OPEN_SIZE")
     Storage._PerPageNum = Storage._PerPageNum or GUIDefine.STORAGE_PER_PAGE_MAX
     -- 取实际容器大小
     Storage._PHeight = GUI:getContentSize(Storage._ui["Panel_items"]).height
@@ -333,7 +333,7 @@ end
 
 function Storage.UpdateStorageOpenNum()
     local lastIndex = math.min(Storage._openedCount - (Storage._selPage - 1) * Storage._PerPageNum, Storage._PerPageNum)
-    Storage._openedCount = SL:GetValue("STROAGE_OPEN_SIZE")
+    Storage._openedCount = SL:GetValue("STORAGE_OPEN_SIZE")
     local openIndex = math.min(Storage._openedCount - (Storage._selPage - 1) * Storage._PerPageNum, Storage._PerPageNum)
     if openIndex > 0 then
         if openIndex <= lastIndex then

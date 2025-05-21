@@ -112,7 +112,7 @@ function HeroExtraAtt.UpdateBaseAttri()
 
     for _, id in ipairs(extraAttrs) do
         local attData = {
-            id = id, value = string.format("%s/%s", SL:GetValue("H.CUR_ABIL_BY_ID", id) or 0, SL:GetValue("H.MAX_ABIL_BY_ID", id) or 0)
+            id = id, min = SL:GetValue("H.CUR_ABIL_BY_ID", id) or 0, max = SL:GetValue("H.MAX_ABIL_BY_ID", id) or 0
         }
         table.insert(showList, attData)
     end

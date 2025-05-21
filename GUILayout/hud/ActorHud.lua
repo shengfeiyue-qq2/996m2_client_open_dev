@@ -173,7 +173,12 @@ function ActorHud.GetActorHUDLabelInfo(actorID, color, guildInfo)
     --前缀文本（称号文本）
     for i = 1, 12 do
         local titleStr = nameStr[i]
-        result.title[i] = {color = color, str = titleStr, visible = labelTitleVisible, offsetX = offsetX, offsetY = offsetY}
+        local _, __, titleName, titleColor = string.find(titleStr or "", "<(.+)/(%d+)>")
+        if titleName then
+            color = tonumber(titleColor) or color
+            titleStr = titleName
+        end
+        result.title[i] = {titleColor = tonumber(titleColor), color = color, str = titleStr, visible = labelTitleVisible, offsetX = offsetX, offsetY = offsetY}
         --文本往下移
         if labelTitleVisible and titleStr and sLen(titleStr) > 0 then
             local hudIndex = SLDefine.HudIndex.HUD_LABEL_PRE_NAME1 - 1 + i
@@ -205,6 +210,17 @@ function ActorHud.GetActorHUDLabelInfo(actorID, color, guildInfo)
     --//////掉落物color是0xFFFFFF格式  其他的是colorID
     --名字
     offsetX = 2
+    -- 前缀 {<前缀/253>}名字
+    local i, j, namePrefix, name = string.find(showName, "%{(.+)%}(.+)")
+    if namePrefix then
+        local _, __, titleName, titleColor = string.find(namePrefix, "<(.+)/(%d+)>")
+        if titleName then
+            color = tonumber(titleColor) or color
+            namePrefix = titleName
+        end
+        result.prefix = {titleColor = tonumber(titleColor), color = color, str = namePrefix, visible = labelNameVisible, offsetX = offsetX, offsetY = offsetY}
+    end
+    showName = name or showName
     if isPlayer then 
         local horseStateName = ActorHud.GetHorseStateName(actorID)
         showName = horseStateName or showName
@@ -231,10 +247,10 @@ end
 -- 获取称号文本 行会信息 角色名 颜色
 local result = {}
 result.title = {}
-function ActorHud.GetActorHUDLabelColorInfo(actorID, color)
+function ActorHud.GetActorHUDLabelColorInfo(actorID, color, titleColors)
     --前缀文本
     for i = 1, 12 do
-        result.title[i] = color
+        result.title[i] = titleColors and titleColors[i] or color
     end
     result.guild = color
     result.name = color

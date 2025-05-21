@@ -466,7 +466,7 @@ function MergeBag.UpdateItems()
 end
 
 function MergeBag.SetClockImag(panelItems, posX, posY)
-    local clockImage = GUI:Image_Create(panelItems, "ClockImag", posX, posY, MergeBagInfo._lockImg)
+    local clockImage = GUI:Image_Create(panelItems, string.format("ClockImage_%s_%s", posX, posY), posX, posY, MergeBagInfo._lockImg)
     GUI:setAnchorPoint(clockImage, 0.5, 0.5)
     GUI:setScale(clockImage, MergeBagInfo._isWin32 and 0.5 or 1)
     GUI:setTouchEnabled(clockImage, true)

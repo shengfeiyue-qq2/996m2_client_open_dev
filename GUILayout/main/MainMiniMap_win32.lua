@@ -183,6 +183,7 @@ function MainMiniMap.ChangeStatus(status)
     MainMiniMap._limitSize = MainMiniMap._mapSizes[MainMiniMap._status] or {width = 110, height = 110}
 
     MainMiniMap.UpdateMapShowStatus(status)
+    SL:onLUAEvent(LUA_EVENT_PCMINIMAP_STATUS_CHANGE, status)
 end
 
 function MainMiniMap.OnTabKeyExchange()

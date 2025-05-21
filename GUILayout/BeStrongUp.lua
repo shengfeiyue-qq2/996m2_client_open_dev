@@ -110,6 +110,7 @@ end
 function BeStrongUp.OnClose()
     if  BeStrongUpInfo and BeStrongUpInfo._layer then
         GUI:removeFromParent(BeStrongUpInfo._layer)
+        BeStrongUpInfo._layer = nil
         BeStrongUp.UnRegisterEvent()
         BeStrongUpInfo = nil
     end

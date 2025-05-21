@@ -472,7 +472,7 @@ end
 
 -- 设置 锁
 function Bag.SetClockImag(panelItems, posX, posY)
-    local clockImage = GUI:Image_Create(panelItems, string.format("ClockImag_%s_%s",posX, posY), posX, posY, BagInfo._lockImg)
+    local clockImage = GUI:Image_Create(panelItems, string.format("ClockImage_%s_%s", posX, posY), posX, posY, BagInfo._lockImg)
     GUI:setAnchorPoint(clockImage, 0.5, 0.5)
     GUI:setScale(clockImage, BagInfo._isWin32 and 0.5 or 1)
     GUI:setTouchEnabled(clockImage, true)

@@ -493,6 +493,13 @@ for i = 5, 15 do
     GUIDefine.MergeAttrConfig[attTypeTable[maxKey]] = {attTypeTable[minKey], attTypeTable[maxKey]}
 end
 
+-- 额外合并属性
+GUIDefine.ExMergeAttrID = {
+    [attTypeTable.Weight]       = true,
+    [attTypeTable.Wear_Weight]  = true,
+    [attTypeTable.Hand_Weight]  = true,
+}
+
 -- 物品来源
 GUIDefine.ItemFrom = {
     BAG                 = 1,    -- 背包
@@ -509,7 +516,7 @@ GUIDefine.ItemFrom = {
     ITEMBOX             = 13,   -- 自定义UI ITEMBOX
     NPC_DO_SOMETHING    = 14,   -- NPC自定义放入框
     NEWTYPE             = 15,
-    HERO_BAG            = 66,   --英雄背包
+    HERO_BAG            = 66,   -- 英雄背包
     HERO_EQUIP          = 67,   -- 英雄装备
     HERO_BEST_RINGS     = 68,   -- 英雄极品首饰
     GUI_ITEMBOX         = 77,   -- GUI ItemBox

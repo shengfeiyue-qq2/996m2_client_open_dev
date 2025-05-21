@@ -173,7 +173,6 @@ function MergePlayerFrame.OnChangeRoleType(widget)
     GUI:setEnabled(MergePlayerFrame._ui["Button_player"], roleType ~= 1)
     GUI:setEnabled(MergePlayerFrame._ui["Button_hero"],   roleType == 1)
 
-    MergePlayerFrame._showType = 0
     MergePlayerFrame.OnChangeShowType(MergePlayerFrame._ui["base_btn"])
     
     MergePlayerFrame.OnOpenPage(UIConst.LayerTable.PlayerEquip, lastRoleType)

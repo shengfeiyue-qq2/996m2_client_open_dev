@@ -61,7 +61,7 @@ function HeroExtraAtt_Look_TradingBank.UpdateBaseAttri()
 
     for _, id in ipairs(extraAttrs) do
         local attData = {
-            id = id, value = string.format("%s/%s",TradingBankLookPlayerData.GetHeroCurAbilByID(id) or 0, TradingBankLookPlayerData.GetHeroMaxAbilByID(id) or 0)
+            id = id, min = TradingBankLookPlayerData.GetHeroCurAbilByID(id) or 0, max = TradingBankLookPlayerData.GetHeroMaxAbilByID(id) or 0
         }
         table.insert(showList, attData)
     end

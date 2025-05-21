@@ -301,8 +301,11 @@ end
 
 -- 设置正在交易或修理中
 function BagData.SetOnSellOrRepaire(makeIndex)
+    local lastItem = BagData._onSellRepaire
     BagData._onSellRepaire = makeIndex
-    SL:onLUAEvent(LUA_EVENT_BAG_ITEM_POS_CHANGE, {makeIndex})
+    if lastItem then
+        SL:onLUAEvent(LUA_EVENT_BAG_ITEM_POS_CHANGE, {lastItem})
+    end
 end
 
 -- 获取是否在交易或修理
@@ -316,7 +319,9 @@ function BagData.CleanOnSellOrRepaire()
     BagData._onSellRepaire = nil
     
     -- 刷新一遍背包 将隐藏的刷出来
-    SL:onLUAEvent(LUA_EVENT_BAG_ITEM_POS_CHANGE, makeIndex and {makeIndex})
+    if makeIndex then
+        SL:onLUAEvent(LUA_EVENT_BAG_ITEM_POS_CHANGE, {makeIndex})
+    end
 end
 
 --背包位置数据

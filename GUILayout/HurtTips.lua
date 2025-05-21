@@ -3,7 +3,19 @@ HurtTips._isShow = false
 
 function HurtTips.main()
     -- 监控血量低于30%
-    SL:RegisterLUAEvent(LUA_EVENT_THROW_DAMAGE, "HurtTips", function(actorID, damageID, damageNum)
+    SL:RegisterLUAEvent(LUA_EVENT_THROW_DAMAGE, "HurtTips", function(data)
+        if not data then
+            return
+        end
+
+        -- 设置- 残血提示
+        if not (SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_UNSAFE_TIPS) == 1) then
+            return
+        end
+
+        local actorID = data.actorID
+        local damageID = data.damageID
+        local damageNum = data.damageNum
         -- 是伤害类型
         if SL:GetValue("ACTOR_IS_MAINPLAYER", actorID) or SL:GetValue("ACTOR_IS_MAINHERO", actorID) then
             if SL:GetValue("DAMAGE_TYPE_BY_ID", damageID) == 1 then
@@ -18,13 +30,8 @@ function HurtTips.main()
 
     -- TODO: 英雄血量改变未监听，英雄收回未监听
     -- 血量变化
-    SL:RegisterLUAEvent(LUA_EVENT_HERO_HPMP_CHANGE, "HurtTips", function(...)
-        if not HurtTips.CheckIsLowHP() then
-            if HurtTips._isShow then
-                HurtTips.Hide()
-            end
-        end
-    end)
+    SL:RegisterLUAEvent(LUA_EVENT_HERO_HPMP_CHANGE, "HurtTips", HurtTips.CheckNeedHide)
+    SL:RegisterLUAEvent(LUA_EVENT_HPMP_CHANGE, "HurtTips", HurtTips.CheckNeedHide)
 
     -- 屏幕宽高改变
     SL:RegisterLUAEvent(LUA_EVENT_WINDOW_CHANGE, "HurtTips", function(...)
@@ -33,6 +40,14 @@ function HurtTips.main()
             HurtTips.Show()
         end
     end)
+end
+
+function HurtTips.CheckNeedHide()
+    if not HurtTips.CheckIsLowHP() then
+        if HurtTips._isShow then
+            HurtTips.Hide()
+        end
+    end
 end
 
 function HurtTips.CheckIsLowHP()
@@ -71,7 +86,10 @@ function HurtTips.Hide()
         return
     end
     HurtTips._isShow = false
-    GUI:removeAllChildren(HurtTips._content)
+    if HurtTips._content then
+        GUI:removeFromParent(HurtTips._content)
+        HurtTips._content = nil
+    end
 end
 
 -- do

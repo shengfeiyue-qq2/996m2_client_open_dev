@@ -619,6 +619,15 @@ local function MergeAtts(list)
             else
                 newList[mergedId].min = v.value or 0
             end
+        elseif GUIDefine.ExMergeAttrID and GUIDefine.ExMergeAttrID[v.id] then
+            local mergedId = GetMergeAttID(v.id, v.id + 1)
+            if not newList[mergedId] then
+                newList[mergedId] = {
+                    id = mergedId,
+                    min = v.min or 0,
+                    max = v.max or 0,
+                }
+            end
         else
             table.insert(newList, v)
         end

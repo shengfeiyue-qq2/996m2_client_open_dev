@@ -55,7 +55,7 @@ function PCSpellScope.CreateDrawPolygon(range)
     local rightTop    = GUI:p(pos.x + size.width/2, pos.y + size.height/2)
     local leftTop     = GUI:p(pos.x - size.width/2, pos.y + size.height/2)
     --线条颜色
-    local borderColor = cc.c4f(255/255, 255/255, 0, 1)
+    local borderColor = GUI:Color4f(255 / 255, 255 / 255, 0, 1)
     --线条宽度
     local borderWidth = 0.7
 
@@ -63,7 +63,7 @@ function PCSpellScope.CreateDrawPolygon(range)
         SLDefine.SceneZOrder.NODE_SKILL,       --场景节点
         {leftBottom, rightBottom, rightTop, leftTop},--顶点数组
         4,                                           --顶点数量
-        cc.c4f(0,0,0,0),           --填充颜色
+        GUI:Color4f(0, 0, 0, 0),               --填充颜色
         borderWidth,                           --线条宽度
         borderColor                            --线条颜色
     )

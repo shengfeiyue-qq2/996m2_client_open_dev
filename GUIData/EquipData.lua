@@ -244,12 +244,17 @@ end
 -- 装备穿戴成功
 function EquipData.handle_MSG_SC_PLAYER_EQUIP_ON_SUCCESS(pos)
     SL:onLUAEvent(LUA_EVENT_TAKE_ON_EQUIP, {isSuccess = true, pos = pos})
+    SL:SetValue("LAST_MOVE_TAKEON_ITEM_MAKEINDEX", nil)
 end
 
 -- 装备穿戴失败
 function EquipData.handle_MSG_SC_PLAYER_EQUIP_ON_FAIL(pos)
     SL:onLUAEvent(LUA_EVENT_TAKE_ON_EQUIP, {isSuccess = false, pos = pos})
-    -- SL:onLUAEvent(LUA_EVENT_BAG_ITEM_POS_CHANGE)
+    -- 刷新移动穿戴失败道具
+    if SL:GetValue("LAST_MOVE_TAKEON_ITEM_MAKEINDEX") then
+        SL:onLUAEvent(LUA_EVENT_BAG_ITEM_POS_CHANGE, {SL:GetValue("LAST_MOVE_TAKEON_ITEM_MAKEINDEX")})
+        SL:SetValue("LAST_MOVE_TAKEON_ITEM_MAKEINDEX", nil)
+    end
 end
 
 -- 装备脱下成功

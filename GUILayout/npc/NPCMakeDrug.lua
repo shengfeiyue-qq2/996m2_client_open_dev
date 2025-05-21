@@ -2,6 +2,51 @@ NPCMakeDrug = {}
 
 NPCMakeDrug.perPageItemsCount = 10 -- 每页最多10条物品
 
+--[[
+    data.dataLength 总长度
+    或者data.items长度
+    data.pageLength 每页长度
+    data.isShowLat 是否显示上页最后一项
+]]
+-- 获取页数据
+local function getPageData(data)
+    if not data then
+        return nil
+    end
+    local length = 0
+    if data.dataLength then
+        length = data.dataLength
+    end
+    if data.items then
+        length = #data.items
+    end
+    local pageData = {}
+    local page = 1
+    local pageLength = data.pageLength or NPCMakeDrug.perPageItemsCount
+    local isShowLastItem = data.isShowLast
+
+    if isShowLastItem then
+        pageLength = pageLength - 1
+    end
+    local maxPage = math.ceil(length / pageLength)
+    for index = page, maxPage do
+        local beginItem = (index - 1) * pageLength + 1
+        local endItem = index * pageLength
+        if isShowLastItem then
+            endItem = index * pageLength + 1
+        end
+        if index == maxPage then
+            endItem = length
+        end
+        pageData[index] = {
+            beginItem = beginItem,
+            endItem = endItem
+        }
+    end
+
+    return pageData
+end
+
 function NPCMakeDrug.main()
     local data = GUI:GetLayerOpenParam()
     GUI:SetLayerOpenParam(nil)
@@ -29,7 +74,7 @@ end
 
 function NPCMakeDrug.InitUI(data)
     NPCMakeDrug.itemList = data and data.items or {}
-    NPCMakeDrug.maxPage = #GetPageData({ dataLength = #NPCMakeDrug.itemList, pageLength = NPCMakeDrug.perPageItemsCount })
+    NPCMakeDrug.maxPage = #getPageData({dataLength = #NPCMakeDrug.itemList, pageLength = NPCMakeDrug.perPageItemsCount})
     NPCMakeDrug.list = GUI:getChildByName(NPCMakeDrug._root, "ListView_list")
     NPCMakeDrug.btnOk = GUI:getChildByName(NPCMakeDrug._root, "Button_ok")
     NPCMakeDrug.btnLast = GUI:getChildByName(NPCMakeDrug._root, "Button_last")
@@ -96,7 +141,7 @@ function NPCMakeDrug.GetPageBeginAndEnd()
     local data = {
         dataLength = maxList
     }
-    local pageData = GetPageData(data)
+    local pageData = getPageData(data)
     local beginIndex = pageData[page].beginItem
     local endIndex = pageData[page].endItem
     return beginIndex, endIndex

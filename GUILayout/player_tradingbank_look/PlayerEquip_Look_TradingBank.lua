@@ -54,7 +54,7 @@ local SetFeature = function (pos, data)
 end
 
 -- 部位位置配置(4 和 13 同部位)
-local EquipPosSet = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 56}
+local EquipPosSet = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 55, 56}
 
 -- 斗笠和头盔是否在相同的位置
 PlayerEquip_Look_TradingBank._SamePos = true

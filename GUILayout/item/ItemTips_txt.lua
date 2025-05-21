@@ -1185,7 +1185,7 @@ function ItemTips.GetStarPanel(star)
                     resNode = GUI:Image_Create(panel, string.format("star_img_%s_%s", k, i), 0, 0, v.res.img)
                     GUI:setAnchorPoint(resNode, 0.5, 0)
                 elseif v.res.sfx then -- 特效
-                    resNode = GUI:Effect_Create(panel, string.format("star_sfx_%s_%s", k, i), 0, 0, 0, v.res.tx)
+                    resNode = GUI:Effect_Create(panel, string.format("star_sfx_%s_%s", k, i), 0, 0, 0, v.res.sfx)
                 end
 
                 if posI == starColNum then
@@ -2634,8 +2634,9 @@ function ItemTips.CreateEquipPanel(data, itemData, isWear, panelInsertIndex)
         local suitArry = string.split(suitids, "#")
         for k, v in ipairs(suitArry) do
             local id = v and tonumber(v)
-            if id then
-                suitStr = suitStr .. (k ~= 1 and "<br>" or "") .. (ItemTips.GetSuitStr(id) or "")
+            local tSuitStr = id and ItemTips.GetSuitStr(id)
+            if tSuitStr then
+                suitStr = suitStr .. (k ~= 1 and "<br>" or "") .. tSuitStr
             end
         end
         if string.len(suitStr) > 0 then

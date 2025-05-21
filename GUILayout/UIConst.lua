@@ -212,6 +212,7 @@ UIConst.LUAFile =
     LUA_FILE_COMPOUND_ITEM                      = "compound/CompoundItem",                                                  -- 合成
 
     LUA_FILE_ITEM                               = "GUILayout/item/Item",                                                    -- 物品框
+    LUA_FILE_COSTITEM                           = "GUILayout/item/CostItem",                                                -- 消耗物品组件
 
     LUA_FILE_REIN_ATTR                          = "reinattr/ReinAttr",                                                      -- 转生加点
 

@@ -477,7 +477,7 @@ function MainTargetBigHp.ChangeHPBarTX(parentNode, animID, func)
 
     anim.frameScale = {}
     SL:scheduleOnce(anim, function()
-        local boundBox = GUI:getBoundingBox(anim)
+        local boundBox = GUI:Effect_getFrameBox(anim)
         GUI:setScaleX(anim, boundBox.width / sz.width)
         GUI:setScaleY(anim, boundBox.height / sz.height)
         GUI:setVisible(anim, true)
