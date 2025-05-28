@@ -2618,11 +2618,14 @@ function ItemTips.CreateEquipPanel(data, itemData, isWear, panelInsertIndex)
     local suitids = itemData.suitid
     if hideSuitTips and not ItemTips._diff and suitids and string.len(suitids) > 0 then
         local suitArry = string.split(suitids, "#")
+        local pos = 0
         for k, v in ipairs(suitArry) do
             local id = v and tonumber(v)
             local tSuitStr = id and ItemTips.GetSuitStr(id)
             if tSuitStr then
-                suitStr = suitStr .. (k ~= 1 and "<br>" or "") .. tSuitStr
+                pos = pos + 1
+                tSuitStr = string.gsub(tSuitStr, "<br>$", "")
+                suitStr = suitStr .. (pos ~= 1 and "<br>" or "") .. tSuitStr
             end
         end
         if string.len(suitStr) > 0 then

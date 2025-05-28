@@ -145,10 +145,32 @@ function GoldBox.SetItemBox(data)
             GUI:setScale(item, 0.75)
         end
         if coverPanel then
-            GUI:addOnClickEvent(coverPanel, function(sender)
-                GUI:delayTouchEnabled(sender)
-                SL:RequestGetGoldBoxReward()
-            end)
+            if GoldBox._isPC then
+                GUI:addOnClickEvent(coverPanel, function(sender)
+                    GUI:delayTouchEnabled(sender)
+                    SL:RequestGetGoldBoxReward()
+                end)
+            else
+                GUI:addOnTouchEvent(coverPanel, function(sender, type)
+                    if type == GUIDefine.TouchEventType.ENDED then
+                        if not sender._lastClick then
+                            sender._lastClick = true
+                            sender._clickDelayHandler = SL:ScheduleOnce(function()
+                                UIOperator:OpenItemTips({typeId = v.ItemId, pos = GUI:getTouchEndPosition(sender)})
+                                sender._lastClick = nil
+                            end, 0.3)
+                        else
+                            if sender._clickDelayHandler then
+                                SL:UnSchedule(sender._clickDelayHandler)
+                                sender._clickDelayHandler = nil
+                            end
+                            -- 双击回调
+                            SL:RequestGetGoldBoxReward()
+                            sender._lastClick = nil
+                        end
+                    end
+                end)
+            end
         end
     end
 

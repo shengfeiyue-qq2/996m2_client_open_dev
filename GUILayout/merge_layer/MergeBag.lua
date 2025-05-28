@@ -853,7 +853,7 @@ function MergeBag.UpdateMovingData(data)
         return
     end
 
-    local onMovingNode = GUI:getChildByTag(MergeBagInfo._ui.Panel_items, data.MakeIndex)
+    local onMovingNode = GUI:getChildByStrTag(MergeBagInfo._ui.Panel_items, data.MakeIndex)
     if onMovingNode then
         GUI:setVisible(onMovingNode, data.state and data.state > 0)
         onMovingNode._movingState = not (data.state and data.state > 0)
@@ -903,7 +903,7 @@ function MergeBag.UpdateEquipRetrieveState(retrive_data)
         else
             MergeBagInfo._chooseTagList[data.MakeIndex] = nil
         end
-        local goodsItem = GUI:getChildByTag(MergeBagInfo._ui.Panel_items, data.MakeIndex)
+        local goodsItem = GUI:getChildByStrTag(MergeBagInfo._ui.Panel_items, data.MakeIndex)
         if goodsItem then
             GUI:ItemShow_setItemShowChooseState(goodsItem, showTag)
         end
@@ -914,7 +914,7 @@ end
 
 function MergeBag.OnRefreshChooseList()
     for makeIndex, _ in pairs(MergeBagInfo._chooseTagList or {}) do
-        local goodsItem = GUI:getChildByTag(MergeBagInfo._ui.Panel_items, makeIndex)
+        local goodsItem = GUI:getChildByStrTag(MergeBagInfo._ui.Panel_items, makeIndex)
         if goodsItem then
             GUI:ItemShow_setItemShowChooseState(goodsItem, true)
         end

@@ -3717,6 +3717,24 @@ function GUIFunction:GetBuffAddAttrShow(buffID)
     return attrStr
 end
 
+-------------------------------------------------------------------------
+-- 仓库数据排序逻辑
+function GUIFunction:SortStorageItemFunc(itemA, itemB)
+    local powerA = GUIFunction:GetEquipPower(itemA)
+    local powerB = GUIFunction:GetEquipPower(itemB)
+    if powerA ~= powerB then
+        return powerA > powerB
+    else
+        local isBindA, bindIndexA = SL:CheckItemBind(itemA.Index)
+        local isBindB, bindIndexB = SL:CheckItemBind(itemB.Index)
+        if isBindA == isBindB then
+            return itemA.Index < itemB.Index
+        else
+            return isBindA
+        end
+    end
+end
+
 ------------------------------ UI 控件相关 -------------------------------
 -- 给ScrollView/ListView添加垂直滑动条
 function GUIFunction:SetScrollViewVerticalBar(parent, param)

@@ -1240,6 +1240,7 @@ function UIOperator:OpenRtouchEventUI()
 end
 -- 引导
 function UIOperator:OpenGuideUI(data)
+    SL:onLUAEvent(LUA_EVENT_GUIDE_EXIT)
     GUI:SetLayerOpenParam(data)
     GUI:Win_Open(UIConst.LUAFile.LUA_FILE_GUIDE)
 end

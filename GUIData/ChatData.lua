@@ -95,7 +95,9 @@ function ChatData.Init()
     -- 是否关闭假掉落消息
     ChatData._closeFakeDrop = false
 
-    ChatData._fakeDropMsgTable = {}
+    ChatData._curFakeDropType = nil     -- 当前打开假掉落分类
+    ChatData._fakeDropMsgTable = {}     -- 假掉落所有配置
+    ChatData._fakeDropMsgTypeTable = {} -- 假掉落分组配置 {[type] = {}, ..}
 
     -----
     ChatData._parseItems = SL:CreateQueue()
@@ -116,6 +118,7 @@ end
 function ChatData.LoadConfig()
     -- 假掉落配置
     ChatData._fakeDropMsgTable = {}
+    ChatData._fakeDropMsgTypeTable = {}
     local fileName = "cfg_chat_drop.lua"
     if SL:IsFileExist("scripts/game_config/" .. fileName) then
         local config = SL:Require("game_config/" .. fileName)
@@ -148,6 +151,13 @@ function ChatData.LoadConfig()
                     str = string.gsub(str, "%%Y", v.mapY)
                 end
                 table.insert(ChatData._fakeDropMsgTable, str)
+                -- 分类
+                if v.type then
+                    if not ChatData._fakeDropMsgTypeTable[v.type] then
+                        ChatData._fakeDropMsgTypeTable[v.type] = {}
+                    end
+                    table.insert(ChatData._fakeDropMsgTypeTable[v.type], str)
+                end
             end
         end
     end
@@ -169,9 +179,18 @@ end
 
 function ChatData.GetRandFakeDropParam()
     if ChatData._fakeDropParam and next(ChatData._fakeDropParam) and next(ChatData._fakeDropMsgTable) then
-        local idx = math.random(1, #ChatData._fakeDropMsgTable)
-        ChatData._fakeDropParam.Msg = ChatData._fakeDropMsgTable[idx]
-        return ChatData._fakeDropParam
+        if ChatData._curFakeDropType then
+            local fakeDropMsgTable = ChatData._fakeDropMsgTypeTable[ChatData._curFakeDropType] or {}
+            if next(fakeDropMsgTable) then
+                local idx = math.random(1, #fakeDropMsgTable)
+                ChatData._fakeDropParam.Msg = fakeDropMsgTable[idx]
+                return ChatData._fakeDropParam
+            end
+        else
+            local idx = math.random(1, #ChatData._fakeDropMsgTable)
+            ChatData._fakeDropParam.Msg = ChatData._fakeDropMsgTable[idx]
+            return ChatData._fakeDropParam
+        end
     end
 
     return nil
@@ -920,10 +939,12 @@ function ChatData.OnChangeFakeDropTimes(data)
 end
 
 -- 通知开关假掉落
-function ChatData.OnChangeFakeDropStatus(status)
-    if not status then
+function ChatData.OnChangeFakeDropStatus(data)
+    if not data or not next(data) then
         return
     end
+    local status = data.status
+    local type = data.type
     if status == 0 then
         ChatData.CloseFakeDropTimerID()
         ChatData._closeFakeDrop = true
@@ -933,6 +954,7 @@ function ChatData.OnChangeFakeDropStatus(status)
             local isReceiving = ChatData.GetDropTypeSwitch(ChatData._dropTotalTypeID)
             ChatData.SetReceiving(GUIDefine.ChatChannel.DROP, isReceiving)
         end
+        ChatData._curFakeDropType = type
         ChatData.OpenFakeDropTimerID()
         ChatData._closeFakeDrop = false
     end

@@ -173,12 +173,12 @@ function MergePlayerFrame.OnChangeRoleType(widget)
     GUI:setEnabled(MergePlayerFrame._ui["Button_player"], roleType ~= 1)
     GUI:setEnabled(MergePlayerFrame._ui["Button_hero"],   roleType == 1)
 
-    MergePlayerFrame.OnChangeShowType(MergePlayerFrame._ui["base_btn"])
+    MergePlayerFrame.OnChangeShowType(MergePlayerFrame._ui["base_btn"], lastRoleType)
     
     MergePlayerFrame.OnOpenPage(UIConst.LayerTable.PlayerEquip, lastRoleType)
 end
 
-function MergePlayerFrame.OnChangeShowType(widget)
+function MergePlayerFrame.OnChangeShowType(widget, lastRoleType)
     local showType = GUI:getTag(widget)
     if MergePlayerFrame._showType == showType then
         return false
@@ -190,7 +190,7 @@ function MergePlayerFrame.OnChangeShowType(widget)
     MergePlayerFrame.InitPageChangeBtn()
 
     local pageID = MergePlayerFrame._showType == 1 and UIConst.LayerTable.PlayerEquip or UIConst.LayerTable.InternalState
-    MergePlayerFrame.OnOpenPage(pageID, nil, lastShowType)
+    MergePlayerFrame.OnOpenPage(pageID, lastRoleType, lastShowType)
 end
 
 -- 打开子页签

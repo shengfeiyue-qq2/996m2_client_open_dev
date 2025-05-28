@@ -174,7 +174,7 @@ function Item:InitData(data)
 
     local index = data.index or (itemData and itemData.Index or 0)
     self._index = index
-    self:SetItemIndex(index)
+    self:SetItemIcon()
 
     -- 是否显示数量
     local showCount = not data.disShowCount
@@ -408,15 +408,25 @@ function Item:SetItemEffect()
 end
 
 function Item:SetItemIndex(index)
-    local function getIconResPath(looks)
-        local fileIndex = looks % 10000
-        local fileName = string.format("%06d", fileIndex)
-        local pathIndex = math.floor(tonumber(looks) / 10000)
-        local filePath = "item_" .. pathIndex .. "/" .. fileName
-
-        return string.format("res/item/%s.png", filePath)
+    if not index then
+        return
     end
+    self._index = index
+    self._itemData = SL:GetValue("ITEM_DATA", self._index)
+    self._looks = self._itemData and self._itemData.Looks or -1
+    self:SetItemIcon()
+    self:SetItemEffect()
+end
 
+local function getIconResPath(looks)
+    local fileIndex = looks % 10000
+    local fileName = string.format("%06d", fileIndex)
+    local pathIndex = math.floor(tonumber(looks) / 10000)
+    local filePath = "item_" .. pathIndex .. "/" .. fileName
+    return string.format("res/item/%s.png", filePath)
+end
+
+function Item:SetItemIcon()
     local newItemLooks = self._itemData and self._itemData.newLooks
     local path = ""
     if newItemLooks and newItemLooks > 0 then
