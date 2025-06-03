@@ -1944,7 +1944,7 @@ function MainProperty.OnQuickUseRefresh(data)
     if not cell then
         return false
     end
-    cell.item:ResetMoveState(data.state == 0)
+    GUI:ItemShow_resetMoveState(cell.item, data.state == 0)
 end
 
 -- 快捷栏变化通知
@@ -2035,7 +2035,6 @@ function MainProperty.AddQuickUseItem(data)
     GUI:setAnchorPoint(item, 0.5, 0.5)
 
     GUI:addMouseButtonEvent(item, {
-        onRightDownFunc = function() SL:RequestUseItem(itemData) end,
         onRightUpFunc   = function() SL:RequestUseItem(itemData) end,
         onDoubleLFunc   = function() SL:RequestUseItem(itemData) end,
     })

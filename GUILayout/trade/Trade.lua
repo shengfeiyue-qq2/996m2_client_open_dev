@@ -291,7 +291,7 @@ function Trade.UpdateItemList(param)
                 local tipsData = {}
                 tipsData.itemData = data
                 tipsData.pos = GUI:getWorldPosition(goodItem)
-                UIOperator:OpenItemTips(data)
+                UIOperator:OpenItemTips(tipsData)
             end
 
             local function leaveItem()

@@ -203,7 +203,7 @@ function MainProperty.OnQuickUseRefresh(data)
     if not cell then
         return false
     end
-    cell.item:ResetMoveState(data.state == 0)
+    GUI:ItemShow_resetMoveState(cell.item, data.state == 0)
 end
 
 -- 快捷栏操作

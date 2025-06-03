@@ -90,7 +90,7 @@ function HeroEquip.main()
     GUI:setVisible(BestRingBox, isVisible)
 
     GUI:addOnClickEvent(BestRingBox, function()
-        SL:RequestOpenPlayerBestRings()
+        SL:RequestOpenHeroBestRings()
         GUI:setClickDelay(BestRingBox, 0.3)
     end)
     HeroEquip._BestRingBox = BestRingBox
