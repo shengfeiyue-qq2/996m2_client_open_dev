@@ -69,6 +69,8 @@ function MergePlayerFrame.main()
     -- 1基础; 2内功
     MergePlayerFrame._showType = data and data.type or  1
 
+    MergePlayerFrame.typeCapture = data and data.typeCapture or nil
+
     local root = MergePlayerFrame._ui["Panel_1"]
 
     -- 适配

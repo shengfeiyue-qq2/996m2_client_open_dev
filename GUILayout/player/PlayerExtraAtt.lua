@@ -25,6 +25,10 @@ function PlayerExtraAtt.main()
     end
 
     PlayerExtraAtt._listView = PlayerExtraAtt._ui["ListView_extraAtt"]
+    if PlayerFrame and PlayerFrame.typeCapture == 1 then
+        GUI:ListView_setClippingEnabled(PlayerExtraAtt._listView,false)
+        PlayerExtraAtt.manyHeight = 0
+    end
 
     -- 请求更新次数
     PlayerExtraAtt._updateCount = 0
@@ -192,6 +196,9 @@ function PlayerExtraAtt.UpdateBaseAttri()
             end
         end
     end
+
+    local manyHeight = GUI:ListView_getInnerContainerSize(PlayerExtraAtt._listView).height - GUI:getContentSize(PlayerExtraAtt._listView).height
+    PlayerExtraAtt.manyHeight = math.max(0, manyHeight)
 end
 
 function PlayerExtraAtt.LoadAttriCell(ui, data)

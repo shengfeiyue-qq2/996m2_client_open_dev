@@ -140,21 +140,37 @@ function LoginRolePanel.InitAct()
         if SL:GetValue("IS_VISITOR_MODE") then
             return
         end
+        local shiwan = SL:GetValue("BOX_TEST_PLAY")
+        if shiwan then
+            return
+        end
         SL:ExitToLoginUI(true)
     end)
 
     -- 创建
     GUI:addOnClickEvent(LoginRolePanel._ui.Button_create, function()
+        local shiwan = SL:GetValue("BOX_TEST_PLAY")
+        if shiwan then
+            return
+        end
         LoginRolePanel.OnCreateRole()
     end)
 
     -- 删除
     GUI:addOnClickEvent(LoginRolePanel._ui.Button_delete, function()
+        local shiwan = SL:GetValue("BOX_TEST_PLAY")
+        if shiwan then
+            return
+        end
         LoginRolePanel.OnDeleteRole()
     end)
 
     -- 恢复
     GUI:addOnClickEvent(LoginRolePanel._ui.Button_restore, function()
+        local shiwan = SL:GetValue("BOX_TEST_PLAY")
+        if shiwan then
+            return
+        end
         LoginRolePanel.OnRestoreRole()
     end)
 
@@ -404,6 +420,11 @@ end
 
 function LoginRolePanel.OnCreateRole()
     if SL:GetValue("IS_VISITOR_MODE") then
+        return
+    end
+
+    local shiwan = SL:GetValue("BOX_TEST_PLAY")
+    if shiwan then
         return
     end
 

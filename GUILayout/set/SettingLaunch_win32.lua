@@ -296,7 +296,8 @@ function SettingLaunch.InitSkillGroup()
     local configCount = table.nums(jobConfig)
     local contentSize = GUI:getContentSize(scrollView3)
     local totalWid = GUI:getContentSize(SettingLaunch._ui.ScrollView_1).width
-    local innerContainerSize = contentSize
+    local innerContainerSizeW = contentSize.width
+    local innerContainerSizeH = contentSize.height
     local colCount = 3
     if SettingLaunch._isHaveHero then
         colCount = 2
@@ -304,22 +305,22 @@ function SettingLaunch.InitSkillGroup()
     else
         GUI:setPositionX(SettingLaunch._ui.ImageBG3, 0)
         contentSize.width = totalWid
-        innerContainerSize = contentSize
+        innerContainerSizeW = totalWid
     end
     local maxH = math.ceil(configCount / colCount) * cellH
     if maxH > contentSize.height then
         if SettingLaunch._isHaveHero then
-            innerContainerSize.width = totalWid - cellW
-            innerContainerSize.height = maxH
+            innerContainerSizeW = totalWid - cellW
+            innerContainerSizeH = maxH
         else
             contentSize.width = totalWid
-            innerContainerSize.width = totalWid
-            innerContainerSize.height = maxH
+            innerContainerSizeW = totalWid
+            innerContainerSizeH = maxH
         end
     end
     GUI:setContentSize(scrollView3, contentSize)
     GUI:setContentSize(SettingLaunch._ui.ImageBG3, contentSize.width, contentSize.height + 4)
-    GUI:ScrollView_setInnerContainerSize(scrollView3, innerContainerSize)
+    GUI:ScrollView_setInnerContainerSize(scrollView3, innerContainerSizeW, innerContainerSizeH)
     local i = 1
     local maxH = 0
     for k, config in pairs(jobConfig) do
@@ -331,7 +332,7 @@ function SettingLaunch.InitSkillGroup()
         local hei = y * cellH + maxH
         local cell = SettingLaunch.CreateCell(scrollView3, config)
         if cell then 
-            GUI:setPosition(cell, cellW * x, innerContainerSize.height - hei)
+            GUI:setPosition(cell, cellW * x, innerContainerSizeH - hei)
         end 
         i = i + 1
     end

@@ -203,6 +203,8 @@ UIConst.LUAFile =
     LUA_FILE_ITEM_TIPS                          = "item/ItemTips",                                                          -- 道具tips
     LUA_FILE_ITEM_TIPS_TXT                      = "item/ItemTips_txt",                                                      -- 道具tips  读配置
 
+    LUA_FILE_ITEM_ICON_TIPS                     = "item/ItemIconTips",                                                      -- 道具Icon tips
+
     LUA_FILE_CHAT                               = "chat/Chat",                                                              -- 聊天
     LUA_FILE_CHAT_EXTEND                        = "chat/ChatExtend",                                                        -- 聊天拓展框
     LUA_FILE_PRIVATE_CHAT_WIN32                 = "chat/PrivateChat_win32",                                                 -- 私聊记录页
@@ -359,6 +361,7 @@ UIConst.LAYERID =
     CommonTipsSplitGUI          = "CommonTipsSplitGUI",             -- 道具拆分弹窗
     CommonTipsGUI               = "CommonTipsGUI",                  -- 通用弹窗GUI
     ItemTipsGUI                 = "ItemTipsGUI",                    -- 道具Tips
+    ItemIconTipsGUI             = "ItemIconTipsGUI",                -- 道具Icon Tips
     CommonBubbleInfoGUI         = "CommonBubbleInfoGUI",            -- 通用气泡弹窗
     CommonDescTipsGUI           = "CommonDescTipsGUI",              -- 通用描述弹窗
     CommonSelectListGUI         = "CommonSelectListGUI",            -- 选择下拉栏

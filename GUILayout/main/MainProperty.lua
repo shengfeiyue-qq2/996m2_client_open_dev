@@ -660,7 +660,7 @@ function MainProperty.InitChatHideBtn()
                 if i and name and widget then
                     if i ~= 8 and i ~= 9 and i ~= 10 then
                         local chatHei = GUI:getContentSize(_layoutMiniChat).height
-                        if not tolua.isnull(widget) then
+                        if not GUI:Widget_IsNull(widget) then
                             if not oriPosYList[name] then
                                 oriPosYList[name] = GUI:getPositionY(widget)
                             end
@@ -1130,7 +1130,7 @@ function MainProperty.OnPlayMagicBallEffect(data)
 
     if data.time ~= -1 and data.time > 0 then
         SL:ScheduleOnce(function()
-            if sprite and not tolua.isnull(sprite) then
+            if sprite and not GUI:Widget_IsNull(sprite) then
                 GUI:stopAllActions(sprite)
                 GUI:removeFromParent(sprite)
             end

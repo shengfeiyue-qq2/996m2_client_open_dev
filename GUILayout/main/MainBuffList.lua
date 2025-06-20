@@ -277,7 +277,7 @@ function MainBuffList.OnUpdateBuff(data)
         return
     end
 
-    if not MainBuffList._buffList or tolua.isnull(MainBuffList._buffList) then
+    if not MainBuffList._buffList or GUI:Widget_IsNull(MainBuffList._buffList) then
         return
     end
 

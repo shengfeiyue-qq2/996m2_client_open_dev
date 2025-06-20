@@ -20,6 +20,10 @@ function PlayerTitle.main()
     end
 
     PlayerTitle._listView = PlayerTitle._ui["ListView_cells"]
+    if PlayerFrame and PlayerFrame.typeCapture == 1 then
+        GUI:ListView_setClippingEnabled(PlayerTitle._listView,false)
+        PlayerExtraAtt.manyHeight = 0
+    end
     
     PlayerTitle.RegistEvent()
 
@@ -302,6 +306,9 @@ function PlayerTitle.RefTitleList(activeID)
 
         GUI:setIgnoreContentAdaptWithSize(buttonIcon, false)
     end
+    GUI:ListView_doLayout(PlayerTitle._listView)
+    local manyHeight = GUI:ListView_getInnerContainerSize(PlayerTitle._listView).height - GUI:getContentSize(PlayerTitle._listView).height
+    PlayerTitle.manyHeight = math.max(0, manyHeight)
 end
 
 PlayerTitle.main()

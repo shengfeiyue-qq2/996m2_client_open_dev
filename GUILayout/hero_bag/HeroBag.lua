@@ -473,7 +473,7 @@ function HeroBag.BeginMove(data)
     end
 
     local gooditem = GUI:getChildByStrTag(HeroBagInfo._ui.Panel_items, MakeIndex)
-    if gooditem and not GUI.Widget_IsNull(gooditem) and not isOnSelling then
+    if gooditem and not GUI:Widget_IsNull(gooditem) and not isOnSelling then
         GUI:ItemShow_showIteminfo(gooditem, nil, pos)
     end
 end

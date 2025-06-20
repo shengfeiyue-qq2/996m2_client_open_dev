@@ -20,7 +20,7 @@ function Guide.main()
     Guide._ssrWidget         = Guide._data and Guide._data.guideWidget
     Guide._ssrParent         = Guide._data and Guide._data.guideParent
     Guide._desc              = Guide._data and Guide._data.guideDesc
-    Guide._isForce           = Guide._data and Guide._data.isForce or true -- 默认强制
+    Guide._isForce           = (Guide._data and Guide._data.isForce) == nil and true or Guide._data.isForce -- 默认强制
     Guide._hideMask          = Guide._data and Guide._data.hideMask        -- 禁止蒙版
     Guide._mainType          = Guide._data and tonumber(Guide._data.mainIdx)             -- 主界面
     Guide._autoExcute        = Guide._data and tonumber(Guide._data.autoExcute)
@@ -75,7 +75,7 @@ function Guide.Init()
             GUI:Win_Close(parent)
             return
         end
-        local temp = { typeassist = Guide._uiIDStr }
+        local temp = {typeassist = Guide._uiIDStr}
         Guide._widget, Guide._parent = getNodesFunc(temp)
         Guide._StartEventName = GUIDefine.GuideEvent[idx] and GUIDefine.GuideEvent[idx].start
         Guide._EndEventName = GUIDefine.GuideEvent[idx] and GUIDefine.GuideEvent[idx].close
@@ -188,7 +188,7 @@ end
 function Guide.onEventBegan(data)
     if Guide._StartEventName then
         if Guide._StartEventName == data.name and Guide._active then
-            local temp = { typeassist = Guide._data.uiId }
+            local temp = {typeassist = Guide._uiIDStr}
             Guide._widget, Guide._parent = Guide.getNodesFunc(temp)
             if Guide._widget and Guide._parent then
                 Guide.CreateGuide()
@@ -220,7 +220,7 @@ function Guide.OnGuideEventEnded(data)
 end
 
 function Guide.Exit()
-    if Guide._layer and not tolua.isnull(Guide._layer) then
+    if Guide._layer and not GUI:Widget_IsNull(Guide._layer) then
         GUI:stopAllActions(Guide._layer)
         GUI:removeFromParent(Guide._layer)
     end
@@ -492,7 +492,7 @@ function Guide.ShowForceGuide(data)
             local notExit = false
             if Guide._clickCallback then
                 notExit = Guide._clickCallback(Guide)
-            elseif Guide._widget and not tolua.isnull(Guide._widget) then
+            elseif Guide._widget and not GUI:Widget_IsNull(Guide._widget) then
                 local touchCB = GUI:getOnTouchEvent(Guide._widget)
                 if tolua.type(touchCB) == "function" then
                     touchCB(Guide._widget, 2)

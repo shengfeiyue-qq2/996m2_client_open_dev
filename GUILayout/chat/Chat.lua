@@ -139,10 +139,12 @@ function Chat.InitChatParam()
 end
 
 function Chat.InitAdapet()
+    local notch, rect = SL:GetValue("NOTCH_PHONE_INFO")
     local screenW = SL:GetValue("SCREEN_WIDTH")
     local screenH = SL:GetValue("SCREEN_HEIGHT")
     
     GUI:setPositionY(ChatInfo._ui.Node, screenH)
+    GUI:setPositionX(ChatInfo._ui.Node, rect.x or 0)
 
     GUI:setContentSize(ChatInfo._ui.Panel_touch, screenW, screenH)
     GUI:setMouseEnabled(ChatInfo._ui.Panel_touch, true)

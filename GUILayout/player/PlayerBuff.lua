@@ -172,7 +172,7 @@ function PlayerBuff.OnUpdateBuff(data)
         return
     end
 
-    if not PlayerBuff._buffList or tolua.isnull(PlayerBuff._buffList) then
+    if not PlayerBuff._buffList or GUI:Widget_IsNull(PlayerBuff._buffList) then
         return
     end
 

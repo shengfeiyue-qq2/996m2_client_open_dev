@@ -54,6 +54,9 @@ function PlayerHeroFrame_Look_TradingBank.main()
             else
                 UIOperator:CloseTradePlyerUI()
                 SL:CloseTradingBankLookInfoUI()
+                if  PlayerHeroFrame_Look_TradingBank._parent and not GUI:Widget_IsNull(PlayerHeroFrame_Look_TradingBank._parent) then
+                    GUI:removeAllChildren(PlayerHeroFrame_Look_TradingBank._parent)
+                end
             end 
         end)
     end

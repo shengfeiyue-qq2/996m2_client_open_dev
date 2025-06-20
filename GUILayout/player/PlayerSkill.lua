@@ -19,6 +19,15 @@ function PlayerSkill.main()
         return false
     end
 
+    if PlayerFrame and PlayerFrame.typeCapture == 1 then
+        GUI:ListView_setClippingEnabled(PlayerSkill._ui["ListView_cells"],false)
+        if PlayerSkill._ui["Image_5"] and PlayerSkill._ui["Button_setting"] then
+            GUI:setVisible(PlayerSkill._ui["Image_5"], false)
+            GUI:setVisible(PlayerSkill._ui["Button_setting"], false)
+        end
+        PlayerExtraAtt.manyHeight = 0
+    end
+
     if isPC then
         GUI:ListView_addMouseScrollPercent(PlayerSkill._ui["ListView_cells"])
         PlayerSkill._moveIconCells = {}
@@ -110,6 +119,10 @@ function PlayerSkill.UpdateSkillListView()
     for k, v in pairs(PlayerSkill._cells) do
         PlayerSkill.UpdateSkillCell(k)
     end
+
+    GUI:ListView_doLayout(PlayerSkill._ui["ListView_cells"])
+    local manyHeight = GUI:ListView_getInnerContainerSize(PlayerSkill._ui["ListView_cells"]).height - GUI:getContentSize(PlayerSkill._ui["ListView_cells"]).height
+    PlayerSkill.manyHeight = math.max(0, manyHeight)
 end
 
 function PlayerSkill.UpdateSkillCell(skillID, deleteChange)
@@ -228,7 +241,7 @@ function PlayerSkill.RegisterNodeMovable(skillID, deleteChange)
             param.skillId  = skillID
 
             param.cancelMoveCall = function()
-                if PlayerSkill._moveIconCells[skillID] and not tolua.isnull(PlayerSkill._moveIconCells[skillID]) then
+                if PlayerSkill._moveIconCells[skillID] and not GUI:Widget_IsNull(PlayerSkill._moveIconCells[skillID]) then
                     PlayerSkill._moveIconCells[skillID]._movingState = false
                 end
             end

@@ -23,7 +23,11 @@ end
 
 -- 关闭个人人物界面
 function UIOperator:CloseMyPlayerUI()
-    GUI:Win_CloseByID(UIConst.LAYERID.PlayerMainGUI)
+    if GUIDefineEx.IsMergeMode then
+        GUI:Win_CloseByID(UIConst.LAYERID.MergePlayerMainGUI)
+    else
+        GUI:Win_CloseByID(UIConst.LAYERID.PlayerMainGUI)
+    end
 end
 
 -- 打开个人英雄界面(data = {type = 类型 1基础 2内功, page = 子页ID})
@@ -54,7 +58,11 @@ end
 
 -- 关闭个人人物界面
 function UIOperator:CloseMyHeroUI()
-    GUI:Win_CloseByID(UIConst.LAYERID.HeroMainGUI)
+    if GUIDefineEx.IsMergeMode then
+        GUI:Win_CloseByID(UIConst.LAYERID.MergePlayerMainGUI)
+    else
+        GUI:Win_CloseByID(UIConst.LAYERID.HeroMainGUI)
+    end
 end
 
 -- 打开角色装备
@@ -862,6 +870,11 @@ end
 -- 商城
 -- 打开商城界面
 function UIOperator:OpenStoreFrameUI(data)
+    local shiwan = SL:GetValue("BOX_TEST_PLAY")
+    if shiwan then
+        return
+    end
+    
     GUI:SetLayerOpenParam(data)
     GUI:Win_Open(UIConst.LUAFile.LUA_FILE_STORE_FRAME)
 end
@@ -980,6 +993,15 @@ function UIOperator:OpenItemTips(data)
 end
 function UIOperator:CloseItemTips()
     GUI:Win_CloseByID(UIConst.LAYERID.ItemTipsGUI)
+end
+
+-- ItemIconTips
+function UIOperator:OpenItemIconTips(data)
+    GUI:SetLayerOpenParam(data)
+    GUI:Win_Open(UIConst.LUAFile.LUA_FILE_ITEM_ICON_TIPS)
+end
+function UIOperator:CloseItemIconTips()
+    GUI:Win_CloseByID(UIConst.LAYERID.ItemIconTipsGUI)
 end
 
 -------------------------------------------

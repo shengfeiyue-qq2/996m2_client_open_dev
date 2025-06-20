@@ -61,6 +61,50 @@ function Mail.InitUI()
         SL:RequestDelMail(Mail._currMailID)
     end)
 
+    -- 确定收货
+    if MailInfo._ui.btn_sure then
+        GUI:addOnClickEvent(MailInfo._ui.btn_sure, function()
+            local mailId = Mail._currMailID
+            local mail = SL:GetValue("MAIL_BY_ID", mailId)
+            if not mail then 
+                return
+            end
+            local itemData =  SL:JsonDecode(mail.sItem)
+            local other =  SL:JsonDecode(itemData.other)
+            if other then
+                other.emailId = mailId
+                SL:RequestSureTake(nil, other, function(code, data, msg)
+                    if code == 200 then
+                        SL:ShowSystemTips(msg)
+                    end
+                end)
+            end
+        end)
+    end
+    
+    -- 拒绝收货
+    if MailInfo._ui.btn_refuse then
+        GUI:addOnClickEvent(MailInfo._ui.btn_refuse, function()
+            local mailId = Mail._currMailID
+            local mail = SL:GetValue("MAIL_BY_ID", mailId)
+            if not mail then 
+                return
+            end
+            local itemData =  SL:JsonDecode(mail.sItem)
+            local other =  SL:JsonDecode(itemData.other)
+            if other then
+                other.emailId = mailId
+                SL:RequestRefuseTake(nil, other, function(code, data, msg)
+                    if code == 200 then
+                        SL:ShowSystemTips(msg)
+                    end
+                end)
+            end
+        end)
+    end
+
+   
+
     SL:AttachTXTSUI({
         root  = MailInfo._ui.bg,
         index = SLDefine.SUIComponentTable.Mail
@@ -274,7 +318,22 @@ function Mail.RefreshMainPanel()
 
         if mail.btRecvFlag == 0 then
             -- 附件未领取 不能删除
-            GUI:setVisible(MailInfo._ui.btn_takeOut, true)
+            if mail.btType == 9997 then
+                if MailInfo._ui.btn_sure then
+                    GUI:setVisible(MailInfo._ui.btn_sure, true)
+                end
+                if MailInfo._ui.btn_refuse then
+                    GUI:setVisible(MailInfo._ui.btn_refuse, true)
+                end
+            else
+                GUI:setVisible(MailInfo._ui.btn_takeOut, true)
+                if MailInfo._ui.btn_sure then
+                    GUI:setVisible(MailInfo._ui.btn_sure, false)
+                end
+                if MailInfo._ui.btn_refuse then
+                    GUI:setVisible(MailInfo._ui.btn_refuse, false)
+                end
+            end
 
         elseif mail.btRecvFlag == 1 then
             GUI:setVisible(MailInfo._ui.rewardFlag_icon, true)
@@ -286,7 +345,15 @@ function Mail.RefreshMainPanel()
             countFontSize = 10
         end
 
-        if mail.btType == 9999 then --交易行的附件
+        if mail.btType == 9997 then --确定收货 or 拒绝收货邮件
+            local itemData =  SL:JsonDecode(mail.sItem)
+            local items = SL:TransItemDataIntoChatShow(itemData)
+            local itemdata = { index = items.Index, count = items.OverLap, look = true, countFontSize = countFontSize, bgVisible = true }
+            local item = GUI:ItemShow_Create(MailInfo._ui.list_items, "item1", 0, 0, itemdata)
+            if mail.btRecvFlag == 1 then
+                GUI:ItemShow_setIconGrey(item, true)
+            end
+        elseif mail.btType == 9999 then --交易行的附件
             local itemData = SL:JsonDecode(mail.sItem)
             local items = SL:TransItemDataIntoChatShow(itemData)
             local itemdata = { index = items.Index, count = items.OverLap, look = true, countFontSize = countFontSize, bgVisible = true }
@@ -401,15 +468,15 @@ function Mail.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_MAIL_LIST_REFRESH, "Mail", Mail.RefreshMailList)
     SL:RegisterLUAEvent(LUA_EVENT_MAIL_DELETE_ALL_READ, "Mail", Mail.OnDeleteAllRead)
     SL:RegisterLUAEvent(LUA_EVENT_MAIL_UPDATE_ALL, "Mail", Mail.OnUpdateAll)
-    SL:RegisterLUAEvent(LUA_EVENT_MAIL_UPDATE, "Mail", Mail.OnUpdateOne)
+    SL:RegisterLUAEvent(LUA_EVENT_MAIL_UPDATE, "Mail", Mail.RefreshMailList)
     SL:RegisterLUAEvent(LUA_EVENT_MAIL_DELETE, "Mail", Mail.DelOneMail)
     SL:RegisterLUAEvent(LUA_EVENT_SOCIAL_MAIL_LAYER_CLOSE, "Mail", Mail.OnClose)
 end
 
 function Mail.UnRegisterEvent()
     SL:UnRegisterLUAEvent(LUA_EVENT_MAIL_LIST_REFRESH, "Mail")
+    SL:UnRegisterLUAEvent(LUA_EVENT_MAIL_DELETE_ALL_READ, "Mail")
     SL:UnRegisterLUAEvent(LUA_EVENT_MAIL_UPDATE_ALL, "Mail")
-    SL:UnRegisterLUAEvent(LUA_EVENT_MAIL_UPDATE, "Mail")
     SL:UnRegisterLUAEvent(LUA_EVENT_MAIL_UPDATE, "Mail")
     SL:UnRegisterLUAEvent(LUA_EVENT_MAIL_DELETE, "Mail")
     SL:UnRegisterLUAEvent(LUA_EVENT_SOCIAL_MAIL_LAYER_CLOSE, "Mail")

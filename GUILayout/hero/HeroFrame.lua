@@ -78,7 +78,7 @@ function HeroFrame.main()
     GUI:RefPosByParent(parent)
 
     HeroFrame._showType = data and data.type or 1
-
+    HeroFrame.typeCapture = data and data.typeCapture or nil
     local root = HeroFrame._ui["Panel_1"]
 
     -- 适配

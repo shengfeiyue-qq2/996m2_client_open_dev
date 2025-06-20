@@ -19,6 +19,7 @@ function GuildCreate.main()
     GuildCreate._autoApprove = true             -- 创建行会是否自动同意加入
     GuildCreate._autoLevel = 1                  -- 默认自动同意等级
     GuildCreate._costItems = {}                 -- 创建所需物品/货币
+    GuildCreate._rankName = nil                 -- 记录当前随机行会名
 
     local mainPanel = GuildCreate._ui["PMainUI"]
     local closeLayout = GuildCreate._ui["CloseLayout"]
@@ -100,7 +101,8 @@ end
 function GuildCreate.InitUI()
 
     GUI:addOnClickEvent(GuildCreate._ui.BtnCreate, function(sender, event)
-        if SL:GetValue("M2_FORBID_NAME", true) then
+        local isRankName = GuildCreate._rankName and GuildCreate._rankName == GUI:TextInput_getString(GuildCreate._ui.Input) or false
+        if not isRankName and SL:GetValue("M2_FORBID_NAME", true) then
             return
         end
         if not GuildCreate.CheckCreateCostItemEnough(true) then
@@ -138,6 +140,10 @@ function GuildCreate.InitUI()
     end)
    
     GuildCreate.InitGuildCreate()
+
+    if SL:GetValue("M2_FORBID_NAME") then
+        GuildCreate.CreateRankBtn()
+    end
 end
 
 function GuildCreate.InitGuildCreate()
@@ -159,6 +165,25 @@ function GuildCreate.InitGuildCreate()
         GUI:setAnchorPoint(ui_rich, 0, 0)
     end
 end 
+
+-- 创建随机名按钮
+function GuildCreate.CreateRankBtn()
+    local inputPos        = GUI:getPosition(GuildCreate._ui["Input"])
+    local inputSize       = GUI:getContentSize(GuildCreate._ui["Input"])
+    local Button_rand     = GUI:Button_Create(GuildCreate._ui["PMainUI"], "Button_rand", inputPos.x + inputSize.width/2 + 10, inputPos.y, "")
+    local normalfilepath  = "res/private/login/btn_cjzy_03.png"
+    local pressedfilepath = "res/private/login/btn_cjzy_03_1.png"
+    local disabledfilepath= "res/private/login/btn_cjzy_03_1.png"
+    GUI:setAnchorPoint(Button_rand, 0, 0.5)
+    GUI:Button_loadTextures(Button_rand, normalfilepath ,pressedfilepath ,disabledfilepath ,0)
+    GUI:setIgnoreContentAdaptWithSize(Button_rand, true)
+
+
+    GUI:addOnClickEvent(Button_rand, function()
+        GuildCreate._rankName = SL:GetValue("GUILD_CREATE_RANK_NAME")
+        GUI:TextInput_setString(GuildCreate._ui.Input, GuildCreate._rankName)
+    end)
+end
 
 ---------------------------------------------------------------------------
 function GuildCreate.RegisterEvent()

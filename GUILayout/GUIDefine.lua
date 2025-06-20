@@ -947,18 +947,22 @@ local GuideType = {
     EQUIP               = 2,
     HEROBAG             = 3,
     BAG_COMPONENT       = 7,
-    STORE               = 9
+    STORE               = 9,
+    MAINSKILL           = 109,
+    MAINASSIST          = 110,
 }
 GUIDefine.GuideType = GuideType
 
---引导 事件
+-- 引导 事件
 GUIDefine.GuideEvent = {
     [GuideType.NPC]           = {start = "GUIDE_NPC_TALK_LOAD_SUCCESS",     close = "GUIDE_END_NPC_TALK_LAYER_CLOSED"},
     [GuideType.BAG]           = {start = "GUIDE_BAG_ITEM_LOAD_SUCCESS",     close = "GUIDE_BAG_LAYER_CLOSED"},
     [GuideType.HEROBAG]       = {start = "GUIDE_HEROBAG_ITEM_LOAD_SUCCESS", close = "GUIDE_HEROBAG_LAYER_CLOSED"},
     [GuideType.EQUIP]         = {start = "GUIDE_PLAYER_EQUIP_LOAD_SUCCESS"},
     [GuideType.BAG_COMPONENT] = {start = "GUIDE_BAG_COMPONENT_LOAD_SUCCESS"},
-    [GuideType.STORE]         = {start = "GUIDE_STORE_ITEM_LOAD_SUCCESS"} 
+    [GuideType.STORE]         = {start = "GUIDE_STORE_ITEM_LOAD_SUCCESS"},
+    [GuideType.MAINSKILL]     = {start = "GUIDE_BEGIN_SKILL_BUTTON",        close = "GUIDE_END_SKILL_BUTTON"},
+    [GuideType.MAINASSIST]    = {start = "GUIDE_ASSIST_MISSION_BEGIN",      close = "GUIDE_ASSIST_MISSION_END"},
 }
 
 --------------------------------------------

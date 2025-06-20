@@ -167,7 +167,7 @@ function LookPlayerBuff.OnUpdateBuff(data)
         return
     end
 
-    if not LookPlayerBuff._buffList or tolua.isnull(LookPlayerBuff._buffList) then
+    if not LookPlayerBuff._buffList or GUI:Widget_IsNull(LookPlayerBuff._buffList) then
         return
     end
 

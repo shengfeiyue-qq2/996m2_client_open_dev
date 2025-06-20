@@ -109,6 +109,8 @@ function ItemTips.main()
 
     ItemTips.fromTrading = nil
 
+    ItemTips.typeCapture = data and data.typeCapture or nil
+
     -- 是否是英雄装备
     _isHero     = data.from and FromHero[data.from] or false
     _lookPlayer = data.lookPlayer
@@ -1363,14 +1365,18 @@ function ItemTips.SetTipsScrollArrow(tipsPanel, listView, innH, listH)
 
     local function refreshArrow()
         local innerPos = GUI:ListView_getInnerContainerPosition(listView)
-        GUI:setVisible(bottomArrowImg, innerPos.y < innH and innerPos.y < 0)
-        GUI:setVisible(topArrowImg, innerPos.y > (listH - innH) or innerPos.y >= 0)
+        if ItemTips.typeCapture == 1 then
+            GUI:setVisible(bottomArrowImg, false)
+        else
+            GUI:setVisible(bottomArrowImg, innerPos.y < innH and innerPos.y < 0)
+            GUI:setVisible(topArrowImg, innerPos.y > (listH - innH) or innerPos.y >= 0)
+        end
     end
 
     refreshArrow()
 
     local bottomEvent = function()
-        if innH > listH and not tolua.isnull(listView) then
+        if innH > listH and not GUI:Widget_IsNull(listView) then
             local innerPos      = GUI:ListView_getInnerContainerPosition(listView)
             local vHeight       = innH - listH
             local percent       = (vHeight + innerPos.y + 50) / vHeight * 100
@@ -1381,7 +1387,7 @@ function ItemTips.SetTipsScrollArrow(tipsPanel, listView, innH, listH)
     end
 
     local topEvent = function()
-        if innH > listH and not tolua.isnull(listView) then
+        if innH > listH and not GUI:Widget_IsNull(listView) then
             local innerPos      = GUI:ListView_getInnerContainerPosition(listView)
             local vHeight       = innH - listH
             local percent       = (vHeight + innerPos.y - 50) / vHeight * 100
@@ -1999,6 +2005,15 @@ function ItemTips.CreateDiyAttrWidget(param)
                                         GUI:setScale(sfx, tonumber(params[5]))
                                     end
                                 end
+                            elseif params[1] == "DESC" then
+                                local descId = tonumber(params[2])
+                                local config = descId and GUIDefineEx.ItemDescConfig[descId]
+                                if config and config.str then
+                                    local richText = GUI:RichText_Create(layout, "desc_" .. i, tonumber(params[3]), tonumber(params[4]), config.str, sizeW, SL:GetValue("GAME_DATA","DEFAULT_FONT_SIZE"), "#FFFFFF")
+                                    if tonumber(params[5]) and tonumber(params[5]) > 0 then
+                                        GUI:setScale(richText, tonumber(params[5]))
+                                    end
+                                end
                             end
                         end
                     end
@@ -2515,7 +2530,8 @@ function ItemTips.FillTipsContent(tipsLayout, cellView, tipsParam)
     if bottomLayout then
         GUI:setPosition(bottomLayout, rightSpace, topSpace)
     end
-
+    
+    ItemTips.manyHeight = innerH + topSpace
     return innerH, listH
 end
 
@@ -2612,6 +2628,9 @@ function ItemTips.CreateEquipPanel(data, itemData, isWear, panelInsertIndex)
     table.insert(ItemTips._panelSortItems, index, tipsLayout)
 
     local cellView = GUI:ListView_Create(tipsLayout, "cellView", 0, 0, 0, 0, 1)
+    if ItemTips.typeCapture == 1 then--截图
+        GUI:ScrollView_setClippingEnabled(cellView, false)
+    end
     GUI:setTouchEnabled(cellView, false)
 
     if not SL:GetValue("IS_PC_OPER_MODE") then

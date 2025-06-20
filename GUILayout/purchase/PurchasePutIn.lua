@@ -217,7 +217,7 @@ function PurchasePutIn.UpdateItemList(searchStr)
                 end
                 PurchasePutIn._selItemIdx = idx
                 PurchasePutIn._selItemID = PurchasePutIn._itemList[idx]
-                if PurchasePutIn._itemUIItem[lastIdx] and not tolua.isnull(PurchasePutIn._itemUIItem[lastIdx].Image_sel) then
+                if PurchasePutIn._itemUIItem[lastIdx] and not GUI:Widget_IsNull(PurchasePutIn._itemUIItem[lastIdx].Image_sel) then
                     GUI:setVisible(PurchasePutIn._itemUIItem[lastIdx].Image_sel, false)
                 end
                 GUI:setVisible(PurchasePutIn._itemUIItem[idx].Image_sel, true)

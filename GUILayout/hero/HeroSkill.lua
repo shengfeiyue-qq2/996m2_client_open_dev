@@ -16,6 +16,11 @@ function HeroSkill.main()
         return false
     end
 
+    if HeroFrame and HeroFrame.typeCapture == 1 then
+        GUI:ListView_setClippingEnabled(HeroSkill._ui["ListView_cells"],false)
+        HeroSkill.manyHeight = 0
+    end
+
     if isPC then
         GUI:ListView_addMouseScrollPercent(HeroSkill._ui["ListView_cells"])
     end
@@ -83,6 +88,10 @@ function HeroSkill.UpdateSkillListView()
     for k, v in pairs(HeroSkill._cells) do
         HeroSkill.UpdateSkillCell(k)
     end
+
+    GUI:ListView_doLayout(HeroSkill._ui["ListView_cells"])
+    local manyHeight = GUI:ListView_getInnerContainerSize(HeroSkill._ui["ListView_cells"]).height - GUI:getContentSize(HeroSkill._ui["ListView_cells"]).height
+    HeroSkill.manyHeight = math.max(0, manyHeight)
 end
 
 function HeroSkill.UpdateSkillCell(skillID)

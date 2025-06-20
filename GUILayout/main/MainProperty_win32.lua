@@ -1612,7 +1612,7 @@ function MainProperty.OnPlayMagicBallEffect(data)
     if data.time ~= -1 and data.time > 0 then
         SL:ScheduleOnce(
             function()
-                if sprite and not tolua.isnull(sprite) then
+                if sprite and not GUI:Widget_IsNull(sprite) then
                     GUI:stopAllActions(sprite)
                     GUI:removeFromParent(sprite)
                 end

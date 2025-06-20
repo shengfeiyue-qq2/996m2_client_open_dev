@@ -18,6 +18,11 @@ function HeroTitle.main()
 
     HeroTitle._listView = HeroTitle._ui["ListView_cells"]
 
+    if HeroFrame and HeroFrame.typeCapture == 1 then
+        GUI:ListView_setClippingEnabled(HeroTitle._listView,false)
+        HeroTitle.manyHeight = 0
+    end
+
     HeroTitle.RegistEvent()
 
     -- 请求称号列表
@@ -302,6 +307,10 @@ function HeroTitle.RefTitleList(activeID)
 
         GUI:setIgnoreContentAdaptWithSize(buttonIcon, false)
     end
+
+    GUI:ListView_doLayout(HeroTitle._listView)
+    local manyHeight = GUI:ListView_getInnerContainerSize(HeroTitle._listView).height - GUI:getContentSize(HeroTitle._listView).height
+    HeroTitle.manyHeight = math.max(0, manyHeight)
 end
 
 HeroTitle.main()

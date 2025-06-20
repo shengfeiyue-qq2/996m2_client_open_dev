@@ -358,14 +358,9 @@ local config = {
 
     -- 主界面技能模块 按钮
     [109] = function(config)
-        local widget = GUI:GetWindow(nil, UIConst.LUAFile.LUA_FILE_MAIN_SKILL)
-        if not widget then
+        if not MainSkill or not MainSkill._ui then
             return nil
         end
-        if not MainSkill._ui then
-            return nil
-        end
-
 
         local widget = getChildByKey(MainSkill._ui["Panel_active"], tostring(config.typeassist))
         local parent = GUI.ATTACH_GUIDE

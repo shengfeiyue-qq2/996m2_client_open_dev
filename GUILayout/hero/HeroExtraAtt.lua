@@ -23,6 +23,11 @@ function HeroExtraAtt.main()
 
     HeroExtraAtt._listView = HeroExtraAtt._ui["ListView_extraAtt"]
 
+    if HeroFrame and HeroFrame.typeCapture == 1 then
+        GUI:ListView_setClippingEnabled(HeroExtraAtt._listView,false)
+        HeroExtraAtt.manyHeight = 0
+    end
+
     -- 请求更新次数
     HeroExtraAtt._updateCount = 0
 
@@ -189,6 +194,9 @@ function HeroExtraAtt.UpdateBaseAttri()
             end
         end
     end
+
+    local manyHeight = GUI:ListView_getInnerContainerSize(HeroExtraAtt._listView).height - GUI:getContentSize(HeroExtraAtt._listView).height
+    HeroExtraAtt.manyHeight = math.max(0, manyHeight)
 end
 
 function HeroExtraAtt.LoadAttriCell(ui, data)

@@ -81,7 +81,7 @@ function PlayerFrame.main()
     GUI:RefPosByParent(parent)
 
     PlayerFrame._showType = data and data.type or 1
-
+    PlayerFrame.typeCapture = data and data.typeCapture or nil
     local root = PlayerFrame._ui["Panel_1"]
 
     -- 适配

@@ -113,7 +113,7 @@ function HeroEquip_Look_TradingBank.main()
     -- 初始化装备内观
     HeroEquip_Look_TradingBank.CreateUIModel()
 
-    if SL:GetValue("GAME_DATA","TradingBankHideSUI") ~= 1 then 
+    if SL:GetValue("GAME_DATA", "TradingBankShowSUI") == 1 then 
         -- 自定义组件挂接
         SL:AttachTXTSUI({root = parent, index = SLDefine.SUIComponentTable.PlayerEquipB_hero})
 
@@ -361,7 +361,7 @@ end
 
 -- 界面关闭回调
 function HeroEquip_Look_TradingBank.OnClose()
-    if SL:GetValue("GAME_DATA","TradingBankHideSUI") ~= 1 then 
+    if SL:GetValue("GAME_DATA", "TradingBankShowSUI") == 1 then 
         -- 自定义组件卸载
         SL:UnAttachTXTSUI({
             index = SLDefine.SUIComponentTable.PlayerEquipB_hero
