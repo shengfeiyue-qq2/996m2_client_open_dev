@@ -82,6 +82,9 @@ function ChatData.Init()
     -- PC聊天记录缓存
     ChatData._PCPrivateCache = {}
 
+    -- PC行会聊天页记录缓存
+    ChatData._PCGuildCache = {}
+
     -- 表情包配置
     ChatData._emoji = SL:Require("config/ZTFace")
 
@@ -111,6 +114,9 @@ function ChatData.Init()
 
     ChatData._parsePCPrivateItems = SL:CreateQueue()
     ChatData._parsePCPrivateEnable = true
+
+    ChatData._parsePCGuildItems = SL:CreateQueue()
+    ChatData._parsePCGuildEnable = true
 
     ChatData.RegisterEvent()
 end
@@ -659,6 +665,11 @@ function ChatData.ReleaseCache()
         GUI:autoDecRef(v)
     end
     ChatData._PCPrivateCache = {}
+
+    for _, v in ipairs(ChatData._PCGuildCache) do
+        GUI:autoDecRef(v)
+    end
+    ChatData._PCGuildCache = {}
 end
 
 -- 私聊记录
@@ -676,6 +687,23 @@ end
 
 function ChatData.GetPCPrivateCache(...)
     return ChatData._PCPrivateCache
+end
+
+-- 行会聊天页记录
+function ChatData.StoragePCGuildItem(item)
+    -- 保存
+    if not SL:GetValue("IS_PC_OPER_MODE") then return end
+    local cache = ChatData._PCGuildCache
+    table.insert(cache, item)
+    GUI:addRef(item)
+    while #cache > GUIDefine.ChatConfig.LIMIT_COUNT_PC do
+        local item = table.remove(cache, 1)
+        GUI:autoDecRef(item)
+    end
+end
+
+function ChatData.GetPCGuildCache()
+    return ChatData._PCGuildCache
 end
 
 -- PC Mini
@@ -757,6 +785,17 @@ function ChatData.AddChatItem(data)
             ChatData.CheckParsePCPrivateItems()
         end
     end
+
+    -- PC Guild Chat
+    if SL:GetValue("IS_PC_OPER_MODE") and data.ChannelId == GUIDefine.ChatChannel.GUILD then
+        ChatData._parsePCGuildItems:push(data)
+        while ChatData._parsePCGuildItems:size() > GUIDefine.ChatConfig.LIMIT_COUNT_PC do
+            ChatData._parsePCGuildItems:pop()
+        end
+        if ChatData._parsePCGuildEnable then
+            ChatData.CheckParsePCGuildItems()
+        end
+    end
 end
 
 function ChatData.CheckParseItems()
@@ -836,6 +875,26 @@ function ChatData.CheckParsePCPrivateItems()
     end
 end
 
+function ChatData.CheckParsePCGuildItems()
+    if ChatData._parsePCGuildEnable and not ChatData._parsePCGuildItems:empty() then
+        ChatData._parsePCGuildEnable = false
+
+        -- parse
+        local function callback()
+            local item = ChatData._parsePCGuildItems:pop()
+            ChatData.ParsePCGuildItem(item)
+        end
+        SL:ScheduleOnce(callback, 1 / 60)
+
+        -- delay parse next
+        local function callback()
+            ChatData._parsePCGuildEnable = true
+            ChatData.CheckParsePCGuildItems()
+        end
+        SL:ScheduleOnce(callback, ChatData._parseInterval)
+    end
+end
+
 function ChatData.ParseItem(data)
     if not data then
         return
@@ -881,6 +940,20 @@ function ChatData.ParsePCPItem(data)
 
         ChatData.StoragePCPrivateItem(item, data.ChannelId)
     end
+end
+
+function ChatData.ParsePCGuildItem(data)
+    if not data then
+        return
+    end
+
+    local item = GUIFunction:GenerateChatPCGuildItem(data)
+    if not item then
+        return
+    end
+    SL:onLUAEvent(LUA_EVENT_CHAT_PCGUILD_ITEM_ADD, item)
+
+    ChatData.StoragePCGuildItem(item, data.ChannelId)
 end
 
 ---------------------------------- cache end----------------------------------

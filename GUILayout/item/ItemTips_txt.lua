@@ -669,7 +669,7 @@ function ItemTips.GetPowerStr(itemData)
         local config = id and SL:GetMetaValue("ATTR_POWER_CONFIG")[id]
         if config then
             local powerKey = string.format("power%s", job >= 0 and job <= 2 and job + 1 or job)
-            local powerValue = config[powerKey] and (config[powerKey] / config.value * value) or 0
+            local powerValue = config[powerKey] and (math.floor(value / config.value) * config[powerKey]) or 0
             power = power + powerValue
         end
     end

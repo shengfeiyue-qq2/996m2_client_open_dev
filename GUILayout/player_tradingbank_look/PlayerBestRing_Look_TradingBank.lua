@@ -70,7 +70,8 @@ function PlayerBestRing_Look_TradingBank.OnOpenItemTips(widget, pos)
     data.itemData   = itemData
     data.pos        = GUI:getWorldPosition(widget)
     data.from       = GUIDefine.ItemFrom.BEST_RINGS
-    data.lookPlayer = false
+    data.lookPlayer = true
+    data.fromTrading = true
 
     UIOperator:OpenItemTips(data)
 end

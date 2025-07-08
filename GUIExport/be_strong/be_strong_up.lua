@@ -1,13 +1,13 @@
 local ui = {}
 function ui.init(parent)
-	-- Create Node
-	local Node = GUI:Node_Create(parent, "Node", 0.00, 0.00)
-	GUI:setChineseName(Node, "气泡节点")
-	GUI:setAnchorPoint(Node, 0.50, 0.50)
-	GUI:setTag(Node, -1)
+	-- Create BeStrongNode
+	local BeStrongNode = GUI:Node_Create(parent, "BeStrongNode", 0.00, 0.00)
+	GUI:setChineseName(BeStrongNode, "气泡节点")
+	GUI:setAnchorPoint(BeStrongNode, 0.50, 0.50)
+	GUI:setTag(BeStrongNode, -1)
 
 	-- Create Button_up
-	local Button_up = GUI:Button_Create(Node, "Button_up", 0.00, 0.00, "res/private/be_strong/bg_jindutiao_11.png")
+	local Button_up = GUI:Button_Create(BeStrongNode, "Button_up", 0.00, 0.00, "res/private/be_strong/bg_jindutiao_11.png")
 	GUI:Button_setScale9Slice(Button_up, 15, 15, 11, 11)
 	GUI:setContentSize(Button_up, 59, 59)
 	GUI:setIgnoreContentAdaptWithSize(Button_up, false)
@@ -21,7 +21,7 @@ function ui.init(parent)
 	GUI:setTag(Button_up, 18)
 
 	-- Create Panel_bg
-	local Panel_bg = GUI:Layout_Create(Node, "Panel_bg", -65.00, 30.00, 130.00, 90.00, false)
+	local Panel_bg = GUI:Layout_Create(BeStrongNode, "Panel_bg", -65.00, 30.00, 130.00, 90.00, false)
 	GUI:Layout_setBackGroundImage(Panel_bg, "res/public/1900000677.png")
 	GUI:Layout_setBackGroundImageScale9Slice(Panel_bg, 21, 21, 33, 33)
 	GUI:setChineseName(Panel_bg, "气泡_提升列表组合")

@@ -402,7 +402,7 @@ function UIOperator:OpenBagUI(data)
         return
     end
     data = data or {}
-    data.bagType = GUIDefine.BagType.Bag
+    data.bagType = GUIDefine.BagType.BAG
     GUI:SetLayerOpenParam(data)
     if GUIFunction:IsPlayerHeroMergeMode() then 
         GUI:Win_Open(UIConst.LUAFile.LUA_FILE_MERGE_BAG)
@@ -426,7 +426,7 @@ function UIOperator:OpenHeroBagUI(data)
         return
     end
     data = data or {}
-    data.bagType = GUIDefine.BagType.HEROBag
+    data.bagType = GUIDefine.BagType.HEROBAG
     GUI:SetLayerOpenParam(data)
     if GUIFunction:IsPlayerHeroMergeMode() then 
         GUI:Win_Open(UIConst.LUAFile.LUA_FILE_MERGE_BAG)

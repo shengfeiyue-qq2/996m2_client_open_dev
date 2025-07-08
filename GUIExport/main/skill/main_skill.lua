@@ -1,21 +1,25 @@
 local ui = {}
 function ui.init(parent)
+	-- Create Main_Skill
+	local Main_Skill = GUI:Node_Create(parent, "Main_Skill", 0.00, 0.00)
+	GUI:setTag(Main_Skill, -1)
+
 	-- Create Panel_swallow
-	local Panel_swallow = GUI:Layout_Create(parent, "Panel_swallow", 0.00, 0.00, 240.00, 270.00, false)
+	local Panel_swallow = GUI:Layout_Create(Main_Skill, "Panel_swallow", 0.00, 0.00, 240.00, 270.00, false)
 	GUI:setChineseName(Panel_swallow, "防点击穿透区域1")
 	GUI:setAnchorPoint(Panel_swallow, 1.00, 0.00)
 	GUI:setTouchEnabled(Panel_swallow, true)
 	GUI:setTag(Panel_swallow, -1)
 
 	-- Create Panel_swallow_0
-	local Panel_swallow_0 = GUI:Layout_Create(parent, "Panel_swallow_0", -240.00, 0.00, 50.00, 150.00, false)
+	local Panel_swallow_0 = GUI:Layout_Create(Main_Skill, "Panel_swallow_0", -240.00, 0.00, 50.00, 150.00, false)
 	GUI:setChineseName(Panel_swallow_0, "防点击穿透区域2")
 	GUI:setAnchorPoint(Panel_swallow_0, 1.00, 0.00)
 	GUI:setTouchEnabled(Panel_swallow_0, true)
 	GUI:setTag(Panel_swallow_0, -1)
 
 	-- Create Panel_skill
-	local Panel_skill = GUI:Layout_Create(parent, "Panel_skill", 0.00, 0.00, 320.00, 260.00, false)
+	local Panel_skill = GUI:Layout_Create(Main_Skill, "Panel_skill", 0.00, 0.00, 320.00, 260.00, false)
 	GUI:setChineseName(Panel_skill, "主技能组合")
 	GUI:setAnchorPoint(Panel_skill, 1.00, 0.00)
 	GUI:setTouchEnabled(Panel_skill, false)
@@ -115,14 +119,14 @@ function ui.init(parent)
 	GUI:setTag(Button_attack, -1)
 
 	-- Create Panel_hide
-	local Panel_hide = GUI:Layout_Create(parent, "Panel_hide", 0.00, 0.00, 1136.00, 640.00, false)
+	local Panel_hide = GUI:Layout_Create(Main_Skill, "Panel_hide", 0.00, 0.00, 1136.00, 640.00, false)
 	GUI:setChineseName(Panel_hide, "菜单_触摸还原区域")
 	GUI:setAnchorPoint(Panel_hide, 1.00, 0.00)
 	GUI:setTouchEnabled(Panel_hide, true)
 	GUI:setTag(Panel_hide, -1)
 
 	-- Create Panel_button
-	local Panel_button = GUI:Layout_Create(parent, "Panel_button", 0.00, 0.00, 225.00, 355.00, false)
+	local Panel_button = GUI:Layout_Create(Main_Skill, "Panel_button", 0.00, 0.00, 225.00, 355.00, false)
 	GUI:setChineseName(Panel_button, "菜单切换组合")
 	GUI:setAnchorPoint(Panel_button, 1.00, 0.00)
 	GUI:setTouchEnabled(Panel_button, false)
@@ -162,7 +166,7 @@ function ui.init(parent)
 	GUI:setTag(Panel_active, -1)
 
 	-- Create Button_pick
-	local Button_pick = GUI:Button_Create(parent, "Button_pick", -160.00, 320.00, "res/private/main/Skill/btn_zhijiemian_05.png")
+	local Button_pick = GUI:Button_Create(Main_Skill, "Button_pick", -160.00, 320.00, "res/private/main/Skill/btn_zhijiemian_05.png")
 	GUI:Button_loadTextureDisabled(Button_pick, "res/private/main/Skill/btn_zhijiemian_06.png")
 	GUI:Button_setTitleText(Button_pick, "")
 	GUI:Button_setTitleColor(Button_pick, "#ffffff")
@@ -174,19 +178,19 @@ function ui.init(parent)
 	GUI:setTag(Button_pick, -1)
 
 	-- Create Node_hj_skill
-	local Node_hj_skill = GUI:Node_Create(parent, "Node_hj_skill", -345.00, 244.00)
+	local Node_hj_skill = GUI:Node_Create(Main_Skill, "Node_hj_skill", -345.00, 244.00)
 	GUI:setChineseName(Node_hj_skill, "技能_合击技能_节点")
 	GUI:setAnchorPoint(Node_hj_skill, 0.50, 0.50)
 	GUI:setTag(Node_hj_skill, -1)
 
 	-- Create Node_combo_skill
-	local Node_combo_skill = GUI:Node_Create(parent, "Node_combo_skill", -402.00, 278.00)
+	local Node_combo_skill = GUI:Node_Create(Main_Skill, "Node_combo_skill", -402.00, 278.00)
 	GUI:setChineseName(Node_combo_skill, "技能_连击技能_节点")
 	GUI:setAnchorPoint(Node_combo_skill, 0.50, 0.50)
 	GUI:setTag(Node_combo_skill, -1)
 
 	-- Create Button_Lock
-	local Button_Lock = GUI:Button_Create(parent, "Button_Lock", -240.00, 290.00, "res/private/player_hero/btn_heji_05_1.png")
+	local Button_Lock = GUI:Button_Create(Main_Skill, "Button_Lock", -240.00, 290.00, "res/private/player_hero/btn_heji_05_1.png")
 	GUI:Button_loadTexturePressed(Button_Lock, "res/private/player_hero/btn_heji_05_1.png")
 	GUI:Button_loadTextureDisabled(Button_Lock, "res/private/player_hero/btn_heji_05.png")
 	GUI:Button_setTitleText(Button_Lock, "")

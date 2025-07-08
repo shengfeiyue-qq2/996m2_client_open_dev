@@ -220,6 +220,7 @@ function EquipData.ChangeEquipData(item, bagDelayUpdate, isChangeLook)
     local data = {
         MakeIndex      = makeIndex,
         Where          = pos,
+        item           = item,
         bagDelayUpdate = bagDelayUpdate,
         isChangeLook   = isChangeLook,
         opera          = GUIDefine.OperateType.CHANGE
@@ -269,6 +270,10 @@ function EquipData.handle_MSG_SC_PLAYER_EQUIP_OFF_FAIL(data)
     local makeIndex = data.makeIndex
     if makeIndex ~= 0 then
         SL:onLUAEvent(LUA_EVENT_EQUIP_STATE_CHANGE, {MakeIndex = makeIndex, state = 1})
+    end
+
+    if data.errorCode == 0 then
+        return
     end
 
     local stringCodes = {

@@ -1327,10 +1327,8 @@ end
 -- 私聊时间格式化
 function GUIFunction:ChatFixPrivateTime(data)
     if checkIsPrivateChannel(data.ChannelId) then
-        if data.SendTime then
-            local date = os.date("*t", data.SendTime)
-            return string.format("%d-%02d-%02d %02d:%02d:%02d", date.year, date.month, date.day, date.hour, date.min, date.sec)
-        end
+        local date = os.date("*t", data.SendTime or SL:GetValue("SERVER_TIME"))
+        return string.format("%d-%02d-%02d %02d:%02d:%02d", date.year, date.month, date.day, date.hour, date.min, date.sec)
     end
     return ""
 end
@@ -1364,7 +1362,8 @@ end
 ---@param isMini boolean 是否是主界面的聊天item
 ---@param miniChatWidth integer 主界面的聊天item宽度
 ---@param isPCPrivate boolean 是否PC私聊页的聊天item
-function GUIFunction:ChatGetWidth(isMini, miniChatWidth, isPCPrivate)
+---@param isPCGuild boolean 是否PC行会聊天页的聊天item
+function GUIFunction:ChatGetWidth(isMini, miniChatWidth, isPCPrivate, isPCGuild)
     if isMini then
         if SL:GetValue("IS_PC_OPER_MODE") then
             return miniChatWidth or 722
@@ -1373,6 +1372,8 @@ function GUIFunction:ChatGetWidth(isMini, miniChatWidth, isPCPrivate)
         end
     elseif isPCPrivate then
         return 345
+    elseif isPCGuild then
+        return 606
     end
     return 310
 end
@@ -1909,6 +1910,149 @@ function GUIFunction:GenerateChatPCPrivateItem(data)
             })
             table.insert(elements, element)
         end
+
+        -- prefix
+        if data.Prefix and data.Prefix ~= "" then
+            local element   = GUI:RichTextCombineCell_Create(-1, "prefix_show", 0, 0, "TEXT", {
+                str         = data.Prefix,
+                color       = FColorHEX,
+                fontPath    = defaultfontPath,
+                fontSize    = defaultSize
+            })
+            table.insert(elements, element)
+        end
+
+        -- vip label
+        if data.viplabel and data.viplabel ~= "" and data.vipcolor then
+            local element   = GUI:RichTextCombineCell_Create(-1, "vip_show", 0, 0, "TEXT", {
+                str         = data.viplabel,
+                color       = SL:GetHexColorByStyleId(data.vipcolor),
+                fontPath    = defaultfontPath,
+                fontSize    = defaultSize
+            })
+            table.insert(elements, element)
+        end
+
+        -- name
+        local str       = GUIFunction:ChatFixName(data)
+        local element   = GUI:RichTextCombineCell_Create(-1, "name_show", 0, 0, "TEXT", {
+            str         = str,
+            color       = FColorHEX,
+            fontPath    = defaultfontPath,
+            fontSize    = defaultSize
+        })
+        table.insert(elements, element)
+
+        -- msg
+        local telements = GUIFunction:CreateChatRichElements(data)
+        for _, v in ipairs(telements) do
+            table.insert(elements, v)
+        end
+
+        -- 填充
+        richText = GUI:RichTextCombine_Create(cell, "RichText", 0, 0, width, space)
+        GUI:RichTextCombine_pushBackElements(richText, elements)
+
+        -- 
+        GUI:RichText_setOpenUrlEvent(richText, function(sender, str)
+            local slices  = string.split(str, "#")
+            local command = slices[1]
+            if command == "position" then
+                local originScale = GUI:getScale(sender)
+                GUI:setScale(sender, originScale + 0.2)
+                local function reback()
+                    GUI:setScale(sender, originScale)
+                end
+                SL:scheduleOnce(sender, reback, 0.03)
+                
+                -- find position
+                local mapID   = slices[2]
+                local x       = tonumber(slices[3])
+                local y       = tonumber(slices[4])
+                local moveType = GUIDefine.AutoMoveType.CHAT
+                SL:SetValue("BATTLE_MOVE_BEGIN", mapID, x, y, nil, moveType)
+
+                return nil
+            end
+        end)
+
+        GUI:RichTextCombine_format(richText)
+    end
+    if BColorEnable then 
+        GUI:RichText_setBackgroundColor(richText, BColorHEX)
+    end
+
+    -- 与发送者私聊
+    if isWinMode then
+        GUI:setTouchEnabled(richText, true)
+        GUI:setSwallowTouches(richText, false)
+        GUI:addOnClickEvent(richText, function()
+            local mainPlayerID = SL:GetValue("USER_ID")
+            if data.SendId and data.SendName and data.SendId ~= mainPlayerID then
+                GUIFunction:PrivateChat(data, richText)
+            end
+        end)
+    end
+
+    local richSize = GUI:getContentSize(richText)
+    GUI:setAnchorPoint(richText, 0, 1)
+    GUI:setPosition(richText, 0, richSize.height)
+
+    GUI:setContentSize(cell, width, richSize.height)
+    GUI:setAnchorPoint(cell, 0, 0)
+    GUI:setPosition(cell, 40, 0)
+    -- 右键展示功能栏
+    if isWinMode then
+        if data.SendId and data.SendName then
+            GUIFunction:ChatItemOnMouseRightEvent(data, cell)
+        end
+    end
+
+    return cell
+end
+
+-- 生成PC行会聊天页聊天item
+function GUIFunction:GenerateChatPCGuildItem(data)
+    local CHANNEL   = GUIDefine.ChatChannel
+    local MSG_TYPE  = GUIDefine.ChatTextType
+    local isWinMode = SL:GetValue("IS_PC_OPER_MODE")
+
+    data.FColor     = data.FColor or 0
+    data.BColor     = data.BColor or 255
+    local FColorHEX = SL:GetHexColorByStyleId(data.FColor)
+    local BColorEnable = data.BColor ~= -1
+    local BColorHEX = SL:GetHexColorByStyleId(data.BColor)
+
+    -- 默认字体字号
+    local defaultSize       = GUIFunction:GetChatRichFontSize()
+    local defaultfontPath   = GUIDefineEx.ChatRichFontPath
+
+    local width     = GUIFunction:ChatGetWidth(false, nil, false, true)
+    local richText  = nil
+
+    local cell      = GUI:Widget_Create(-1, "cell", 0, 0, 0, 0)
+
+    local msgFont   = GUIFunction:ChatGetNoticeMsgFont() or {}
+    local fontSize  = msgFont.fontSize or defaultSize
+    local fontColor = msgFont.color and SL:GetHexColorByStyleId(msgFont.color) or FColorHEX
+    local fontPath  = msgFont.fontPath or defaultfontPath
+    local space     = GUIDefineEx.ChatContentInterval.richVspace
+
+    if (data.textType and data.textType == MSG_TYPE.SYSTEMTIPS) or (data.ChannelId == CHANNEL.GUILDTIPS) then
+        local str = GUIFunction:ChatFixMsg(data, true)
+        local hexColor = msgFont.color and SL:GetHexColorByStyleId(msgFont.color)
+        richText = GUI:RichText_Create(cell, "RichText", 0, 0, str, width, fontSize, fontColor, space, nil, fontPath)
+        
+    elseif data.textType and data.textType == MSG_TYPE.FCTEXT then
+        local str = GUIFunction:ChatFixMsgWithoutOutline(data, true)
+        richText = GUI:RichTextFCOLOR_Create(cell, "RichText", 0, 0, str, width, fontSize, fontColor, space, nil, fontPath, {outlineSize = 0})
+
+    elseif data.textType and data.textType == MSG_TYPE.SRTEXT then
+        local str = GUIFunction:ChatFixMsgWithoutOutline(data, true)
+        richText = GUI:RichTextSR_Create(cell, "RichText", 0, 0, str, width, fontSize, fontColor, space, nil, fontPath)
+
+    else
+        local elements  = {}
 
         -- prefix
         if data.Prefix and data.Prefix ~= "" then

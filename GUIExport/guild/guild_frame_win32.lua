@@ -54,7 +54,7 @@ function ui.init(parent)
 	GUI:setAnchorPoint(CloseButton, 0.00, 0.50)
 	GUI:setTouchEnabled(CloseButton, true)
 	GUI:setTag(CloseButton, -1)
-	
+
 	-- Create page_cell_1
 	local page_cell_1 = GUI:Button_Create(FrameLayout, "page_cell_1", 640.00, 336.00, "res/public_win32/1900000683_1.png")
 	GUI:Button_loadTexturePressed(page_cell_1, "res/public_win32/1900000683_1.png")
@@ -139,5 +139,32 @@ function ui.init(parent)
 	GUI:setTouchEnabled(TouchSize, true)
 	GUI:setTag(TouchSize, -1)
 
+	-- Create page_cell_4
+	local page_cell_4 = GUI:Button_Create(FrameLayout, "page_cell_4", 640.00, 156.00, "res/public_win32/1900000683_1.png")
+	GUI:Button_loadTexturePressed(page_cell_4, "res/public_win32/1900000683_1.png")
+	GUI:Button_loadTextureDisabled(page_cell_4, "res/public_win32/1900000683.png")
+	GUI:Button_setTitleText(page_cell_4, "")
+	GUI:Button_setTitleColor(page_cell_4, "#ffffff")
+	GUI:Button_setTitleFontSize(page_cell_4, 14)
+	GUI:Button_titleEnableOutline(page_cell_4, "#000000", 1)
+	GUI:setChineseName(page_cell_4, "行会_聊天组合")
+	GUI:setTouchEnabled(page_cell_4, false)
+	GUI:setTag(page_cell_4, -1)
+
+	-- Create PageText
+	local PageText = GUI:Text_Create(page_cell_4, "PageText", 10.00, 44.00, 13, "#807256", [[聊
+天]])
+	GUI:setChineseName(PageText, "行会_聊天_文本")
+	GUI:setAnchorPoint(PageText, 0.50, 0.50)
+	GUI:setTouchEnabled(PageText, false)
+	GUI:setTag(PageText, -1)
+	GUI:Text_enableOutline(PageText, "#111111", 2)
+
+	-- Create TouchSize
+	local TouchSize = GUI:Layout_Create(page_cell_4, "TouchSize", 0.00, 67.00, 25.00, 62.00, false)
+	GUI:setChineseName(TouchSize, "行会_聊天触摸")
+	GUI:setAnchorPoint(TouchSize, 0.00, 1.00)
+	GUI:setTouchEnabled(TouchSize, true)
+	GUI:setTag(TouchSize, -1)
 end
 return ui

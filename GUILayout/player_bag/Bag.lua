@@ -706,6 +706,10 @@ function Bag.CheckItemOnSomeState(MakeIndex)
         return true
     end
 
+    if SL:GetValue("CHECK_ITEM_IN_GUIITEMBOX", MakeIndex) then
+        return true
+    end
+
     return false
 end
 

@@ -5,6 +5,7 @@ MainSkill._showIndex = 0
 function MainSkill.main()
     local parent = GUI:Attach_RightBottom()
     GUI:LoadExport(parent, "main/skill/main_skill")
+    parent = GUI:getChildByName(parent, "Main_Skill") or parent
 
     local ui = GUI:ui_delegate(parent)
     if not ui then

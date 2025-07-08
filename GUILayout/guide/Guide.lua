@@ -444,7 +444,7 @@ function Guide.ShowForceGuide(data)
                 end
             else
                 GUI:setSwallowTouches(layoutBlack, false)
-                if Guide._clickCallback and GUI.RectContainsPoint(clipBox, beganPos) then
+                if Guide._clickCallback and GUI:RectContainsPoint(clipBox, beganPos) then
                     GUI:setSwallowTouches(layoutBlack, true)
                 end
             end

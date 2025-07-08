@@ -347,8 +347,13 @@ function Rank.CreateListCell(parent, data)
         guildText = ui.Text_4
         GUI:Text_setString(ui.Text_3, value and (value .. Rank.CheckSuffixDesc()) or "")
     end
-    GUI:Text_setString(guildText, data.GuildName)
-    GUI:Text_setString(ui.Text_1, data.Name)
+    GUI:Text_setString(guildText, "")
+    GUI:Text_setString(ui.Text_1, "")
+
+    local guildScrollText = GUI:ScrollText_Create(guildText, "guildScrollText", 0, 0, 120, GUI:Text_getFontSize(guildText), GUI:Text_getTextColor(guildText) or "#ffffff", data.GuildName)
+    GUI:setAnchorPoint(guildScrollText, 0.5, 0.5)
+    local nameScrollText = GUI:ScrollText_Create(ui.Text_1, "nameScrollText", 0, 0, 120, GUI:Text_getFontSize(ui.Text_1), GUI:Text_getTextColor(ui.Text_1) or "#ffffff", data.Name)
+    GUI:setAnchorPoint(nameScrollText, 0.5, 0.5)
 
     local function panelCB()
         Rank.ResetSelectItem(data)

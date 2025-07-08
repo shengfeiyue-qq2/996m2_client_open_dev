@@ -21,7 +21,6 @@ function HeroBagData.Init()
     HeroBagData._bagNoPosItems       = {}    --{makeindex = {}}
     HeroBagData._itemCountByIndex    = {}    --{itemCount = Index}
     HeroBagData._isInit              = false
-    HeroBagData._bagLevel            = 5
     -------------------------------------------------------
     HeroBagData._selfDropItems       = {}    -- 自己丢弃的物品
     HeroBagData._onSellRepaire       = nil   -- 正在交易或者修理中物品
@@ -43,10 +42,6 @@ end
 
 function HeroBagData.GetMaxBag()
     return HeroBagData._bagMax
-end
-
-function HeroBagData.GetBagLevel()
-    return HeroBagData._bagLevel
 end
 
 function HeroBagData.GetSelfDropItems()

@@ -47,18 +47,13 @@ end
 
 function HeroBag.InitData(data)
     -- 初始化数据
-    HeroBagInfo._rowMax = 5
-    HeroBagInfo._maxnum = 10
     HeroBagInfo._maxWidth = 186
     HeroBagInfo._maxHeight = 75
-    HeroBagInfo._maxnumt = { 10, 20, 30, 35, 40 }
     HeroBagInfo._powerScheduleTime = 0  -- 战力对比延迟时间
     local isWin32 = SL:GetValue("IS_PC_OPER_MODE")
     HeroBagInfo._isWin32 = isWin32
     HeroBagInfo._col    = 5                        -- 列数
-
-    local level = data and data.level
-    HeroBagInfo._maxnum = level and maxnumt[level] or HeroBagData.GetMaxBag()
+    HeroBagInfo._maxnum = HeroBagData.GetMaxBag()
     HeroBagInfo._rowMax = HeroBagInfo._col or HeroBagInfo._rowMax
     HeroBagInfo._itemWidth = isWin32 and 43 or 63
     HeroBagInfo._itemHeight = isWin32 and 43 or 63

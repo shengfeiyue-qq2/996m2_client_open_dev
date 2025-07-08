@@ -1570,6 +1570,19 @@ SL:RegisterLUAEvent(LUA_EVENT_SOCIAL_RELATION_NOTICE, "GUIInit", function(data)
     end
 end)
 
+-- 攻击模式为自定义关系时提示到聊天框
+SL:RegisterLUAEvent(LUA_EVENT_PKMODE_CHANGE, "GUIInit", function(pkModeID)
+    local config = SL:GetValue("RELATION_TYPE_CONFIG", pkModeID)
+    if config then 
+        SL:onLUAEvent(LUA_EVENT_CHAT_MSG_ADD, {
+            Msg       = string.format("〖提示〗[攻击模式: %s模式]", config.mode_name or ""),
+            FColor    = 255,
+            BColor    = 249,
+            ChannelId = GUIDefine.ChatChannel.SYSTEM,
+        })
+    end
+end)
+
 -----------------------------------------------------------------------------
 -- 通知
 function FixNodePosToAnchorZero(node)

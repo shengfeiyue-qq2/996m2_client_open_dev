@@ -39,6 +39,7 @@ function PrivateChat.InitUI()
 
     -- 关闭
     GUI:addOnClickEvent(PrivateChat._ui.Button_close, function()
+        PrivateChat.ReleaseCache()
         UIOperator:ClosePCPrivateUI()
     end)
 
@@ -158,6 +159,7 @@ function PrivateChat.InitListEvent()
     setPercent(0)
     GUI:addOnTouchEvent(progressBar, bodyCallback)
     GUI:ListView_addOnScrollEvent(PrivateChat._listView, scrollCallback)
+    GUI:ListView_addMouseScrollPercent(PrivateChat._listView)
 
     ---
     local function onUpOrDown(isUp)
@@ -239,6 +241,13 @@ function PrivateChat.ShowCache()
         PrivateChat.PushItem(item)
     end
     GUI:ListView_jumpToBottom(PrivateChat._listView)
+end
+
+function PrivateChat.ReleaseCache()
+    for _, v in ipairs(PrivateChat._cache) do
+        GUI:autoDecRef(v)
+    end
+    PrivateChat._cache = {}
 end
 
 ---------------------------------------------------

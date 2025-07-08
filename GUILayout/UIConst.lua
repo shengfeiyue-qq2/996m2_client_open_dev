@@ -130,6 +130,7 @@ UIConst.LUAFile =
     LUA_FILE_GUILD_FRAME                        = "guild/GuildFrame",                                                       -- 行会 外框
     LUA_FILE_GUILD_MAIN                         = "guild/GuildMain",                                                        -- 行会主界面
     LUA_FILE_GUILD_LIST                         = "guild/GuildList",                                                        -- 行会列表
+    LUA_FILE_GUILD_CHAT                         = "guild/GuildChat",                                                        -- 行会聊天
     LUA_FILE_GUILD_CREATE                       = "guild/GuildCreate",                                                      -- 行会创建
     LUA_FILE_GUILD_MEMBER                       = "guild/GuildMember",                                                      -- 行会成员
     LUA_FILE_GUILD_EDITTITLE                    = "guild/GuildEditTitle",                                                   -- 行会编辑
@@ -451,6 +452,7 @@ UIConst.LayerTable = {
     GuildList               = 1203,           -- 行会列表
     GuildApply              = 1204,           -- 行会申请
     GuildCreate             = 1205,           -- 行会创建
+    GuildChat               = 1206,           -- 行会聊天记录
 
     SkillSetting            = 1401,           -- 技能设置
 

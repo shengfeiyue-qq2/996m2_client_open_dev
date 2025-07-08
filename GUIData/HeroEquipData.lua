@@ -169,6 +169,10 @@ function HeroEquipData.handle_MSG_SC_PLAYER_EQUIP_OFF_FAIL(data)
         SL:onLUAEvent(LUA_EVENT_HERO_STATE_CHANGE, {MakeIndex = makeIndex, state = 1})
     end
 
+    if data.errorCode == 0 then
+        return
+    end
+
     local stringCodes = {
         [-1]  = "位置错误",
         [-2]  = "未穿戴该位置物品",

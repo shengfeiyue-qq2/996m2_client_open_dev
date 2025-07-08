@@ -39,6 +39,18 @@ MainProperty._pkModeStrList = {
     [PKType.HAM_SERVER] = "[区服攻击模式]"
 }
 
+MainProperty._channelBtnTipList = {
+    [0] = {"综合", CHANNEL.COMMON},
+    [1] = {"系统", CHANNEL.SYSTEM},
+    [2] = {"喊话", CHANNEL.SHOUT},
+    [3] = {"私聊", CHANNEL.PRIVATE},
+    [4] = {"行会", CHANNEL.GUILD},
+    [5] = {"组队", CHANNEL.TEAM},
+    [6] = {"附近", CHANNEL.NEAR},
+    [7] = {"世界", CHANNEL.WORLD},
+    [8] = {"国家", CHANNEL.NATION}
+}
+
 local DarkState = GUIDefine.DarkState or {}
 MainProperty._darkImgList = {
     [DarkState.DAYTIME or 0]    = "00000044.png",   -- 白天
@@ -238,11 +250,11 @@ end
 
 function MainProperty.InitHPPanel()
     local iconPaths = {
-        [1] = {"190001100.png", "190001101.png"}, -- 系统频道
-        [2] = {"190001108.png", "190001109.png"}, -- 喊话
-        [3] = {"190001104.png", "190001105.png"}, -- 私聊
-        [4] = {"190001106.png", "190001107.png"}, -- 行会
-        [7] = {"190001102.png", "190001103.png"}, -- 世界
+        [CHANNEL.SYSTEM]  = {"190001100.png", "190001101.png"}, -- 系统频道
+        [CHANNEL.SHOUT]   = {"190001108.png", "190001109.png"}, -- 喊话
+        [CHANNEL.PRIVATE] = {"190001104.png", "190001105.png"}, -- 私聊
+        [CHANNEL.GUILD]   = {"190001106.png", "190001107.png"}, -- 行会
+        [CHANNEL.WORLD]   = {"190001102.png", "190001103.png"}, -- 世界
     }
 
     local function mainSetReceiving(channel, sender)
@@ -261,27 +273,27 @@ function MainProperty.InitHPPanel()
     -- 频道接收开关
     -- 系统
     GUI:addOnClickEvent(MainProperty._ui["Button_chat_1"], function(sender)
-        mainSetReceiving(1, sender)
+        mainSetReceiving(CHANNEL.SYSTEM, sender)
     end)
 
     -- 世界
     GUI:addOnClickEvent(MainProperty._ui["Button_chat_2"], function(sender)
-        mainSetReceiving(7, sender)
+        mainSetReceiving(CHANNEL.WORLD, sender)
     end)
 
     -- 私聊
     GUI:addOnClickEvent(MainProperty._ui["Button_chat_3"], function(sender)
-        mainSetReceiving(3, sender)
+        mainSetReceiving(CHANNEL.PRIVATE, sender)
     end)
 
     -- 行会
     GUI:addOnClickEvent(MainProperty._ui["Button_chat_4"], function(sender)
-        mainSetReceiving(4, sender)
+        mainSetReceiving(CHANNEL.GUILD, sender)
     end)
 
     -- 喊话
     GUI:addOnClickEvent(MainProperty._ui["Button_chat_5"], function(sender)
-        mainSetReceiving(2, sender)
+        mainSetReceiving(CHANNEL.SHOUT, sender)
     end)
 
     -- 自动喊话开关
@@ -707,29 +719,18 @@ function MainProperty.InitChatPanel()
     GUI:setVisible(MainProperty._ui["Panel_channel"], isOpen)
 
     local receiveChannel = ChatData.GetReceiveChannel()
-    local strs = {
-        [0] = "综合",
-        [1] = "系统",
-        [2] = "喊话",
-        [3] = "私聊",
-        [4] = "行会",
-        [5] = "组队",
-        [6] = "附近",
-        [7] = "世界",
-        [8] = "国家",
-    }
-
     for i = 0, 8 do
         local btnChannel = MainProperty._ui["Button_channel_" .. i]
         if btnChannel then
-            GUI:Button_setBright(btnChannel, i ~= receiveChannel)
-            GUI:setTouchEnabled(btnChannel, i ~= receiveChannel)
+            local channel = MainProperty._channelBtnTipList[i][2]
+            GUI:Button_setBright(btnChannel, channel ~= receiveChannel)
+            GUI:setTouchEnabled(btnChannel, channel ~= receiveChannel)
             GUI:addOnClickEvent(btnChannel, function()
-                ChatData.SetReceiveChannel(i)
+                ChatData.SetReceiveChannel(channel)
                 MainProperty.UpdateReceiving()
             end)
             if isOpen then
-                GUI:addMouseOverTips(btnChannel, strs[i], {x = -10, y = -20}, {x = 1, y = 0.5})
+                GUI:addMouseOverTips(btnChannel, MainProperty._channelBtnTipList[i][1], {x = -10, y = -20}, {x = 1, y = 0.5})
             end
         end
     end
@@ -986,8 +987,9 @@ function MainProperty.UpdateReceiving()
     for i = 0, 8 do
         local btnChannel = MainProperty._ui["Button_channel_" .. i]
         if btnChannel then
-            GUI:Button_setBright(btnChannel, i ~= receiveChannel)
-            GUI:setTouchEnabled(btnChannel, i ~= receiveChannel)
+            local channel = MainProperty._channelBtnTipList[i][2]
+            GUI:Button_setBright(btnChannel, channel ~= receiveChannel)
+            GUI:setTouchEnabled(btnChannel, channel ~= receiveChannel)
         end
     end
 

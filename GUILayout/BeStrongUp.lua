@@ -17,7 +17,7 @@ end
 function BeStrongUp.InitUI()
     GUI:LoadExport(BeStrongUpInfo._parent, "be_strong/be_strong_up") 
     BeStrongUpInfo._ui = GUI:ui_delegate(BeStrongUpInfo._parent)
-    BeStrongUpInfo._layer = BeStrongUpInfo._ui.Node
+    BeStrongUpInfo._layer = BeStrongUpInfo._ui.BeStrongNode or BeStrongUpInfo._ui.Node
 
     GUI:addOnClickEvent(BeStrongUpInfo._ui["Button_up"], function()
         local panelBg = BeStrongUpInfo._ui["Panel_bg"]

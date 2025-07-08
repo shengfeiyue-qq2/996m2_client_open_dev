@@ -8,7 +8,7 @@ function MergeBag.main()
     local bagType = data and data.bagType or GUIDefine.BagType.BAG
     local pos = data and data.pos
     local bag_page = data and data.bag_page
-    if bagType == GUIDefine.BagType.HEROBAG and SL:GetValue("HERO_IS_ALIVE") then
+    if bagType == GUIDefine.BagType.HEROBAG and not SL:GetValue("HERO_IS_ALIVE") then
         SL:ShowSystemTips("英雄还未召唤")
         return 
     end
@@ -669,6 +669,10 @@ function MergeBag.CheckItemOnSomeState(MakeIndex)
     local onTradingData = SL:GetValue("TRADE_MY_ITEMS")
     if onTradingData[MakeIndex] then
         return false
+    end
+
+    if SL:GetValue("CHECK_ITEM_IN_GUIITEMBOX", MakeIndex) then
+        return true
     end
 
     return true

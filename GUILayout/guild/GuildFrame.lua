@@ -9,10 +9,15 @@ GuildFrame._pageIDs = {
     UIConst.LayerTable.GuildList,
 }
 
+if SL:GetValue("IS_PC_OPER_MODE") and #GuildFrame._pageIDs < 4 then
+    table.insert(GuildFrame._pageIDs, UIConst.LayerTable.GuildChat)
+end
+
 GuildFrame._pageFiles = {
     [UIConst.LayerTable.GuildMain]      = UIConst.LUAFile.LUA_FILE_GUILD_MAIN,
     [UIConst.LayerTable.GuildMember]    = UIConst.LUAFile.LUA_FILE_GUILD_MEMBER,
     [UIConst.LayerTable.GuildList]      = UIConst.LUAFile.LUA_FILE_GUILD_LIST,
+    [UIConst.LayerTable.GuildChat]      = UIConst.LUAFile.LUA_FILE_GUILD_CHAT,
 }
 
 function GuildFrame.main()
@@ -81,11 +86,13 @@ function GuildFrame.main()
     for i, layerId in ipairs(GuildFrame._pageIDs) do
         local btnName = "page_cell_" .. i
         local page = GuildFrameInfo._ui[btnName]
-        GUI:Win_SetParam(page, layerId)
-        GUI:addOnClickEvent(GUI:getChildByName(page, "TouchSize"), function()
-            GuildFrame.PageTo(layerId)
-        end)
-        GuildFrameInfo._Pages[btnName] = page
+        if page then
+            GUI:Win_SetParam(page, layerId)
+            GUI:addOnClickEvent(GUI:getChildByName(page, "TouchSize"), function()
+                GuildFrame.PageTo(layerId)
+            end)
+            GuildFrameInfo._Pages[btnName] = page
+        end
     end
 
     if not index then
