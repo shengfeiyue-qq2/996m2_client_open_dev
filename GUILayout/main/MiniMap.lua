@@ -136,19 +136,9 @@ function MiniMap.InitMiniMap()
 
                 local pathPoints = SL:GetValue("MAP_PATH_POINTS") or {}
                 if #pathPoints == 0 then
-                    local mdata = {
-                        Msg        = string.format("自动移动坐标点(%s:%s)不可到达", mapX, mapY),
-                        FColor     = 154,
-                        BColor     = 255,
-                    }
-                    SL:RequestSendChatGMMsg(mdata)
+                    SL:ShowSystemChat(string.format("自动移动坐标点(%s:%s)不可到达", mapX, mapY), 154, 255)
                 else
-                    local mdata = {
-                        Msg        = string.format("自动移动至坐标(%s:%s)，点击鼠标任意键停止...", mapX, mapY),
-                        FColor     = 154,
-                        BColor     = 255,
-                    }
-                    SL:RequestSendChatGMMsg(mdata)
+                    SL:ShowSystemChat(string.format("自动移动至坐标(%s:%s)，点击鼠标任意键停止...", mapX, mapY), 154, 255)
                 end
 
                 -- 是否阻挡

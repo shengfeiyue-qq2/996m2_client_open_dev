@@ -750,6 +750,17 @@ function UIOperator:CloseSkillPanelUI()
     GUI:Win_CloseByID(UIConst.LAYERID.SettingSkillPanelGUI)
 end
 
+-- 打开 玩家名字颜色 设置界面
+function UIOperator:OpenPlayerNameColorSettingUI(data)
+    GUI:SetLayerOpenParam(data)
+    GUI:Win_Open(UIConst.LUAFile.LUA_FILE_SETTING_PLAYER_NAME_COLOR)
+end
+
+-- 关闭 玩家名字颜色 设置界面
+function UIOperator:ClosePlayerNameColorSettingUI()
+    GUI:Win_CloseByID(UIConst.LAYERID.SettingPlayerNameColorGUI)
+end
+
 -------------------------------------
 -- 打开摆摊界面
 function UIOperator:OpenStallLayerUI(data)

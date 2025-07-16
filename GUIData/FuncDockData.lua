@@ -670,7 +670,7 @@ function FuncDockData.RequestLookPlayerInfo(data)
 
     local isHero = data.isHero
     FuncDockData._openParam = data
-    SL:RequestFuncDockLookPlayerInfo(tonumber(userID), isHero)
+    SL:RequestFuncDockLookPlayerInfo(userID, isHero)
 end
 
 function FuncDockData.OnUpdateOption(data)

@@ -87,6 +87,17 @@ local function toEven(num)
     return num % 2 ~= 0 and (num + 1) or num
 end
 
+-- 属性类型 基础: 1 元素: 2 自定义: 3
+local BASE_ATTR_TYPE    = 1
+local YS_ATTR_TYPE      = 2
+local DIY_ATTR_TYPE     = 3
+
+local attTypeTag = {
+    [BASE_ATTR_TYPE]    = "base",
+    [YS_ATTR_TYPE]      = "ys",
+    [DIY_ATTR_TYPE]     = "diy",
+}
+
 function ItemTips.main()
     local parent = GUI:Win_Create(UIConst.LAYERID.ItemTipsGUI, 0, 0, 0, 0, nil, nil, nil, nil, nil, nil, GUIDefine.UIZ.MOUSE)
     local data   = GUI:GetLayerOpenParam()
@@ -297,7 +308,10 @@ end
 
 --获取属性原始id
 local function getAttOriginId(id)
-    return id >= 10000 and math.floor(id / 10000) or id
+    if id >= 10000 then
+        return math.floor(id / 10000), id % 10000
+    end
+    return id
 end
 
 --显示 +
@@ -1790,6 +1804,91 @@ function ItemTips.CreateSwordOfSoulWidget(param, index)
     return swordSoulPanel
 end
 
+function ItemTips.CreateSingleAttWidget(parent, data, type, idx)
+    type = type or 1
+    local rich_att = nil
+    local layoutHei = 0
+    local name = string.format("panel_%s_%s", attTypeTag[type], idx)
+    local layout = GUI:Layout_Create(parent, name, 0, 0, ItemTips._richWid, layoutHei)
+
+    local id, id2 = getAttOriginId(data.id or 0)
+    local config = id and SL:GetValue("ATTR_CONFIG", id)
+    local attrPrefix = config and config.attrPrefix
+    local showType = config and config.showPrefixType
+    if id2 then
+        config = SL:GetValue("ATTR_CONFIG", id2)
+        if config and config.attrPrefix then
+            attrPrefix = config.attrPrefix
+        end
+        if config and config.showPrefixType then
+            showType = config.showPrefixType
+        end
+    end
+    if attrPrefix and string.len(attrPrefix) > 0 and showType and SL:CheckBit(showType, type - 1) then
+        local prefixList = SL:Split(attrPrefix, "&")
+        local maxPrefixWid = 0
+        local maxPrefixHei = 0
+        for t, prefixStr in ipairs(prefixList) do
+            if prefixStr ~= "" then
+                local paramList = SL:Split(prefixStr, "#")
+                local type = tonumber(paramList[1])
+                local value = paramList[2]
+                local x = tonumber(paramList[3]) or 0
+                local y = tonumber(paramList[4]) or 0
+                local wid = tonumber(paramList[5])
+                local hei = tonumber(paramList[6])
+                local subWid = 0
+                if type == 1 then       -- 图片
+                    local path = value and string.format("res/custom/tiptitle/%s.png", value)
+                    local image = GUI:Image_Create(layout, "custom_prefix_icon_" .. t, x, y, path)
+                    local imageSize = GUI:getContentSize(image)
+                    if wid and imageSize.width ~= wid then
+                        GUI:setScaleX(image, wid / imageSize.width)
+                    end
+                    if hei and imageSize.height ~= hei then
+                        GUI:setScaleY(image, hei / imageSize.height)
+                    end
+                    wid = wid or imageSize.width
+                    hei = hei or imageSize.height
+                elseif type == 2 and tonumber(value) then   -- 特效
+                    local sfx = GUI:Effect_Create(layout, "custom_prefix_sfx_" .. t, x, y, 0, tonumber(value))
+                    local scheduleAction = nil
+                    scheduleAction = SL:schedule(sfx, function()
+                        local sfxSize = GUI:Effect_getFrameBox(sfx)
+                        if sfxSize.width > 1 then
+                            SL:unSchedule(scheduleAction)
+                            if wid and sfxSize.width ~= wid then
+                                GUI:setScaleX(sfx, wid / sfxSize.width)
+                            end
+                            if hei and sfxSize.height ~= hei then
+                                GUI:setScaleY(sfx, hei / sfxSize.height)
+                            end
+                        end
+                    end, 1 / 60)
+                    
+                    -- 特效必须传参尺寸!
+                    wid = wid or 0
+                    hei = hei or 0
+                    subWid = GUI:getAnchorPoint(sfx).x * wid
+                end
+                maxPrefixWid = math.max(wid + x - subWid, maxPrefixWid)
+                maxPrefixHei = math.max(hei, maxPrefixHei)
+            end
+        end
+        rich_att = GUI:RichText_Create(layout, string.format("rich_att_%s_%s", attTypeTag[type], idx), maxPrefixWid, 0, data.str, ItemTips._richWid - maxPrefixWid, fontSize, "#FFFFFF", vspace, nil, fontPath)
+        GUI:setAnchorPoint(rich_att, 0, 0.5)
+        local richHei = toEven(GUI:getContentSize(rich_att).height)
+        layoutHei = math.max(maxPrefixHei, richHei)
+        GUI:setPositionY(rich_att, math.floor(layoutHei / 2))
+    elseif data.str then
+        rich_att = GUI:RichText_Create(layout, string.format("rich_att_%s_%s", attTypeTag[type], idx), 0, 0, data.str, ItemTips._richWid, fontSize, "#FFFFFF", vspace, nil, fontPath) 
+        layoutHei = toEven(GUI:getContentSize(rich_att).height)
+    end
+    GUI:setContentSize(layout, ItemTips._richWid, layoutHei)
+    
+    return layout, rich_att
+end
+
 function ItemTips.CreateBaseAttrWidget(param)
     local isItem = param and param.tip_isItem
     if isItem then
@@ -1828,14 +1927,14 @@ function ItemTips.CreateBaseAttrWidget(param)
         for i, v in ipairs(attStr) do
             local rich_att_base = nil
             if v.str then
-                rich_att_base = GUI:RichText_Create(widget, "rich_att_base_" .. i, 0, 0, v.str, width, fontSize, "#FFFFFF", vspace, nil, fontPath) 
-                cellHei = cellHei + toEven(GUI:getContentSize(rich_att_base).height)
+                local attWidget, rich_att_base = ItemTips.CreateSingleAttWidget(widget, v, BASE_ATTR_TYPE, i)
+                cellHei = cellHei + toEven(GUI:getContentSize(attWidget).height)
                 ItemTips._upAttrMaxWidth = math.max(ItemTips._upAttrMaxWidth, GUI:getContentSize(rich_att_base).width)
-                table.insert(cells, rich_att_base)
-            end
+                table.insert(cells, attWidget)
 
-            if rich_att_base and v.id and upAttrs[v.id] then
-                table.insert(ItemTips._upAttrRichs, rich_att_base)
+                if rich_att_base and v.id and upAttrs[v.id] then
+                    table.insert(ItemTips._upAttrRichs, rich_att_base)
+                end
             end
         end
 
@@ -1894,16 +1993,15 @@ function ItemTips.CreateYsAttrWidget(param)
     if attStr and #attStr > 0 then
         widget = GUI:Layout_Create(-1, "ys_attr_panel", 0, 0, width, 0)
         for i, v in ipairs(attStr) do
-            local rich_att_ys = nil
             if v.str then
-                rich_att_ys = GUI:RichText_Create(widget, "rich_att_ys_" .. i, 0, 0, v.str, width, fontSize, "#FFFFFF", vspace, nil, fontPath) 
-                cellHei = cellHei + toEven(GUI:getContentSize(rich_att_ys).height)
+                local attWidget, rich_att_ys = ItemTips.CreateSingleAttWidget(widget, v, YS_ATTR_TYPE, i)
+                cellHei = cellHei + toEven(GUI:getContentSize(attWidget).height)
                 ItemTips._upAttrMaxWidth = math.max(ItemTips._upAttrMaxWidth, GUI:getContentSize(rich_att_ys).width)
-                table.insert(cells, rich_att_ys)
-            end
+                table.insert(cells, attWidget)
 
-            if rich_att_ys and v.id and upAttrs[v.id] then
-                table.insert(ItemTips._upAttrRichs, rich_att_ys)
+                if rich_att_ys and v.id and upAttrs[v.id] then
+                    table.insert(ItemTips._upAttrRichs, rich_att_ys)
+                end
             end
         end
 
@@ -2022,11 +2120,10 @@ function ItemTips.CreateDiyAttrWidget(param)
                 end
             else
                 for k, v in ipairs(attStrs) do
-                    local rich_att_diy = nil
                     if v.str then
-                        rich_att_diy = GUI:RichText_Create(widget, string.format("rich_att_diy_%s_%s", i, k), 0, 0, v.str, width, fontSize, "#FFFFFF", vspace, nil, fontPath) 
-                        cellHei = cellHei + toEven(GUI:getContentSize(rich_att_diy).height)
-                        table.insert(cells, rich_att_diy)
+                        local attWidget, rich_att_diy = ItemTips.CreateSingleAttWidget(widget, v, DIY_ATTR_TYPE, k)
+                        cellHei = cellHei + toEven(GUI:getContentSize(attWidget).height)
+                        table.insert(cells, attWidget)
                     end
                 end
             end

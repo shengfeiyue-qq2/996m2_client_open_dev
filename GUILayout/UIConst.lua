@@ -44,6 +44,7 @@ UIConst.LUAFile =
     LUA_FILE_SETTING_ADD_MONSTER_NAME           = "set/SettingAddMonsterName",                                              -- 设置 增加怪物name
     LUA_FILE_SETTING_ADD_MONSTER_TYPE           = "set/SettingAddMonsterType",                                              -- 设置 增加怪物type
     LUA_FILE_SETTING_BOSSTIPS                   = "set/SettingBossTips",                                                    -- 设置 增加boss提醒
+    LUA_FILE_SETTING_PLAYER_NAME_COLOR          = "set/SettingPlayerNameColor",
     LUA_FILE_SETTING_HELP                       = "GUILayout/set/SettingHelp",                                              -- 设置 帮助
     LUA_FILE_SETTINGFRAME_WIN32                 = "GUILayout/set/SettingFrame_win32",                                       -- 设置 外框
     LUA_FILE_SETTING_BASIC_WIN32                = "GUILayout/set/SettingBasic_win32",                                       -- 设置 基础
@@ -276,6 +277,7 @@ UIConst.LAYERID =
     SettingAddMonsterTypeGUI    = "SettingAddMonsterTypeGUI",       -- 设置增加怪物类型
     SettingSkillRankGUI         = "SettingSkillRankGUI",            -- 设置技能排序
     SettingSkillPanelGUI        = "SettingSkillPanelGUI",           -- 设置技能组件
+    SettingPlayerNameColorGUI   = "SettingPlayerNameColorGUI",      -- 设置人物名字颜色
     
     NPCTalkGUI                  = "NPCTalkGUI",                     -- NPC 对话
     GameWorldConfirmGUI         = "GameWorldConfirmGUI",            -- 游戏世界确认公告

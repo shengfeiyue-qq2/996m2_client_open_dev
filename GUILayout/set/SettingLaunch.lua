@@ -24,6 +24,7 @@ local commonGroup = {
 local commonGroup2 = {
     SLDefine.SETTINGID.SETTING_IDX_BOSS_TIPS, --boss提醒
     SLDefine.SETTINGID.SETTING_IDX_PICK_SETTING, --xxxxxxxxxxxxxxxx--拾取设置
+    SLDefine.SETTINGID.SETTING_IDX_PLAYER_NAME_COLOR, -- 玩家名字变色
 }
 
 local heroGroup = {
@@ -220,7 +221,7 @@ function SettingLaunch.InitCommonGroup()
         end
     end
     local scrollView4 = SettingLaunch._ui.ScrollView_4
-    local cellW2 = 288
+    local cellW2 = 220
     for i, config in ipairs(commonConfig2) do
         local cell = SettingLaunch.CreateCell(scrollView4, config)
         if cell then 
@@ -353,6 +354,8 @@ function SettingLaunch.CreateCell(parent, config)
         end 
     elseif config.id == SLDefine.SETTINGID.SETTING_IDX_AUTO_SUMMON then -- 自动召唤
         cell = SettingLaunch.CreateSelectClickCell(parent, config)
+    elseif config.id == SLDefine.SETTINGID.SETTING_IDX_PLAYER_NAME_COLOR then -- 玩家名字变色
+        cell = SettingLaunch.CreateListCell(parent, config)
     else
         cell = SettingLaunch.CreateClickCell(parent, config)
     end
@@ -799,7 +802,7 @@ function SettingLaunch.CreateListClickCell(parent, data)
     GUI:setTouchEnabled(Image_ClickBg, true)
 
     -- 列表配置
-    local Text_desc_2 = GUI:Text_Create(Image_ClickBg, "Text_desc_2", 39, 16, 18, "#109c18", "列表配置")
+    local Text_desc_2 = GUI:Text_Create(Image_ClickBg, "Text_desc_2", 39, 14, 18, "#109c18", "列表配置")
     GUI:setAnchorPoint(Text_desc_2, 0.5, 0.5)
     GUI:setTouchEnabled(Text_desc_2, false)
 
@@ -870,18 +873,31 @@ function SettingLaunch.CreateListCell(parent, data)
     -- 点击背景
     local Image_ClickBg = GUI:Image_Create(Panel_Layout, "Image_ClickBg", 118, 18, "res/private/new_setting/textBg.png")
     GUI:Image_setScale9Slice(Image_ClickBg, 33, 33, 9, 9)
-    GUI:setContentSize(Image_ClickBg, 77, 28)
+    GUI:setContentSize(Image_ClickBg, 78, 28)
     GUI:setIgnoreContentAdaptWithSize(Image_ClickBg, false)
     GUI:setAnchorPoint(Image_ClickBg, 0.5, 0.5)
     GUI:setTouchEnabled(Image_ClickBg, true)
 
     -- 列表配置
-    local Text_desc_2 = GUI:Text_Create(Image_ClickBg, "Text_desc_2", 39, 16, 18, "#109c18", "列表配置")
+    local Text_desc_2 = GUI:Text_Create(Image_ClickBg, "Text_desc_2", 39, 14, 18, "#109c18", "列表配置")
     GUI:setAnchorPoint(Text_desc_2, 0.5, 0.5)
     GUI:setTouchEnabled(Text_desc_2, false)
 
+    local textWid = GUI:getContentSize(Text_desc).width
+    local textPosX = GUI:getPositionX(Text_desc)
+    local imageSizeW = GUI:getContentSize(Image_ClickBg).width
+    local imagePosX = GUI:getPositionX(Image_ClickBg)
+    if textWid > (imagePosX - imageSizeW / 2 - textPosX) then
+        imagePosX = textPosX + textWid + imageSizeW / 2 + 6
+        GUI:setPositionX(Image_ClickBg, imagePosX)
+    end
+
     GUI:addOnClickEvent(Image_ClickBg, function()
-        UIOperator:OpenPickSettingUI()
+        if data.id == SLDefine.SETTINGID.SETTING_IDX_PICK_SETTING then
+            UIOperator:OpenPickSettingUI()
+        elseif data.id == SLDefine.SETTINGID.SETTING_IDX_PLAYER_NAME_COLOR then
+            UIOperator:OpenPlayerNameColorSettingUI()
+        end
     end)
 
     return Panel_Layout
