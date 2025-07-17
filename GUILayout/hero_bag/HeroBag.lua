@@ -285,7 +285,7 @@ function HeroBag.CreateBagItem(data)
             local stroageType = SL:GetValue("STORAGE_TOUCH_TYPE")
             local state = stroageType > 1
             if state then
-                SL:RequestSaveItemToNpcStorage(data.MakeIndex, data.Name)
+                SL:RequestSaveItemToNpcStorageCurPage(data)
             end
             return not state
         end)
@@ -295,7 +295,7 @@ function HeroBag.CreateBagItem(data)
             local stroageType = SL:GetValue("STORAGE_TOUCH_TYPE")
             local state = stroageType > 0
             if state then
-                SL:RequestSaveItemToNpcStorage(data.MakeIndex, data.Name)
+                SL:RequestSaveItemToNpcStorageCurPage(data)
             else
                 local newData = SL:CopyData(data)
                 newData.from = GUIDefine.ItemFrom.HERO_BAG

@@ -170,7 +170,7 @@ function AuctionTimeout.main()
     local Image_icon = AuctionTimeout._ui["Image_icon"]
     local itemSize = GUI:getContentSize(Image_icon)
     GUI:removeAllChildren(Image_icon)
-    local goodsInfo = { itemData = itemData, look = true, index = itemData.item.Index, disShowCount = true, }
+    local goodsInfo = { itemData = itemData.item, look = true, index = itemData.item.Index, disShowCount = true, }
     local goodsItem = GUI:ItemShow_Create(Image_icon, "goodsItem", itemSize.width / 2, itemSize.height / 2, goodsInfo)
     GUI:setAnchorPoint(goodsItem, 0.5, 0.5)
     -- name

@@ -227,7 +227,7 @@ function RobotAuto.SelectEnemy(delta)
             return false
         end
 
-        -- 找距离内可以攻击的人形怪
+        -- 找距离内可以攻击的玩家
         local pMapX      = SL:GetValue("X")
         local pMapY      = SL:GetValue("Y")
         local aX         = 0
@@ -236,7 +236,7 @@ function RobotAuto.SelectEnemy(delta)
         local playerVec, playerVecNum = SL:GetValue("FIND_IN_VIEW_PLAYER_LIST")
         for i = 1, playerVecNum do
             local playerID = playerVec[i]
-            if SL:GetValue("ACTOR_IS_VALID", playerID) and SL:GetValue("ACTOR_IS_HUMAN", playerID) then
+            if SL:GetValue("ACTOR_IS_VALID", playerID) and not SL:GetValue("ACTOR_IS_HUMAN", playerID) then
                 aX = SL:GetValue("ACTOR_MAP_X", playerID)
                 aY = SL:GetValue("ACTOR_MAP_Y", playerID)
                 if GUIFunction:CheckLaunchEnableByID(playerID) and math.abs(aX - pMapX) <= distance and math.abs(aY - pMapY) <= distance then

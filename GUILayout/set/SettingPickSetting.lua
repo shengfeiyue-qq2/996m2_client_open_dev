@@ -272,6 +272,9 @@ end
 function SettingPickSetting.OnCloseLayer()
     SettingPickSetting.UnRegisterEvent()
     SettingPickSetting._layer = nil
+    if SL:GetValue("PICKUPSPRITE_IS_SYSTEM_MODE") then
+        SL:RequestSendFilterAutoPickItem()
+    end
 end
 
 function SettingPickSetting.RegisterEvent()
@@ -279,7 +282,7 @@ function SettingPickSetting.RegisterEvent()
 end
 
 function SettingPickSetting.UnRegisterEvent()
-    SL:RegisterLUAEvent(LUA_EVENT_CLOSEWIN, "SettingPickSetting")
+    SL:UnRegisterLUAEvent(LUA_EVENT_CLOSEWIN, "SettingPickSetting")
 end
 
 SettingPickSetting.main()

@@ -210,7 +210,10 @@ function SkillSetting.OnClickRSkillEvent(key)
 
     -- special basic skill
     if SkillSetting._selSkillID ~= BASIC_SKILL_ID and key ~= 1 then
-        SL:SetValue("SKILL_KEY", BASIC_SKILL_ID, 1)
+        local baseKeySkill = SL:GetValue("SKILL_DATA_BY_KEY", 1) or {}
+        if not baseKeySkill or baseKeySkill.id == SkillSetting._selSkillID then
+            SL:SetValue("SKILL_KEY", BASIC_SKILL_ID, 1)
+        end
     end
 
     -- new key

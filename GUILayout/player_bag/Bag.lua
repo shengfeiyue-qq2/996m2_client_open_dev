@@ -566,7 +566,7 @@ function Bag.CreateBagItem(data)
         local stroageType = SL:GetValue("STORAGE_TOUCH_TYPE")  --normal = 1, -- 普通的双击存取  quick  = 2, -- 快速存取
         local state = stroageType > 1
         if state then
-            SL:RequestSaveItemToNpcStorage(data)
+            SL:RequestSaveItemToNpcStorageCurPage(data)
         end
 
         return not state
@@ -579,7 +579,7 @@ function Bag.CreateBagItem(data)
             local stroageType = SL:GetValue("STORAGE_TOUCH_TYPE")
             local state = stroageType > 0
             if state then
-                SL:RequestSaveItemToNpcStorage(data)
+                SL:RequestSaveItemToNpcStorageCurPage(data)
             else
                 local nowItemData = BagData.GetItemDataByMakeIndex(data.MakeIndex ) 
                 SL:RequestUseItem(nowItemData)

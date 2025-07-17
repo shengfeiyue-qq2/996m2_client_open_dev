@@ -88,7 +88,7 @@ function SettingSkillRank.InitUI(data)
                 if not SettingSkillRank._touchItem then
                     local order = SettingSkillRank._selItem.order
                     local index = SettingSkillRank._selItem.index
-                    SettingSkillRank._touchItem = SettingSkillRank.CreateItem(ui.Panel_touch, order + 100000)
+                    SettingSkillRank._touchItem = SettingSkillRank.CreateItem(ui.Panel_touch, order + 100000, index)
                     GUI:setAnchorPoint(SettingSkillRank._touchItem, 0.5, 0.5)
                     GUI:setTouchEnabled(SettingSkillRank._touchItem, false)
                     local name = SL:GetValue("SKILL_NAME", index)--技能名字
@@ -156,7 +156,7 @@ function SettingSkillRank.InitUI(data)
 end
 
 function SettingSkillRank.CreateItem(parent, order, index)
-    local Panel_item = GUI:Layout_Create(parent, "Panel_item_" .. order, 11, 185, 314, 43, false)
+    local Panel_item = GUI:Layout_Create(parent, string.format("Panel_item_%s_%s", order, index), 11, 185, 314, 43, false)
     GUI:setTouchEnabled(Panel_item, true)
 
     local Image_1 = GUI:Image_Create(Panel_item, "Image_1", 1, 2, "res/public/bg_yyxsz_01.png")

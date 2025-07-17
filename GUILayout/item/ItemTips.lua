@@ -1784,11 +1784,11 @@ function ItemTips.CreateSwordOfSoulWidget(param, index)
     return swordSoulPanel
 end
 
-function ItemTips.CreateSingleAttWidget(parent, data, type, idx)
+function ItemTips.CreateSingleAttWidget(parent, data, type, idx, diyGroup)
     type = type or 1
     local rich_att = nil
     local layoutHei = 0
-    local name = string.format("panel_%s_%s", attTypeTag[type], idx)
+    local name = string.format("panel_%s_%s_%s", attTypeTag[type], idx, diyGroup or "")
     local layout = GUI:Layout_Create(parent, name, 0, 0, ItemTips._richWid, layoutHei)
 
     local id, id2 = getAttOriginId(data.id or 0)
@@ -2099,7 +2099,7 @@ function ItemTips.CreateDiyAttrWidget(param)
                 end
             else
                 for k, v in ipairs(attStrs) do
-                    local attWidget, rich_att_diy = ItemTips.CreateSingleAttWidget(widget, v, DIY_ATTR_TYPE, k)
+                    local attWidget, rich_att_diy = ItemTips.CreateSingleAttWidget(widget, v, DIY_ATTR_TYPE, k, type)
                     cellHei = cellHei + toEven(GUI:getContentSize(attWidget).height)
                     table.insert(cells, attWidget)
                 end

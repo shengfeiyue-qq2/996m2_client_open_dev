@@ -558,7 +558,7 @@ function MergeBag.CreateBagItem(data)
             local stroageType = SL:GetValue("STORAGE_TOUCH_TYPE")
             local state = stroageType > 1
             if state then
-                SL:RequestSaveItemToNpcStorage(data)
+                SL:RequestSaveItemToNpcStorageCurPage(data)
             end
             return not state
         end)
@@ -570,7 +570,7 @@ function MergeBag.CreateBagItem(data)
                 local stroageType = SL:GetValue("STORAGE_TOUCH_TYPE")
                 local state = stroageType > 0
                 if state then
-                    SL:RequestSaveItemToNpcStorage(data)
+                    SL:RequestSaveItemToNpcStorageCurPage(data)
                 else
                     if MergeBag.IsHeroBag() then
                         local newData = clone(data)
