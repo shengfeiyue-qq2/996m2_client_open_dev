@@ -13,7 +13,7 @@ function MainSkill.main()
     end
     MainSkill._ui = ui
 
-    GUI:setPositionY(MainSkill._ui["Panel_skill"], 25)
+    GUI:setPositionY(parent, 25)
 
     GUI:setContentSize(ui["Panel_hide"], SL:GetValue("SCREEN_WIDTH"), SL:GetValue("SCREEN_HEIGHT"))
 

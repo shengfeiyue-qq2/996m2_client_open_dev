@@ -348,7 +348,7 @@ function Mail.RefreshMainPanel()
         if mail.btType == 9997 then --确定收货 or 拒绝收货邮件
             local itemData =  SL:JsonDecode(mail.sItem)
             local items = SL:TransItemDataIntoChatShow(itemData)
-            local itemdata = { index = items.Index, count = items.OverLap, look = true, countFontSize = countFontSize, bgVisible = true,itemData = items }
+            local itemdata = { index = items.Index, count = items.OverLap, look = true, countFontSize = countFontSize, bgVisible = true }
             local item = GUI:ItemShow_Create(MailInfo._ui.list_items, "item1", 0, 0, itemdata)
             if mail.btRecvFlag == 1 then
                 GUI:ItemShow_setIconGrey(item, true)
@@ -356,7 +356,7 @@ function Mail.RefreshMainPanel()
         elseif mail.btType == 9999 then --交易行的附件
             local itemData = SL:JsonDecode(mail.sItem)
             local items = SL:TransItemDataIntoChatShow(itemData)
-            local itemdata = { index = items.Index, count = items.OverLap, look = true, countFontSize = countFontSize, bgVisible = true,itemData = items }
+            local itemdata = { index = items.Index, count = items.OverLap, look = true, countFontSize = countFontSize, bgVisible = true }
             local item = GUI:ItemShow_Create(MailInfo._ui.list_items, "item1", 0, 0, itemdata)
             if mail.btRecvFlag == 1 then
                 GUI:ItemShow_setIconGrey(item, true)
