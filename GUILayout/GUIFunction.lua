@@ -3229,7 +3229,7 @@ local function findBagItem(stdMode, shape)
     return nil
 end
 
--- 检查毒符
+-- 检查毒符     type: 1 绿 2 红
 function GUIFunction:CheckDuItem(type)
     local dressType = SL:GetValue("SERVER_OPTION", "UseAmuletType")-- 0 穿戴 1 背包 2 无
 

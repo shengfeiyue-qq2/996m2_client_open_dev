@@ -68,6 +68,7 @@ function AuctionWorld.main()
     AuctionWorld._filterPriceCell   = nil
 
     AuctionWorld._IsSearchItem      = nil
+    AuctionWorld._itemConfig        = SL:GetValue("STD_ITEMS")
 
     -- 单职业
     local isSingleJob               = SL:GetValue("GAME_DATA", "isSingleJob")
@@ -748,6 +749,45 @@ function AuctionWorld.OnAuctionWorldItemSearchByName(data)
 
     AuctionWorld.UpdateFilter1()
     AuctionWorld.UpdateFilter2()
+end
+
+function AuctionWorld.SearchAllItemsByKeyWord(str)
+    if not str or string.len(str) == 0 then
+        SL:ShowSystemTips("无法匹配，自动显示全部内容")
+        return nil
+    end
+   
+    local matchItems = {}
+
+    local specialR  = {"%[", "%]", "%(","%)","%*"}
+    for _, key in ipairs(specialR) do
+        str = string.gsub(str, key, "%"..key)
+    end
+    
+    if string.len(str) > 32 then
+        SL:ShowSystemTips("无法匹配，自动显示全部内容")
+        return nil
+    end
+
+    for _, v  in pairs(AuctionWorld._itemConfig) do
+        if #matchItems > 36 then
+            break
+        end
+        if string.find(v.Name, str) then
+            table.insert(matchItems, v.Index)
+        end
+    end
+
+    if #matchItems > 35 then
+        SL:ShowSystemTips("相似名称过多，请精确搜索内容")
+        return nil
+    elseif #matchItems == 0 then
+        SL:ShowSystemTips("无法匹配，自动显示全部内容")
+        return nil
+    end
+
+    local matchIndexStr = table.concat(matchItems, ",")
+    return matchIndexStr
 end
 
 -- 界面关闭回调
