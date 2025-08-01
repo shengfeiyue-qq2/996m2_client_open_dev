@@ -529,7 +529,7 @@ function Notice.OnShowTimerNotice(data)
     resetListview()
 
     local remaining = data.Time
-    local Msg = FixStringFormatCharacter(data.Msg)
+    local Msg = SL:FixStringFormatCharacter(data.Msg)
     local hasFormat = string.find(Msg, "%%") 
     local function callback()
         local str = Msg 
@@ -619,7 +619,7 @@ function Notice.OnShowTimerXYNotice(data)
     end
 
     local remaining = data.Time - 1
-    local Msg = FixStringFormatCharacter(data.Msg)
+    local Msg = SL:FixStringFormatCharacter(data.Msg)
     local hasFormat = string.find(Msg, "%%")
     local function callback()
         local str = Msg 

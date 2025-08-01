@@ -931,10 +931,12 @@ function Chat.CheckChatExNotice(initId)
     local scrollAble = nil
     local scrollSize = {width = 0, height = 0}
     local remaining = data.Time
+    local Msg = SL:FixStringFormatCharacter(data.Msg)
+    local hasFormat = string.find(Msg, "%%") 
     local showName = data.SendName and (data.SendName .. ": ") or ""
     local function callback()
         local name = showName or ""
-        local str  = name .. string.format(data.Msg, remaining)
+        local str  = name .. (hasFormat and string.format(Msg, remaining) or Msg)
         local fontSize = SL:GetValue("GAME_DATA","DEFAULT_FONT_SIZE") or 16
         GUI:removeAllChildren(scrollWidget)
         local richText = GUI:RichTextFCOLOR_Create(scrollWidget, "richText", 0, capacitySize.height / 2, str, 1000, fontSize, FColorHex, ChatInfo._richVspace or 0)

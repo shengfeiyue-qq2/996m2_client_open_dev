@@ -103,7 +103,7 @@ function MainDig.CheckDigAble()
     local pMapY   = SL:GetValue("Y")
     local tMapX   = 0
     local tMapY   = 0
-    local minLen  = 3
+    local minLen  = 2
     local targetID = nil
 
     -- 找最近的

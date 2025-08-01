@@ -138,7 +138,7 @@ end
 
 -- 四周是否有足够的敌人（人物）
 function RobotAuto.CheckIsEnoughEnemyPlayer(targetID, count, distance)
-    if SL:GetValue("ACTOR_IS_VALID", targetID) then
+    if not SL:GetValue("ACTOR_IS_VALID", targetID) then
         return false
     end
     
@@ -169,7 +169,7 @@ end
 
 -- 四周是否有足够的红名敌人（人物）
 function RobotAuto.CheckIsEnoughRedNameEnemy(targetID, count, distance)
-    if SL:GetValue("ACTOR_IS_VALID", targetID) then
+    if not SL:GetValue("ACTOR_IS_VALID", targetID) then
         return false
     end
     
