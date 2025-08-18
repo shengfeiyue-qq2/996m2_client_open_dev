@@ -115,9 +115,6 @@ function HeroEquip.main()
     -- 初始化装备内观
     HeroEquip.CreateUIModel()
 
-    -- 装备加载成功添加红点
-    SL:HeroEquipUILoadSuccessAddRed()
-
     -- 自定义组件挂接
     SL:AttachTXTSUI({root = HeroEquip._ui["EquipUI"], index = SLDefine.SUIComponentTable.PlayerEquip_hero})
 
@@ -640,8 +637,6 @@ function HeroEquip.RegistEvent()
     SL:RegisterLUAEvent(LUA_EVENT_HERO_EQUIP_CHANGE, "HeroEquip", HeroEquip.UpdateEquipLayer)
     SL:RegisterLUAEvent(LUA_EVENT_HERO_STATE_CHANGE, "HeroEquip", HeroEquip.UpdateEquipPanelState)
     SL:RegisterLUAEvent(LUA_EVENT_HERO_SEX_CHANGE, "HeroEquip", HeroEquip.OnSexChange)
-
-    SL:SexChangeAddRed()
 end
 
 -- 取消事件
@@ -662,7 +657,6 @@ end
 function HeroEquip.OnSexChange()
     HeroEquip._sex = SL:GetValue("SEX")
     HeroEquip.CreateUIModel()
-    SL:SexChangeAddRed()
 end
 
 function HeroEquip.CreateUIModel()

@@ -135,6 +135,9 @@ function MainTarget.OnTargetChange(targetID)
         MainTarget.SelectTarget(nil)
     end
 
+    if not GUI:getVisible(MainTarget._root) then
+        return
+    end
     -- 目标归属
     UIOperator:OpenTargetBelongUI({parent = MainTarget._root, targetID = targetID, X = 0, Y = -50})
 end

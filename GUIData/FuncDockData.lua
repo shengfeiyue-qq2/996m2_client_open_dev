@@ -326,19 +326,19 @@ function FuncDockData.InitFunction()
     end
     FuncDockData._typeFunction[BtnType.appoint_rank2] = function(targetId)
         -- 任命副会
-        SL:RequestGuildAppointRank(targetId, 1)
+        SL:RequestGuildAppointRank(targetId, SLDefine.GuildRank.ViceChairman)
     end
     FuncDockData._typeFunction[BtnType.appoint_rank3] = function(targetId)
         -- 任命精英
-        SL:RequestGuildAppointRank(targetId, 2)
+        SL:RequestGuildAppointRank(targetId, SLDefine.GuildRank.Elite)
     end
     FuncDockData._typeFunction[BtnType.appoint_rank4] = function(targetId)
         -- 任命会员
-        SL:RequestGuildAppointRank(targetId, 3)
+        SL:RequestGuildAppointRank(targetId, SLDefine.GuildRank.Member)
     end
     FuncDockData._typeFunction[BtnType.appoint_rank5] = function(targetId)
         -- 任命会员
-        SL:RequestGuildAppointRank(targetId, 4)
+        SL:RequestGuildAppointRank(targetId, SLDefine.GuildRank.Rank5)
     end
     FuncDockData._typeFunction[BtnType.appoint_rank1] = function(targetId)
         -- 转移会长
@@ -349,7 +349,7 @@ function FuncDockData.InitFunction()
             data.btnType    = 2
             data.callback   = function(type)
                 if 1 == type then
-                    SL:RequestGuildAppointRank(targetId, 1)
+                    SL:RequestGuildAppointRank(targetId, SLDefine.GuildRank.Chairman)
                 end
             end
             UIOperator:OpenCommonTipsUI(data)

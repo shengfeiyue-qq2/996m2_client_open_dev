@@ -190,7 +190,6 @@ function HeroEquipData.handle_MSG_SC_PLAYER_EQUIP_INFO(items)
     for i = 1, nItem do
         HeroEquipData.AddEquipData(items[i], true)
     end
-    SL:OnHeroEquipInitAddRed()
     SL:onLUAEvent(LUA_EVENT_HERO_EQUIP_CHANGE, {opera = GUIDefine.OperateType.INIT})
 end
 

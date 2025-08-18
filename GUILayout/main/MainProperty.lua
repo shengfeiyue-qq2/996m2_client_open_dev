@@ -109,12 +109,11 @@ function MainProperty.main()
     MainProperty.InitChatHideBtn()
     MainProperty.InitQuickUseShow()
     MainProperty.InitInternalUI()
-
-    MainProperty.AfterCUILoadFunc()
-end
-
-function MainProperty.AfterCUILoadFunc()
     MainProperty.InitQuickUseItems()
+
+    -- 龙头特效
+    GUI:Effect_Create(MainProperty._ui.Image_4, "dragon_anim", 39, 125, 0, 5010)
+
 end
 
 ------------------------------ 快捷栏 -------------------------------------------------------

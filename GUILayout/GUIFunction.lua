@@ -1279,7 +1279,7 @@ function GUIFunction:GetItemDescStrByGroup(list, groupId)
     local strList = list[groupId]
     local str = ""
     for i = 1, #strList do
-        str = string.format("%s%s%s", str, strList[i], i ~= #strList and "<br>" or "")
+        str = string.format("%s%s%s", str, SL:ParseMetaValueStr(strList[i]), i ~= #strList and "<br>" or "")
     end
     return str
 end

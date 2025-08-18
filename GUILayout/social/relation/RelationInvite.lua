@@ -125,10 +125,10 @@ function RelationInvite.RefreshContent()
         local guildName = SL:GetValue("GUILD_INFO").guildName
 
         for _, v in pairs(SL:GetValue("GUILD_MEMBER_LIST") or {}) do
-            if v.UserID ~= myUid and v.Online == 1 then
+            if v.UserID ~= myUid and v.Line == 1 then
                 local item = {}
                 item.uid = v.UserID
-                item.name = v.Name
+                item.name = v.UserName
                 item.level = v.Level
                 item.guildName = guildName
                 tinsert(members, item)

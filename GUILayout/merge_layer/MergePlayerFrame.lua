@@ -52,6 +52,8 @@ local ChildsUICfgs = {
 -- 内功是否显示
 local isShowNG = tonumber(SL:GetValue("GAME_DATA", "OpenNGUI")) == 1
 
+local path = "res/private/player_hero/"
+
 function MergePlayerFrame.main()
     local parent = GUI:Win_Create(UIConst.LAYERID.MergePlayerMainGUI, 0, 0, 0, 0, false, false, true, true)
     local data = GUI:GetLayerOpenParam()
@@ -61,6 +63,15 @@ function MergePlayerFrame.main()
     MergePlayerFrame._ui = GUI:ui_delegate(parent)
     if not MergePlayerFrame._ui then
         return false
+    end
+
+    if isShowNG then
+        GUI:Image_loadTexture(MergePlayerFrame._ui["Image_1"], path .. "img_bg1_ng.png")
+
+        local offY = 20
+        GUI:setPositionY(MergePlayerFrame._ui["Text_Name"], GUI:getPositionY(MergePlayerFrame._ui["Text_Name"]) + offY)
+    else
+        GUI:Image_loadTexture(MergePlayerFrame._ui["Image_1"], path .. "img_bg1.png")
     end
 
     -- 1人物; 2英雄

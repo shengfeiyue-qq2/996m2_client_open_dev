@@ -329,7 +329,7 @@ function HeroBagData.DelayNotifyBagOper()
     end
 
     HeroBagData._delayNotifyTimerID = SL:ScheduleOnce(function()
-        SL:BagDataDelayNotice()
+        SL:BagDataDelayNotice(true)
     end, 0.5)
 end
 

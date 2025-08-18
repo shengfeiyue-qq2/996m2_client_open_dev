@@ -17,8 +17,7 @@ function UIOperator:OpenMyPlayerUI(data)
     else
         GUI:Win_Open(UIConst.LUAFile.LUA_FILE_PLAYER_FRAME)
     end
-    
-    SL:OnPlayerFrameLoadSuccessAddRed()
+
 end
 
 -- 关闭个人人物界面
@@ -52,8 +51,6 @@ function UIOperator:OpenMyHeroUI(data)
         GUI:SetLayerOpenParam(data)
         GUI:Win_Open(UIConst.LUAFile.LUA_FILE_HERO_FRAME)
     end
-
-    SL:OnHeroFrameLoadSuccessAddRed()
 end
 
 -- 关闭个人人物界面

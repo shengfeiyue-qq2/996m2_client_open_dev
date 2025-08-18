@@ -69,8 +69,9 @@ function HeroFrame.main()
     if isShowNG then
         GUI:Image_loadTexture(HeroFrame._ui["Image_bg"], path .. "1900015000_ng.png")
 
-        local offY = isPC and 3 or 18
+        local offY = isPC and 3 or 10
         GUI:setPositionY(HeroFrame._ui["Text_Name"], GUI:getPositionY(HeroFrame._ui["Text_Name"]) + offY)
+        GUI:setPositionY(HeroFrame._ui["Node_panel"], GUI:getPositionY(HeroFrame._ui["Node_panel"]) - offY)
     else
         GUI:Image_loadTexture(HeroFrame._ui["Image_bg"], path .. "1900015000.png")
     end

@@ -144,17 +144,13 @@ function MainProperty.main()
     MainProperty.OnUpdatePlayerPosition()
     MainProperty.OnDarkStateChange()
 
-    MainProperty.AfterCUILoadFunc()
+    MainProperty.InitAdapet()
+    MainProperty.InitQuickUseItems()
 
     MainProperty.RegisterEvent()
     
     GUI:RefPosByParent(MainProperty._root)
     SL:AttachTXTSUI({root = MainProperty._ui["Panel_chat_funcs"], index = SLDefine.SUIComponentTable.PCMainPropertyFuncs})
-end
-
-function MainProperty.AfterCUILoadFunc()
-    MainProperty.InitAdapet()
-    MainProperty.InitQuickUseItems()
 end
 
 function MainProperty.InitDropData()

@@ -293,7 +293,6 @@ function EquipData.handle_MSG_SC_PLAYER_EQUIP_INFO(items)
     for i = 1, nItem do
         EquipData.AddEquipData(items[i], true)
     end
-    SL:OnPlayEquipInitAddRed()
     SL:onLUAEvent(LUA_EVENT_PLAYER_EQUIP_CHANGE, {opera = GUIDefine.OperateType.INIT})
     SL:onLUAEvent(LUA_EVENT_PLAYER_EQUIP_INIT)
 end

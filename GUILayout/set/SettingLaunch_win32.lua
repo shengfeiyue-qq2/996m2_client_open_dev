@@ -34,6 +34,7 @@ local heroGroup = {
     SLDefine.SETTINGID.SETTING_IDX_HERO_FOLLOW_ATTACK, -- 跟随主角攻击
     SLDefine.SETTINGID.SETTING_IDX_HERO_AUTO_LOGIN, -- 自动召唤英雄
     SLDefine.SETTINGID.SETTING_IDX_HERO_ATTACK_DODGE, -- 英雄打怪躲避
+    SLDefine.SETTINGID.SETTING_IDX_MORE_FAST,   -- 更快的加速
 }
 
 local skillsGroups = {

@@ -120,9 +120,6 @@ function PlayerEquip.main()
     -- 初始化装备内观
     PlayerEquip.CreateUIModel()
 
-    -- 装备加载成功添加红点
-    SL:PlayerEquipUILoadSuccessAddRed()
-
     -- 自定义组件挂接
     SL:AttachTXTSUI({root = PlayerEquip._ui["EquipUI"], index = SLDefine.SUIComponentTable.PlayerEquip})
 
@@ -707,8 +704,6 @@ function PlayerEquip.RegistEvent()
     SL:RegisterLUAEvent(LUA_EVENT_PLAYER_EQUIP_CHANGE, "PlayerEquip", PlayerEquip.UpdateEquipLayer)
     SL:RegisterLUAEvent(LUA_EVENT_EQUIP_STATE_CHANGE, "PlayerEquip", PlayerEquip.UpdateEquipPanelState)
     SL:RegisterLUAEvent(LUA_EVENT_PLAYER_SEX_CHANGE, "PlayerEquip", PlayerEquip.OnSexChange)
-
-    SL:SexChangeAddRed()
 end
 
 -- 取消事件
@@ -730,7 +725,6 @@ end
 function PlayerEquip.OnSexChange()
     PlayerEquip._sex = GUIFunction:GetRoleSex(GUIDefine.RoleUIType.PLAYER)
     PlayerEquip.CreateUIModel()
-    SL:SexChangeAddRed()
 end
 
 function PlayerEquip.CreateUIModel()

@@ -50,6 +50,73 @@ end
 -----------------------------------------------
 -- 血量相关
 -------------------------------------------------------
+ActorHud._hudSpriteFrameNameFormat = "actor_hud_%04d.png"
+ActorHud.HUD = {
+    HP_BG_SPRITE_ID             = 9990,         -- 血条背景资源ID
+	HP_SPRITE_ID                = 9991,         -- 血条资源ID
+	HP_MAIN_SPRITE_ID           = 9994,         -- 血条资源ID  主玩家高亮
+	MP_SPRITE_ID                = 9992,         -- 蓝条资源ID
+	NG_SPRITE_ID                = 9993,         -- 内功资源ID
+	HUD_SPRITE_DEFAULT_ID       = 9999,         -- hud sprite 默认图片ID
+}
+
+ActorHud.HUD_OFFSET = {
+    HP                  = GUI:p(-16, 50),
+	HP_BG               = GUI:p(-16, 50),
+	MP                  = GUI:p(-16, 50),
+	MP_BG               = GUI:p(-16, 50),
+	NG                  = GUI:p(-16, 47),
+	NG_BG               = GUI:p(-16, 47),
+    HORSE               = GUI:p(0, 15),         -- 骑马的HUD偏移
+	HORSE_LABEL         = GUI:p(0, 15),         -- 骑马的HUD Label偏移
+}
+
+-- HUD {id = 资源ID, offset = HUD偏移坐标}
+local shareHudParam = {}
+-- HP HUD 血条
+function ActorHud.GetHUDHPSpriteParam(actorID, isHudBg)
+    if isHudBg then
+        shareHudParam.id = ActorHud.HUD.HP_BG_SPRITE_ID
+        shareHudParam.offset = ActorHud.HUD_OFFSET.HP_BG
+        return shareHudParam
+    end
+
+    if SL:GetValue("GAME_DATA", "hight_main_player_hp") == 1 and SL:GetValue("ACTOR_IS_MAINPLAYER", actorID) then
+        shareHudParam.id = ActorHud.HUD.HP_MAIN_SPRITE_ID
+    else
+        shareHudParam.id = ActorHud.HUD.HP_SPRITE_ID
+    end
+
+    shareHudParam.offset = ActorHud.HUD_OFFSET.HP
+    return shareHudParam
+end
+
+-- MP HUD 蓝条
+function ActorHud.GetHUDMPSpriteParam(actorID, isHudBg)
+    if isHudBg then
+        shareHudParam.id = ActorHud.HUD.HP_BG_SPRITE_ID
+        shareHudParam.offset = ActorHud.HUD_OFFSET.MP_BG
+        return shareHudParam
+    end
+
+    shareHudParam.id = ActorHud.HUD.MP_SPRITE_ID
+    shareHudParam.offset = ActorHud.HUD_OFFSET.HP
+    return shareHudParam
+end
+
+-- NG HUD 内功条
+function ActorHud.GetHUDNGSpriteParam(actorID, isHudBg)
+    if isHudBg then
+        shareHudParam.id = ActorHud.HUD.HP_BG_SPRITE_ID
+        shareHudParam.offset = ActorHud.HUD_OFFSET.NG_BG
+        return shareHudParam
+    end
+
+    shareHudParam.id = ActorHud.HUD.NG_SPRITE_ID
+    shareHudParam.offset = ActorHud.HUD_OFFSET.NG
+    return shareHudParam
+end
+
 function ActorHud.GetJobMask(job)
     local jobStr = {
         [0] = "Z",

@@ -45,7 +45,7 @@ function Stall.InitUI()
 
     local winSizeW = SL:GetValue("SCREEN_WIDTH")
     local winSizeH = SL:GetValue("SCREEN_HEIGHT")
-    GUI:setPositionY(StallInfo._ui.PMainUI, isWinMode and SL:GetValue("PC_POS_Y") or winSizeH / 2)
+    GUI:setPositionY(StallInfo._ui.PMainUI, StallInfo._isWinMode and SL:GetValue("PC_POS_Y") or (winSizeH / 2))
     GUI:Win_SetZPanel(StallInfo._layer, StallInfo._ui.PMainUI)
     GUI:Win_SetDrag(StallInfo._layer, StallInfo._ui.Image_move)
 
