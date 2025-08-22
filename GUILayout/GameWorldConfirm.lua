@@ -53,10 +53,6 @@ function GameWorldConfirm.OnUpdate()
     GUI:removeAllChildren(contentLayout)
 
     local content = ""
-    local path = "scripts/game_config/game_world_confirm.txt"
-    if SL:IsFileExist(path) then
-        content = SL:GetDataFromFileEx(path)
-    end
     if not content or content == "" then
         return nil
     end

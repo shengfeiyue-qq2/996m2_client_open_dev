@@ -1788,7 +1788,7 @@ function MainProperty.CreateDropSwitchCell(id)
         nameText = nameText,
         checkBox = checkBox
     }
-    cell:removeFromParent()
+    GUI:removeFromParent(cell)
     return data
 end
 

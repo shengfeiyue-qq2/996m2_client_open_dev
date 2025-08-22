@@ -17,7 +17,7 @@ MainTarget._targetOwnID = nil
 MainTarget._isPC = SL:GetValue("IS_PC_OPER_MODE")
 
 function MainTarget.main()
-    local parent = GUI:Attach_Bottom()
+    local parent = GUI:Attach_LeftBottom()
     GUI:LoadExport(parent, "main/main_target")
 
     MainTarget._root = GUI:getChildByName(parent, "Main_Target")
