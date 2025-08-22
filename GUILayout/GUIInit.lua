@@ -915,6 +915,52 @@ SL:RegisterLUAEvent(LUA_EVENT_EXP_CHANGE, "GUIInit", function(data)
     end
 end)
 
+-- 英雄经验改变
+SL:RegisterLUAEvent(LUA_EVENT_HERO_EXP_CHANGE, "GUIInit", function(data)
+    if not data or not next(data) then
+        return false
+    end
+
+    local changed = data.changed or 0
+    if changed < 1 or data.isInit then
+        return false
+    end
+    
+    local value    = SL:GetValue("SETTING_VALUE", SLDefine.SETTINGID.SETTING_IDX_EXP_IGNORE)
+    local disable  = value[1] == 1
+    local limit    = tonumber(value[2]) or 1
+    if not disable or changed >= limit then
+        -- 服务器开关 经验信息是否显示在聊天框 0：显示在聊天框
+        if SL:GetValue("SERVER_OPTION", SW_KEY_EXP_IN_CHAT) == 0 then
+            SL:onLUAEvent(LUA_EVENT_CHAT_MSG_ADD, {
+                Msg       = string.format("%s 英雄经验值增加.", changed),
+                FColor    = 255,
+                BColor    = 249,
+                ChannelId = GUIDefine.ChatChannel.SYSTEM,
+            })
+        else
+            local EXPcoordinate = GUIDefineEx.EXPcoordinate
+            if not next(EXPcoordinate) then
+                return false
+            end
+
+            if changed < EXPcoordinate[4] then
+                return false
+            end
+
+            local platformID = SL:GetValue("IS_PC_OPER_MODE") and 1 or 2
+            local data = {
+                Msg    = string.format("%s <英雄/FCOLOR=22>经验值增加.", changed),
+                X      = EXPcoordinate[platformID].X,
+                Y      = EXPcoordinate[platformID].Y,
+                FColor = EXPcoordinate[3].X,
+                BColor = EXPcoordinate[3].Y,
+            }
+            SL:onLUAEvent(LUA_EVENT_NOTICE_EXP, data)
+        end
+    end
+end)
+
 -----------------------------------------------------------------------------
 -- 键盘事件
 SL:RegisterLUAEvent(LUA_EVENT_ENTER_WORLD, "GUIInit_KeyBoard", function()

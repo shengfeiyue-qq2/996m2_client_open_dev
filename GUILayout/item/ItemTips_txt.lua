@@ -2739,6 +2739,9 @@ function ItemTips.CreateEquipPanel(data, itemData, isWear, panelInsertIndex)
 
     local color = (itemData.Color and itemData.Color > 0) and itemData.Color or 255
     local name = itemData.Name or ""
+    if itemData.shabakeUpTag and itemData.shabakeUpTag > 0 then
+        name = "(*)" .. name
+    end
     local nameStr = string.format("<font color='%s' size='%s'>%s</font>", SL:GetHexColorByStyleId(color), _nameSize, name)
     local descList, effectList = GUIFunction:GetItemDescList(itemData)
 

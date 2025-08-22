@@ -410,8 +410,8 @@ function Notice.OnShowSystemXYNotice(data)
     local Y             = tonumber(data.Y)
     data.FColor         = data.FColor or 255
     data.BColor         = data.BColor or 255
-    local FColorRGB     = GET_COLOR_BYID_C3B(data.FColor)
-    local BColorRGB     = GET_COLOR_BYID_C3B(data.BColor)
+    local FColorRGB     = SL:GetColorByStyleId(data.FColor)
+    local BColorRGB     = SL:GetColorByStyleId(data.BColor)
 
     if not X or not Y then
         return

@@ -301,12 +301,10 @@ function RobotHeroAuto.AutoUseFIXItem(delta)
             local equipData         = HeroEquipData.GetEquipData()
             for _, equip in pairs(equipData) do
                 if equip.Dura < 1000 and not isInvalidEquip(equip) then
-                    if not SL:GetValue("ITEM_ARTICLE", equip.Index, checkFixArticleType) then
-                        local fixValue = equip.Bind or 0
-                        found = not SL:CheckBit(fixValue, 3) --是否已经修复过了
-                        if found then 
-                            break
-                        end
+                    local _, isMeetType = SL:GetValue("ITEM_IS_BIND", equip, GUIDefine.ItemArticleType.TYPE_FIX)
+                    if not isMeetType then  -- 未禁止修理
+                        found = true
+                        break
                     end
                 end
             end
