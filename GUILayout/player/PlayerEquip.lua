@@ -538,6 +538,9 @@ function PlayerEquip.UpdateEquipLayer(data)
     if not equipPanel then
         return false
     end
+    if equipPanel._movingState and GUIDefine.OperateType.CHANGE == optType then
+        return
+    end
     equipPanel._movingState = false
 
     local function onRefEquipNaikan()

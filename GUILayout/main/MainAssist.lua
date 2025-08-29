@@ -1006,7 +1006,7 @@ function MainAssist.AddHero(data)
     end
 
     -- 找到插入位置
-    local index = nItems
+    local index = #items
     for playerID, cell in pairs(MainAssist._heroCells) do
         if SL:GetValue("ACTOR_LEVEL", actorID) > SL:GetValue("ACTOR_LEVEL", playerID) then
             index = math.min(index, GUI:ListView_getItemIndex(listview, cell))

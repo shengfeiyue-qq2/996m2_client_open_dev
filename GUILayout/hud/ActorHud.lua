@@ -117,6 +117,45 @@ function ActorHud.GetHUDNGSpriteParam(actorID, isHudBg)
     return shareHudParam
 end
 
+-- HP HUD 血条进度值(0 - 1)
+function ActorHud.GetHUDHPBarPer(actorID)
+    if not SL:GetValue("ACTOR_IS_VALID", actorID) then
+        return 0
+    end
+
+    local hpPer = SL:GetValue("ACTOR_HP", actorID) / SL:GetValue("ACTOR_MAXHP", actorID)
+    if SL:GetValue("GAME_DATA", "showFewHp") == 1 and not SL:GetValue("ACTOR_HUD_FULL_HP_SHOW", actorID) then
+        if not SL:GetValue("ACTOR_IS_MAINPLAYER", actorID) and not SL:GetValue("ACTOR_IS_MAINHERO", actorID) then
+            hpPer = 1
+        end
+    end
+
+    return hpPer
+end
+
+-- MP HUD 蓝条进度值(0 - 1)
+function ActorHud.GetHUDMPBarPer(actorID)
+    if not SL:GetValue("ACTOR_IS_VALID", actorID) then
+        return 0
+    end
+
+    local mpPer = SL:GetValue("ACTOR_MP", actorID) / SL:GetValue("ACTOR_MAXMP", actorID)
+    return mpPer
+end
+
+-- NG HUD 内力条进度值(0 - 1)
+function ActorHud.GetHUDNGBarPer(actorID)
+    if not SL:GetValue("ACTOR_IS_VALID", actorID) or not SL:GetValue("ACTOR_IS_PLAYER", actorID) then
+        return 0
+    end
+
+    local force     = SL:GetValue("ACTOR_IFORCE", actorID)
+    local maxForce  = SL:GetValue("ACTOR_MAX_IFORCE", actorID)
+    local forcePer  = maxForce == 0 and 0 or (force / maxForce)
+    return forcePer
+end
+
+--------------------------------------
 function ActorHud.GetJobMask(job)
     local jobStr = {
         [0] = "Z",

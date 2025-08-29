@@ -710,11 +710,23 @@ function ItemTips.GetNeedStr(itemData, isItem)
     return isItem and "需求：无限制" or nil
 end
 
+local function checkIsLimit(itemData)
+    if (itemData.Need == 101 or itemData.Need == 102 or itemData.Need == 103 or itemData.Need == 104) 
+        and tonumber(itemData.NeedLevel) and tonumber(itemData.NeedLevel) > 0 then
+        return true, tonumber(itemData.NeedLevel) * 60
+    end
+    return false
+end
+
 -- 道具时限
 function ItemTips.GetTimeStr(type, itemData, from, lookPlayer)
     local time = itemData.limitRemainTime
     local active = itemData.limitTimeActive
     if not time or time <= 0 then
+        local isLimit, limitTime = checkIsLimit(itemData)
+        if not active and isLimit then
+            return string.format("%s：%s", type == 1 and "限时装备" or "限时道具", SL:TimeFormatToStr(limitTime))
+        end
         return nil
     end
 
@@ -2107,7 +2119,15 @@ function ItemTips.CreateDiyAttrWidget(param)
                                 local descId = tonumber(params[2])
                                 local config = descId and GUIDefineEx.ItemDescConfig[descId]
                                 if config and config.str then
-                                    local richText = GUI:RichText_Create(layout, "desc_" .. i, tonumber(params[3]), tonumber(params[4]), config.str, sizeW, SL:GetValue("GAME_DATA","DEFAULT_FONT_SIZE"), "#FFFFFF")
+                                    local richText = GUI:RichText_Create(layout, "desc_" .. i, tonumber(params[3]), tonumber(params[4]), SL:ParseMetaValueStr(config.str), sizeW, SL:GetValue("GAME_DATA","DEFAULT_FONT_SIZE"), "#FFFFFF")
+                                    if tonumber(params[5]) and tonumber(params[5]) > 0 then
+                                        GUI:setScale(richText, tonumber(params[5]))
+                                    end
+                                end
+                            elseif params[1] == "RTEXT" then
+                                local str = params[2]
+                                if str and string.len(str) then
+                                    local richText = GUI:RichTextFCOLOR_Create(layout, "richText_" .. i, tonumber(params[3]), tonumber(params[4]), str, sizeW, SL:GetValue("GAME_DATA","DEFAULT_FONT_SIZE"), "#FFFFFF")
                                     if tonumber(params[5]) and tonumber(params[5]) > 0 then
                                         GUI:setScale(richText, tonumber(params[5]))
                                     end

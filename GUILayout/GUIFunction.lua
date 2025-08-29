@@ -2627,6 +2627,7 @@ function GUIFunction:CheckAuctionCellShowInView(cell, view)
     return isShow
 end
 ---------------------------------------------------------------------
+
 -------------------------------------------------------------------------
 -- 客户端释放技能前是否允许执行
 function GUIFunction:OnCheckAllowLaunchSkillBefore(skillID)
@@ -2634,6 +2635,15 @@ function GUIFunction:OnCheckAllowLaunchSkillBefore(skillID)
     -- 是否继续释放技能
     return true
 end
+
+-- 判断能否自动拾取该物品 [内部判断可自动拾取后的额外判断] 
+-- 参数: itemIndex 道具Index , bySprite: 是否小精灵自动拾取 boolean
+-- 返回值: boolean
+function GUIFunction:CheckAutoPickItemEnable_Extra(itemIndex, bySprite)
+
+    return true
+end
+
 -------------------------------------------------------------------------
 
 --是否英雄人物面板合并
