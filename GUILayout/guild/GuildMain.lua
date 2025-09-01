@@ -63,7 +63,7 @@ function GuildMain.OnRefreshGuildInfo()
     end
 
     GUI:Text_setString(GuildMain._ui["GuildName"], guildInfo.guildName)
-    GUI:Text_setString(GuildMain._ui["MasterName"], guildInfo.guidMaster)
+    GUI:Text_setString(GuildMain._ui["MasterName"], guildInfo.guildMaster)
 
     local str = guildInfo.notice or ""
     GuildMain.OnSetGuildNotice(str)
