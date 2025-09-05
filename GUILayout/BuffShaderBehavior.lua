@@ -15,6 +15,8 @@ function BuffShaderBehavior.ShaderIce(node)
     local blendType = GUI:Effect_getBlendMode(node)
     if blendType and blendType == 4 then
         iceShader = SLDefine.SHADER_TYPE.SHADER_TYPE_ICE_ALPHA_MULTIP
+    elseif blendType and (blendType == 2 or blendType == 1) then
+        iceShader = SLDefine.SHADER_TYPE.SHADER_TYPE_ICE_ALPHA_ENHANCE
     end
 
     ShaderUtils.SetTypeShader(node, iceShader)
@@ -74,6 +76,10 @@ SL:RegisterLUAEvent(LUA_EVENT_ACTOR_EXIT_BUFF, "BuffShaderBehavior", function(da
 
     local actorID = data.actorID
     local buffID = data.buffID
+    if buffID ~= SLDefine.BUFFID.FREEZED_GRAY and buffID ~= SLDefine.BUFFID.ICE and buffID ~= SLDefine.BUFFID.STONE_MODE then
+        return
+    end
+
     local shaderNodeFunc = BuffShaderBehavior.ShaderNormal
     if SL:GetValue("ACTOR_IS_VALID", actorID) and shaderNodeFunc then
         GUI:SetActorShaderFunc(actorID, shaderNodeFunc)

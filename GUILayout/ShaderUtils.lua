@@ -9,6 +9,7 @@ local OutlineGLKey          = "ShaderOutlineColor_noMVP"
 local IceGLKey              = "ShaderIceColor_noMVP"
 local BlurGLKey             = "ShaderBlurGLKey_noMVP"
 local IceAlphaMulitipGLKEY  = "ShaderIceAlphaMulitipColor_noMVP"
+local IceAlphaFilterGLKEY   = "ShaderIceAlphaFilterColor_noMVP"
 
 local NormalGLKEY           = "ShaderPositionTextureColor_noMVP"
 local GrayGLKEY             = "ShaderUIGrayScale"
@@ -52,6 +53,9 @@ function ShaderUtils.SetTypeShader(node, type)
 
     elseif type == SLDefine.SHADER_TYPE.SHADER_TYPE_NORMAL then
         shader = ShaderUtils.CreateNormalShader()
+
+    elseif type == SLDefine.SHADER_TYPE.SHADER_TYPE_ICE_ALPHA_ENHANCE then
+        shader = ShaderUtils.CreateIceAlphaEnhanceShader()
 
     else
         shader = ShaderUtils.CreateNormalShader()
@@ -112,6 +116,11 @@ end
 
 function ShaderUtils.CreateIceAlphaMulitipShader()
     local shader = GUI:Shader_Create(IceAlphaMulitipGLKEY, "shader/position_texture_color_nomvp.vert", "shader/highlight_ice_alpha_mulitip_color_nomvp.frag")
+    return shader
+end
+
+function ShaderUtils.CreateIceAlphaEnhanceShader(filterValue)
+    local shader = GUI:Shader_Create(IceAlphaFilterGLKEY, "shader/position_texture_color_nomvp.vert", "shader/highlight_ice_alpha_enhance_color_nomvp.frag")
     return shader
 end
 
