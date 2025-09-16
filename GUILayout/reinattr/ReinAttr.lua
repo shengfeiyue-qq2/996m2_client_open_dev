@@ -531,7 +531,8 @@ end
 function ReinAttr.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_CLOSEWIN, "ReinAttr", ReinAttr.OnCloseWin)
     SL:RegisterLUAEvent(LUA_EVENT_REIN_ATTR_CHANGE, "ReinAttr", ReinAttr.OnUpdateData, ReinAttr._layer)
-    SL:RegisterLUAEvent(LUA_EVENT_ROLE_PROPERTY_CHANGE, "ReinAttr", ReinAttr.OnUpdateData, ReinAttr._layer)
+    -- 要求属性变化不刷新显示
+    -- SL:RegisterLUAEvent(LUA_EVENT_ROLE_PROPERTY_CHANGE, "ReinAttr", ReinAttr.OnUpdateData, ReinAttr._layer)
 end
 
 function ReinAttr.RemoveEvent()

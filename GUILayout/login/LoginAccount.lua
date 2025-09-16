@@ -1190,6 +1190,12 @@ function LoginAccount.InitResolutionUI()
     local width  = LoginAccount._screenW
     local height = LoginAccount._screenH
 
+    local debugSetSize = SL:GetDebugResolutionSize()
+    if debugSetSize then
+        width = debugSetSize.width
+        height = debugSetSize.height
+    end
+
     GUI:TextInput_setString(ui.TextField_width, width)
     GUI:TextInput_setString(ui.TextField_height, height)
     GUI:TextInput_setInputMode(ui.TextField_width, 2)
@@ -1216,19 +1222,14 @@ function LoginAccount.InitResolutionUI()
     GUI:TextInput_addOnEvent(ui.TextField_width, onChangeEdit)
     GUI:TextInput_addOnEvent(ui.TextField_height, onChangeEdit)
 
-    if not SL:GetValue("IS_PC_OPER_MODE") then
-        GUI:setVisible(ui.btnOk, false)
-        GUI:setVisible(ui.btnReset, false)
-    else
-        GUI:addOnClickEvent(ui.btnOk, function()
-            local setWidth  = tonumber(GUI:TextInput_getString(ui.TextField_width))
-            local setHeight = tonumber(GUI:TextInput_getString(ui.TextField_height))
-            SL:ChangeDebugResolutionSize(false, setWidth, setHeight)
-        end)
-        GUI:addOnClickEvent(ui.btnReset, function()
-            SL:ChangeDebugResolutionSize(true)
-        end)
-    end
+    GUI:addOnClickEvent(ui.btnOk, function()
+        local setWidth  = tonumber(GUI:TextInput_getString(ui.TextField_width))
+        local setHeight = tonumber(GUI:TextInput_getString(ui.TextField_height))
+        SL:ChangeDebugResolutionSize(false, setWidth, setHeight)
+    end)
+    GUI:addOnClickEvent(ui.btnReset, function()
+        SL:ChangeDebugResolutionSize(true)
+    end)
 end
 
 -- 说明书
@@ -1242,7 +1243,7 @@ function LoginAccount.InitIntroButton()
         GUI:Button_setTitleText(introButton, "说明书")
         GUI:Button_titleEnableOutline(introButton, "#111111", 2)
         GUI:addOnClickEvent(introButton, function()
-            local url = "http://engine-doc.996m2.com/web/#/22/1351"
+            local url = "https://engine-doc.996m2.com/web/#/70/23182"
             SL:OpenURL(url)
         end)
     end

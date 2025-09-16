@@ -6,14 +6,12 @@ function Mail.main()
     local parent = GUI:GetLayerOpenParam()
     GUI:SetLayerOpenParam(nil)
     MailInfo._parent = parent
-    if not MailInfo._layer then
-        Mail.InitData()
-        Mail.InitUI() 
-        Mail.RegisterEvent()
-        Mail.ShowDefaultMainPanel()
-        Mail.HideBubbleTips()
-        SL:RequestMailList()
-    end
+    Mail.InitData()
+    Mail.InitUI() 
+    Mail.RegisterEvent()
+    Mail.ShowDefaultMainPanel()
+    Mail.HideBubbleTips()
+    SL:RequestMailList()
 end
 
 function Mail.InitData()

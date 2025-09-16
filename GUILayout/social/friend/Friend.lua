@@ -6,13 +6,11 @@ function Friend.main()
     local parent = GUI:GetLayerOpenParam()
     GUI:SetLayerOpenParam(nil)
     FriendInfo._parent = parent
-    if not FriendInfo._layer then
-        Friend.InitData()
-        Friend.InitUI()
-        Friend.RefreshBtn()
-        Friend.RegisterEvent()
-        SL:RequestFriendList() --可能被好友删了重新请求
-    end
+    Friend.InitData()
+    Friend.InitUI()
+    Friend.RefreshBtn()
+    Friend.RegisterEvent()
+    SL:RequestFriendList() --可能被好友删了重新请求
 end
 
 function Friend.InitData()

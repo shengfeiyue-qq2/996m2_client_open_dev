@@ -5,12 +5,10 @@ function NearPlayer.main()
     local parent = GUI:GetLayerOpenParam()
     GUI:SetLayerOpenParam(nil)
     NearPlayerInfo._parent = parent
-    if not NearPlayerInfo._layer then
-        NearPlayer.InitData()
-        NearPlayer.InitUI() 
-        NearPlayer.RegisterEvent()
-        NearPlayer.RefreshList()
-    end
+    NearPlayer.InitData()
+    NearPlayer.InitUI() 
+    NearPlayer.RegisterEvent()
+    NearPlayer.RefreshList()
 end
 
 function NearPlayer.InitData()

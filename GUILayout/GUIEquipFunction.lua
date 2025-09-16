@@ -407,6 +407,21 @@ function GUIFunction:DealEquipTouch(widget, eventType, params)
         ENDED         = 3
     }
 
+    local itemData = GUIFunction:GetEquipDataByPos(pos, nil, dataType)
+    if not itemData then
+        return false
+    end
+    
+    local itemMoveData = SL:GetValue("ITEM_MOVE_DATA")
+    if itemMoveData and itemMoveData.StdMode then
+        local posList = GUIDefine.EquipPosByStdMode[itemMoveData.StdMode]
+        for i = 1, #posList do
+            if not GUIFunction:GetEquipDataByPos(posList[1], nil, dataType) then
+                return false
+            end
+        end
+    end
+
     local updateEquipState = function(state, where, movePos)
         if MoveEvent.MOVEING == state then
             SL:ItemMoveUpdate({pos = movePos})
@@ -440,7 +455,7 @@ function GUIFunction:DealEquipTouch(widget, eventType, params)
                 cancelCallBack = function ()
                     if endCallBack then
                         widget.__hasEventCallOnTouchBegin = false
-                        widget.__lastClickTime = false
+                        -- widget.__lastClickTime = false
                         endCallBack(widget, false, where)
                     end
                 end
@@ -496,10 +511,6 @@ function GUIFunction:DealEquipTouch(widget, eventType, params)
     elseif eventType == GUIDefine.TouchEventType.ENDED then
         GUI:stopAllActions(widget)
 
-        if widget._Click_flag == true then
-            return false
-        end
-
         if widget.__isMoving then
             updateEquipState(MoveEvent.ENDED, pos, GUI:getTouchEndPosition(widget))
         elseif widget.__isPress then
@@ -510,21 +521,26 @@ function GUIFunction:DealEquipTouch(widget, eventType, params)
                     widget.__clickDelayHandler = nil
                 end
                 onDouble(pos)
+                widget.__hasEventCallOnTouchBegin = false
                 widget.__lastClickTime = false
             else
                 widget.__lastClickTime = true
+                if IsPC then
+                    if onClick and widget.__hasEventCallOnTouchBegin then
+                        if widget._movingState then
+                            SL:onLUAEvent(LUA_EVENT_LAYER_MOVED_CANCEL)
+                            widget._movingState = false
+                        else
+                            updateEquipState(MoveEvent.BEGAN, pos, GUI:getWorldPosition(widget))
+                        end
+                    end
+                end
+
                 -- 记录单击触发
                 -- 记录进入此处时的状态，避免在延时操作后状态被改变
-                widget.__clickDelayHandler = SL:ScheduleOnce(function ()
-                    if onClick and widget.__hasEventCallOnTouchBegin then
-                        if IsPC then
-                            if widget._movingState then
-                                SL:onLUAEvent(LUA_EVENT_LAYER_MOVED_CANCEL)
-                                widget._movingState = false
-                            else
-                                updateEquipState(MoveEvent.BEGAN, pos, GUI:getWorldPosition(widget))
-                            end
-                        else
+                widget.__clickDelayHandler = SL:ScheduleOnce(function()
+                    if not IsPC then
+                        if onClick and widget.__hasEventCallOnTouchBegin then
                             onClick(widget, pos)
                         end
                     end

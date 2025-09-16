@@ -142,7 +142,7 @@ function PurchaseWorld.UpdateFilter1()
                 GUI:setVisible(ui.Image_1, selected)
                 GUI:setVisible(ui.Image_2, selected)
 
-                cell:addClickEventListener(function()
+                GUI:addOnClickEvent(cell, function()
                     -- record
                     PurchaseWorld._filterID = v.id
                     local tconfig = SL:GetValue("PURCHASE_MENU_CONFIG_BY_ID", PurchaseWorld._filterID)

@@ -6,13 +6,11 @@ function Team.main()
     local parent = GUI:GetLayerOpenParam()
     GUI:SetLayerOpenParam(nil)
     TeamInfo._parent = parent
-    if not TeamInfo._layer then
-        Team.InitData()
-        Team.InitUI() 
-        Team.RefreshBtn()
-        Team.Refresh()
-        Team.RegisterEvent()
-    end
+    Team.InitData()
+    Team.InitUI() 
+    Team.RefreshBtn()
+    Team.Refresh()
+    Team.RegisterEvent()
 end
 
 function Team.InitData()

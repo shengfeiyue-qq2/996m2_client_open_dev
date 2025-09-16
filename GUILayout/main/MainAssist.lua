@@ -218,6 +218,10 @@ function MainAssist.ChangeAssistGroup(g)
     GUI:setVisible(MainAssist._ui["BtnG_enemy"], g == 1)
     GUI:setVisible(MainAssist._ui["BtnG_content"], g == 2)
     GUI:setVisible(MainAssist._ui["BtnG_hero"], g == 3)
+
+    if MainAssist._assistGroup == 3 then
+        MainAssist.UpdateAllHero()
+    end
 end
 
 -- 任务、组队选择操作
@@ -384,6 +388,7 @@ function MainAssist.OnActorOutOfView(data)
 
     if SL:GetValue("ACTOR_IS_PLAYER", actorID) then
         if SL:GetValue("ACTOR_IS_HERO", actorID) then
+            MainAssist.RmvPlayer(data)
             MainAssist.RmvHero(data)
         elseif SL:GetValue("ACTOR_IS_HUMAN", actorID) then
             MainAssist.RmvMonster(data)
@@ -404,6 +409,7 @@ function MainAssist.OnActorPlayerDie(data)
 
     if SL:GetValue("ACTOR_IS_PLAYER", actorID) then
         if SL:GetValue("ACTOR_IS_HERO", actorID) then
+            MainAssist.RmvPlayer(data)
             MainAssist.RmvHero(data)
         elseif SL:GetValue("ACTOR_IS_HUMAN", actorID) then
             MainAssist.RmvMonster(data)
@@ -464,7 +470,10 @@ function MainAssist.OnMainNearRefresh(data)
     
     if SL:GetValue("ACTOR_IS_PLAYER", actorID) then
         if SL:GetValue("ACTOR_IS_HERO", actorID) then
+            MainAssist.RmvPlayer(data)
             MainAssist.RmvHero(data)
+        elseif SL:GetValue("ACTOR_IS_HUMAN", actorID) then
+            MainAssist.RmvMonster(data)
         else
             MainAssist.RmvPlayer(data)
         end
@@ -530,6 +539,7 @@ function MainAssist.AutoAddPlayer()
         return false
     end
 
+    -- 要求英雄也显示在内..
     local actors, nPlayer = SL:GetValue("FIND_IN_VIEW_PLAYER_LIST")
     for i = 1, nPlayer do
         MainAssist.AddPlayer({actorID = actors[i]})
@@ -960,7 +970,7 @@ function MainAssist.InitHero()
     GUI:ListView_removeAllItems(MainAssist._ui["ListView_hero"])
 
     -- 1s检测一次
-    SL:ScheduleOnce(function ()
+    SL:schedule(MainAssist._ui["Panel_hero"], function()
         MainAssist.CheckAllHero()
     end, 1)
 end
@@ -971,6 +981,16 @@ function MainAssist.CheckAllHero( ... )
     end
     MainAssist._updateHeroAble = false
 
+    MainAssist.AutoAddHero()
+end
+
+function MainAssist.UpdateAllHero()
+    GUI:ListView_removeAllItems(MainAssist._ui["ListView_hero"])
+    MainAssist._heroCells = {}
+    MainAssist.AutoAddHero()
+end
+
+function MainAssist.AutoAddHero()
     if MainAssist._assistGroup ~= 3 or not MainAssist._checkHero then
         return false
     end
@@ -1022,7 +1042,7 @@ end
 function MainAssist.AutoRmvHero()
     local listview = MainAssist._ui["ListView_hero"]
     local items    = GUI:ListView_getItems(listview)
-    if #items >= HERO_COUNT then
+    if #items <= HERO_COUNT then
         return false
     end
 
