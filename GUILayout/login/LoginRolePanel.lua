@@ -966,6 +966,8 @@ function LoginRolePanel.OnCreateRoleFail(errorCode)
         SL:ShowSystemTips("禁止角色名包含特殊字符")
     elseif errorCode == 999 then
         SL:ShowSystemTips("创建失败：数据有误！")
+    else
+        SL:ShowSystemTips("创建失败: 错误码 "..tostring(errorCode))
     end 
 end
 
