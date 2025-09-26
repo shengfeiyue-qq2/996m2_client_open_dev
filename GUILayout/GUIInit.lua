@@ -801,7 +801,7 @@ SL:RegisterLUAEvent(LUA_EVENT_CHAT_MSG_ADD, "GUIInit", function(data)
             end
         end
 
-        if SL:GetValue("SOCIAL_IS_BLICKLIST_BY_UID", data.SendId) then
+        if SL:GetValue("SOCIAL_IS_BLACKLIST_BY_UID", data.SendId) then
             return
         end
 

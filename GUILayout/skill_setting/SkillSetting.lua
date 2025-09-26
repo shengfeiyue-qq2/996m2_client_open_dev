@@ -174,7 +174,7 @@ function SkillSetting.UpdateSkillChangeKey(data)
     GUI:MotionStreak_reset(mStreak)
     
     -- 贝塞尔曲线
-    local bezier = GUI:TimeLine_BezierTo(0.7, startPos, ctrlPos, endPos)
+    local bezier = GUI:Timeline_BezierTo(0.7, startPos, ctrlPos, endPos)
     -- 播放完删除
     local removeFunc = GUI:CallFunc(function ()
         if GUI:Win_IsNotNull(mStreak) then

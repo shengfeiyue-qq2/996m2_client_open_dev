@@ -233,6 +233,10 @@ function PlayerEquip.UpdateEquipStateChange(state, pos)
         -- 开始移动, 设置移动的装备内观特效ID是空
         if state then
             SetFeature(pos, {})
+            if pos == EquipPosCfg.Equip_Type_Dress then
+                PlayerEquip._feature.showNodeModel = true
+                PlayerEquip._feature.showHair = true
+            end
         else
             PlayerEquip.UpdateModelFeatureData()
         end

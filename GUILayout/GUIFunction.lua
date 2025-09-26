@@ -1253,7 +1253,20 @@ function GUIFunction:GetItemDescList(itemData)
                     if not descList[config.group_id] then
                         descList[config.group_id] = {}
                     end
-                    table.insert(descList[config.group_id], config.str)
+                    local splitList = SL:Split(config.str, "<LINE>")
+                    if #splitList > 1 then
+                        for i = 1, #splitList do
+                            local str = splitList[i]
+                            if str and string.len(str) > 0 then
+                                table.insert(descList[config.group_id], str)
+                            end
+                            if i ~= #splitList then
+                                table.insert(descList[config.group_id], "line")
+                            end
+                        end
+                    else
+                        table.insert(descList[config.group_id], config.str)
+                    end
                 end
             else
                 local effect = parseDescEffect(config.str)
@@ -1279,6 +1292,9 @@ function GUIFunction:GetItemDescStrByGroup(list, groupId)
     local strList = list[groupId]
     local str = ""
     for i = 1, #strList do
+        if strList[i] == "line" then
+            return nil, strList
+        end
         str = string.format("%s%s%s", str, SL:ParseMetaValueStr(strList[i]), i ~= #strList and "<br>" or "")
     end
     return str
@@ -2563,7 +2579,7 @@ function GUIFunction:SendChatMsg(data)
             return nil
         end
         -- 黑名单
-        if SL:GetValue("SOCIAL_IS_BLICKLIST", target.name) then
+        if SL:GetValue("SOCIAL_IS_BLACKLIST", target.name) then
             SL:ShowSystemTips("对方在你的黑名单，无法向其发送信息")
             return nil
         end

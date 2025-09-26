@@ -46,7 +46,7 @@ function FriendAdd.main()
         end
 
         -- 在黑名单中，二次确认
-        if SL:GetValue("SOCIAL_IS_BLICKLIST", inputStr) then
+        if SL:GetValue("SOCIAL_IS_BLACKLIST", inputStr) then
             local data    = {}
             data.btnType  = 2
             data.str      = string.format("玩家 %s 在你的黑名单中，是否将该玩家从黑名单中删除并加为好友?", inputStr)

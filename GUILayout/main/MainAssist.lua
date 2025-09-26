@@ -281,7 +281,7 @@ function MainAssist.ChangeHideStatus(data)
             if callback then
                 callback()
             end
-            GUI:ActionHide()
+            GUI:setVisible(Panel_assist, false)
             GUI:setContentSize(MainAssist._root, pHideW, PAssistH)
 
             -- 110 任务栏引导主ID
@@ -290,13 +290,13 @@ function MainAssist.ChangeHideStatus(data)
 
         SL:onLUAEvent(LUA_EVENT_ASSIST_HIDESTATUS_CHANGE, {assistSize = GUI:getContentSize(Panel_assist), bHide = true})
     else
+        GUI:setVisible(Panel_assist, true)
         GUI:setContentSize(MainAssist._root, pHideX + pHideW, PAssistH)
         GUI:Timeline_EaseSineIn_MoveTo(Panel_hide, {x = pHideX, y = pHideY}, 0.2)
         GUI:Timeline_EaseSineIn_MoveTo(Panel_assist, {x = pAssistX, y = pAssistY}, 0.2, function ()
             if callback then
                 callback()
             end
-            GUI:ActionShow()
             SL:SetValue("GUIDE_EVENT_BEGAN", 110, true)
         end)
 

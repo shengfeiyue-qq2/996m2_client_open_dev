@@ -739,7 +739,7 @@ function ChatData.AddChatItem(data)
     end
 
     -- 黑名单
-    if data.SendId and data.SendName and SL:GetValue("SOCIAL_IS_BLICKLIST_BY_UID", data.SendId) then
+    if data.SendId and data.SendName and SL:GetValue("SOCIAL_IS_BLACKLIST_BY_UID", data.SendId) then
         return false
     end
 

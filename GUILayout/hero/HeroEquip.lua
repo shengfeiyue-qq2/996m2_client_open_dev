@@ -210,6 +210,10 @@ function HeroEquip.UpdateEquipStateChange(state, pos)
         -- 开始移动, 设置移动的装备内观特效ID是空
         if state then
             SetFeature(pos, {})
+            if pos == EquipPosCfg.Equip_Type_Dress then
+                HeroEquip._feature.showNodeModel = true
+                HeroEquip._feature.showHair = true
+            end
         else
             HeroEquip.UpdateModelFeatureData()
         end

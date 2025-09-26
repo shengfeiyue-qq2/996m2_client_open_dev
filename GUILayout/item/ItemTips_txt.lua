@@ -2442,15 +2442,50 @@ function ItemTips.CreateDescWidget(groupId, param)
         return
     end
     local richStr = nil
+    local inLineList = nil
     if param and param[string.format("tip_desc%sStr", groupId)] then
         richStr = param[string.format("tip_desc%sStr", groupId)]
     else
         local descList = param and param.tip_descList
-        richStr = GUIFunction:GetItemDescStrByGroup(descList, groupId)
+        richStr, inLineList = GUIFunction:GetItemDescStrByGroup(descList, groupId)
     end
     if richStr and string.len(richStr) > 0 then
         local rich_desc = GUI:RichText_Create(-1, "rich_desc_" .. groupId, 0, 0, richStr, ItemTips._richWid, fontSize, "#FFFFFF", vspace, nil, fontPath)
         return rich_desc
+    elseif inLineList and #inLineList > 0 then
+        local descWidgets = {}
+        local descLayout = GUI:Layout_Create(-1, "desc_layout_" .. groupId, 0, 0, ItemTips._richWid, 0)
+        local descLayoutHei = 0
+        local str = ""
+        for i = 1, #inLineList do
+            local value = inLineList[i]
+            if value ~= "line" then
+                str = string.format("%s%s%s", str, str ~= "" and "<br>" or "", value)
+                if i == #inLineList then
+                    local richWidget = GUI:RichText_Create(descLayout, string.format("rich_desc_%s_%s", groupId, i), 0, 0, str, ItemTips._richWid, fontSize, "#FFFFFF", vspace, nil, fontPath)
+                    descLayoutHei = descLayoutHei + GUI:getContentSize(richWidget).height
+                    table.insert(descWidgets, richWidget)
+                end
+            else
+                local richWidget = GUI:RichText_Create(descLayout, string.format("rich_desc_%s_%s", groupId, i), 0, 0, str, ItemTips._richWid, fontSize, "#FFFFFF", vspace, nil, fontPath)
+                descLayoutHei = descLayoutHei + GUI:getContentSize(richWidget).height
+                table.insert(descWidgets, richWidget)
+                local lineWidget = ItemTips.CreateSplitLine()
+                GUI:addChild(descLayout, lineWidget)
+                descLayoutHei = descLayoutHei + GUI:getContentSize(lineWidget).height
+                table.insert(descWidgets, lineWidget)
+                str = ""
+            end
+        end
+        descLayoutHei = descLayoutHei + ItemTips._cellSpace * (#descWidgets - 1)
+        GUI:setContentSize(descLayout, ItemTips._richWid, descLayoutHei)
+        local topY = descLayoutHei
+        for i = 1, #descWidgets do
+            local hei = GUI:getContentSize(descWidgets[i]).height
+            topY = topY - hei - (i ~= 1 and ItemTips._cellSpace or 0)
+            GUI:setPositionY(descWidgets[i], topY)
+        end
+        return descLayout
     end
 end
 
@@ -2479,16 +2514,19 @@ end
 local function checkCanShow(param, tipsParam, lastWidgetList)
     if param and param.bindParam then
         local value = tipsParam[param.bindParam]
+        local value2 = nil
         if not value then
             local _, _, groupId = string.find(param.bindParam, "tip_desc(%d+)Str")
             if groupId then
                 local descList = tipsParam and tipsParam.tip_descList
-                value = GUIFunction:GetItemDescStrByGroup(descList, tonumber(groupId))
+                value, value2 = GUIFunction:GetItemDescStrByGroup(descList, tonumber(groupId))
             end
         end
         if type(value) == "string" and string.len(value) > 0 then
             return true
         elseif tonumber(value) and tonumber(value) > 0 then
+            return true
+        elseif type(value2) == "table" and #value2 > 0 then
             return true
         end
     elseif param and param.bindWidget then

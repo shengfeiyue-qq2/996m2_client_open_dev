@@ -1,17 +1,17 @@
 local ui = {}
 function ui.init(parent)
 	-- Create Panel_icon
-	local Panel_icon = GUI:Layout_Create(parent, "Panel_icon", 0.00, 0.00, 60.00, 60.00, false)
+	local Panel_icon = GUI:Layout_Create(parent, "Panel_icon", 0.00, 0.00, 80.00, 60.00, false)
 	GUI:setTouchEnabled(Panel_icon, false)
 	GUI:setTag(Panel_icon, -1)
 
 	-- Create Image_iconBg
-	local Image_iconBg = GUI:Image_Create(Panel_icon, "Image_iconBg", 0.00, 0.00, "res/public/1900000651.png")
+	local Image_iconBg = GUI:Image_Create(Panel_icon, "Image_iconBg", 20.00, 0.00, "res/public/1900000651.png")
 	GUI:setTouchEnabled(Image_iconBg, false)
 	GUI:setTag(Image_iconBg, -1)
 
 	-- Create Node_icon
-	local Node_icon = GUI:Node_Create(Panel_icon, "Node_icon", 30.00, 30.00)
+	local Node_icon = GUI:Node_Create(Panel_icon, "Node_icon", 50.00, 30.00)
 	GUI:setAnchorPoint(Node_icon, 0.50, 0.50)
 	GUI:setTag(Node_icon, -1)
 
@@ -32,7 +32,7 @@ function ui.init(parent)
 	GUI:Text_enableOutline(Text_need, "#000000", 1)
 
 	-- Create Text_count
-	local Text_count = GUI:Text_Create(Panel_icon, "Text_count", 58.00, 12.00, 15, "#ffffff", [[999]])
+	local Text_count = GUI:Text_Create(Panel_icon, "Text_count", 78.00, 12.00, 15, "#ffffff", [[999]])
 	GUI:setAnchorPoint(Text_count, 1.00, 0.50)
 	GUI:setTouchEnabled(Text_count, false)
 	GUI:setTag(Text_count, -1)

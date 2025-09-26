@@ -2419,15 +2419,36 @@ function ItemTips.CreateDescWidget(groupId, param)
         return
     end
     local richStr = nil
+    local inLineList = nil
     if param and param[string.format("tip_desc%sStr", groupId)] then
         richStr = param[string.format("tip_desc%sStr", groupId)]
     else
         local descList = param and param.tip_descList
-        richStr = GUIFunction:GetItemDescStrByGroup(descList, groupId)
+        richStr, inLineList = GUIFunction:GetItemDescStrByGroup(descList, groupId)
     end
     if richStr and string.len(richStr) > 0 then
         local rich_desc = GUI:RichText_Create(-1, "rich_desc_" .. groupId, 0, 0, richStr, ItemTips._richWid, fontSize, "#FFFFFF", vspace, nil, fontPath)
         return rich_desc
+    elseif inLineList and #inLineList > 0 then
+        local descWidgets = {}
+        local str = ""
+        for i = 1, #inLineList do
+            local value = inLineList[i]
+            if value ~= "line" then
+                str = string.format("%s%s%s", str, str ~= "" and "<br>" or "", value)
+                if i == #inLineList then
+                    local richWidget = GUI:RichText_Create(-1, string.format("rich_desc_%s_%s", groupId, i), 0, 0, str, ItemTips._richWid, fontSize, "#FFFFFF", vspace, nil, fontPath)
+                    table.insert(descWidgets, richWidget)
+                end
+            else
+                local richWidget = GUI:RichText_Create(-1, string.format("rich_desc_%s_%s", groupId, i), 0, 0, str, ItemTips._richWid, fontSize, "#FFFFFF", vspace, nil, fontPath)
+                table.insert(descWidgets, richWidget)
+                local lineWidget = ItemTips.CreateSplitLine()
+                table.insert(descWidgets, lineWidget)
+                str = ""
+            end
+        end
+        return descWidgets
     end
 end
 
@@ -2450,6 +2471,12 @@ function ItemTips.PushItem(cellView, widget)
     ItemTips._allCellHei = ItemTips._allCellHei + GUI:getContentSize(cell).height
     ItemTips._cell_num = ItemTips._cell_num + 1
     GUI:ListView_pushBackCustomItem(cellView, cell)
+end
+
+function ItemTips.PushItemList(cellView, widgetList)
+    for i, widget in ipairs(widgetList) do
+        ItemTips.PushItem(cellView, widget)
+    end
 end
 
 function ItemTips.FillTipsContent(tipsLayout, cellView, tipsParam)
@@ -2475,7 +2502,11 @@ function ItemTips.FillTipsContent(tipsLayout, cellView, tipsParam)
 
     -- 描述1
     local descWidget = ItemTips.CreateDescWidget(1, tipsParam)
-    ItemTips.PushItem(cellView, descWidget)
+    if type(descWidget) == "table" and #descWidget > 0 then
+        ItemTips.PushItemList(cellView, descWidget)
+    else
+        ItemTips.PushItem(cellView, descWidget)
+    end
 
     ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
 
@@ -2548,7 +2579,11 @@ function ItemTips.FillTipsContent(tipsLayout, cellView, tipsParam)
     if desc3Widget then
         removeLastLine()
         ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
-        ItemTips.PushItem(cellView, desc3Widget)
+        if type(desc3Widget) == "table" and #desc3Widget > 0 then
+            ItemTips.PushItemList(cellView, desc3Widget)
+        else
+            ItemTips.PushItem(cellView, desc3Widget)
+        end
         ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
     end
 
@@ -2585,7 +2620,11 @@ function ItemTips.FillTipsContent(tipsLayout, cellView, tipsParam)
     if desc2Widget then
         removeLastLine()
         ItemTips.PushItem(cellView, ItemTips.CreateSplitLine())
-        ItemTips.PushItem(cellView, desc2Widget)
+        if type(desc2Widget) == "table" and #desc2Widget > 0 then
+            ItemTips.PushItemList(cellView, desc2Widget)
+        else
+            ItemTips.PushItem(cellView, desc2Widget)
+        end
     end
 
     if GUIGlobal_ItemTipsEx then

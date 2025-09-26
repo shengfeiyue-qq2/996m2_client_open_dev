@@ -220,6 +220,12 @@ function ActorHud.GetHUDHPLabelInfo(actorID)
     local result = {str = hpStr, visible = visible, offsetX = offset.x, offsetY = offset.y}
     return result
 end
+
+-- 仅刷新显示状态时触发 boolean
+-- 血量文本
+function ActorHud.GetHUDHPLabelVisible(actorID, visible)
+    return visible
+end
 -------------------------------------------------------
 --前缀文本 行会信息 角色名 相关
 -------------------------------------------------------
@@ -361,6 +367,27 @@ function ActorHud.GetActorHUDLabelColorInfo(actorID, color, titleColors)
     result.guild = color
     result.name = color
     return result
+end
+
+-- 仅刷新显示状态时触发 boolean
+-- 名字文本
+function ActorHud.GetActorHUDLabelNameVisible(actorID, visible)
+    return visible
+end
+
+-- 行会文本
+function ActorHud.GetActorHUDLabelGuildVisible(actorID, visible)
+    return visible
+end
+
+-- 前缀/称号文本
+local title = {}
+function ActorHud.GetActorHUDLabelTitleVisible(actorID, visible)
+    -- 前缀文本
+    for i = 1, 12 do
+        title[i] = visible
+    end
+    return title
 end
 -------------------------------------------------------
 --称号 封号 相关

@@ -1,7 +1,5 @@
 RechargeQRCode = {}
 
-local RichTextHelp = requireUtil("RichTextHelp")
-
 function RechargeQRCode.main()
     local data = GUI:GetLayerOpenParam()
     local parent = GUI:Win_Create(UIConst.LAYERID.RechargeQRCodeGUI, 0, 0, 0, 0, false, false, true, true)
@@ -50,10 +48,9 @@ function RechargeQRCode.ShowQRCode(data)
         [PAY_CHANNEL.HUABEI] = setTip or "请使用手机 <font color='#00ff00'>支付宝</font> 扫描二维码支付",
     }
 
-    local richText    = RichTextHelp:CreateRichTextWithXML(tips[channel], 500,
-        SL:GetValue("GAME_DATA", "DEFAULT_FONT_SIZE") or 16, "#ffffff")
     GUI:removeAllChildren(RechargeQRCode._ui.Node_qrcode_tips)
-    GUI:addChild(RechargeQRCode._ui.Node_qrcode_tips, richText)
+    local richText = GUI:RichText_Create(RechargeQRCode._ui.Node_qrcode_tips, "qrcode_tips", 0, 0, tips[channel], 500, SL:GetValue("GAME_DATA", "DEFAULT_FONT_SIZE") or 16, "#ffffff")
+    GUI:setAnchorPoint(richText, 0.5, 0.5)
 
     local leftTime = 40 -- 倒计时40秒
     local function showLeftTime()

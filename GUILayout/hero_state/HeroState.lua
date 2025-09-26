@@ -287,7 +287,7 @@ function HeroState.InitUI()
                         node._clicking = false
                     else
                         node._clicking = true
-                        performWithDelay(node, function()
+                        SL:scheduleOnce(node, function()
                             node._clicking = false
                             if clickCallBack then
                                 clickCallBack()

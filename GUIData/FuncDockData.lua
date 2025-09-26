@@ -500,7 +500,7 @@ function FuncDockData.IsShowBtn(type, index)
         end
 
     elseif type == FuncType.Func_Player_Head then
-        if not SL:GetValue("SOCIAL_IS_BLICKLIST_BY_UID", FuncDockData._targetId) then
+        if not SL:GetValue("SOCIAL_IS_BLACKLIST_BY_UID", FuncDockData._targetId) then
             if BtnType.invite_team == index then
                 if FuncDockData._playerBasic and FuncDockData._playerBasic.group == 1 then
                     show = false
@@ -540,10 +540,10 @@ function FuncDockData.IsShowBtn(type, index)
         show = not SL:GetValue("FRIEND_INFO_BY_UID", FuncDockData._targetId) and SL:GetValue("USER_ID") ~= FuncDockData._targetId
     elseif index == BtnType.add_blacklist then
         -- 拉黑
-        show = not SL:GetValue("SOCIAL_IS_BLICKLIST_BY_UID", FuncDockData._targetId)
+        show = not SL:GetValue("SOCIAL_IS_BLACKLIST_BY_UID", FuncDockData._targetId)
     elseif index == BtnType.out_blacklist then
         -- 移除黑名单
-        show = SL:GetValue("SOCIAL_IS_BLICKLIST_BY_UID", FuncDockData._targetId)
+        show = SL:GetValue("SOCIAL_IS_BLACKLIST_BY_UID", FuncDockData._targetId)
     elseif BtnType.invite_team == index then
         if SL:GetValue("TEAM_IS_MEMBER", FuncDockData._targetId) then
             show = false

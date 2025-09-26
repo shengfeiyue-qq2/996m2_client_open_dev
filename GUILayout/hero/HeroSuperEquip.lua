@@ -197,6 +197,10 @@ function HeroSuperEquip.UpdateEquipStateChange(state, pos)
         -- 开始移动, 设置移动的装备内观特效ID是空
         if state then
             SetFeature(pos, {})
+            if pos == EquipPosCfg.Equip_Type_Super_Dress and tonumber(SL:GetValue("GAME_DATA", "Fashionfx") or 0) ~= 1 then
+                HeroSuperEquip._feature.showNodeModel = true
+                HeroSuperEquip._feature.showHair = true
+            end
         else
             HeroSuperEquip.UpdateModelFeatureData()
         end

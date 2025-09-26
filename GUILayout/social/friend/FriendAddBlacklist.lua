@@ -40,7 +40,7 @@ function FriendAddBlacklist.main()
         end
 
         -- 已经在黑名单
-        if SL:GetValue("SOCIAL_IS_BLICKLIST", inputStr) then
+        if SL:GetValue("SOCIAL_IS_BLACKLIST", inputStr) then
             SL:ShowSystemTips("该玩家已经在你的黑名单中")
             return
         end
