@@ -109,7 +109,7 @@ function PlayerExtraAtt.UpdateBaseAttri()
             local attData = {
                 id = attConfig.Idx, value = attValue
             }
-            if attConfig.Idx <= SL:GetValue("SPD") then
+            if attConfig.Idx <= AttType.Speed_Point then
                 table.insert(showList, attData)
             else
                 table.insert(showListBehind, attData)

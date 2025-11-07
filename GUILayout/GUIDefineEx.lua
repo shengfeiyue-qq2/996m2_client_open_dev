@@ -254,7 +254,7 @@ GUIDefineEx.ItemDescConfig = GUIDefineEx.ItemDescConfig or (
     function()
         local file = "game_config/cfg_itemdesc.lua"
         if SL:IsFileExist("scripts/" .. file) then
-            local config = SL:Require(file)
+            local config = SL:RequireFile(file)
             return config
         end
         return {}

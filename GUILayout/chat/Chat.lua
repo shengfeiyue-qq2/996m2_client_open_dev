@@ -312,10 +312,27 @@ function Chat.InitInput()
                 return
             end
 
-            local function handleFunc(_, str, risk_param, ext_param)
+            local function handleFunc(state, str, risk_param, ext_param)
                 if not str then
                     SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
                     return
+                end
+
+                if SL:GetValue("GAME_DATA", "OpenChatSensitiveTips") == 1 then
+                    if not state then
+                        SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
+                        return
+                    end
+        
+                    if risk_param and risk_param ~= 0 then
+                        SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
+                        return
+                    end
+
+                    if ext_param and ext_param.status and ext_param.status ~= 0 then
+                        SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
+                        return
+                    end
                 end
 
                 if special_Str then
@@ -341,7 +358,11 @@ function Chat.InitInput()
             if channelID == Chat._CHANNEL.PRIVATE then
                 input = content
             end
-            SL:RequestCheckSensitiveWord(special_Str or input, 2, handleFunc, data)
+            if SL:GetValue("GAME_DATA", "OpenChatSensitiveTips") == 1 then
+                SL:RequestCheckChatIsHaveSensitive(special_Str or input, handleFunc, data)
+            else
+                SL:RequestCheckSensitiveWord(special_Str or input, 2, handleFunc, data)
+            end
         else
             sendChatMsg(input)
         end

@@ -232,7 +232,7 @@ function MainTargetBelong.OnMainPlayerActionEnd()
 end
 
 function MainTargetBelong.UpdateMoveCancelTracking()
-    SL:GetValue("AUTO_TRACE_TARGET_OWNER", false)
+    SL:SetValue("AUTO_TRACE_TARGET_OWNER", false)
 
     local targetID = SL:GetValue("SELECT_TARGET_ID")
     SL:onLUAEvent(LUA_EVENT_TARGET_CHANGE, targetID)

@@ -7,7 +7,7 @@ function MiniMapData.Init()
 end
 
 function MiniMapData.LoadConfig()
-    MiniMapData._portalConfig = SL:Require("game_config/cfg_mapdesc")
+    MiniMapData._portalConfig = SL:RequireFile("game_config/cfg_mapdesc")
 end
 
 function MiniMapData.GetPortals(sMapID)

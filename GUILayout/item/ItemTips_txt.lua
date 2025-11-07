@@ -614,7 +614,7 @@ function ItemTips.GetInlayAttStr(itemData)
     local cell = itemData.TNCell
     for i = 0, 19 do
         local itemId = cell[i]
-        if itemId > 0 then
+        if itemId and itemId > 0 then
             local item = SL:GetValue("ITEM_DATA", itemId)
             local attList = GUIFunction:ParseItemBaseAtt(item and item.Attribute, ItemTips._job)
             local attShow = GUIFunction:GetAttDataShow(attList, false, true)
@@ -1026,7 +1026,6 @@ function ItemTips.GetSuitStr(suit)
     end
 
 
-    local posCheckSwitch = tonumber(SL:GetValue("GAME_DATA", "suitCheckPos")) == 1 --做个开关， 是由装备位还是装备名作为检测key（默认是装备名）
     local suitStr = ""
     for cfgIdx, suitConfig in ipairs(suitConfigs) do
         if suitConfig and next(suitConfig) then
@@ -1049,47 +1048,25 @@ function ItemTips.GetSuitStr(suit)
                 local checkIndex = 1
                 local meetEquipShow = {}
                 local tempMeetEquipShowCount = {}
-                local isDistinct = suitConfig.distinct == 1 --(部位5 6、 7 8检测去除一个检测)
-                local cullingCheckPos = {} --去除检测的部位做个标记
+                local isDistinct = suitConfig.distinct == 1 -- 去重开关: 服务端相同装备ID只计一次
 
                 for i, pos in ipairs(equipPos) do
                     pos = tonumber(pos)
-                    if pos and not cullingCheckPos[pos] then
-                        local nextCheckPos = nil
-                        if isDistinct then
-                            if pos == 5 then
-                                nextCheckPos = 6
-                            elseif pos == 6 then
-                                nextCheckPos = 5
-                            elseif pos == 7 then
-                                nextCheckPos = 8
-                            elseif pos == 8 then
-                                nextCheckPos = 7
-                            end
-                        end
-
-                        if nextCheckPos then
-                            cullingCheckPos[nextCheckPos] = true
-                        end
-
+                    if pos then
                         local meet, equipName = checkEquipMeet(suitConfig, pos)
-
-                        if not meet and nextCheckPos then
-                            meet, equipName = checkEquipMeet(suitConfig, nextCheckPos)
-                        end
-
-                        if meet then
-                            meetCount = meetCount + 1
-                        end
                         if not suitConfig.num then
                             suitCount = suitCount + 1
                         end
 
                         if equipName then
-                            local meetKey = posCheckSwitch and i or equipName --是用下标做key,或者道具名
+                            local meetKey = equipName
                             meetEquipShow[meetKey] = meet
                             if meet then
+                                meetCount = meetCount + 1
                                 tempMeetEquipShowCount[meetKey] = (tempMeetEquipShowCount[meetKey] or 0) + 1
+                                if isDistinct and tempMeetEquipShowCount[meetKey] > 1 then  -- 同一装备去重
+                                    meetCount = meetCount - 1
+                                end
                             end
                         end
                     end
@@ -1097,7 +1074,7 @@ function ItemTips.GetSuitStr(suit)
 
                 for i, showStr in ipairs(equipShow) do
                     if showStr and showStr ~= "" then
-                        local meetKey = posCheckSwitch and i or showStr --是用下标做key,或者道具名
+                        local meetKey = showStr
                         local meet = meetEquipShow[meetKey]
 
                         if tempMeetEquipShowCount[meetKey] then

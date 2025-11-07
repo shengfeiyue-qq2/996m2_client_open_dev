@@ -220,10 +220,15 @@ SkillUtils.CHECK_SKILL = {
 
     -- 火墙
     [SKILL_ID_HuoQiang] = function(targetID)
+        local skillID = SKILL_ID_HuoQiang
+        local ret = GUIFunction:CheckSkillAbleToLaunch(skillID)
+        if ret ~= 1 then
+            return nil
+        end
+
         if not targetID or not SL:GetValue("ACTOR_IS_VALID", targetID) then
             return nil
         end
-        local skillID = SKILL_ID_HuoQiang
         -- check fire is existed
         local dstX = SL:GetValue("ACTOR_MAP_X", targetID)
         local dstY = SL:GetValue("ACTOR_MAP_Y", targetID)
@@ -234,7 +239,7 @@ SkillUtils.CHECK_SKILL = {
         -- check launchTime
         local lastLaunchTime = SL:GetValue("SKILL_CUSTOM_DATA", skillID)
         local currTime = os.time()
-        if lastLaunchTime and currTime - lastLaunchTime < 3 then
+        if lastLaunchTime and currTime - lastLaunchTime < 2 then
             return nil
         end
         SL:SetValue("SKILL_CUSTOM_DATA", skillID, currTime)

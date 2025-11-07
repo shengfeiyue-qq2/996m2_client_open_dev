@@ -36,6 +36,7 @@ function MainDig.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_MONSTER_DIE, "MainDig", MainDig.OnActorMonsterDie)
     SL:RegisterLUAEvent(LUA_EVENT_NET_PLAYER_DIE, "MainDig", MainDig.OnActorPlayerDie)
     SL:RegisterLUAEvent(LUA_EVENT_PLAYER_ACTION_BEGIN, "MainDig", MainDig.OnPlayerActorBegin)
+    SL:RegisterLUAEvent(LUA_EVENT_WINDOW_CHANGE, "MainDig", MainDig.OnWindowChange)
 end
 
 function MainDig.OnDig(sender, eventType)
@@ -130,6 +131,10 @@ function MainDig.OnPlayerActorBegin(data)
     end
 
     MainDig.CheckDigAble()
+end
+
+function MainDig.OnWindowChange()
+    GUI:setPositionX(MainDig._root, SL:GetValue("SCREEN_WIDTH") / 2)
 end
 
 MainDig.main()

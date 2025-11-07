@@ -34,7 +34,7 @@ function CompoundItemData.LoadConfig()
     local config = {}
     local filePath = "scripts/game_config/cfg_makeitems.lua"
     if SL:IsFileExist(filePath) then
-        config = SL:Require(filePath)
+        config = SL:RequireFile(filePath)
     end
 
     for k, item in pairs(config) do
@@ -160,6 +160,17 @@ function CompoundItemData.LoadConfig()
             end
         end
     end
+end
+
+function CompoundItemData.ReloadConfig()
+    CompoundItemData._config = {}
+    CompoundItemData._pageNameList = {}
+    CompoundItemData._showItemList = {}
+    CompoundItemData._materialNeedList = {}
+    CompoundItemData._moneyNeedList = {}
+    CompoundItemData._effectList = {}
+
+    CompoundItemData.LoadConfig()
 end
 
 -- 获取配置数据

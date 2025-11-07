@@ -187,11 +187,8 @@ function PlayerBestRing.RegisterMouseEvent()
         data.pos = touchPos
         data.equipPos = getItemBagEmptyPos(touchPos)
 
-        if isPC then
-            SL:ScheduleOnce(function () SL:ItemMoveCheck(data) end, GUIDefine.CLICK_DOUBLE_TIME)
-        else
-            SL:ItemMoveCheck(data)
-        end
+        SL:ItemMoveCheck(data)
+
         return 1
     end
 

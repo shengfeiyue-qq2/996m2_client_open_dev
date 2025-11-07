@@ -6,6 +6,8 @@ AuctionWorld.Group1CellColorNormal = "#6c6861"                      -- 左侧页
 AuctionWorld.FilterPriceArrowUp    = "res/public/btn_szjm_01_3.png" -- 筛选价格向上箭头图片
 AuctionWorld.FilterPriceArrowDown  = "res/public/btn_szjm_01_4.png" -- 筛选价格向上箭头图片
 
+local isFixedPrice = true   --是否一口价价格
+
 function AuctionWorld.main()
     local data = GUI:GetLayerOpenParam()
     local parent = data.parent
@@ -52,6 +54,13 @@ function AuctionWorld.main()
             name  = "价格",
         },
     }
+
+    -- 一口价开关
+    if isFixedPrice then
+        -- 竞价1 2   一口价 3 4
+        AuctionWorld.filter_price[1].iValue = 3
+        AuctionWorld.filter_price[2].iValue = 4
+    end
 
     AuctionWorld._source            = data.data or 0 -- 0.世界拍卖 1.行会拍卖
     AuctionWorld._items             = {}
@@ -252,6 +261,12 @@ function AuctionWorld.PullItemList()
         f4  = currency,
         f5  = AuctionWorld._filter[5],
     }
+
+    local priceFilter = AuctionWorld.filter_price[AuctionWorld._filter[5]]
+    if priceFilter and priceFilter.iValue then
+        filterSrv.f5 = priceFilter.iValue
+    end
+
     if AuctionWorld._filter[1] == 1 and AuctionWorld._source == 0 then
         filterSrv.f6 = AuctionWorld._IsSearchItem
     else

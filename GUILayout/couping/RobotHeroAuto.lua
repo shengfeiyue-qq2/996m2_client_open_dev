@@ -336,7 +336,8 @@ end
 function RobotHeroAuto.AutoUseItem(items, isHpProtect)
     for _, itemIndex in ipairs(items) do
         repeat
-            if SL:GetValue("ITEM_IS_CITY_STONE", itemIndex) or SL:GetValue("ITEM_IS_RAND_STONE", itemIndex) then 
+            -- 回城石和随机石、特殊设定的回城/随机道具
+            if SL:GetValue("ITEM_IS_CITY_STONE", itemIndex) or SL:GetValue("ITEM_IS_RAND_STONE", itemIndex) or SL:GetValue("ITEM_IS_CUSTOM_CITY_OR_RAND", itemIndex) then
                 if SL:GetValue("MAP_IS_IN_SAFE_AREA") then -- 安全区不使用
                     break
                 end

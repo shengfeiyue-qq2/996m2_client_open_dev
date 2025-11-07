@@ -24,7 +24,7 @@ function ActorHud.InitConfig()
     if ActorHud._isWin32 then
         ActorHud._useBmpFont = SL:GetValue("GAME_DATA", "HudNotUseBmpFont") ~= 1 
     else
-        ActorHud._useBmpFont = SL:GetMetaValue("GAME_DATA", "MobileHudUseBmpFont") == 1
+        ActorHud._useBmpFont = SL:GetValue("GAME_DATA", "MobileHudUseBmpFont") == 1
     end
     if ActorHud._useBmpFont then 
         ActorHud._fontPath = GUI.PATH_BMP_FONT

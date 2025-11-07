@@ -7,7 +7,7 @@ function AuctionData.Init()
 end
 
 function AuctionData.InitConfigType()
-    AuctionData._config_type = SL:Require("game_config/cfg_auction_type")
+    AuctionData._config_type = SL:RequireFile("game_config/cfg_auction_type")
 end
 
 function AuctionData.GetCTypeByID(id)

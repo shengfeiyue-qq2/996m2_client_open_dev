@@ -430,8 +430,10 @@ end
 
 -- 额外的装备位置
 function HeroEquip.InitEquipCells()
-    -- 请求通知脚本查看uid的珍宝
-    SL:RequestLookZhenBao(SL:GetValue("HERO_ID"))
+    -- 请求查看英雄的珍宝
+    if SL:GetValue("HERO_ID") then
+        SL:RequestLookZhenBao(SL:GetValue("HERO_ID"))
+    end
     
     local showExtra = SL:GetValue("SERVER_OPTION", SW_KEY_EQUIP_EXTRA_POS) == 1
     if showExtra then

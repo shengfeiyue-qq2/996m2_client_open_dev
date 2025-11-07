@@ -34,6 +34,34 @@ function ui.init(parent)
 	GUI:setTouchEnabled(Panel_pos18, true)
 	GUI:setTag(Panel_pos18, 31)
 
+	-- Create Panel_pos21
+	local Panel_pos21 = GUI:Layout_Create(EquipUI, "Panel_pos21", 174.00, 322.00, 50.00, 50.00, false)
+	GUI:setChineseName(Panel_pos21, "玩家时装_头盔位置")
+	GUI:setAnchorPoint(Panel_pos21, 0.50, 0.50)
+	GUI:setTouchEnabled(Panel_pos21, true)
+	GUI:setTag(Panel_pos21, 33)
+
+	-- Create PanelBg
+	local PanelBg = GUI:Image_Create(Panel_pos21, "PanelBg", 25.00, 25.00, "res/private/player_main_layer_ui/player_main_layer_ui_mobile/icon_chenghd_03.png")
+	GUI:Image_setScale9Slice(PanelBg, 17, 17, 16, 14)
+	GUI:setContentSize(PanelBg, 52, 52)
+	GUI:setIgnoreContentAdaptWithSize(PanelBg, false)
+	GUI:setChineseName(PanelBg, "玩家时装_头盔_物品框")
+	GUI:setAnchorPoint(PanelBg, 0.50, 0.50)
+	GUI:setTouchEnabled(PanelBg, false)
+	GUI:setTag(PanelBg, 50)
+	GUI:setVisible(PanelBg, false)
+
+	-- Create DefaultIcon
+	local DefaultIcon = GUI:Image_Create(Panel_pos21, "DefaultIcon", 25.00, 25.00, "res/private/gui_edit/ImageFile.png")
+	GUI:setContentSize(DefaultIcon, 47, 37)
+	GUI:setIgnoreContentAdaptWithSize(DefaultIcon, false)
+	GUI:setChineseName(DefaultIcon, "玩家时装_头盔_图标")
+	GUI:setAnchorPoint(DefaultIcon, 0.50, 0.50)
+	GUI:setTouchEnabled(DefaultIcon, false)
+	GUI:setTag(DefaultIcon, 72)
+	GUI:setVisible(DefaultIcon, false)
+
 	-- Create Panel_pos19
 	local Panel_pos19 = GUI:Layout_Create(EquipUI, "Panel_pos19", 174.00, 322.00, 50.00, 50.00, false)
 	GUI:setChineseName(Panel_pos19, "玩家时装_斗笠位置")
@@ -62,33 +90,12 @@ function ui.init(parent)
 	GUI:setTag(DefaultIcon, 72)
 	GUI:setVisible(DefaultIcon, false)
 
-	-- Create Panel_pos21
-	local Panel_pos21 = GUI:Layout_Create(EquipUI, "Panel_pos21", 174.00, 322.00, 50.00, 50.00, false)
-	GUI:setChineseName(Panel_pos21, "玩家时装_头盔位置")
-	GUI:setAnchorPoint(Panel_pos21, 0.50, 0.50)
-	GUI:setTouchEnabled(Panel_pos21, true)
-	GUI:setTag(Panel_pos21, 33)
-
-	-- Create PanelBg
-	local PanelBg = GUI:Image_Create(Panel_pos21, "PanelBg", 25.00, 25.00, "res/private/player_main_layer_ui/player_main_layer_ui_mobile/icon_chenghd_03.png")
-	GUI:Image_setScale9Slice(PanelBg, 17, 17, 16, 14)
-	GUI:setContentSize(PanelBg, 52, 52)
-	GUI:setIgnoreContentAdaptWithSize(PanelBg, false)
-	GUI:setChineseName(PanelBg, "玩家时装_头盔_物品框")
-	GUI:setAnchorPoint(PanelBg, 0.50, 0.50)
-	GUI:setTouchEnabled(PanelBg, false)
-	GUI:setTag(PanelBg, 50)
-	GUI:setVisible(PanelBg, false)
-
-	-- Create DefaultIcon
-	local DefaultIcon = GUI:Image_Create(Panel_pos21, "DefaultIcon", 25.00, 25.00, "res/private/gui_edit/ImageFile.png")
-	GUI:setContentSize(DefaultIcon, 47, 37)
-	GUI:setIgnoreContentAdaptWithSize(DefaultIcon, false)
-	GUI:setChineseName(DefaultIcon, "玩家时装_头盔_图标")
-	GUI:setAnchorPoint(DefaultIcon, 0.50, 0.50)
-	GUI:setTouchEnabled(DefaultIcon, false)
-	GUI:setTag(DefaultIcon, 72)
-	GUI:setVisible(DefaultIcon, false)
+	-- Create Panel_pos46
+	local Panel_pos46 = GUI:Layout_Create(EquipUI, "Panel_pos46", 174.00, 322.00, 50.00, 50.00, false)
+	GUI:setChineseName(Panel_pos46, "玩家时装_面巾位置")
+	GUI:setAnchorPoint(Panel_pos46, 0.50, 0.50)
+	GUI:setTouchEnabled(Panel_pos46, true)
+	GUI:setTag(Panel_pos46, 33)
 
 	-- Create Node_playerModel
 	local Node_playerModel = GUI:Node_Create(EquipUI, "Node_playerModel", 174.00, 219.00)

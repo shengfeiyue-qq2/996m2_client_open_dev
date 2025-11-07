@@ -35,6 +35,10 @@ function TitleTips.main()
     end
 
     TitleTips.InitUI(data)
+
+    SL:RegisterLUAEvent(LUA_EVENT_USERINPUT_EVENT_NOTICE, "TitleTips", function()
+        GUI:Win_Close(parent)
+    end, parent)
 end
 
 function TitleTips.InitUI(data)
@@ -54,7 +58,7 @@ function TitleTips.CreateItemPanel(data)
     local width = 420
     local tips = GUI:Layout_Create(TitleTips._panel,"Layout_Tips", 0, 0, 135, 173, false)
     GUI:Layout_setBackGroundImage(tips, GUIDefine.PATH_RES_PRIVATE .. "item_tips/bg_tipszy_05.png")
-    GUI:Layout_setBackGroundImageScale9Slice(tips, 44, 44, 57, 57)
+    GUI:Layout_setBackGroundImageScale9Slice(tips, 16, 16, 16, 16)
     GUI:setAnchorPoint(tips,0, 0)
     local listView = GUI:ListView_Create(tips,"PlayerListView", 10, 10, 0, 0, 1)
     GUI:ListView_setClippingEnabled(listView,true)

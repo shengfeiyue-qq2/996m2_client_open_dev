@@ -1242,6 +1242,12 @@ function MainProperty.OnDelQuitTimeTips()
 end
 ---------------------------------------------------------------------------------------------
 
+---------------------------- 窗体尺寸改变 ----------------------------------------------------
+function MainProperty.OnWindowChange()
+    GUI:setPositionX(MainProperty._root, SL:GetValue("SCREEN_WIDTH") / 2)
+end
+---------------------------------------------------------------------------------------------
+
 ------------------------------ 注册事件 ------------------------------------------------------
 function MainProperty.RegisterEvent(...)
     -- 气泡相关
@@ -1286,6 +1292,7 @@ function MainProperty.RegisterEvent(...)
 
     SL:RegisterLUAEvent(LUA_EVENT_MAIN_CHAT_EX_CLEAR, "MainProperty", MainProperty.OnChatExClear)
     SL:RegisterLUAEvent(LUA_EVENT_CHAT_MOBILE_AUTO_SHOUT, "MainProperty", MainProperty.OnChatAutoShout)
+    SL:RegisterLUAEvent(LUA_EVENT_WINDOW_CHANGE, "MainProperty", MainProperty.OnWindowChange)
 end
 ----------------------------------------------------------------------------------------------
 

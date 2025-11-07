@@ -952,6 +952,23 @@ function MainProperty.SendChatMsg(msg, channelID)
                 return SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
             end
 
+            if SL:GetValue("GAME_DATA", "OpenChatSensitiveTips") == 1 then
+                if not state then
+                    SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
+                    return
+                end
+    
+                if risk_param and risk_param ~= 0 then
+                    SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
+                    return
+                end
+
+                if ext_param and ext_param.status and ext_param.status ~= 0 then
+                    SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
+                    return
+                end
+            end
+
             if targetName then
                 str = string.format("/%s %s", targetName, str)
             end
@@ -970,8 +987,11 @@ function MainProperty.SendChatMsg(msg, channelID)
             end
             msg = content
         end
-    
-        SL:RequestCheckSensitiveWord(msg, 2, handle_Func, data)
+        if SL:GetValue("GAME_DATA", "OpenChatSensitiveTips") == 1 then
+            SL:RequestCheckChatIsHaveSensitive(msg, handle_Func, data)
+        else
+            SL:RequestCheckSensitiveWord(msg, 2, handle_Func, data)
+        end
     else
         toSendMsg(msg)
     end
@@ -2118,7 +2138,6 @@ end
 ---------------------------- 窗体尺寸改变 ----------------------------------------------------
 function MainProperty.OnWindowChange()
     MainProperty.InitAdapet()
-    GUI:setPositionX(MainProperty._root, SL:GetValue("SCREEN_WIDTH") / 2)
 end
 ---------------------------------------------------------------------------------------------
 -- 更新恢复聊天框未聚焦状态:  关闭Keyboard

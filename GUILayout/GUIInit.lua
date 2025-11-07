@@ -706,6 +706,8 @@ SL:RegisterLUAEvent(LUA_EVENT_NPC_STORE_BUY_RESULT_FAIL, "GUIInit", function (ms
             str = "您没有足够的钱来购买此物品."
         elseif msg == 1 then
             str = "此物品被卖出."
+        elseif msg == 4 then
+            str = "无法购买，你的背包负重已满."
         end
 
         local data   = {}
@@ -993,7 +995,7 @@ SL:RegisterLUAEvent(LUA_EVENT_ENTER_WORLD, "GUIInit_KeyBoard", function()
         local function releaseCB()
             SL:ClearLaunchFirstSkill()
         end
-        GUI:addKeyboardEvent(string.format("KEY_F%s", i), pressedCB, releaseCB, 0.1)
+        GUI:addKeyboardEvent(string.format("KEY_F%s", i), pressedCB, releaseCB, 0.001)
     end
 
     -- CTRL+F1 - CTRL+F8 技能
@@ -1020,7 +1022,7 @@ SL:RegisterLUAEvent(LUA_EVENT_ENTER_WORLD, "GUIInit_KeyBoard", function()
             SL:ClearLaunchFirstSkill()
         end
         local codeKeys = {"KEY_CTRL", string.format("KEY_F%s", i)}
-        GUI:addKeyboardEvent(codeKeys, pressedCB, releaseCB, 0.1)
+        GUI:addKeyboardEvent(codeKeys, pressedCB, releaseCB, 0.001)
     end
 
     -- 1-6 使用物品
@@ -1775,6 +1777,8 @@ local UnableLaunchTips = {
     [-6]    = "此地图无法执行该操作",
     [-12]   = "您的内力值不足",
 }
+local unableLaunchTipsRet = nil
+local unableLaunchTipsScheduleID = nil 
 -- 处理玩家自主释放技能 （如: 主界面技能按钮 / PC快捷键）
 SL:RegisterLUAEvent(LUA_EVENT_USER_INPUT_LAUNCH_SKILL , "GUIInit", function(data)
     if not _initedWorld then
@@ -1812,8 +1816,20 @@ SL:RegisterLUAEvent(LUA_EVENT_USER_INPUT_LAUNCH_SKILL , "GUIInit", function(data
     -- unable tips
     local ret, param = GUIFunction:CheckSkillAbleToLaunch(skillID, true)
     if UnableLaunchTips[ret] then
-        SL:ShowSystemTips(UnableLaunchTips[ret])
-        SL:Print("CheckAbleToLaunch:" .. ret, skillID)
+        if unableLaunchTipsRet ~= ret then
+            SL:ShowSystemTips(UnableLaunchTips[ret])
+            SL:Print("CheckAbleToLaunch:" .. ret, skillID)
+
+            unableLaunchTipsRet = ret 
+            if unableLaunchTipsScheduleID then
+                SL:Unschedule(unableLaunchTipsScheduleID)
+                unableLaunchTipsScheduleID = nil
+            end
+            unableLaunchTipsScheduleID = SL:ScheduleOnce(function()
+                unableLaunchTipsScheduleID = nil
+                unableLaunchTipsRet = nil
+            end, 0.5)
+        end
     end
     
     -- 1.check launch

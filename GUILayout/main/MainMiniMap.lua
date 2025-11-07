@@ -43,8 +43,7 @@ function MainMiniMap.main()
         return false
     end
 
-    local _, rect = SL:GetValue("NOTCH_PHONE_INFO")
-    GUI:setPosition(MainMiniMap._root, rect.width, SL:GetValue("SCREEN_HEIGHT") - 30)
+    MainMiniMap.InitAdapet()
 
     MainMiniMap._Image_minimap = MainMiniMap._ui["Image_minimap"]
     MainMiniMap._miniScaleX = GUI:getScaleX(MainMiniMap._Image_minimap)
@@ -100,6 +99,11 @@ function MainMiniMap.main()
     MainMiniMap._VARHangNode = MainMiniMap._ui["Node"]
 end
 
+function MainMiniMap.InitAdapet()
+    local _, rect = SL:GetValue("NOTCH_PHONE_INFO")
+    GUI:setPosition(MainMiniMap._root, rect.width, SL:GetValue("SCREEN_HEIGHT") - 30)
+end
+
 function MainMiniMap.InitCustomPKMode()
     local typeList = SL:GetValue("RELATION_TYPE_LIST")
     if typeList and next(typeList) then
@@ -110,6 +114,10 @@ function MainMiniMap.InitCustomPKMode()
         end
     end
 end
+
+function MainMiniMap.OnWindowChange()
+    MainMiniMap.InitAdapet()
+end 
 
 function MainMiniMap.RegisterEvent()
     -- PK模式改变
@@ -154,6 +162,8 @@ function MainMiniMap.RegisterEvent()
 
     -- 释放内存
     SL:RegisterLUAEvent(LUA_EVENT_GAME_MEMORY_RELEASE, "MainMiniMap", MainMiniMap.OnReleaseMemory)
+
+    SL:RegisterLUAEvent(LUA_EVENT_WINDOW_CHANGE, "MainMiniMap", MainMiniMap.OnWindowChange)
 end
 
 function MainMiniMap.OnChangeScene()

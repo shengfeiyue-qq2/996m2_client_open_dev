@@ -120,7 +120,7 @@ end
 
 function MainMiniMap.InitMouseEvent()
     GUI:addMouseMoveEvent(MainMiniMap._ui["Panel_minimap"], {
-        onEnterFunc = function ()
+        onInsideFunc = function()
             if MainMiniMap._curStatus == 1 or MainMiniMap._curStatus == 2 then
                 local isEnable = MainMiniMap.IsEnableMiniMap()
                 if not isEnable then
@@ -138,8 +138,8 @@ function MainMiniMap.InitMouseEvent()
                     return nil
                 end
                 
-                local mmapPosX  = (nodePos.x / minimapSize.width) * sliceRows
-                local mmapPosY  = (1 - (nodePos.y / minimapSize.height)) * sliceCols
+                local mmapPosX  = (nodePos.x / minimapSize.width) * sliceCols
+                local mmapPosY  = (1 - (nodePos.y / minimapSize.height)) * sliceRows
                 GUI:Text_setString(MainMiniMap._ui["Text_mouse_pos"], string.format("%s:%s", math.floor(mmapPosX), math.floor(mmapPosY)))
             end
         end,

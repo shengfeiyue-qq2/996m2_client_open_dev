@@ -399,10 +399,10 @@ GUIDefine.EquipAllShow = {
 
 -- 用于装备界面中一个部位可以实现穿戴多个部位， 纯显示上
 local Helmets = {
-    EquipPosUI.Equip_Type_Cap, EquipPosUI.Equip_Type_Helmet, EquipPosUI.Equip_Type_Veil
+    EquipPosUI.Equip_Type_Veil, EquipPosUI.Equip_Type_Cap, EquipPosUI.Equip_Type_Helmet
 }
 local SuperHelmets = {
-    EquipPosUI.Equip_Type_Super_Cap, EquipPosUI.Equip_Type_Super_Helmet, EquipPosUI.Equip_Type_Super_Veil
+    EquipPosUI.Equip_Type_Super_Veil, EquipPosUI.Equip_Type_Super_Cap, EquipPosUI.Equip_Type_Super_Helmet
 }
 GUIDefine.EquipPosMappingEx = {
     [EquipPosUI.Equip_Type_Cap]          = Helmets,

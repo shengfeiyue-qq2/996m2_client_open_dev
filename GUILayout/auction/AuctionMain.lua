@@ -196,10 +196,10 @@ function AuctionMain.OnClose(UID)
 end
 
 function AuctionMain.InitSearchPanel()
-    local function Confirm_Search( )
+    local function Confirm_Search()
         local itemName = GUI:Text_getString(AuctionMain._ui.SearchInput)
         if string.len(itemName) < 1 then
-            return ShowSystemTips("输入的内容不能为空")
+            return SL:ShowSystemTips("输入的内容不能为空")
         end
         SL:onLUAEvent(LUA_EVENT_AUCTION_WORLD_ITEM_SEARCH, itemName)
     end
@@ -209,7 +209,7 @@ function AuctionMain.InitSearchPanel()
             GUI:TextInput_setString(AuctionMain._ui.SearchInput, "")
         elseif eventType == GUIDefine.TextInputEventType.CHANGE then
             local str = GUI:TextInput_getString(sender)
-            if sender.closeKeyboard and string.find(str, "\n") then
+            if string.find(str, "\n") then
                 GUI:TextInput_closeInput(sender)
                 GUI:TextInput_setString(sender, string.trim(str))
                 SL:scheduleOnce(AuctionMain._ui.SearchInput, function() Confirm_Search() end, 0.01)
