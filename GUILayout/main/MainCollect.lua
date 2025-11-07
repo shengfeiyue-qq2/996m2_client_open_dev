@@ -87,7 +87,7 @@ function MainCollect.CollectShow(collections)
                 collectionID = nil
             end
             local index = GUI:ListView_getItemIndex(MainCollect._list, item)
-            GUI:ListView_removeItemByIndex(index)
+            GUI:ListView_removeItemByIndex(MainCollect._list, index)
         end
     end
 
