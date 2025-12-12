@@ -235,7 +235,7 @@ function Chat.InitUI()
     GUI:ListView_addOnScrollEvent(ChatInfo._ui.ListView_cells, function(_, eventType)
         if eventType == GUIDefine.ScrollEventType.CONTAINER_MOVED or eventType == GUIDefine.ScrollEventType.AUTOSCROLL_ENDED then
             local innerPos = GUI:ListView_getInnerContainerPosition(ChatInfo._ui.ListView_cells)
-            if innerPos == 0 and ChatInfo._isScrolling then
+            if innerPos.y == 0 and ChatInfo._isScrolling then
                 ChatInfo._isScrolling = false
                 Chat.ShowCacheItems()
             end

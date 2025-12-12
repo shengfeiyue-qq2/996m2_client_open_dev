@@ -169,7 +169,7 @@ function HeroSuperEquip.OnDoubleEvent(pos)
     end
 
     -- 卸下装备
-    SL:RequestTakeOffEquip({itemData = itemData})
+    SL:RequestHeroTakeOffEquip({itemData = itemData})
 end
 
 function HeroSuperEquip.UpdateMoveState(widget, state, pos)

@@ -3661,8 +3661,8 @@ function GUIFunction:CheckLaunchLockSkill()
             SharedInputLaunchData.destPosX = destPosX
             SharedInputLaunchData.destPosY = destPosY
             SL:InputLaunch(SharedInputLaunchData)
+            return true
         end
-        return true
     end
     return false
 end

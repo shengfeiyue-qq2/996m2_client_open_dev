@@ -1865,3 +1865,12 @@ SL:RegisterLUAEvent(LUA_EVENT_USER_INPUT_LAUNCH_SKILL , "GUIInit", function(data
         end
     end
 end)
+
+-----------------------------------------------------------------------------
+-- 宝箱 [未开宝箱界面时]
+-- 监听宝箱数据刷新
+SL:RegisterLUAEvent(LUA_EVENT_TREASUREBOX_DATA_REFRESH, "GUIInit", function(data)
+    if not GUI:GetWindow(nil, UIConst.LAYERID.TreasureBoxGUI) then
+        UIOperator:OpenGoldBox(data)
+    end
+end)
