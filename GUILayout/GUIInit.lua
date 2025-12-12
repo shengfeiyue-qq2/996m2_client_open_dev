@@ -77,6 +77,21 @@ SL:RegisterLUAEvent(LUA_EVENT_MAIL_NEW_NOTICE, "GUIInit", function(data)
     end)
 end)
 
+-- 监听邮件气泡改变提醒
+SL:RegisterLUAEvent(LUA_EVENT_MAIL_BUBBLE_TIPS_CHANGE, "GUIInit", function(status)
+    if status then
+        SL:AddBubbleTips(GUIDefine.BubbleType.MAIL, "res/private/main/bubble_tips/1900012564_1.png", function()
+            if tonumber(SL:GetValue("GAME_DATA", "UIOpenMethod")) == 1 then
+                SL:CheckOpenLayer(SLDefine.HyperLinkID.Mail)
+            else
+                SL:JumpTo(SLDefine.HyperLinkID.Mail)
+            end
+        end)
+    else
+        SL:DelBubbleTips(GUIDefine.BubbleType.MAIL)
+    end
+end)
+
 -----------------------------------------------------------------------------
 -- 组队
 -- 移除队伍相关特效
@@ -1880,5 +1895,14 @@ SL:RegisterLUAEvent(LUA_EVENT_USER_INPUT_LAUNCH_SKILL , "GUIInit", function(data
         else
             SL:SetValue("AUTO_LOCK_SKILLID", skillID)
         end
+    end
+end)
+
+-----------------------------------------------------------------------------
+-- 宝箱 [未开宝箱界面时]
+-- 监听宝箱数据刷新
+SL:RegisterLUAEvent(LUA_EVENT_TREASUREBOX_DATA_REFRESH, "GUIInit", function(data)
+    if not GUI:GetWindow(nil, UIConst.LAYERID.TreasureBoxGUI) then
+        UIOperator:OpenGoldBox(data)
     end
 end)

@@ -399,6 +399,10 @@ function SkillLaunch.CheckAttackRange(skillID, param)
         -- move best pos to launch
         local launchX, launchY, moveX, moveY = SkillUtils.FindBestLaunchPos(skillID, targetID, srcX, srcY, dstX, dstY)
         if srcX ~= launchX or srcY ~= launchY then
+            if SL:GetValue("IS_PC_OPER_MODE") and SL:GetValue("INPUT_MOUSE_TOUCH_POS") then   -- 有输入鼠标点击位置, 不再移动到技能最佳释放点
+                SL:ResetInputLaunchDirty()
+                return
+            end
             if srcX == moveX and srcY == moveY then
                 moveX = launchX
                 moveY = launchY

@@ -130,9 +130,26 @@ function TitleTips.CreateItemPanel(data)
     local groupIdTab = itemDescList and table.keys(itemDescList) or {}
     table.sort(groupIdTab)
     for _, groupId in ipairs(groupIdTab) do
-        local descStr = GUIFunction:GetItemDescStrByGroup(itemDescList, groupId)
+        local descStr, inLineList = GUIFunction:GetItemDescStrByGroup(itemDescList, groupId)
         if descStr and string.len(descStr) > 0 then
             local rich_desc = GUI:RichText_Create(listView, "rich_desc_" .. groupId, 0, 0, descStr, width, SL:GetValue("GAME_DATA", "DEFAULT_FONT_SIZE"), "#FFFFFF")
+        elseif inLineList and #inLineList > 0 then
+            local descWidgets = {}
+            local str = ""
+            for i = 1, #inLineList do
+                local value = inLineList[i]
+                if value ~= "line" then
+                    str = string.format("%s%s%s", str, str ~= "" and "<br>" or "", value)
+                    if i == #inLineList then
+                        local richWidget = GUI:RichText_Create(listView, string.format("rich_desc_%s_%s", groupId, i), 0, 0, str, width, SL:GetValue("GAME_DATA", "DEFAULT_FONT_SIZE"), "#FFFFFF")
+                    end
+                else
+                    local richWidget = GUI:RichText_Create(listView, string.format("rich_desc_%s_%s", groupId, i), 0, 0, str, width, SL:GetValue("GAME_DATA", "DEFAULT_FONT_SIZE"), "#FFFFFF")
+                    local lineWidget = TitleTips.CreateSplitLine()
+                    GUI:ListView_pushBackCustomItem(listView, lineWidget)
+                    str = ""
+                end
+            end
         end
     end
 
@@ -141,6 +158,16 @@ function TitleTips.CreateItemPanel(data)
     local anchorPoint, pos = TitleTips.GetTipsAnchorPoint(tips, data.pos, TitleTips._data.anchorPoint or GUI:p(0,1))
     GUI:setAnchorPoint(tips, anchorPoint)
     GUI:setPosition(tips,pos)
+end
+
+function TitleTips.CreateSplitLine(width, height)
+    width = width or 10
+    height = height or 10
+
+    local pLine = GUI:Layout_Create(-1, "PLINE", 0, 0, width, height)
+    local line = GUI:Image_Create(pLine, "line", width / 2, height / 2, "res/private/item_tips/line_tips_01.png")
+    GUI:setAnchorPoint(line, 0.5, 0.5)
+    return pLine
 end
 
 function TitleTips.GetTipsAnchorPoint(widget, pos, ancPoint)
@@ -187,6 +214,14 @@ function TitleTips.RefreshItemPosition(tips, listView)
         maxWidth = math.max(maxWidth, GUI:getContentSize(v).width)
     end
     listWidth = math.min(listWidth, maxWidth)
+    for _, v in ipairs(GUI:getChildren(listView)) do
+        if GUI:getName(v) == "PLINE" then
+            local pLineHei = GUI:getContentSize(v).height
+            GUI:setContentSize(v, listWidth, pLineHei)
+            local img = GUI:getChildByName(v, "line")
+            GUI:setPosition(img, listWidth / 2, pLineHei / 2)
+        end
+    end
 
     GUI:setContentSize(listView, listWidth, listHeight)
     

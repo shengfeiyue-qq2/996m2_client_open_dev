@@ -811,7 +811,7 @@ function Bag.GetItemBagEmptyPos(touchPos)
         return nil
     end
 
-    local indexX = math.ceil(posXInPanel / BagInfo._iHeight)
+    local indexX = math.ceil(posXInPanel / BagInfo._iWidth)
     local indexY = math.floor(posYInPanel / BagInfo._iHeight)
     local posIndex = indexY * BagInfo._col + indexX
     if posIndex > BagInfo._perPageNum then
