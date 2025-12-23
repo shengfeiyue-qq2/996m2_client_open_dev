@@ -174,7 +174,7 @@ function AuctionTimeout.main()
     local goodsItem = GUI:ItemShow_Create(Image_icon, "goodsItem", itemSize.width / 2, itemSize.height / 2, goodsInfo)
     GUI:setAnchorPoint(goodsItem, 0.5, 0.5)
     -- name
-    local itemName = SL:GetValue("ITEM_NAME", itemData.item.Index)
+    local itemName = itemData.item.Name or SL:GetValue("ITEM_NAME", itemData.item.Index)
     GUI:Text_setString(AuctionTimeout._ui["Text_name"], itemName)
     -- count
     GUI:TextInput_setString(TextField_count, itemData.item.OverLap)

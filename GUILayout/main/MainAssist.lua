@@ -759,7 +759,7 @@ function MainAssist.CreateTeamMemberCell(data)
     local userName = data.UserName
     local job      = data.Job
     local level    = data.Level
-    local isLeader = data.Rand == 1      -- 是否是队长
+    local isLeader = data.Rank == 1      -- 是否是队长
 
     -- 职业图标
     GUI:setIgnoreContentAdaptWithSize(ui["Image_job"], true)

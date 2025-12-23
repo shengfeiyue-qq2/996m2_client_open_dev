@@ -54,7 +54,7 @@ function AuctionPutout.main()
     GUI:setAnchorPoint(goodsItem, 0.5, 0.5)
 
     -- name
-    GUI:Text_setString(AuctionPutout._ui["Text_name"], SL:GetValue("ITEM_NAME", itemData.item.Index))
+    GUI:Text_setString(AuctionPutout._ui["Text_name"], itemData.item.Name or SL:GetValue("ITEM_NAME", itemData.item.Index))
 
     -- 数量
     GUI:Text_setString(AuctionPutout._ui["Text_count"], "数量：" .. (itemData.item.OverLap or 1))

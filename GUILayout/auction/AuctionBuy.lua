@@ -55,7 +55,7 @@ function AuctionBuy.main()
     GUI:setAnchorPoint(goodsItem, 0.5, 0.5)
 
     -- name
-    GUI:Text_setString(AuctionBuy._ui["Text_name"], SL:GetValue("ITEM_NAME", itemData.item.Index))
+    GUI:Text_setString(AuctionBuy._ui["Text_name"], itemData.item.Name or SL:GetValue("ITEM_NAME", itemData.item.Index))
 
     local goodsItem = GUI:ItemShow_Create(AuctionBuy._ui["Node_money"], "goodsItem", 0, 0, itemData.btType)
     GUI:setAnchorPoint(goodsItem, 0.5, 0.5)

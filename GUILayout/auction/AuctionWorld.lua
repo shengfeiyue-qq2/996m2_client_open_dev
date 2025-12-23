@@ -579,7 +579,7 @@ function AuctionWorld.CreateItemCell(parent, item)
     -- 名字
     local color = (item.Color and item.Color > 0) and item.Color
     local colorHex = color and SL:GetHexColorByStyleId(color) or SL:GetValue("ITEM_NAME_COLOR_VALUE", item.item.Index)
-    local itemName = SL:GetValue("ITEM_NAME", item.item.Index)
+    local itemName = item.item.Name or SL:GetValue("ITEM_NAME", item.item.Index)
     GUI:Text_setString(ui.Text_name, "")
     local fontSize = GUI:Text_getFontSize(ui.Text_name)
     local scrollText = GUI:ScrollText_Create(ui.Text_name, "scrollText", 0, 0,

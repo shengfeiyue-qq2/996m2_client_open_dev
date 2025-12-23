@@ -98,7 +98,7 @@ function AuctionPutList.CreatePutCell(parent, index)
         local color = (item.Color and item.Color > 0) and item.Color
         local colorHex = color and SL:GetHexColorByStyleId(color) or
         SL:GetValue("ITEM_NAME_COLOR_VALUE", item.item.Index)
-        local itemName = SL:GetValue("ITEM_NAME", item.item.Index)
+        local itemName = item.item.Name or SL:GetValue("ITEM_NAME", item.item.Index)
         GUI:Text_setString(ui.Text_name, itemName)
         GUI:Text_setTextColor(ui.Text_name, colorHex)
 

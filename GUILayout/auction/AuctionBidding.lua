@@ -54,7 +54,7 @@ function AuctionBidding.CreateItemCell(parent, data)
     -- 名字
     local color = (data.Color and data.Color > 0) and data.Color
     local colorHex = color and SL:GetHexColorByStyleId(color) or SL:GetValue("ITEM_NAME_COLOR_VALUE", data.Index)
-    local itemName = SL:GetValue("ITEM_NAME", data.item.Index)
+    local itemName = data.item.Name or SL:GetValue("ITEM_NAME", data.item.Index)
     GUI:Text_setString(ui.Text_name, "")
     local fontSize = GUI:Text_getFontSize(ui.Text_name)
     local scrollText = GUI:ScrollText_Create(ui.Text_name, "scrollText", 0, 0, 98, fontSize, colorHex, itemName)

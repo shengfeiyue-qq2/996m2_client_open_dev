@@ -93,7 +93,7 @@ function AuctionBid.main()
     local goodsItem = GUI:ItemShow_Create(Image_icon, "goodsItem", itemSize.width / 2, itemSize.height / 2, goodsInfo)
     GUI:setAnchorPoint(goodsItem, 0.5, 0.5)
     -- name
-    GUI:Text_setString(AuctionBid._ui["Text_name"], SL:GetValue("ITEM_NAME", itemData.item.Index))
+    GUI:Text_setString(AuctionBid._ui["Text_name"], itemData.item.Name or SL:GetValue("ITEM_NAME", itemData.item.Index))
 
     goodsItem = GUI:ItemShow_Create(AuctionBid._ui["Node_money1"], "goodsItem1", 0, 0, itemData.btType)
     GUI:setAnchorPoint(goodsItem, 0.5, 0.5)
