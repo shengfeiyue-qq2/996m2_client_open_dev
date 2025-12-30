@@ -930,7 +930,8 @@ function MainProperty.SendChatMsg(msg, channelID)
         local oriMsg = ext_param and ext_param.originStr
         local sensitiveWords = ext_param and ext_param.replacedWords
         local status = ext_param and ext_param.status
-        local sendData  = {textType = GUIDefine.ChatTextType.NORMAL, msg = input, channel = channelID, risk = risk_param, oriMsg = oriMsg, sensitiveWords = sensitiveWords, status = status}
+        local uid = MainProperty.TargetData and MainProperty.TargetData.uid
+        local sendData  = {textType = GUIDefine.ChatTextType.NORMAL, msg = input, channel = channelID, risk = risk_param, oriMsg = oriMsg, sensitiveWords = sensitiveWords, status = status,uid = uid}
         GUIFunction:SendChatMsg(sendData)
     end
 

@@ -2348,7 +2348,12 @@ function GUIFunction:GetChannelByChatMsg(msg)
         local findInfo = {string.find(msg, "^/.+")}
         if findInfo[1] and findInfo[2] then
             channel = GUIDefine.ChatChannel.PRIVATE
-            content = " "
+            findInfo[3] = string.sub(msg, 2, -1)
+            local fName, fContent = GUIFunction:FixPrivateChatMsgWithSpace(findInfo)
+            content = fContent .. " "
+            if fName and string.len(fName) > 0 then
+                targetName = fName
+            end
         end
     end
 
@@ -2496,7 +2501,7 @@ function GUIFunction:SendChatMsg(data)
 
             local targetName = GUIFunction:FindTargetByChatMsg(data.originMsg)
             if targetName then
-                ChatData.AddTarget({name = targetName})
+                ChatData.AddTarget({name = targetName, uid = data.uid})
             end
         end
     end
@@ -2511,7 +2516,7 @@ function GUIFunction:SendChatMsg(data)
         if data.channel == CHANNEL.PRIVATE then
             local targetName = GUIFunction:FindTargetByChatMsg(data.originMsg)
             if targetName then
-                ChatData.AddTarget({name = targetName})
+                ChatData.AddTarget({name = targetName, uid = data.uid})
             end
         end
     end
