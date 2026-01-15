@@ -1837,7 +1837,7 @@ SL:RegisterLUAEvent(LUA_EVENT_USER_INPUT_LAUNCH_SKILL , "GUIInit", function(data
 
             unableLaunchTipsRet = ret 
             if unableLaunchTipsScheduleID then
-                SL:Unschedule(unableLaunchTipsScheduleID)
+                SL:UnSchedule(unableLaunchTipsScheduleID)
                 unableLaunchTipsScheduleID = nil
             end
             unableLaunchTipsScheduleID = SL:ScheduleOnce(function()

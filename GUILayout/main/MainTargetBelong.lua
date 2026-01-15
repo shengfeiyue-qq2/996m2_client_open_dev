@@ -23,11 +23,14 @@ function MainTargetBelong.main()
     local targetID = params.targetID
 
     local root = GUI:getChildByName(parent, "Main_Target_Belong")
+
+    if root then
+        GUI:removeFromParent(root)
+        MainTargetBelong.UnRegisterEvent()
+        root = nil
+    end
+
     if not targetID then
-        if root then
-            GUI:removeFromParent(root)
-            MainTargetBelong.UnRegisterEvent()
-        end
         return false
     end
 

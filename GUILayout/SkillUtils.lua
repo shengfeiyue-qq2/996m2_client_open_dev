@@ -60,6 +60,7 @@ local AUTO_SETTING_KEY_VALUE = {
     [SKILL_ID_ShiZiHou]     = SLDefine.SETTINGID.SETTING_IDX_AUTO_SHI_ZI_HOU,       -- 自动狮子吼
     [SKILL_ID_WuLiDun]      = SLDefine.SETTINGID.SETTING_IDX_AUTO_SHIELD_OF_FORCE,  -- 自动武力盾
     [SKILL_ID_DaoLiDun]     = SLDefine.SETTINGID.SETTING_IDX_AUTO_SHIELD_OF_TAOIST, -- 自动道力盾
+    [SKILL_ID_ShuangLongZhan]= SLDefine.SETTINGID.SETTING_IDX_AUTO_DOUBLE_DRAGON_Z, -- 自动双龙斩
 }
 
 -- 内挂检测技能
@@ -80,6 +81,7 @@ local SETTING_SKILL = {
     SKILL_ID_BSQunYu,
     SKILL_ID_LieHuo,
     SKILL_ID_ShiZiHou,
+    SKILL_ID_ShuangLongZhan,
 }
 
 local sharedQuickSelTab = {}

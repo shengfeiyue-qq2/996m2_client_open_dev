@@ -97,6 +97,7 @@ function ChatData.Init()
 
     -- 是否关闭假掉落消息
     ChatData._closeFakeDrop = false
+    ChatData._fakeDropTimerID = nil
 
     ChatData._curFakeDropType = nil     -- 当前打开假掉落分类
     ChatData._fakeDropMsgTable = {}     -- 假掉落所有配置
