@@ -466,7 +466,7 @@ function Mail.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_MAIL_LIST_REFRESH, "Mail", Mail.RefreshMailList)
     SL:RegisterLUAEvent(LUA_EVENT_MAIL_DELETE_ALL_READ, "Mail", Mail.OnDeleteAllRead)
     SL:RegisterLUAEvent(LUA_EVENT_MAIL_UPDATE_ALL, "Mail", Mail.OnUpdateAll)
-    SL:RegisterLUAEvent(LUA_EVENT_MAIL_UPDATE, "Mail", Mail.RefreshMailList)
+    SL:RegisterLUAEvent(LUA_EVENT_MAIL_UPDATE, "Mail", Mail.OnUpdateOne)
     SL:RegisterLUAEvent(LUA_EVENT_MAIL_DELETE, "Mail", Mail.DelOneMail)
     SL:RegisterLUAEvent(LUA_EVENT_SOCIAL_MAIL_LAYER_CLOSE, "Mail", Mail.OnClose)
 end
