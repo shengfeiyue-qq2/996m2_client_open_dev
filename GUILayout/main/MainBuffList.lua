@@ -132,6 +132,27 @@ function MainBuffList.CreateBuffCell(data, parent)
 
     local layout = GUI:Layout_Create(parent or -1, "cell_panel", 0, 0, cellWid, cellHei)
     
+    local tips = data and data.tips
+    if tips and string.len(tips) > 0 then
+        GUI:setTouchEnabled(layout, true)
+        GUI:addOnClickEvent(layout, function(sender)
+            if not tips then
+                return
+            end
+            
+            local pos = GUI:getTouchEndPosition(sender)
+            local str = (data.name or "") .. "\\" .. tips
+            str = string.gsub(str, "%^", "\\")
+            local openData = {
+                str         = str,
+                worldPos    = pos,
+                width       = 400,
+                anchorPoint = MainBuffList._tipDir and MainBuffList._anchorP[MainBuffList._tipDir + 1] or GUI:p(0, 0)
+            }
+            UIOperator:OpenCommonDescTipsUI(openData)
+        end)
+    end
+
     MainBuffList.UpdateBuffCell(layout, data)
 
     return layout
@@ -168,24 +189,6 @@ function MainBuffList.UpdateBuffCell(layout, data)
     local olText = GUI:getChildByName(icon, "olText") or GUI:Text_Create(icon, "olText", iconS.width + offsetX, iconS.height + offsetY, fontSize, fontColor, "")
     GUI:setAnchorPoint(olText, 1, 1)
     GUI:Text_enableOutline(olText, "#000000", 1)
-
-    -- tips
-    local tips = data.tips
-    if tips and string.len(tips) > 0 then 
-        GUI:setTouchEnabled(layout, true)
-        GUI:addOnClickEvent(layout, function(sender)
-            local pos = GUI:getTouchEndPosition(sender)
-            local str = (data.name or "") .. "\\" .. tips
-            str = string.gsub(str, "%^", "\\")
-            local openData = {
-                str         = str,
-                worldPos    = pos,
-                width       = 400,
-                anchorPoint = MainBuffList._tipDir and MainBuffList._anchorP[MainBuffList._tipDir + 1] or GUI:p(0, 0)
-            }
-            UIOperator:OpenCommonDescTipsUI(openData)
-        end)
-    end
 
     GUI:setVisible(timeText, false)
     GUI:setVisible(olText, false)
