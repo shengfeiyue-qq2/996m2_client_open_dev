@@ -182,6 +182,8 @@ function ItemTips.main()
     SL:RegisterLUAEvent(LUA_EVENT_USERINPUT_EVENT_NOTICE, "ItemTips", function ()
         GUI:Win_Close(parent)
     end)
+   --注册监听道具时间刷新
+    SL:RegisterLUAEvent(LUA_EVENT_BAG_UPDATE_ITEM_TIME, "ItemTips", ItemTips.UpdateItemTime)
 end
 
 function ItemTips.InitTips()
@@ -2735,6 +2737,9 @@ function ItemTips.CreateEquipPanel(data, itemData, isWear, panelInsertIndex)
     GUI:setPosition(tipsLayout, 0, 0)
     GUI:setAnchorPoint(tipsLayout, 0, 1)
     GUI:setTouchEnabled(tipsLayout, false)
+    if itemData and itemData.MakeIndex then
+        GUI:setStrTag(tipsLayout, itemData.MakeIndex)
+    end
 
     local index = tonumber(panelInsertIndex) and (tonumber(panelInsertIndex) + 1) or 1
     table.insert(ItemTips._panelSortItems, index, tipsLayout)
@@ -2871,6 +2876,9 @@ function ItemTips.CreateItemPanel(data, itemData)
     GUI:setPosition(tipsLayout, 0, 0)
     GUI:setAnchorPoint(tipsLayout, 0, 0)
     GUI:setTouchEnabled(tipsLayout, false)
+    if itemData and itemData.MakeIndex then
+        GUI:setStrTag(tipsLayout, itemData.MakeIndex)
+    end
 
     local cellView = GUI:ListView_Create(tipsLayout, "cellView", 0, 0, 0, 0, 1)
     GUI:setTouchEnabled(cellView, false)
@@ -3058,6 +3066,95 @@ function ItemTips.RefreshBtnPosition(tipsLayout)
         end
     end
 
+end
+
+------------    限时道具刷新    ------------------------------------------------
+function ItemTips.UpdateItemTime(eventData)
+    if not eventData or not eventData.data then
+        return
+    end
+
+    local updateData = eventData.data
+    local targetMakeIndex = updateData.makeIndex
+    local newRemainTime = updateData.limitRemainTime or 0
+
+    if not targetMakeIndex then
+        return
+    end
+
+    if newRemainTime <= 0 then
+        UIOperator:CloseItemTips()
+        return
+    end
+
+    local PList = ItemTips._PList
+    if not PList or GUI:Widget_IsNull(PList) then
+        return
+    end
+
+    local targetPanel = nil
+    for _, tipsPanel in ipairs(ItemTips._panelSortItems or {}) do
+        if tipsPanel and not GUI:Widget_IsNull(tipsPanel) and 
+           GUI:getStrTag(tipsPanel) == targetMakeIndex then
+            targetPanel = tipsPanel
+            break
+        end
+    end
+
+    if not targetPanel then
+        return
+    end
+
+    local itemData = ItemTips._data.itemData
+    if targetMakeIndex ~= (itemData and itemData.MakeIndex) then
+        if _isHero then
+            itemData = HeroEquipData.GetEquipDataByMakeIndex(targetMakeIndex)
+        else
+            itemData = EquipData.GetEquipDataByMakeIndex(targetMakeIndex)
+        end
+    end
+
+    if not itemData then
+        return
+    end
+
+    local type = isEquip(itemData) and 1 or 2
+    local newTimeStr = ItemTips.GetTimeStr(type, itemData, ItemTips._data.from, _lookPlayer) or ""
+    
+    local cellView = GUI:getChildByName(targetPanel, "cellView")
+    if not cellView or GUI:Widget_IsNull(cellView) then
+        return
+    end
+
+    local items = GUI:ListView_getItems(cellView) or {}
+    local targetCell = nil
+    local targetRichTime = nil
+
+    for _, item in ipairs(items) do
+        if item and not GUI:Widget_IsNull(item) then
+            local richTime = GUI:getChildByName(item, "rich_time")
+            if richTime and not GUI:Widget_IsNull(richTime) then
+                targetCell = item
+                targetRichTime = richTime
+                break
+            end
+        end
+    end
+
+    if not (targetCell and targetRichTime) then
+        return
+    end
+
+    GUI:removeFromParent(targetRichTime)
+    local newRichTime = GUI:RichText_Create(targetCell, "rich_time", 0, 0, newTimeStr, ItemTips._richWid, fontSize, "#28EF01", vspace, nil, fontPath
+    )
+    
+    GUI:setAnchorPoint(newRichTime, 0, 0)
+    GUI:setPosition(newRichTime, 0, 0)
+    
+    local cellSize = GUI:getContentSize(newRichTime)
+    GUI:setContentSize(targetCell, toEven(cellSize.width), toEven(cellSize.height))
+    GUI:ListView_doLayout(cellView)
 end
 
 ItemTips.main()

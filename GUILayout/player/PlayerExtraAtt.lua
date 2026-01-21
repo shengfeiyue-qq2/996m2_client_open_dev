@@ -142,6 +142,10 @@ function PlayerExtraAtt.UpdateBaseAttri()
 
     local behindList = GUIFunction:GetAttDataShow(showListBehind, nil)
 
+    if behindList[AttType.Internal_Value] then
+        behindList[AttType.Internal_Value].value = string.format("%s/%s", behindList[AttType.Internal_Value].value, SL:GetValue("MAX_ABIL_BY_ID", AttType.Internal_Value) or 0)
+    end
+
     for k, v in pairs(behindList) do
         showAttList[k] = v
     end
