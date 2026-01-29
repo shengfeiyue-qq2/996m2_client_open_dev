@@ -135,6 +135,9 @@ function MainMiniMap.RegisterEvent()
     -- 小地图下载成功
     SL:RegisterLUAEvent(LUA_EVENT_MINIMAP_DOWNLOAD_SUCCESS, "MainMiniMap", MainMiniMap.OnDownLoadSuccess)
 
+    -- 地图数据加载成功
+    SL:RegisterLUAEvent(LUA_EVENT_MAPDATA_LOAD_SUCCESS, "MainMiniMap", MainMiniMap.OnMapDataLoadSuccess)
+
     -- 人物坐标发生变化
     SL:RegisterLUAEvent(LUA_EVENT_PLAYER_MAPPOS_CHANGE, "MainMiniMap", MainMiniMap.OnActorMoveComplete)
 
@@ -230,6 +233,13 @@ end
 
 function MainMiniMap.OnActorRevive(data)
     MainMiniMap.AddActorPoint(data.actorID)
+end
+
+function MainMiniMap.OnMapDataLoadSuccess(mapID)
+    if SL:GetValue("MAP_ID") == mapID then
+        MainMiniMap.UpdatePortalShowPos()
+        MainMiniMap.UpdateMiniMapPos()
+    end
 end
 
 function MainMiniMap.SetMapInfoInDebug()
@@ -591,6 +601,25 @@ function MainMiniMap.UpdatePortal(isUpdateMap)
         MainMiniMap._markPortalIdx = nil
         GUI:Text_setString(MainMiniMap._nameText, "")
         GUI:setVisible(MainMiniMap._icon, false)
+    end
+end
+
+function MainMiniMap.UpdatePortalShowPos()
+    if not MainMiniMap._markPortalIdx then
+        return
+    end
+    
+    local showConfig = MainMiniMap._portals[MainMiniMap._markPortalIdx] or {}
+    local showName = string.gsub(showConfig.sShowName or "", "%s+", "") 
+    if string.len(showName) == 0 then 
+        return false
+    end
+    local miniMapPos = MainMiniMap.CalcMiniMapPos(tonumber(showConfig.X) or 1, tonumber(showConfig.Y) or 1)
+    if MainMiniMap._nameText then
+        GUI:setPosition(MainMiniMap._nameText, miniMapPos.x, miniMapPos.y + 13)
+    end
+    if MainMiniMap._icon then
+        GUI:setPosition(MainMiniMap._icon, miniMapPos.x, miniMapPos.y)
     end
 end
 

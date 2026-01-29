@@ -671,7 +671,7 @@ function MainNear.OnRefreshActorHP(data)
 end
 
 function MainNear.OnTargetChange(targetID)
-    local cells = MainNear._selectType == 1 and MainNear._playerCells or (MainNear._selectType == 2 and MainNear._monsterCells or (MainNear._checkHero and MainNear._heroCells))
+    local cells = MainNear._selectType == 1 and MainNear._monsterCells or (MainNear._selectType == 2 and MainNear._playerCells or (MainNear._checkHero and MainNear._heroCells))
     for k, v in pairs(cells) do
         GUI:setVisible(v["Image_target"], k == targetID)
     end

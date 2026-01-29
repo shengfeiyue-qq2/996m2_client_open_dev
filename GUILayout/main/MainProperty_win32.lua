@@ -2215,6 +2215,7 @@ function MainProperty.RegisterEvent()
     
     SL:RegisterLUAEvent(LUA_EVENT_WINDOW_CHANGE, "MainProperty", MainProperty.OnWindowChange)
     SL:RegisterLUAEvent(LUA_EVENT_MAIN_CLOSE_KEYBOARD, "MainProperty", MainProperty.OnCloseKeyBoard) 
+    SL:RegisterLUAEvent(LUA_EVENT_MAIN_PROPERTY_ON_KEY_ENTER, "MainProperty", MainProperty.handlePressedEnter)
 end
 ----------------------------------------------------------------------------------------------
 
