@@ -20,6 +20,8 @@ function CostItem:ctor(parent, data)
     end
 
     self._data = nil
+    self._itemId = nil
+    self._itemCount = nil
 
     self._ui = ui
     self._parent = parent
@@ -28,6 +30,8 @@ function CostItem:ctor(parent, data)
     self._nodeTitle = self._layoutBG:getChildByName("Node_title")
     self._nodeIcon  = self._layoutBG:getChildByName("Node_icon")
     self._nodeCount = self._layoutBG:getChildByName("Node_count")
+    self._goodsItem = nil
+    self._title     = nil
 
     GUI:setTouchEnabled(self._layoutBG, false)
 
@@ -40,19 +44,20 @@ function CostItem:Update(data)
     -- default auto size
     self._data.autoSize = ((self._data.autoSize == nil) and true or self._data.autoSize)
 
-    self:OnUpdateShow()
-end
+    self._itemId = tonumber(self._data.itemId) or 1
+    self._itemCount = tonumber(self._data.itemCount) or 1
 
-function CostItem:OnUpdateShow()
-    local id = tonumber(self._data.itemId) or 1
-    local count = tonumber(self._data.itemCount) or 1
-
-    if id == 0 and count == 0 then
+    if self._itemId == 0 and self._itemCount == 0 then
         return
     end
-    
+
+    self:OnInitShow()
+end
+
+function CostItem:OnInitShow()
+    -- item
     local goodsData = {}
-    goodsData.index = id
+    goodsData.index = self._itemId
     goodsData.count = self._data.showItemCount
     goodsData.noMouseTips = self._data.noMouseTips
     goodsData.mouseCheckTimes = self._data.mouseCheckTimes
@@ -61,6 +66,47 @@ function CostItem:OnUpdateShow()
     GUI:setAnchorPoint(goodsItem, 0.5, 0.5)
     local scale = self._data.itemScale or 0.5
     GUI:setScale(goodsItem, scale)
+    self._goodsItem = goodsItem
+
+    -- title
+    GUI:removeAllChildren(self._nodeTitle)
+    local title = nil
+    local hasTitle = not self._data or not self._data.noTitle
+    if hasTitle then
+        local fontSize = self._data.fontSize or SL:GetMetaValue("GAME_DATA","DEFAULT_FONT_SIZE") or 16
+        if self._data and self._data.titlePath then
+            title = GUI:Image_Create(self._nodeTitle, "titleImg", 0, 0, self._data.titlePath)
+        elseif self._data and self._data.titleText then
+            title = GUI:Text_Create(self._nodeTitle, "titleText", 0, 0, fontSize, self._data.titleColor or "#ffffff", self._data.titleText)
+            GUI:Text_enableOutline(title, "#111111", 1)
+        else
+            title = GUI:Text_Create(self._nodeTitle, "titleText", 0, 0, fontSize, "#ffffff", "消耗:")
+            GUI:Text_enableOutline(title, "#111111", 1)
+        end
+        GUI:setAnchorPoint(title, 0, 0.5)
+    end
+    self._title = title
+
+    if not (self._data and self._data.unTouched) then
+        -- click item tips
+        GUI:setTouchEnabled(self._layoutBG, true)
+        GUI:addOnClickEvent(self._layoutBG, function()
+            UIOperator:OpenItemTips({typeId = self._itemId, pos = GUI:getTouchEndPosition(self._layoutBG)})
+        end)
+    else
+        GUI:setTouchEnabled(self._layoutBG, false)
+    end
+    
+    self:OnUpdateShow()
+end
+
+function CostItem:OnUpdateShow()
+    local id = self._itemId
+    local count = self._itemCount
+
+    if id == 0 and count == 0 then
+        return
+    end
 
     --bOneID :cost Equivalent replacement
     local bOneID = true
@@ -69,7 +115,6 @@ function CostItem:OnUpdateShow()
     end
 
     local itemCount = SL:GetValue("ITEM_COUNT", id, bOneID)
-
     if self._data and self._data.speicalYuanBao then
         if id == MoneyType.BindYuanBao then
             itemCount = itemCount + SL:GetValue("ITEM_COUNT", MoneyType.YuanBao, false)
@@ -81,26 +126,12 @@ function CostItem:OnUpdateShow()
             itemCount = SL:GetValue("ITEM_COUNT", v, bOneID)
         end
     end
+
     local contentStr = ""
     local colorIdEnough = "#28ef01"
     local colorIdLess = "#ff0500"
-    if self._data and (self._data.cutLineData) then
-        colorIdEnough = "#28ef01"
-        colorIdLess = "#ff0500"
-    end
-
-    if not (self._data and self._data.unTouched) then
-        -- click item tips
-        GUI:setTouchEnabled(self._layoutBG, true)
-        GUI:addOnClickEvent(self._layoutBG, function()
-            UIOperator:OpenItemTips({typeId = id, pos = GUI:getTouchEndPosition(self._layoutBG)})
-        end)
-    else
-        GUI:setTouchEnabled(self._layoutBG, false)
-    end
 
     local needSimpleNum = self._data.simplenum == 1
-
     if self._data and self._data.limit then
         local countStr = count
         local itemCountStr = itemCount
@@ -174,23 +205,6 @@ function CostItem:OnUpdateShow()
     local richTextColor = "#ffffff"
     local richText = GUI:RichText_Create(self._nodeCount, "countRichText", 0, 0, contentStr, 400, fontSize, richTextColor)
     GUI:setAnchorPoint(richText, 0, 0.5)
-
-    -- title
-    GUI:removeAllChildren(self._nodeTitle)
-    local title = nil
-    local hasTitle = not self._data or not self._data.noTitle
-    if hasTitle then
-        if self._data and self._data.titlePath then
-            title = GUI:Image_Create(self._nodeTitle, "titleImg", 0, 0, self._data.titlePath)
-        elseif self._data and self._data.titleText then
-            title = GUI:Text_Create(self._nodeTitle, "titleText", 0, 0, fontSize, self._data.titleColor or "#ffffff", self._data.titleText)
-            GUI:Text_enableOutline(title, "#111111", 1)
-        else
-            title = GUI:Text_Create(self._nodeTitle, "titleText", 0, 0, fontSize, "#ffffff", "消耗:")
-            GUI:Text_enableOutline(title, "#111111", 1)
-        end
-        GUI:setAnchorPoint(title, 0, 0.5)
-    end
     
     -- calc contentSize、position again
     if self._data and self._data.autoSize then
@@ -198,9 +212,10 @@ function CostItem:OnUpdateShow()
         local dis = 1
         -- width
         local wid = 0
-        local titleWid = title and GUI:getContentSize(title).width or 0
-        local itemWid = GUI:getContentSize(goodsItem).width
+        local titleWid = self._title and GUI:getContentSize(self._title).width or 0
+        local itemWid = GUI:getContentSize(self._goodsItem).width
         local countWid = GUI:getContentSize(richText).width
+        local scale = self._data.itemScale or 0.5
         wid = wid + titleWid + dis
         wid = wid + itemWid * scale + dis
         wid = wid + countWid
