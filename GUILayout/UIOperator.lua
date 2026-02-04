@@ -1066,6 +1066,19 @@ end
 ----------------------------------------
 --开宝箱
 function UIOperator:OpenTreasure(data)
+    if GUI:GetWindow(nil, UIConst.LAYERID.TreasureBoxGUI) then
+        -- 还原背包宝箱显示
+        local boxMakeIndex = data and data.MakeIndex
+        if boxMakeIndex then
+            SL:onLUAEvent(LUA_EVENT_BAG_STATE_CHANGE, {
+                storage = {
+                    MakeIndex = boxMakeIndex,
+                    state = 1
+                }
+            })
+        end
+        return
+    end
     GUI:SetLayerOpenParam(data)
     GUI:Win_Open(UIConst.LUAFile.LUA_FILE_TREASURE_BOX)
 end

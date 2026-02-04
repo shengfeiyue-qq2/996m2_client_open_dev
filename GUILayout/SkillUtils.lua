@@ -1012,6 +1012,15 @@ SkillUtils.FindAutoLaunchSkill = function()
         return skillID, destPosX, destPosY
     end
 
+    -- 火墙
+    skillID, destPosX, destPosY = SkillUtils.CheckAbleToAutoLaunch(SKILL_ID_HuoQiang, targetID)
+    if skillID and not SkillUtils.CheckSkillBlocked(skillID, srcPosX, srcPosY, destPosX, destPosY) then
+        if not destPosX or not destPosY then
+            destPosX, destPosY = getCursorMapPos()
+        end
+        return skillID, destPosX, destPosY
+    end
+
     -- 内挂 群、单体技能
     local neighbors = SkillUtils.CheckTargetNeighbors(targetID, 1)
     local isSample = not neighbors[1]
