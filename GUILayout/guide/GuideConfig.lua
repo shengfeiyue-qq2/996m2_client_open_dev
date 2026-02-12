@@ -202,7 +202,7 @@ local config = {
         end
         if uiId == 1 or not SL:GetValue("IS_PC_OPER_MODE") then
             local nodeParent = GUI:Attach_Top()
-            if not nodeParent or GUI:getChildByName(nodeParent, "Hero_State") then
+            if not nodeParent or not GUI:getChildByName(nodeParent, "Hero_State") then
                 return nil
             end
 
@@ -211,25 +211,29 @@ local config = {
                 return nil
             end
 
-            local child = { "Image_head", "Button_state", "Button_bag", "Button_hero" }
+            local child = { "Image_head", "Button_state", "Button_bag", "btnCallHerop" }
 
             widget = getChildByKey(layer, child[tonumber(config.typeassist)])
             parent = layer
+            if not widget and tonumber(config.typeassist) == 4 then
+                widget = GUI:getChildByName(nodeParent, child[tonumber(config.typeassist)])
+                parent = nodeParent
+            end
         else
-            local nodeParent = GUI:Attach_Bottom()
-            if not nodeParent or GUI:getChildByName(nodeParent, "Main_Property") then
+            local nodeParent = GUI:Attach_Center()
+            if not nodeParent or not GUI:getChildByName(nodeParent, "Main_Property") then
                 return nil
             end
 
-            local ui = MainProperty and MainProperty._ui
-            if not ui then
+            local layer = MainProperty and MainProperty._root
+            if not layer then
                 return nil
             end
 
             local child = { "Image_head", "Button_heroinfo", "Button_herobag", "Button_herostate" }
 
-            widget = getChildByKey(ui, child[tonumber(config.typeassist)])
-            parent = ui
+            widget = getChildByKey(layer, child[tonumber(config.typeassist)])
+            parent = layer
         end
 
         if uiId < 4 then
