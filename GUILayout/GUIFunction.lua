@@ -670,16 +670,20 @@ local function GetSpecialAttrName(id)
     return strList[id]
 end
 
+-- 0: 十分比 / 1: 百分比
 local function GetAttScaleType(id)
+    -- 始终显示百分比
     local list = {
         [AttTypeTable.Health_Recover]   = 1,
         [AttTypeTable.Spell_Recover]    = 1
     }
 
+    -- 未开启属性万分比显示十分比
     if id == AttTypeTable.Anti_Magic and not SL:GetValue("SERVER_OPTION", SW_KEY_MAGIC_MISS_TYPE) then
-        return 1
+        return 0
     end
 
+    -- 未开启属性万分比显示百分比
     if (id == AttTypeTable.Anti_Posion or id == AttTypeTable.Posion_Recover) and not SL:GetValue("SERVER_OPTION", SW_KEY_ANTI_POISON_TYPE) then
         return 1
     end
@@ -763,7 +767,7 @@ local function GetAttNumShow(id, min, max, maxID, stars)
         if attNumType == 2 or attNumType == 3 then
             local percent = attNumType == 2 and 100 or 1
             local showValue = min / percent
-            if GetAttScaleType(id) then
+            if GetAttScaleType(id) == 0 then -- 显示十分比
                 showValue = showValue * 10
             end
             if attNumType == 2 then --万分比都支持小数点后两位
