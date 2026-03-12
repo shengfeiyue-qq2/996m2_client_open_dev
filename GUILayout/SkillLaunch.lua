@@ -2,6 +2,9 @@ local SkillLaunch = {}
 
 local SharedInputMoveTab = {}
 
+local checkOtherTargetPoints    = 30    -- 超出该路径限制查找其他可攻击目标
+local isFarMovePointsLimit      = 50    -- 远距离寻路路径点限制
+
 local mMax = math.max
 local mAbs = math.abs
 local function squLen(x, y)
@@ -330,7 +333,8 @@ function SkillLaunch.CheckParam5_pc(param)
     -- 魔法锁定
     if not param.targetID then
         local magicTargetID = SL:GetValue("SELECT_TARGET_ID")
-        if magicTargetID and GUIFunction:CheckLaunchEnableByID(magicTargetID) then
+        if magicTargetID and SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_MAGIC_LOCK) == 1 
+        and GUIFunction:CheckLaunchEnableByID(magicTargetID) then
             param.targetID = magicTargetID
             param.vecDstX, param.vecDstY = SL:GetValue("ACTOR_MAP_X", magicTargetID), SL:GetValue("ACTOR_MAP_Y", magicTargetID)
             param.dir   = SkillUtils.CalcLaunchDirection(param.vecDstX, param.vecDstY, param.vecSrcX, param.vecSrcY)
@@ -437,6 +441,31 @@ function SkillLaunch.CheckAttackRange(skillID, param)
                     SL:ClearInputLaunch()
 
                     SL:SetValue("SELECT_TARGET_ID", nil)
+                end
+            end
+
+            -- 目标移动路径点超出限制, 查找其他可攻击目标, 有则忽略当前目标3秒; 无则判定是否远距离寻怪
+            if pathPoints > checkOtherTargetPoints then
+                if targetID and SL:GetValue("ACTOR_IS_VALID", targetID) then
+                    local autoTarget = SL:GetValue("AUTO_TARGET")
+                    local targetIndex = autoTarget.targetIndex
+                    local targetType = autoTarget.targetType
+                    if SL:GetValue("BATTLE_IS_AUTO_FIGHT_STATE") and targetType == GUIDefine.ActorType.MONSTER 
+                      and not SL:GetValue("ACTOR_IS_PAUSE_IGNORED", targetID) and not SL:GetValue("ACTOR_IS_IGNORED", targetID) then
+                        local otherTargetID = GUIFunction:GetCurAutoFindTargetID(targetID)
+                        if otherTargetID then
+                            SL:SetValue("ACTOR_IS_IGNORED", targetID, true)
+
+                            -- clear launch data
+                            SL:SetValue("BATTLE_IS_AUTO_LOCK_STATE", false)
+                            SL:SetValue("AUTO_LOCK_SKILLID", nil)
+                            SL:ClearInputLaunch()
+                            SL:SetValue("CLEAR_CUR_MOVE")
+                            SL:SetValue("SELECT_TARGET_ID", nil)
+                        elseif pathPoints > isFarMovePointsLimit then
+                            SL:SetValue("IS_FAR_PATH_MOVE_FOR_TARGET", true)
+                        end
+                    end
                 end
             end
 

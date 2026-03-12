@@ -9,7 +9,7 @@ function ui.init(parent)
 	-- Create Panel_bg
 	local Panel_bg = GUI:Layout_Create(Node, "Panel_bg", 0.00, 0.00, 60.00, 20.00, false)
 	GUI:setChineseName(Panel_bg, "拍卖货币组合")
-	GUI:setAnchorPoint(Panel_bg, 1.00, 0.50)
+	GUI:setAnchorPoint(Panel_bg, 0.00, 0.50)
 	GUI:setTouchEnabled(Panel_bg, false)
 	GUI:setTag(Panel_bg, 49)
 
@@ -24,9 +24,9 @@ function ui.init(parent)
 	GUI:setTag(Node_item, 236)
 
 	-- Create Text_count
-	local Text_count = GUI:Text_Create(Panel_bg, "Text_count", 37.00, 10.00, 12, "#ffffff", [[666666]])
+	local Text_count = GUI:Text_Create(Panel_bg, "Text_count", 32.00, 10.00, 12, "#ffffff", [[666666]])
 	GUI:setChineseName(Text_count, "拍卖货币_数量_文本")
-	GUI:setAnchorPoint(Text_count, 0.50, 0.50)
+	GUI:setAnchorPoint(Text_count, 0.00, 0.50)
 	GUI:setTouchEnabled(Text_count, false)
 	GUI:setTag(Text_count, 53)
 	GUI:Text_enableOutline(Text_count, "#111111", 1)

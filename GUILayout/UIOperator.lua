@@ -8,10 +8,6 @@ function UIOperator:OpenMyPlayerUI(data)
 
     GUI:SetLayerOpenParam(data)
 
-    if PlayerFrame and PlayerFrame.OnClose then
-        PlayerFrame.OnClose()
-    end
-
     if GUIDefineEx.IsMergeMode then
         GUI:Win_Open(UIConst.LUAFile.LUA_FILE_MERGE_PLAYER_MAIN)
     else
@@ -1354,4 +1350,44 @@ end
 -- 关闭英雄状态选择界面
 function UIOperator:CloseHeroStateSelectUI()
     GUI:Win_CloseByID(UIConst.LAYERID.HeroStateSelectGUI)
+end
+
+
+--------------------------------------
+-- 交易所
+-- 主界面
+function UIOperator:OpenExchangeUI(data)
+    GUI:SetLayerOpenParam(data)
+    GUI:Win_Open(UIConst.LUAFile.LUA_FILE_EXCHANGE_MAIN)
+end
+
+function UIOperator:CloseExchangeUI()
+    GUI:Win_CloseByID(UIConst.LAYERID.ExchangeMainGUI)
+end
+
+-- 打开交易所物品上架界面
+function UIOperator:OpenExchangePutInUI(data)
+    GUI:SetLayerOpenParam(data)
+    GUI:Win_Open(UIConst.LUAFile.LUA_FILE_EXCHANGE_PUTIN)
+end
+
+
+-- 打开交易所物品下架界面
+function UIOperator:OpenExchangePutOutUI(data)
+    GUI:SetLayerOpenParam(data)
+    GUI:Win_Open(UIConst.LUAFile.LUA_FILE_EXCHANGE_PUTOUT)
+end
+
+function UIOperator:CloseExchangePutOutUI()
+    GUI:Win_CloseByID(UIConst.LAYERID.ExchangePutoutGUI)
+end
+
+-- 购买
+function UIOperator:OpenExchangeBuyUI(data)
+    GUI:SetLayerOpenParam(data)
+    GUI:Win_Open(UIConst.LUAFile.LUA_FILE_EXCHANGE_BUYPANEL)
+end
+
+function UIOperator:CloseExchangeBuyPanelUI()
+    GUI:Win_CloseByID(UIConst.LAYERID.ExchangeBuyPanelGUI)
 end

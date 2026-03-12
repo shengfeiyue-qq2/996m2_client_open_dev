@@ -15,6 +15,7 @@ local commonGroup = {
         SLDefine.SETTINGID.SETTING_IDX_BB_ATTACK_WITH, --宝宝跟随
         SLDefine.SETTINGID.SETTING_IDX_DU_FU_AUTOCHANGE, --毒符互换
         SLDefine.SETTINGID.SETTING_IDX_NOT_NEED_SHIFT, --免shift
+        SLDefine.SETTINGID.SETTING_IDX_TELEPORT_KEEP_TARGET, -- 瞬移锁定原目标
     },
     {
         SLDefine.SETTINGID.SETTING_IDX_EXP_IGNORE,  --经验过滤

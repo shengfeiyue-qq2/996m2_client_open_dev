@@ -77,7 +77,7 @@ function HeroEquipData.AddEquipData(item, isInit)
     end
 end
 
-function HeroEquipData.DelEquipData(item)
+function HeroEquipData.DelEquipData(item, noTakeOff)
     local makeIndex = item.MakeIndex
     local pos       = item.Where
 
@@ -86,7 +86,9 @@ function HeroEquipData.DelEquipData(item)
         return
     end
 
-    AutoUseItemData.SetTakeOffEquipMask(makeIndex)
+    if not noTakeOff then
+        AutoUseItemData.SetTakeOffEquipMask(makeIndex)
+    end
 
     -- 存储数据
     HeroEquipData._equipPosDatas[pos] = nil

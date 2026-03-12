@@ -46,7 +46,8 @@ function ProgressBar.StartProgress()
     callback()
 end
 
-function ProgressBar.OnActionBegin(actorID, act)
+function ProgressBar.OnActionBegin(data)
+    local act = data and data.act
     if GUIDefine.Action.IDLE == act then
         return false
     end

@@ -19,7 +19,7 @@ local NGOrders = {
 local equipOffset = EquipData.GetEquipModelOffSet()
 local IsPcModel   = SL:GetValue("IS_PC_OPER_MODE")
 
-local GetFileFunc = function (looks)
+local calcFileInfoByLooksID = function (looks)
     return string.format("%06d", looks % 10000), math.floor(looks / 10000)
 end
 
@@ -108,7 +108,7 @@ function UIModel.main(sex, feature, scale, params)
 
     local base = GUI:Image_Create(baseModel, "baseImg", offx, 0, "res/private/player_model/".. imgName .. ".png")
     GUI:setAnchorPoint(base, 0.5, 0.5)
-    GUI:setVisible(base, feature and feature.showNodeModel)
+    GUI:setVisible(base, (feature and feature.showNodeModel) == true)
 
     if not feature or not next(feature) then
         return baseNode
@@ -207,7 +207,7 @@ function UIModel.CreateModel(node, id, effect, name, order)
     end
 
     -- 图片
-    local fileName, pathIndex = GetFileFunc(id)
+    local fileName, pathIndex = calcFileInfoByLooksID(id)
     local offset = equipOffset[id] or {x = 0, y = 0}
     if offset and fileName then
         local path = string.format("res/player_show/player_show_%s/%s.png", pathIndex, fileName)
@@ -220,7 +220,7 @@ function UIModel.CreateModel(node, id, effect, name, order)
     if effect and effect ~= "0" and effect ~= "" then
         local effectList = SL:ParseModelEffect(effect)
         for i, v in ipairs(effectList) do
-            local anim = GUI:Effect_Create(node, "Effect_" .. name, v.offX, - v.offY, 0, v.effectId)
+            local anim = GUI:Effect_Create(node, string.format("Effect_%s_%s", name, i), v.offX, - v.offY, 0, v.effectId)
             if anim then
                 local scale = v.scale or 1
                 GUI:setScale(anim,  GUI:getScale(anim) * scale)

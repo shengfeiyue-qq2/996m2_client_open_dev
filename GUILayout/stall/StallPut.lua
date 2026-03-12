@@ -102,7 +102,7 @@ function StallPut.PutItemIntoAutoSellFromBag(MakeIndex, goldType, price)
 
         SL:StallAddItemToSell(item)
         SL:SetValue("ITEM_BELONG_BY_MAKEINDEX", MakeIndex, GUIDefine.ItemBelong.STALL)
-        SL:onLUAEvent(LUA_EVENT_STALL_SELF_ITEM_CHANGE, item)
+        SL:onLUAEvent(LUA_EVENT_STALL_SELF_ITEM_CHANGE)
     end
 end
 

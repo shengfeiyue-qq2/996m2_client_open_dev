@@ -86,16 +86,16 @@ function ui.init(parent)
 	GUI:Text_enableOutline(Text_1_0, "#000000", 1)
 
 	-- Create Text_1_1
-	local Text_1_1 = GUI:Text_Create(Panel_items, "Text_1_1", 350.00, 310.00, 12, "#ffffff", [[竞拍价格]])
-	GUI:setChineseName(Text_1_1, "拍卖_竞拍价格_文本")
+	local Text_1_1 = GUI:Text_Create(Panel_items, "Text_1_1", 276.00, 310.00, 12, "#ffffff", [[状态]])
+	GUI:setChineseName(Text_1_1, "拍卖_竞拍状态_文本")
 	GUI:setAnchorPoint(Text_1_1, 0.50, 0.50)
 	GUI:setTouchEnabled(Text_1_1, false)
 	GUI:setTag(Text_1_1, 102)
 	GUI:Text_enableOutline(Text_1_1, "#000000", 1)
 
 	-- Create Text_1_2
-	local Text_1_2 = GUI:Text_Create(Panel_items, "Text_1_2", 450.00, 310.00, 12, "#ffffff", [[一口价]])
-	GUI:setChineseName(Text_1_2, "拍卖_一口价_文本")
+	local Text_1_2 = GUI:Text_Create(Panel_items, "Text_1_2", 399.00, 310.00, 12, "#ffffff", [[价格]])
+	GUI:setChineseName(Text_1_2, "拍卖_价格_文本")
 	GUI:setAnchorPoint(Text_1_2, 0.50, 0.50)
 	GUI:setTouchEnabled(Text_1_2, false)
 	GUI:setTag(Text_1_2, 103)
@@ -124,25 +124,25 @@ function ui.init(parent)
 	GUI:setTag(Panel_filter_2, 360)
 
 	-- Create Node_filter_job
-	local Node_filter_job = GUI:Node_Create(Panel_filter_2, "Node_filter_job", 230.00, 15.00)
+	local Node_filter_job = GUI:Node_Create(Panel_filter_2, "Node_filter_job", 72.00, 15.00)
 	GUI:setChineseName(Node_filter_job, "拍卖_筛选职业_节点")
 	GUI:setAnchorPoint(Node_filter_job, 0.50, 0.50)
 	GUI:setTag(Node_filter_job, 386)
 
 	-- Create Node_filter_quality
-	local Node_filter_quality = GUI:Node_Create(Panel_filter_2, "Node_filter_quality", 330.00, 15.00)
+	local Node_filter_quality = GUI:Node_Create(Panel_filter_2, "Node_filter_quality", 172.00, 15.00)
 	GUI:setChineseName(Node_filter_quality, "拍卖_筛选品质_节点")
 	GUI:setAnchorPoint(Node_filter_quality, 0.50, 0.50)
 	GUI:setTag(Node_filter_quality, 387)
 
 	-- Create Node_filter_money
-	local Node_filter_money = GUI:Node_Create(Panel_filter_2, "Node_filter_money", 430.00, 15.00)
+	local Node_filter_money = GUI:Node_Create(Panel_filter_2, "Node_filter_money", 272.00, 15.00)
 	GUI:setChineseName(Node_filter_money, "拍卖_筛选货币_节点")
 	GUI:setAnchorPoint(Node_filter_money, 0.50, 0.50)
 	GUI:setTag(Node_filter_money, 108)
 
 	-- Create Node_filter_price
-	local Node_filter_price = GUI:Node_Create(Panel_filter_2, "Node_filter_price", 530.00, 15.00)
+	local Node_filter_price = GUI:Node_Create(Panel_filter_2, "Node_filter_price", 372.00, 15.00)
 	GUI:setChineseName(Node_filter_price, "拍卖_筛选价格_节点")
 	GUI:setAnchorPoint(Node_filter_price, 0.50, 0.50)
 	GUI:setTag(Node_filter_price, 107)
@@ -154,7 +154,7 @@ function ui.init(parent)
 	GUI:setTag(Panel_hide_filter, 45)
 
 	-- Create Image_filter_bg
-	local Image_filter_bg = GUI:Image_Create(Panel_filter_2, "Image_filter_bg", 233.00, 35.00, "res/public/1900000677.png")
+	local Image_filter_bg = GUI:Image_Create(Panel_filter_2, "Image_filter_bg", 75.00, 35.00, "res/public/1900000677.png")
 	GUI:Image_setScale9Slice(Image_filter_bg, 21, 21, 39, 27)
 	GUI:setContentSize(Image_filter_bg, 96, 100)
 	GUI:setIgnoreContentAdaptWithSize(Image_filter_bg, false)
@@ -170,5 +170,31 @@ function ui.init(parent)
 	GUI:setAnchorPoint(ListView_filter_3, 0.50, 0.00)
 	GUI:setTouchEnabled(ListView_filter_3, true)
 	GUI:setTag(ListView_filter_3, 46)
+
+	-- Create Button_bid
+	local Button_bid = GUI:Button_Create(Panel_filter_2, "Button_bid", 442.00, 0.00, "res/public/1900000653.png")
+	GUI:Button_setScale9Slice(Button_bid, 27, 28, 10, 10)
+	GUI:setContentSize(Button_bid, 64, 30)
+	GUI:setIgnoreContentAdaptWithSize(Button_bid, false)
+	GUI:Button_setTitleText(Button_bid, "竞 价")
+	GUI:Button_setTitleColor(Button_bid, "#ffffff")
+	GUI:Button_setTitleFontSize(Button_bid, 14)
+	GUI:Button_titleEnableOutline(Button_bid, "#000000", 1)
+	GUI:setTouchEnabled(Button_bid, true)
+	GUI:setTag(Button_bid, -1)
+	GUI:setVisible(Button_bid, false)
+
+	-- Create Button_buy
+	local Button_buy = GUI:Button_Create(Panel_filter_2, "Button_buy", 524.00, 0.00, "res/public/1900000652.png")
+	GUI:Button_setScale9Slice(Button_buy, 27, 28, 10, 10)
+	GUI:setContentSize(Button_buy, 64, 30)
+	GUI:setIgnoreContentAdaptWithSize(Button_buy, false)
+	GUI:Button_setTitleText(Button_buy, "购 买")
+	GUI:Button_setTitleColor(Button_buy, "#ffffff")
+	GUI:Button_setTitleFontSize(Button_buy, 14)
+	GUI:Button_titleEnableOutline(Button_buy, "#000000", 1)
+	GUI:setTouchEnabled(Button_buy, true)
+	GUI:setTag(Button_buy, -1)
+	GUI:setVisible(Button_buy, false)
 end
 return ui

@@ -65,6 +65,7 @@ function AuctionWorld.main()
     AuctionWorld._source            = data.data or 0 -- 0.世界拍卖 1.行会拍卖
     AuctionWorld._items             = {}
     AuctionWorld._qCells            = {}
+    AuctionWorld._selectItemMakeIdx = nil
 
     AuctionWorld._filter1Index      = 1
     AuctionWorld._filter1State      = true
@@ -117,6 +118,7 @@ function AuctionWorld.main()
     AuctionWorld.ClearItemList()
     AuctionWorld.PullItemList()
 
+    AuctionWorld.InitBtnEvent()
     AuctionWorld.RegisterEvent()
 
     -- 自定义组件挂接
@@ -534,6 +536,77 @@ function AuctionWorld.OnAuctionItemChange(item)
     end
 end
 
+function AuctionWorld.InitBtnEvent()
+    -- 竞价
+    GUI:addOnClickEvent(AuctionWorld._ui.Button_bid, function()
+        if not AuctionWorld._selectItemMakeIdx then
+            return
+        end
+        local item = AuctionWorld._items[AuctionWorld._selectItemMakeIdx]
+        if not item then
+            return
+        end
+        local status = SL:GetValue("AUCTION_ITEM_STATE", item)
+        if status == 2 then
+            if item.sCurUser == SL:GetValue("USER_ID") then
+                SL:ShowSystemTips("无法连续出价")
+            else
+                UIOperator:OpenAuctionBidUI(item)
+            end
+        else
+            SL:ShowSystemTips("无法竞价")
+        end
+    end)
+    
+    -- 购买
+    GUI:addOnClickEvent(AuctionWorld._ui.Button_buy, function()
+        if not AuctionWorld._selectItemMakeIdx then
+            return
+        end
+        local item = AuctionWorld._items[AuctionWorld._selectItemMakeIdx]
+        if not item then
+            return
+        end
+        local status = SL:GetValue("AUCTION_ITEM_STATE", item)
+        if status == 2 then
+            UIOperator:OpenAuctionBuyUI(item)
+        else
+            SL:ShowSystemTips("无法竞价")
+        end
+    end)
+end
+
+function AuctionWorld.RefreshBtnShow()
+    if not AuctionWorld._selectItemMakeIdx then
+        return
+    end
+    local item = AuctionWorld._items[AuctionWorld._selectItemMakeIdx]
+    if not item then
+        return
+    end
+    local bidAble = SL:GetValue("AUCTION_CAN_BID", item)
+    local buyAble = SL:GetValue("AUCTION_CAN_BUY", item)
+    GUI:setVisible(AuctionWorld._ui.Button_bid, bidAble)
+    GUI:setVisible(AuctionWorld._ui.Button_buy, buyAble)
+end
+
+function AuctionWorld.ResetLastSelectShow()
+    if not AuctionWorld._selectItemMakeIdx then
+        return
+    end
+    local qCell = AuctionWorld._qCells[AuctionWorld._selectItemMakeIdx]
+    if not qCell or GUI:Widget_IsNull(qCell) then
+        return
+    end
+
+    local cell = GUI:getChildren(qCell)[1]
+    -- 清除上次选中显示
+    local selectImg = cell and GUI:getChildByName(cell, "Image_select")
+    if selectImg then
+        GUI:setVisible(selectImg, false)
+    end
+end
+
 -- 左侧列表 一级标签
 function AuctionWorld.CreateFilterGroup1Cell(parent)
     GUI:LoadExport(parent,
@@ -630,11 +703,10 @@ function AuctionWorld.CreateItemCell(parent, item)
         local bidAble = SL:GetValue("AUCTION_CAN_BID", item)
         if bidAble then
             if status == 2 then
-                GUI:Button_setTitleColor(ui.Button_bid, "#FFFFFF")
                 GUI:setVisible(ui.Text_status, true)
 
                 if item.sCurUser == mainPlayerID then
-                    GUI:Text_setString(ui.Text_status, "您目前竞价最高")
+                    GUI:Text_setString(ui.Text_status, "您目前\n竞价最高")
                     GUI:Text_setTextColor(ui.Text_status, "#28ef01")
                 elseif item.sCurUser ~= mainPlayerID and item.joinuser == 1 then
                     GUI:Text_setString(ui.Text_status, "竞价被超过")
@@ -646,18 +718,7 @@ function AuctionWorld.CreateItemCell(parent, item)
                     GUI:setVisible(ui.Text_status, false)
                 end
             else
-                GUI:Button_setTitleColor(ui.Button_bid, "#A6A6A6")
                 GUI:setVisible(ui.Text_status, false)
-            end
-        end
-
-        -- 一口价
-        local buyAble = SL:GetValue("AUCTION_CAN_BUY", item)
-        if buyAble then
-            if status == 2 then
-                GUI:Button_setTitleColor(ui.Button_buy, "#FFFFFF")
-            else
-                GUI:Button_setTitleColor(ui.Button_buy, "#A6A6A6")
             end
         end
     end
@@ -669,21 +730,7 @@ function AuctionWorld.CreateItemCell(parent, item)
     if bidAble then
         GUI:removeAllChildren(ui.Node_bid_price)
         AuctionWorld.CreatePriceCell(ui.Node_bid_price, { id = item.btType, count = item.nCurPrice })
-
-        GUI:addOnClickEvent(ui.Button_bid, function()
-            local status = SL:GetValue("AUCTION_ITEM_STATE", item)
-            if status == 2 then
-                if item.sCurUser == mainPlayerID then
-                    SL:ShowSystemTips("无法连续出价")
-                else
-                    UIOperator:OpenAuctionBidUI(item)
-                end
-            else
-                SL:ShowSystemTips("无法竞价")
-            end
-        end)
     else
-        GUI:setVisible(ui.Button_bid, false)
         GUI:setPositionY(ui.Text_status, math.floor(AuctionWorld._itemSize.height / 2))
         GUI:Text_setTextColor(ui.Text_status, "#FFFFFF")
         GUI:Text_setString(ui.Text_status, "无法竞价")
@@ -694,18 +741,15 @@ function AuctionWorld.CreateItemCell(parent, item)
     if buyAble then
         GUI:removeAllChildren(ui.Node_price)
         AuctionWorld.CreatePriceCell(ui.Node_price, { id = item.btType, count = item.nLastPrice })
-
-        GUI:addOnClickEvent(ui.Button_buy, function()
-            local status = SL:GetValue("AUCTION_ITEM_STATE", item)
-            if status == 2 then
-                UIOperator:OpenAuctionBuyUI(item)
-            else
-                SL:ShowSystemTips("无法竞价")
-            end
-        end)
     end
-    GUI:setVisible(ui.Button_buy, buyAble)
     GUI:setVisible(ui.Text_unable_buy, not buyAble)
+
+    GUI:addOnClickEvent(cell, function()
+        AuctionWorld.ResetLastSelectShow()
+        AuctionWorld._selectItemMakeIdx = item.item.MakeIndex
+        GUI:setVisible(ui.Image_select, true)
+        AuctionWorld.RefreshBtnShow()
+    end)
 
     return cell
 end

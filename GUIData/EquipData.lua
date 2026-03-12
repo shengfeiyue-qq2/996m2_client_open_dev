@@ -176,7 +176,7 @@ function EquipData.AddEquipData(item, isInit)
     end
 end
 
-function EquipData.DelEquipData(item)
+function EquipData.DelEquipData(item, noTakeOff)
     local makeIndex = item.MakeIndex
     local pos       = item.Where
 
@@ -186,7 +186,9 @@ function EquipData.DelEquipData(item)
     end
 
     -- 记录脱下的装备
-    AutoUseItemData.SetTakeOffEquipMask(makeIndex)
+    if not noTakeOff then
+        AutoUseItemData.SetTakeOffEquipMask(makeIndex)
+    end
 
     -- 存储数据
     EquipData._equipPosDatas[pos] = nil

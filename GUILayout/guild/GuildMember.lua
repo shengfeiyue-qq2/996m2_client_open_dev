@@ -86,7 +86,8 @@ function GuildMember.InitUI()
             GUI:addOnClickEvent(item, function()
                 GUI:setVisible(GuildMember._ui.FilterLevel, false)
                 GuildMember._filterLevel = i
-                GuildMember.RefreshMemberList()
+                GuildMember.RefreshShowFilter()
+                GuildMember.RefreshMemberList(true)
             end)
         end
     end

@@ -452,20 +452,16 @@ function PlayerSuperEquip.InitEquipCells()
     -- 服务器开关 时装是否开启首饰
     local openFEquip =  SL:GetValue("SERVER_OPTION", SW_KEY_OPEN_F_EQUIP) 
     if openFEquip and openFEquip == 0 then
-        table.insert(PlayerSuperEquip._EquipPosSet, 14)
-        table.insert(PlayerSuperEquip._EquipPosSet, 15)
-        local newPosSetting = {17, 18}
+        table.insert(PlayerSuperEquip._EquipPosSet, 42)
+        table.insert(PlayerSuperEquip._EquipPosSet, 44)
 
         for i, pos in ipairs(PlayerSuperEquip._EquipPosSet) do
-            if not newPosSetting[pos] then
-                local equipPanel = PlayerSuperEquip._ui["Panel_pos" .. pos]
-                if equipPanel then 
-                    GUI:setVisible(equipPanel, false)
-                end 
+            local equipPanel = PlayerSuperEquip._ui["Panel_pos" .. pos]
+            if equipPanel then 
+                GUI:setVisible(equipPanel, false)
             end
         end
-        PlayerSuperEquip._EquipPosSet = {}
-        PlayerSuperEquip._EquipPosSet = newPosSetting
+        PlayerSuperEquip._EquipPosSet = {17, 18}
     else
         -- 额外的装备位置 1是6格 0是4格
         local showExtra = SL:GetValue("SERVER_OPTION", SW_KEY_EQUIP_EXTRA_POS) == 1

@@ -707,7 +707,8 @@ function MergeBag.ItemDataChange(data)
 
             if isBaitan then
                 local pos = GUI:getPosition(item)
-                GUI:Image_Create(MergeBagInfo._ui.Panel_items, "BAITAN_" .. (v.MakeIndex or ""), pos.x, pos.y, MergeBagInfo._baiTanImg)
+                local stallImg = GUI:Image_Create(MergeBagInfo._ui.Panel_items, "BAITAN_" .. (v.MakeIndex or ""), pos.x, pos.y, MergeBagInfo._baiTanImg)
+                GUI:setAnchorPoint(stallImg, 0.5, 0.5)
             end
 
             if item then
@@ -721,7 +722,13 @@ function MergeBag.ItemDataChange(data)
             local item = GUI:getChildByStrTag(MergeBagInfo._ui.Panel_items, v.MakeIndex)
             local thisItemData = bagDataDispose.GetItemDataByMakeIndex(v.MakeIndex)
             if item and thisItemData then
-                GUI:ItemShow_updateItemCount(item, thisItemData)
+                if v.isChangeLook then
+                    GUI:stopAllActions(item)
+                    GUI:removeFromParent(item)
+                    MergeBag.CreateBagItem(v.item)
+                else
+                    GUI:ItemShow_updateItemCount(item, thisItemData)
+                end
             end
         end
     end

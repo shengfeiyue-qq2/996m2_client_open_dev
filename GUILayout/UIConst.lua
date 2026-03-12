@@ -254,6 +254,14 @@ UIConst.LUAFile =
     LUA_FILE_LOADING_BAR                        = "loading_bar/LoadingBar",
 
     LUA_FILE_ROLE_EFFECT                        = "GUILayout/RoleEffect",
+
+    LUA_FILE_EXCHANGE_MAIN                      = "exchange/ExchangeMain",                                                  -- 交易所- 主界面
+    LUA_FILE_EXCHANGE_BUY                       = "exchange/ExchangeBuy",                                                   -- 购买
+    LUA_FILE_EXCHANGE_PUTLIST                   = "exchange/ExchangePutList",                                               -- 我的上架
+    LUA_FILE_EXCHANGE_RECORD                    = "exchange/ExchangeRecord",                                                -- 我的记录
+    LUA_FILE_EXCHANGE_PUTIN                     = "exchange/ExchangePutin",                                                 -- 上架道具
+    LUA_FILE_EXCHANGE_PUTOUT                    = "exchange/ExchangePutout",                                                -- 下架道具
+    LUA_FILE_EXCHANGE_BUYPANEL                  = "exchange/ExchangeBuyPanel",                                              -- 购买面板
 }
 
 UIConst.LAYERID = 
@@ -392,6 +400,11 @@ UIConst.LAYERID =
     GuideGUI                    = "GuideGUI",                       -- 引导
 
     RelationInviteGUI           = "RelationInviteGUI",              -- 关系邀请页
+
+    ExchangeMainGUI             = "ExchangeMainGUI",                -- 交易所
+    ExchangePutinGUI            = "ExchangePutinGUI",               -- 上架道具
+    ExchangePutoutGUI           = "ExchangePutoutGUI",              -- 下架道具
+    ExchangeBuyPanelGUI         = "ExchangeBuyPanelGUI",            -- 购买
 }
 
 -- 禁止关闭界面

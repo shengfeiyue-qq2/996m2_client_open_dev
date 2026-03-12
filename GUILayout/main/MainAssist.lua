@@ -219,8 +219,10 @@ function MainAssist.ChangeAssistGroup(g)
     GUI:setVisible(MainAssist._ui["BtnG_content"], g == 2)
     GUI:setVisible(MainAssist._ui["BtnG_hero"], g == 3)
 
-    if MainAssist._assistGroup == 3 then
+    if MainAssist._assistGroup == 3 then 
         MainAssist.UpdateAllHero()
+    elseif MainAssist._assistGroup == 1 then
+        MainAssist.UpdateAllEnemy()
     end
 end
 
@@ -392,6 +394,7 @@ function MainAssist.OnActorOutOfView(data)
             MainAssist.RmvHero(data)
         elseif SL:GetValue("ACTOR_IS_HUMAN", actorID) then
             MainAssist.RmvMonster(data)
+            --  MainAssist.RmvPlayer(data)
         else
             MainAssist.RmvPlayer(data)
         end
@@ -441,27 +444,50 @@ function MainAssist.OnRefreshActorHP(data)
         return false
     end
 
-    if not ((MainAssist._enemyIndex == 1 and SL:GetValue("ACTOR_IS_PLAYER", actorID)) or (MainAssist._enemyIndex == 2 and SL:GetValue("ACTOR_IS_MONSTER", actorID)) or (MainAssist._enemyIndex == 3 and SL:GetValue("ACTOR_IS_HERO", actorID))) then
+
+    local isPlayerCondition = (MainAssist._assistGroup == 1 and MainAssist._enemyIndex == 1 and SL:GetValue("ACTOR_IS_PLAYER", actorID))
+    local isMonsterOrHumanCondition = (MainAssist._assistGroup == 1 and MainAssist._enemyIndex == 2 and (SL:GetValue("ACTOR_IS_MONSTER", actorID) or SL:GetValue("ACTOR_IS_HUMAN", actorID)))
+    local isHeroCondition = (MainAssist._assistGroup == 3 and MainAssist._checkHero and SL:GetValue("ACTOR_IS_HERO", actorID))
+
+    local isValidActor = isPlayerCondition or isMonsterOrHumanCondition or isHeroCondition
+
+    if not isValidActor then
         return false
     end
 
-    local cell = MainAssist._enemyIndex == 1 and MainAssist._playerCells[actorID] or (MainAssist._enemyIndex == 2 and MainAssist._monsterCells[actorID] or (MainAssist._checkHero and MainAssist._heroCells[actorID]))
+    local cell = MainAssist._enemyIndex == 1 and MainAssist._playerCells[actorID] or MainAssist._monsterCells[actorID]
+    if MainAssist._assistGroup == 3 and MainAssist._checkHero then
+       cell = MainAssist._heroCells[actorID]
+    end
     if GUI:Win_IsNull(cell) then
         return false
     end
-
     SetLoadingBarHp(cell["LoadingBar_hp"], actorID)
 end
 
 -- 目标发生改变
 function MainAssist.OnTargetChange(targetID)
     local cells = MainAssist._enemyIndex == 1 and MainAssist._playerCells or MainAssist._monsterCells
+    if MainAssist._assistGroup == 3 and MainAssist._checkHero then
+       cells = MainAssist._heroCells
+    end
     for k, v in pairs(cells) do
         GUI:setVisible(v["Image_target"], k == targetID)
     end
 end
 
-function MainAssist.OnMainNearRefresh(data)
+-- 切换攻击模式, 刷新附近列表
+function MainAssist.OnPlayerPKModeChange()
+    if MainAssist._enemyIndex ~= 1 then
+        return nil
+    end
+
+    MainAssist._playerCells = {}
+    GUI:ListView_removeAllItems(MainAssist._ui.ListView_player)
+    MainAssist.AutoAddPlayer()
+end
+
+function MainAssist.OnMainAssistRefresh(data)
     local actorID = data.actorID
 
     if GUIFunction:IsMe(actorID) then
@@ -502,7 +528,11 @@ function MainAssist.AddPlayer(data)
         return false
     end
 
-    if not SL:GetValue("TARGET_ATTACK_ENABLE", actorID) then
+    if SL:GetValue("ACTOR_IS_HUMAN", actorID) then
+        return false
+    end
+
+    if not GUIFunction:CheckLaunchEnableByID(actorID, true) then
         return false
     end
     
@@ -1015,7 +1045,7 @@ function MainAssist.AddHero(data)
         return false
     end
     
-    if not SL:GetValue("TARGET_ATTACK_ENABLE", actorID) then
+    if not GUIFunction:CheckLaunchEnableByID(actorID, true) then
         return false
     end
 
@@ -1132,6 +1162,7 @@ function MainAssist.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_ACTOR_REVIVE, "MainAssist", MainAssist.OnActorRevive)
     SL:RegisterLUAEvent(LUA_EVENT_ACTOR_HP_REFRESH, "MainAssist", MainAssist.OnRefreshActorHP)
     SL:RegisterLUAEvent(LUA_EVENT_TARGET_CHANGE, "MainAssist", MainAssist.OnTargetChange)
+    SL:RegisterLUAEvent(LUA_EVENT_PKMODE_CHANGE, "MainAssist", MainAssist.OnPlayerPKModeChange)
 
     SL:RegisterLUAEvent(LUA_EVENT_TEAM_MEMBER_UPDATE, "MainAssist", MainAssist.UpdateTeamMember)
     SL:RegisterLUAEvent(LUA_EVENT_ASSIST_MISSION_SHOW, "MainAssist", MainAssist.OnMissionShow)

@@ -1526,6 +1526,7 @@ end
 function ItemTips.OnClose()
     SL:UnRegisterLUAEvent(LUA_EVENT_ITEMTIPS_MOUSE_SCROLL, "ItemTips")
     SL:UnRegisterLUAEvent(LUA_EVENT_USERINPUT_EVENT_NOTICE, "ItemTips")
+    SL:UnRegisterLUAEvent(LUA_EVENT_BAG_UPDATE_ITEM_TIME, "ItemTips")
 end
 
 ---------------------------------------------------
@@ -2270,7 +2271,7 @@ function ItemTips.CreateInlayAttrWidget(param)
             return a < b
         end)
         for i, groupId in ipairs(groupTab) do
-            local params = groupList[i]
+            local params = groupList[groupId]
             local indexList = params.indexs or {}
             if checkGroupShow(indexList) then
                 if i ~= 1 then

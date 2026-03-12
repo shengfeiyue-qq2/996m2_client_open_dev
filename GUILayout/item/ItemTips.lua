@@ -182,7 +182,7 @@ function ItemTips.main()
     SL:RegisterLUAEvent(LUA_EVENT_USERINPUT_EVENT_NOTICE, "ItemTips", function ()
         GUI:Win_Close(parent)
     end)
-   --注册监听道具时间刷新
+    --注册监听道具时间刷新
     SL:RegisterLUAEvent(LUA_EVENT_BAG_UPDATE_ITEM_TIME, "ItemTips", ItemTips.UpdateItemTime)
 end
 
@@ -717,10 +717,12 @@ local function checkIsLimit(itemData)
     return false
 end
 
--- 道具时限
+
 function ItemTips.GetTimeStr(type, itemData, from, lookPlayer)
     local time = itemData.limitRemainTime
     local active = itemData.limitTimeActive
+    local makeIndex = itemData and itemData.MakeIndex
+
     if not time or time <= 0 then
         local isLimit, limitTime = checkIsLimit(itemData)
         if not active and isLimit then
@@ -729,10 +731,10 @@ function ItemTips.GetTimeStr(type, itemData, from, lookPlayer)
         return nil
     end
 
-    local makeIndex = itemData and itemData.MakeIndex
+
     if makeIndex then
         if itemData.Need == 102 then -- 穿戴、穿戴后脱到背包、仓库计时
-            if (not from or from == ItemFrom.STORAGE) and SL:GetMetaValue("STORAGE_DATA_BY_MAKEINDEX", makeIndex) then  -- 仓库限时服务端不主动刷新
+            if (not from or from == ItemFrom.STORAGE) and SL:GetMetaValue("STORAGE_DATA_BY_MAKEINDEX", makeIndex) then
                 if itemData.limitEndTime then
                     time = math.max(itemData.limitEndTime - SL:GetMetaValue("SERVER_TIME"), 0)
                 end
@@ -744,7 +746,6 @@ function ItemTips.GetTimeStr(type, itemData, from, lookPlayer)
     end
 
     local str = string.format("%s：%s", type == 1 and "限时装备" or "限时道具", SL:TimeFormatToStr(time))
-
     return str
 end
 
@@ -1509,6 +1510,7 @@ end
 
 -- 滚轮滚动     data: {x,y} 滚轮的方向
 function ItemTips.OnMouseScroll(data)
+   
     if data and data.y then
         if ItemTips._topScrollEvent and data.y == -1 then
             ItemTips._topScrollEvent()
@@ -1522,6 +1524,7 @@ end
 function ItemTips.OnClose()
     SL:UnRegisterLUAEvent(LUA_EVENT_ITEMTIPS_MOUSE_SCROLL, "ItemTips")
     SL:UnRegisterLUAEvent(LUA_EVENT_USERINPUT_EVENT_NOTICE, "ItemTips")
+    SL:UnRegisterLUAEvent(LUA_EVENT_BAG_UPDATE_ITEM_TIME, "ItemTips")
 end
 
 ---------------------------------------------------
@@ -2247,7 +2250,7 @@ function ItemTips.CreateInlayAttrWidget(param)
             return a < b
         end)
         for i, groupId in ipairs(groupTab) do
-            local params = groupList[i]
+            local params = groupList[groupId]
             local indexList = params.indexs or {}
             if checkGroupShow(indexList) then
                 if i ~= 1 then

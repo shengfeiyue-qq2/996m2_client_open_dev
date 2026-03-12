@@ -512,15 +512,103 @@ SkillUtils.CheckAutoSetting = function(skillID)
     return SL:GetValue("SETTING_ENABLED", settingID) == 1
 end
 
+-- 检测自定义技能智能半月类型释放
+SkillUtils.CheckIsSmartBanYueSkill = function(skillID)
+    local skillConfig = SL:GetValue("SKILL_CONFIG", skillID)
+    if skillConfig and skillConfig.type == 5 then
+        return true
+    end
+    return false
+end
+
+SkillUtils.CheckSmartBanYueTypeSkill = function(skillID, targetID)
+    local ret = GUIFunction:CheckSkillAbleToLaunch(skillID)
+    if ret ~= 1 and not SkillUtils.CheckAutoSetting(skillID) then
+        return nil
+    end
+
+    if not targetID or not SL:GetValue("ACTOR_IS_VALID", targetID) then
+        return nil
+    end
+
+    local monsterID = SL:GetValue("ACTOR_TYPE_INDEX", targetID)
+    if not SL:GetValue("SKILL_CAN_ATTACK_MONSTER", skillID, monsterID) then
+        return nil
+    end
+
+    local mapX = SL:GetValue("X")
+    local mapY = SL:GetValue("Y")
+    local mainPlayerDir = SL:GetValue("DIR")
+    local count = 0
+    local isTargetAround = false
+    for k, v in ipairs(banyueAround[mainPlayerDir] or {}) do
+        local monsterIDs = SL:GetValue("MONSTER_BY_MAPXY", mapX + v[1], mapY + v[2], true)
+        if monsterIDs then
+            for i, monID in ipairs(monsterIDs) do
+                if GUIFunction:CheckLaunchEnableByID(monID) and
+                    not SL:GetValue("IS_SKILL_IGNORE_MONSTER", skillID, SL:GetValue("ACTOR_TYPE_INDEX", monID)) then
+                    count = count + 1
+
+                    if not isTargetAround then
+                        isTargetAround = targetID == monID
+                    end
+                end
+            end
+        end
+
+        if not isTargetAround or count < 2 then
+            local playerIDs = SL:GetValue("PLAYER_BY_MAPXY", mapX + v[1], mapY + v[2], true)
+            if playerIDs then
+                for i, playerID in ipairs(playerIDs) do
+                    if GUIFunction:CheckLaunchEnableByID(playerID) then
+                        count = count + 1
+
+                        if not isTargetAround then
+                            isTargetAround = targetID == playerID
+                        end
+                    end
+                end
+            end
+        end
+
+        if count >= 2 and isTargetAround then
+            break
+        end
+    end
+
+    if not isTargetAround then
+        count = 0
+    end
+
+    -- 自动打开/关闭
+    local isOnSkill = SL:GetValue("SKILL_IS_ON_SKILL", skillID)
+    if isOnSkill and count < 2 then
+        SL:SetValue("SKILL_ON", skillID, false)
+        return nil
+    elseif not isOnSkill and count >= 2 then
+        SL:SetValue("SKILL_ON", skillID, true)
+        return nil
+    end
+
+    return count >= 2 and skillID or nil, SL:GetValue("ACTOR_MAP_X", targetID), SL:GetValue("ACTOR_MAP_Y", targetID), false
+end 
+
 -- 检测技能释放
-SkillUtils.CheckSkillLaunch = function(skillID, targetID)
-    if not SkillUtils.CheckAutoSetting(skillID) then
+SkillUtils.CheckSkillLaunch = function(skillID, targetID, isNotCheckSetting)
+    if not isNotCheckSetting and not SkillUtils.CheckAutoSetting(skillID) then
         return nil
     end
     local destPosX, destPosY = nil, nil
     local checkSkill = SkillUtils.CHECK_SKILL[skillID]
     if checkSkill then
         local skillIDT, destPosT1, destPosT2 = checkSkill(targetID)
+        if not skillIDT then
+            return nil
+        end
+        destPosX = destPosT1
+        destPosY = destPosT2
+    elseif SkillUtils.CheckIsSmartBanYueSkill(skillID) then
+        local skillIDT, destPosT1, destPosT2 = SkillUtils.CheckSmartBanYueTypeSkill(skillID, targetID)
         if not skillIDT then
             return nil
         end
@@ -1396,7 +1484,8 @@ SkillUtils.FindAutoCustomLaunchSkill = function(priority)
     local destPosT1, destPosT2 = nil, nil
     local customSkill = SL:GetValue("ALL_CUSTOM_SKILLS")
     for k, v in pairs(customSkill) do
-        skillIDT, destPosT1, destPosT2 = SkillUtils.CheckSkillLaunch(v, targetID)
+        -- 自定义技能不检测内挂开关释放
+        skillIDT, destPosT1, destPosT2 = SkillUtils.CheckSkillLaunch(v, targetID, true)
         if skillIDT then
             if not isProiority then
                 break

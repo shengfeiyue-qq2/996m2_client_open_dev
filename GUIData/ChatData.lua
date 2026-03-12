@@ -236,14 +236,14 @@ function ChatData.OpenFakeDropTimerID()
             end
             ChatData._fakeDropTimerID = SL:ScheduleOnce(event, time / 1000)
         else
-            ChatData._fakeDropTimerID = Schedule(callback, ChatData._fakeDropTime or 0.2)
+            ChatData._fakeDropTimerID = SL:Schedule(callback, ChatData._fakeDropTime or 0.2)
         end
     end
 end
 
 function ChatData.CloseFakeDropTimerID()
     if ChatData._fakeDropTimerID then
-        UnSchedule(ChatData._fakeDropTimerID)
+        SL:UnSchedule(ChatData._fakeDropTimerID)
         ChatData._fakeDropTimerID = nil
     end
 end
@@ -635,6 +635,12 @@ function ChatData.StorageItem(item, channel, dropType)
     while #receiveCache > GUIDefine.ChatConfig.LIMIT_COUNT do
         local item = table.remove(receiveCache, 1)
         GUI:autoDecRef(item)
+    end
+
+    if channel == GUIDefine.ChatChannel.COMMON then
+        -- ?? 容错服务端偶发频道ID为0
+        SL:Print("CHAT MSG ERROR: CHAT CHANNEL IS COMMON??")
+        return
     end
 
     -- 保存至公共频道

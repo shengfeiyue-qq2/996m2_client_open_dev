@@ -277,10 +277,13 @@ function ActorHud.GetActorHUDLabelInfo(actorID, color, guildInfo)
 
     -- check visible
     local labelNameVisible = SL:GetValue("ACTOR_HUD_NAME_SHOW", actorID) or SL:GetValue("ACTOR_HUD_PC_MOUSE_SHOW", actorID)
-    local labelGuildVisible = SL:GetValue("ACTOR_HUD_GUILD_SHOW", actorID) or SL:GetValue("ACTOR_HUD_PC_MOUSE_SHOW", actorID)
+    local labelGuildVisible =  SL:GetValue("ACTOR_HUD_GUILD_SHOW", actorID) or SL:GetValue("ACTOR_HUD_PC_MOUSE_SHOW", actorID)
     local labelTitleVisible = SL:GetValue("ACTOR_HUD_TITLE_LABEL_SHOW", actorID) or SL:GetValue("ACTOR_HUD_PC_MOUSE_SHOW", actorID)
     local offsetX = 2
     local offsetY = ActorHud._useBmpFont and 5 or 0
+    if SL:GetValue("ACTOR_IS_HERO", actorID) then
+        labelGuildVisible = false
+    end
     
     --前缀文本（称号文本）
     for i = 1, 12 do

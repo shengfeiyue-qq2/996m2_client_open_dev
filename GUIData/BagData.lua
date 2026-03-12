@@ -1,12 +1,13 @@
 BagData = BagData or {}
 local tinsert = table.insert
 local SaveKey = "_BagPosData_"
-local function MAKE_OPER_DATA(item, isHad, number)
+local function MAKE_OPER_DATA(item, isHad, number, isChangeLook)
     local operator = {}
     operator.item = item
     operator.isHad = isHad
     operator.change = number
     operator.MakeIndex = item.MakeIndex
+    operator.isChangeLook = isChangeLook
     return operator
 end
 
@@ -530,17 +531,26 @@ function BagData.ChangeItemData(item)
     local index = item.Index
     local newnum = item.OverLap or 1
     local diff = 0
+    local indexDiff = false
     local data = BagData.GetItemDataByMakeIndex(makeIndex)
     if data then
         local oldnum = data.OverLap or 1
         diff = newnum - oldnum
+        local oldIndex = data.Index
+        indexDiff = index and oldIndex and oldIndex ~= index or false
         BagData._bagItems[makeIndex] = item
         BagData.ChangeItemCountByindex(index, diff)
         if diff ~= 0 then
             BagData.ShowGetOrCostItems(diff, item.Name)
         end
     end
-    return diff
+
+    -- 缓存的也刷新
+    if BagData._bagNoPosItems and BagData._bagNoPosItems[makeIndex] then
+        BagData._bagNoPosItems[makeIndex] = item
+    end
+
+    return diff, indexDiff
 end
 
 -- 清理背包
@@ -716,6 +726,7 @@ end
 function BagData.ResponseDelItem(data)
     local header = data.header
     local makeIndex = header.Guid
+    local tag = header.p1    -- 1: 爆出时删除装备
     local itemBelong =  SL:GetValue("ITEM_BELONG_BY_MAKEINDEX", makeIndex) 
     if not itemBelong then
         SL:Print("delete item error, can't find item belong")
@@ -735,7 +746,7 @@ function BagData.ResponseDelItem(data)
             SL:Print("delete item error, can't find item")
             return
         end
-        EquipData.DelEquipData(itemData)
+        EquipData.DelEquipData(itemData, tag == 1)
 
     elseif itemBelong == GUIDefine.ItemBelong.QUICKUSE then
         local itemData = QuickUseData.GetQuickUseDataByMakeIndex(makeIndex)
@@ -782,8 +793,8 @@ function BagData.ResponseUpdateItem(data)
         local operator = {}
         operator.opera = GUIDefine.OperateType.CHANGE
         operator.operID = {}
-        local diff = BagData.ChangeItemData(data)
-        tinsert(operator.operID, MAKE_OPER_DATA(data, true, diff))
+        local diff, indexDiff = BagData.ChangeItemData(data)
+        tinsert(operator.operID, MAKE_OPER_DATA(data, true, diff, indexDiff))
         SL:onLUAEvent(LUA_EVENT_BAG_ITEM_CHANGE, operator)
 
         -- 延迟通知

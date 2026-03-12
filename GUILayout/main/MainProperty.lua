@@ -26,6 +26,7 @@ function MainProperty.Init()
     MainProperty._listInterval, MainProperty._richVspace = values.listInterval, values.richVspace or 0
 
     MainProperty._NGShow = tonumber(SL:GetValue("GAME_DATA", "OpenNGUI")) == 1 and SL:GetValue("IS_LEARNED_INTERNAL")
+    MainProperty._uiSetHide = {}
 end
 
 function MainProperty.main()
@@ -608,7 +609,8 @@ function MainProperty.InitChatHideBtn()
         "Panel_auto_tips",
         "Image_4",
         "Panel_hp",
-        "Image_barbg"
+        "Image_barbg",
+        "Image_barbg_dz",
     }
     local oriPosYList = {}
     GUI:delayTouchEnabled(MainProperty._ui["Button_chat_hide"], 0.4)
@@ -657,7 +659,7 @@ function MainProperty.InitChatHideBtn()
                 local name = widgetList[i]
                 local widget = MainProperty._ui[name]
                 if i and name and widget then
-                    if i ~= 8 and i ~= 9 and i ~= 10 then
+                    if i ~= 8 and i ~= 9 and i ~= 10 and i ~= 11 then
                         local chatHei = GUI:getContentSize(_layoutMiniChat).height
                         if not GUI:Widget_IsNull(widget) then
                             if not oriPosYList[name] then
@@ -670,10 +672,15 @@ function MainProperty.InitChatHideBtn()
                         local function callback()
                             GUI:setVisible(widget, state)
                             GUI:setChildrenCascadeOpacityEnabled(widget, false)
+                            if i == 11 then
+                                MainProperty._uiSetHide[i] =  not state
+                            end
                         end
                         local canSet = true
                         if i == 10 then -- 怒气条
                             canSet = tonumber(SL:GetValue("GAME_DATA", "Heronuqitiao")) == 1 and SL:GetValue("HERO_IS_ALIVE")
+                        elseif i == 11 then -- 斗转条
+                            canSet = SL:GetValue("SKILL_DATA", DZXY_SkillID) and MainProperty._NGShow
                         end
                         if canSet then
                             GUI:setChildrenCascadeOpacityEnabled(widget, true)
@@ -984,7 +991,7 @@ end
 
 function MainProperty.OnRefreshDZShow()
     local dzBg = MainProperty._ui["Image_barbg_dz"]
-    if dzBg then
+    if dzBg and not MainProperty._uiSetHide[11] then
         if SL:GetValue("SKILL_DATA", DZXY_SkillID) then
             GUI:setVisible(dzBg, MainProperty._NGShow and true)
             GUI:setTouchEnabled(dzBg, MainProperty._NGShow and true)

@@ -771,6 +771,7 @@ function SettingAuto.CreateListPanel(parent, data)
             end
             value[name] = nil
             SL:SetValue("SETTING_VALUE", data.id, { value })
+
         end
     end)
 

@@ -1,13 +1,13 @@
 ThrowDamageNum = {}
 
 -- 类型1：图片数值飘字
-function ThrowDamageNum.GetShowDamageNumStr(prefix, originNum)
+function ThrowDamageNum.GetShowDamageNumStr(prefix, originNum, damageID)
     prefix = prefix or ""
     return string.format("%s%s", prefix, tostring(originNum))
 end
 
 -- 类型3: 图片文本(无数值)
-function ThrowDamageNum.GetShowDamageTextStr(prefix)
+function ThrowDamageNum.GetShowDamageTextStr(prefix, damageID)
     prefix = string.gsub(prefix or "", "/", "") or ""
     return prefix
 end
@@ -25,7 +25,7 @@ local function unitFunc(num)
 end
 
 -- 类型4: 图片数值飘字(显示小数单位)
-function ThrowDamageNum.GetShowDamagePointStr(prefix, afterfix, originNum)
+function ThrowDamageNum.GetShowDamagePointStr(prefix, afterfix, originNum, damageID)
     prefix = prefix or ""
     afterfix = afterfix or ""
     originNum = tostring(originNum)

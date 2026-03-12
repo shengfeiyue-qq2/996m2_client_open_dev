@@ -1639,7 +1639,7 @@ SL:RegisterLUAEvent(LUA_EVENT_PKMODE_CHANGE, "GUIInit", function(pkModeID)
     local config = SL:GetValue("RELATION_TYPE_CONFIG", pkModeID)
     if config then 
         SL:onLUAEvent(LUA_EVENT_CHAT_MSG_ADD, {
-            Msg       = string.format("〖提示〗[攻击模式: %s模式]", config.mode_name or ""),
+            Msg       = string.format("%s[攻击模式: %s模式]", SL:GetValue("PROMPT_PREFIX_SHOW") and "〖提示〗" or "", config.mode_name or ""),
             FColor    = 255,
             BColor    = 249,
             ChannelId = GUIDefine.ChatChannel.SYSTEM,
@@ -1905,4 +1905,60 @@ SL:RegisterLUAEvent(LUA_EVENT_TREASUREBOX_DATA_REFRESH, "GUIInit", function(data
     if not GUI:GetWindow(nil, UIConst.LAYERID.TreasureBoxGUI) then
         UIOperator:OpenGoldBox(data)
     end
+end)
+
+-----------------------------------------------------------------------------
+-- 移动足迹
+local function addActorMoveEffectToMap(effectID, mapX, mapY)
+    if not effectID or not mapX or not mapY then
+        return
+    end
+
+    local sceneRoot = GUI:Attach_SceneB()
+    local moveEffectRoot = GUI:getChildByID(sceneRoot, "MAP_MOVE_EFFCT_ROOT")
+    if not moveEffectRoot then
+        moveEffectRoot = GUI:Node_Create(-1, "MAP_MOVE_EFFCT_ROOT")
+        GUI:addChild(sceneRoot, moveEffectRoot, 999)
+    end
+    local wX, wY = SL:ConvertMapPos2WorldPos(mapX, mapY)
+    local effect = GUI:Effect_Create(-1, string.format("moveEffect_%s_%s", mapX, mapY), wX, wY, 0, effectID)
+    if effect then
+        GUI:addChild(moveEffectRoot, effect)
+        GUI:Effect_addOnCompleteEvent(effect, function()
+            if not GUI:Widget_IsNull(effect) then
+                GUI:removeFromParent(effect)
+            end
+        end)
+    end
+end
+
+local function checkActorMoveEffEnable(act, actorID)
+    if act == GUIDefine.Action.WALK or act == GUIDefine.Action.RUN or act == GUIDefine.Action.RIDE_RUN then
+        local actorMoveEff = SL:GetValue("ACTOR_MOVE_EFFECT", actorID)
+        if actorMoveEff and actorMoveEff ~= 0 and SL:GetValue("GAME_DATA", "disable_footprint_effect") ~= 1 then
+            local lastMapX = SL:GetValue("ACTOR_LAST_MAP_X", actorID)
+            local lastMapY = SL:GetValue("ACTOR_LAST_MAP_Y", actorID)
+            local skipStatus = SL:GetValue("ACTOR_MOVE_EFFECT_SKIP_WALK_STATUS", actorID)
+            local skipSwitch = SL:GetValue("ACTOR_MOVE_EFFECT_SKIP_WALK_SWITCH", actorID)
+            SL:SetValue("ACTOR_MOVE_EFFECT_SKIP_WALK_STATUS", actorID, not skipStatus and skipSwitch)
+            if lastMapX == 0xFFFF or lastMapY == 0xFFFF or (act == GUIDefine.Action.WALK and skipStatus) then
+            else
+                addActorMoveEffectToMap(actorMoveEff, lastMapX, lastMapY)
+            end 
+        end
+    end
+end
+
+-- 主玩家
+SL:RegisterLUAEvent(LUA_EVENT_PLAYER_ACTION_COMPLETE, "GUIInit", function(data)
+    local act = data.act
+    local actorID = data.actorID
+    checkActorMoveEffEnable(act, actorID)
+end)
+
+-- 网络玩家
+SL:RegisterLUAEvent(LUA_EVENT_NET_PLAYER_ACTION_COMPLETE, "GUIInit", function(data)
+    local act = data.act
+    local actorID = data.actorID
+    checkActorMoveEffEnable(act, actorID)
 end)

@@ -340,8 +340,8 @@ function Storage.UpdateStorageOpenNum()
             return
         end
         for i = lastIndex + 1, openIndex do
-            if GUI:getChildByName(Storage._panelItems, "clock_" .. i) then
-                GUI:removeChildByName(Storage._panelItems, "clock_" .. i)
+            if GUI:getChildByName(Storage._panelItems, "clock" .. i) then
+                GUI:removeChildByName(Storage._panelItems, "clock" .. i)
             end
         end
     end

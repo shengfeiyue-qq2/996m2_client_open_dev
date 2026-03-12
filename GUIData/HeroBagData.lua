@@ -609,6 +609,7 @@ end
 function HeroBagData.ResponseDelItem(data)
     local header = data.header
     local makeIndex = header.Guid
+    local tag = header.p1    -- 1: 爆出时删除装备
     local itemBelong = SL:GetValue("ITEM_BELONG_BY_MAKEINDEX", makeIndex) 
     if not itemBelong then
         SL:Print("delete item error, can't find item belong")
@@ -628,7 +629,7 @@ function HeroBagData.ResponseDelItem(data)
             SL:Print("delete item error, can't find item")
             return
         end
-        HeroEquipData.DelEquipData(itemData)
+        HeroEquipData.DelEquipData(itemData, tag == 1)
     end
 end
 

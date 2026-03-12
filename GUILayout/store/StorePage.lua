@@ -23,8 +23,24 @@ function StorePage.main()
     end
 
     StorePage.RegisterEvent()
+    StorePage.DetachAllSUI(index)
 
     SL:RequestStorePageData(index)
+
+end
+
+function StorePage.DetachAllSUI(openPageID)
+    for i = 1, 4 do
+        SL:UnAttachTXTSUI({
+            index   = SLDefine.SUIComponentTable["PageStore" .. i]
+        })
+    end
+    if openPageID then
+        SL:AttachTXTSUI({
+            root    = StorePageInfo._ui.Panel_1,
+            index   = SLDefine.SUIComponentTable["PageStore" .. openPageID]
+        })
+    end
 end
 
 function StorePage.refreshStorePageUI(pageData)
@@ -368,6 +384,7 @@ end
 
 function StorePage.OnClose()
     StorePage.UnRegisterEvent()
+    StorePage.DetachAllSUI()
 end
 
 function StorePage.RegisterEvent()

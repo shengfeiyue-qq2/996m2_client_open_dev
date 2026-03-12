@@ -159,7 +159,7 @@ function StoreDetail.InitMoneyCell()
         isCanBuy = isCanBuy,
         isShowIcon = true,
     }
-    local priceCell = StoreDetail.createItemIcon(itemData)
+    local priceCell = StoreDetail.CreateItemIcon(itemData)
     GUI:setPosition(priceCell, 0, 0)
     GUI:setAnchorPoint(priceCell, 0, 0.5)
     GUI:addChild(StoreDetail._ui["Node_single"], priceCell)
@@ -173,7 +173,7 @@ function StoreDetail.InitMoneyCell()
             isCanBuy = isCanBuy,
             isShowIcon = true,
         }
-        local totalCell = StoreDetail.createItemIcon(itemData)
+        local totalCell = StoreDetail.CreateItemIcon(itemData)
         GUI:setPosition(totalCell, offX, 0)
         GUI:setAnchorPoint(totalCell, 0, 0.5)
         GUI:addChild(StoreDetail._ui["Node_total"], totalCell)
@@ -189,7 +189,7 @@ function StoreDetail.InitMoneyCell()
             isCanBuy = isCanBuy,
             isShowIcon = true,
         }
-        local haveCell = StoreDetail.createItemIcon(itemData)
+        local haveCell = StoreDetail.CreateItemIcon(itemData)
         GUI:setPosition(haveCell, offX2, 0)
         GUI:setAnchorPoint(haveCell, 0, 0.5)
         GUI:addChild(StoreDetail._ui["Node_have"], haveCell)
@@ -211,7 +211,7 @@ function StoreDetail.RefreshTotalPrice()
             isCanBuy = isCanBuy,
             isShowIcon = false,
         }
-        local totalCell = StoreDetail.createItemIcon(itemData)
+        local totalCell = StoreDetail.CreateItemIcon(itemData)
         GUI:setPosition(totalCell, offX, 0)
         GUI:setAnchorPoint(totalCell, 0, 0.5)
         GUI:addChild(StoreDetail._ui["Node_total"], totalCell)
@@ -219,12 +219,16 @@ function StoreDetail.RefreshTotalPrice()
     end
 end
 
-function StoreDetail.createItemIcon(data)
+function StoreDetail.CreateItemIcon(data)
     local file = SL:GetValue("IS_PC_OPER_MODE") and "store/item_icon_cell_win32" or "store/item_icon_cell"
     local widget = GUI:Widget_Create(-1, "widget", 0, 0, 0, 0)
     GUI:LoadExport(widget, file)
 
     local item = GUI:getChildByName(widget, "Panel_icon")
+    local itemSize = GUI:getContentSize(item)
+    GUI:setPosition(item, 0, 0)
+    GUI:setAnchorPoint(item, 0, 0)
+    GUI:setContentSize(widget, itemSize.width, itemSize.height)
     -- icon
     local price_icon = GUI:getChildByName(item, "Node_icon")
     GUI:removeAllChildren(price_icon)
@@ -250,11 +254,9 @@ function StoreDetail.createItemIcon(data)
     if not data.isShowIcon then 
         GUI:setVisible(price_icon, false)
         GUI:setPositionX(richText, -24)
-    end 
+    end
 
-    GUI:removeFromParent(item)
-
-    return item
+    return widget
 end 
 
 function StoreDetail.InitGoodsItem(data)

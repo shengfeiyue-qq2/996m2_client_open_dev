@@ -306,7 +306,7 @@ function MainNear.AddPlayer(data)
         return false
     end
 
-    if not SL:GetValue("TARGET_ATTACK_ENABLE", actorID) then
+    if not GUIFunction:CheckLaunchEnableByID(actorID, true) then
         return false
     end
     
@@ -514,7 +514,7 @@ function MainNear.AddHero(data)
         return false
     end
     
-    if not SL:GetValue("TARGET_ATTACK_ENABLE", actorID) then
+    if not GUIFunction:CheckLaunchEnableByID(actorID, true) then
         return false
     end
 

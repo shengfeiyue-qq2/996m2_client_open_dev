@@ -1604,6 +1604,8 @@ function GUIFunction:GenerateChatMiniItem(data)
     local MSG_TYPE  = GUIDefine.ChatTextType
     local isWinMode = SL:GetValue("IS_PC_OPER_MODE")
 
+    data.FColor     = data.FColor or 0
+    data.BColor     = data.BColor or 255
     local FColorHEX = SL:GetHexColorByStyleId(data.FColor)
     local BColorEnable = data.BColor ~= -1
     local BColorHEX = SL:GetHexColorByStyleId(data.BColor)
@@ -2592,7 +2594,6 @@ function GUIFunction:SendChatMsg(data)
             SL:ShowSystemTips("对方在你的黑名单，无法向其发送信息")
             return nil
         end
-
         item.Target     = target.uid
         item.TargetName = target.name
     end
@@ -2744,8 +2745,22 @@ local function squLen(x, y)
     return x * x + y * y
 end
 
--- 检测Actor能否攻击 actorID
-function GUIFunction:CheckLaunchEnableByID(actorID)
+-- 特殊判定和平模式下列表里敌方显示
+function GUIFunction:CheckActorInPeaceEnemyShow(actorID)
+    if not actorID or not SL:GetValue("ACTOR_IS_VALID", actorID) then
+        return GUIDefine.ActorRelationType.RS_NO
+    end
+
+    -- oneself
+    if not SL:GetValue("MAIN_PLAYER_IS_VALID") or (SL:GetValue("ACTOR_IS_PLAYER", actorID) and SL:GetValue("ACTOR_IS_MAINPLAYER", actorID)) then
+        return GUIDefine.ActorRelationType.RS_NO
+    end
+
+    return GUIDefine.ActorRelationType.RS_ENEMY
+end
+
+-- 检测Actor能否攻击 actorID  inPeaceEnemyShow: 特殊针对和平模式敌人UI列表显示处理
+function GUIFunction:CheckLaunchEnableByID(actorID, inPeaceEnemyShow)
     if not actorID or not SL:GetValue("ACTOR_IS_VALID", actorID) then
         return false
     end
@@ -2784,21 +2799,41 @@ function GUIFunction:CheckLaunchEnableByID(actorID)
         return false
     end
 
-    -- humanoid
-    if SL:GetValue("ACTOR_IS_PLAYER", actorID) and SL:GetValue("ACTOR_IS_HUMAN", actorID) then
-        if actorMasterID and SL:GetValue("ACTOR_RELATION_TAG", actorMasterID) ~= 1 then -- 人形怪如果有MasterID, 要判断Master是否是敌友
+    -- 和平模式用于显示敌方列表时
+    if SL:GetValue("PKMODE") == GUIDefine.PKModeType.HAM_PEACE and inPeaceEnemyShow then
+        -- humanoid
+        if SL:GetValue("ACTOR_IS_PLAYER", actorID) and SL:GetValue("ACTOR_IS_HUMAN", actorID) then
+            if actorMasterID and GUIFunction:CheckActorInPeaceEnemyShow(actorMasterID) ~= 1 then -- 人形怪如果有MasterID, 要判断Master是否是敌友
+                return false
+            end
+            return true
+        end
+
+        -- player, check is enmey
+        if SL:GetValue("ACTOR_IS_PLAYER", actorID) and GUIFunction:CheckActorInPeaceEnemyShow(actorID) ~= 1 then
             return false
         end
-        return true
-    end
 
-    -- player, check is enmey
-    if SL:GetValue("ACTOR_IS_PLAYER", actorID) and SL:GetValue("ACTOR_RELATION_TAG", actorID) ~= 1 then
-        return false
-    end
+        if SL:GetValue("ACTOR_IS_HERO", actorID) and GUIFunction:CheckActorInPeaceEnemyShow(actorID) ~= 1 then
+            return false
+        end
+    else
+        -- humanoid
+        if SL:GetValue("ACTOR_IS_PLAYER", actorID) and SL:GetValue("ACTOR_IS_HUMAN", actorID) then
+            if actorMasterID and SL:GetValue("ACTOR_RELATION_TAG", actorMasterID) ~= 1 then -- 人形怪如果有MasterID, 要判断Master是否是敌友
+                return false
+            end
+            return true
+        end
 
-    if SL:GetValue("ACTOR_IS_HERO", actorID) and SL:GetValue("ACTOR_RELATION_TAG", actorID) ~= 1 then
-        return false
+        -- player, check is enmey
+        if SL:GetValue("ACTOR_IS_PLAYER", actorID) and SL:GetValue("ACTOR_RELATION_TAG", actorID) ~= 1 then
+            return false
+        end
+
+        if SL:GetValue("ACTOR_IS_HERO", actorID) and SL:GetValue("ACTOR_RELATION_TAG", actorID) ~= 1 then
+            return false
+        end
     end
 
     -- 采集物
@@ -2868,7 +2903,7 @@ function GUIFunction.CheckAutoTargetEnableByID(actorID)
 end
 
 -- 查找最近怪物
-function GUIFunction:FindNearestMonster(monsterVec, monsterVecNum)
+function GUIFunction:FindNearestMonster(monsterVec, monsterVecNum, ignoreActorID)
     -- 不自动选: 守卫/石化状态下祖玛卫士 
     local target     = nil
     local cost       = GUIDefine.MAX_COST
@@ -2882,7 +2917,7 @@ function GUIFunction:FindNearestMonster(monsterVec, monsterVecNum)
         if SL:GetValue("ACTOR_IS_VALID", monsterID) then
             mX = SL:GetValue("ACTOR_MAP_X", monsterID)
             mY = SL:GetValue("ACTOR_MAP_Y", monsterID)
-            if not (mX == pMapX and mY == pMapY) and GUIFunction.CheckAutoTargetEnableByID(monsterID) then
+            if not (mX == pMapX and mY == pMapY) and GUIFunction.CheckAutoTargetEnableByID(monsterID) and monsterID ~= ignoreActorID then
                 local len = squLen(mX - pMapX, mY - pMapY)
                 if len < cost then
                     target = monsterID
@@ -2982,6 +3017,74 @@ function GUIFunction:OnAutoFindHumanoidFunc()
         -- 没找到, 找其他怪
         GUIFunction:OnAutoFindMonsterFunc()
     end
+end
+
+-- 获取当前挂机查找可攻击目标ID ignoreActorID: 忽略的actorID
+function GUIFunction:GetCurAutoFindTargetID(ignoreActorID)
+    if not SL:GetValue("MAIN_PLAYER_IS_VALID") then
+        return nil
+    end
+
+    local targetID   = nil
+    local cost       = GUIDefine.MAX_COST
+    local pMapX      = SL:GetValue("X")
+    local pMapY      = SL:GetValue("Y")
+    local aX         = 0
+    local aY         = 0
+
+    local playerVec, playerVecNum = SL:GetValue("FIND_IN_VIEW_PLAYER_LIST")
+    for i = 1, playerVecNum do
+        local playerID = playerVec[i]
+        if SL:GetValue("ACTOR_IS_VALID", playerID) and SL:GetValue("ACTOR_IS_HUMAN", playerID) then
+            aX = SL:GetValue("ACTOR_MAP_X", playerID)
+            aY = SL:GetValue("ACTOR_MAP_Y", playerID)
+            if not (aX == pMapX and aY == pMapY) and GUIFunction.CheckAutoTargetEnableByID(playerID) and playerID ~= ignoreActorID then
+                local len = squLen(aX - pMapX, aY - pMapY)
+                if len < cost then
+                    targetID = playerID
+                    cost = len
+                end
+            end
+        end
+    end
+    
+    if targetID and SL:GetValue("ACTOR_IS_VALID", targetID) then
+        return targetID
+    else
+        -- 没找到, 找其他怪
+
+        local autoTarget = SL:GetValue("AUTO_TARGET")
+        local targetIndex = autoTarget.targetIndex
+        local targetType = autoTarget.targetType
+
+        local monsterVec  = {}
+        local monsterVecNum = 0
+        
+        if targetType ~= GUIDefine.ActorType.MONSTER or not targetIndex or GUIDefine.AUTO_FIND_TARGET_NONE == targetIndex or 0 == targetIndex then -- not target index,find nearst monster
+            local monsters, ncount = SL:GetValue("FIND_IN_VIEW_MONSTER_LIST", true, true)
+            monsterVec, monsterVecNum = GUIFunction:GetMonsterVec(monsters, ncount)
+        else
+            local monsters, ncount = SL:GetValue("FIND_IN_VIEW_MONSTER_LIST_BY_TYPEINDEX", targetIndex, true, true)
+            monsterVec, monsterVecNum = GUIFunction:GetMonsterVec(monsters, ncount)
+            
+            if monsterVecNum < 1 then
+                local monsters, ncount = SL:GetValue("FIND_IN_VIEW_MONSTER_LIST")
+                monsterVec, monsterVecNum = GUIFunction:GetMonsterVec(monsters, ncount)
+            end
+        end
+
+        if monsterVecNum < 1 then
+            return nil
+        end
+        
+        -- find nearest monster
+        targetID = GUIFunction:FindNearestMonster(monsterVec, monsterVecNum, ignoreActorID)
+    end
+
+    if targetID and SL:GetValue("ACTOR_IS_VALID", targetID) then
+        return targetID
+    end
+    return nil
 end
 
 -- 受攻击后自动反击
@@ -3147,7 +3250,7 @@ end
 function GUIFunction:GenerateActorSayItem(data)
 
     local content = string.format("%s:%s", data.SendName, data.Msg)
-    local elements = createNormalElements(content, "fonts/font2.ttf", 12, "#FFFFFF", "#000000", 1, true)
+    local elements = createNormalElements(content, GUI.PATH_FONT2, 12, "#FFFFFF", "#000000", 1, true)
 
     local richText = GUI:RichTextCombine_Create(-1, "sayRichText", 0, 0, 200, 0)
     GUI:setAnchorPoint(richText, 0.5, 0)
@@ -4022,3 +4125,130 @@ function GUIFunction:SetScrollViewVerticalBar(parent, param)
     end)
 end
 --------------------------------------------------------------------------
+
+--------------------------- 主玩家检测手动移动触发 -------------------------
+local originPosTab = {}
+function GUIFunction:OnCheckInputMoveFunc()
+    local optionRunOne  = SL:GetValue("SERVER_OPTION", "RunOne") == true  -- 服务器开关控制跑1格
+    local isInputMove   = false
+    local isRunOne      = false
+    local moveDir       = 0xff
+    local moveStep      = 1
+    local moveType      = nil
+
+    -- 点地板
+    -- touchPos: 点击地图坐标 touchWay: 点击方式 -1:鼠标右键 1:鼠标左键/单击
+    local touchPos      = SL:GetValue("INPUT_MOUSE_TOUCH_POS")
+    local touchWay      = SL:GetValue("INPUT_MOUSE_TOUCH_WAY")
+    originPosTab.x      = SL:GetMetaValue("X")
+    originPosTab.y      = SL:GetMetaValue("Y")
+    if touchPos and touchPos.x ~= 0 and touchPos.y ~= 0 and touchWay and (touchPos.x ~= originPosTab.x or touchPos.y ~= originPosTab.y) then
+        moveDir = SL:GetMetaValue("TARGET_MAPPOS_DIR", originPosTab, touchPos)
+        moveStep = touchWay == -1 and 2 or 1
+        isRunOne = optionRunOne and touchWay == -1
+        isInputMove = (moveDir and moveDir ~= SLDefine.Direction.INVALID) == true
+        if isInputMove then
+            moveType = GUIDefine.InputMoveType.GRID
+        end
+    end
+
+    -- 摇杆
+    if not SL:GetValue("IS_PC_OPER_MODE") and not isInputMove then
+        moveDir, moveStep = MainJoyStick.GetGamePadMove()
+        isRunOne = isRunOne or (optionRunOne and moveStep == 2)
+        isInputMove = moveDir ~= SLDefine.Direction.INVALID
+        if isInputMove then
+            moveType = GUIDefine.InputMoveType.JOYSTICK
+        end
+    end
+
+    -- 输入了移动 (点底板或摇杆)
+    if isInputMove then
+        -- 校正步数
+        local runStep = SL:GetValue("RUN_STEP")
+        moveStep = moveStep == 2 and runStep or moveStep
+        moveStep = SL:GetValue("CAN_RUN_ABLE") and moveStep or 1
+        
+        -- 判断是否可开门
+        if SL:GetValue("CAN_OPEN_DOOR_BY_DIR", moveDir, moveStep) then
+            return false
+        end
+
+        -- 计算目标点
+        local inputX, inputY = SL:GetValue("CALC_DEST_POS_BY_DIR", moveDir, moveStep)
+
+        -- 限制范围移动
+        if SL:GetValue("CHECK_OUT_ESCORT_LIMIT_MOVE", inputX, inputY) then
+            SL:ShowSystemTips("你离镖车太远了！")
+            return false
+        end
+        
+        -- 移动失败
+        if inputX == nil or inputY == nil then
+            if moveDir ~= SL:GetMetaValue("DIR") then
+                -- 转向
+                SL:SetValue("TURN_DIR", moveDir)
+            end
+            return false
+        end
+
+        -- 发起移动
+        SL:SetValue("USER_TO_MOVE", inputX, inputY, moveType)
+    end
+    return true, isInputMove, isRunOne
+end
+--------------------------------------------------------------------------
+
+-------------------------------- 数值转换 ---------------------------------
+-- 获取简化数字
+function GUIFunction:GetSimpleNumber(n, places)
+    local places = places and "%." .. places .. "f" or "%.2f"
+    if n >= 100000000 then
+        return string.format(places .. "%s", n / 100000000, "亿")
+    end
+    if n >= 100000 then
+        return string.format(places .. "%s", n / 10000, "万")
+    end
+    if n >= 10000 then
+        return string.format(places .. "%s", n / 10000, "万")
+    end
+    return tostring(n)
+end
+
+local function unitFunc(num, pointBit)
+    if pointBit == 0 then
+        return math.floor(num)
+    end
+    local iNum, fNum = math.modf(num)
+    local fDecimal = math.pow(10, tostring(pointBit))
+    local newFNum = math.floor(tostring(fNum * fDecimal))
+    local newINum = iNum + (newFNum / fDecimal)
+    return newINum
+end
+
+-- 转化数值血量单位 过十亿(单位：E)   10w-99999w(单位：W）
+function GUIFunction:ConvertHPUnit(hp, pointBit, notCheckSet)
+    local hpNum = tonumber(hp) or 0
+    if hpNum < 0 then
+        return hpNum
+    end
+
+    if notCheckSet then
+        return hpNum
+    elseif SL:GetValue("SETTING_ENABLED", SLDefine.SETTINGID.SETTING_IDX_HP_UNIT) ~= 1 then
+        return hpNum
+    end
+
+    -- 小数点后几位  默认保留后两位
+    pointBit = pointBit or 2
+
+    if hpNum >= 1000000000 then
+        hp = unitFunc(hpNum / 100000000, pointBit) .. "E"
+    elseif hpNum >= 100000 and hpNum <= 999999999 then
+        hp = unitFunc(hpNum / 10000, pointBit) .. "W"
+    end
+
+    return hp
+end
+--------------------------------------------------------------------------
+

@@ -13,16 +13,114 @@ function AuctionBidding.main()
 
     AuctionBidding._quickCells = {}
     AuctionBidding._itemList = {}
+    AuctionBidding._selectItemMakeIdx = nil
     SL:RequestAuctionPutList(2)
 
     GUI:ListView_addMouseScrollPercent(AuctionBidding._ui.ListView_items)
 
+    AuctionBidding.InitBtnEvent()
     AuctionBidding.RegisterEvent()
 
     SL:AttachTXTSUI({
         root  = AuctionBidding._ui.Panel_1,
         index = SLDefine.SUIComponentTable.AuctionBidding
     })
+end
+
+function AuctionBidding.InitBtnEvent()
+    GUI:addOnClickEvent(AuctionBidding._ui.Button_bid, function()
+        if not AuctionBidding._selectItemMakeIdx then
+            return
+        end
+        local data = AuctionBidding._itemList[AuctionBidding._selectItemMakeIdx]
+        if not data then
+            return
+        end
+        local status = SL:GetValue("AUCTION_ITEM_STATE", data)
+        if status == 2 then
+            if data.sCurUser == SL:GetValue("USER_ID") then
+                SL:ShowSystemTips("无法连续出价")
+            else
+                UIOperator:OpenAuctionBidUI(data)
+            end
+        elseif status == 1 then
+            SL:ShowSystemTips("还未到开拍时间")
+        else
+            SL:ShowSystemTips("无法竞价")
+        end
+    end)
+
+    GUI:addOnClickEvent(AuctionBidding._ui.Button_buy, function()
+        if not AuctionBidding._selectItemMakeIdx then
+            return
+        end
+        local data = AuctionBidding._itemList[AuctionBidding._selectItemMakeIdx]
+        if not data then
+            return
+        end
+        local status = SL:GetValue("AUCTION_ITEM_STATE", data)
+        if status == 2 then
+            UIOperator:OpenAuctionBuyUI(data)
+        elseif status == 1 then
+            SL:ShowSystemTips("还未到开拍时间")
+        else
+            SL:ShowSystemTips("无法竞价")
+        end
+    end)
+
+    GUI:addOnClickEvent(AuctionBidding._ui.Button_acquire, function()
+        GUI:delayTouchEnabled(AuctionBidding._ui.Button_acquire)
+        if not AuctionBidding._selectItemMakeIdx then
+            return
+        end
+        local data = AuctionBidding._itemList[AuctionBidding._selectItemMakeIdx]
+        if not data then
+            return
+        end
+        if BagData.isToBeFull() then
+            SL:ShowSystemTips("背包空间不足！")
+            return
+        end
+        SL:RequestAcquireBidItem(AuctionBidding._selectItemMakeIdx)
+    end)
+end
+
+function AuctionBidding.RefreshBtnShow()
+    if not AuctionBidding._selectItemMakeIdx then
+        return
+    end
+    local item = AuctionBidding._itemList[AuctionBidding._selectItemMakeIdx]
+    if not item then
+        return
+    end
+    local bidAble = SL:GetValue("AUCTION_CAN_BID", item)
+    local buyAble = SL:GetValue("AUCTION_CAN_BUY", item)
+    GUI:setVisible(AuctionBidding._ui.Button_bid, bidAble)
+    GUI:setVisible(AuctionBidding._ui.Button_buy, buyAble)
+
+    if item.btFlag == 1 and item.sCurUser == SL:GetValue("USER_ID") then
+        GUI:setVisible(AuctionBidding._ui.Button_acquire, true)
+        GUI:setVisible(AuctionBidding._ui.Button_buy, false)
+    else
+        GUI:setVisible(AuctionBidding._ui.Button_acquire, false)
+    end
+end
+
+function AuctionBidding.ResetLastSelectShow()
+    if not AuctionBidding._selectItemMakeIdx then
+        return
+    end
+    local qCell = AuctionBidding._quickCells[AuctionBidding._selectItemMakeIdx]
+    if not qCell or GUI:Widget_IsNull(qCell) then
+        return
+    end
+
+    local cell = GUI:getChildren(qCell)[1]
+    -- 清除上次选中显示
+    local selectImg = cell and GUI:getChildByName(cell, "Image_select")
+    if selectImg then
+        GUI:setVisible(selectImg, false)
+    end
 end
 
 -- 道具列表 cell
@@ -84,11 +182,11 @@ function AuctionBidding.CreateItemCell(parent, data)
         local bidAble = SL:GetValue("AUCTION_CAN_BID", data)
         if bidAble then
             if status == 2 then
-                GUI:Button_setTitleColor(ui.Button_bid, "#FFFFFF")
+                -- GUI:Button_setTitleColor(ui.Button_bid, "#FFFFFF")
                 GUI:setVisible(ui.Text_status, true)
 
                 if data.sCurUser == mainPlayerID then
-                    GUI:Text_setString(ui.Text_status, "您目前竞价最高")
+                    GUI:Text_setString(ui.Text_status, "您目前\n竞价最高")
                     GUI:Text_setTextColor(ui.Text_status, "#28ef01")
                 elseif data.sCurUser ~= mainPlayerID and data.joinuser == 1 then
                     GUI:Text_setString(ui.Text_status, "竞价被超过")
@@ -100,18 +198,7 @@ function AuctionBidding.CreateItemCell(parent, data)
                     GUI:setVisible(ui.Text_status, false)
                 end
             else
-                GUI:Button_setTitleColor(ui.Button_bid, "#A6A6A6")
                 GUI:setVisible(ui.Text_status, false)
-            end
-        end
-
-        -- 一口价
-        local buyAble = SL:GetValue("AUCTION_CAN_BUY", data)
-        if buyAble then
-            if status == 2 then
-                GUI:Button_setTitleColor(ui.Button_buy, "#FFFFFF")
-            else
-                GUI:Button_setTitleColor(ui.Button_buy, "#A6A6A6")
             end
         end
     end
@@ -123,23 +210,7 @@ function AuctionBidding.CreateItemCell(parent, data)
     if bidAble then
         GUI:removeAllChildren(ui.Node_bid_price)
         AuctionBidding.CreatePriceCell(ui.Node_bid_price, { id = data.btType, count = data.nCurPrice })
-
-        GUI:addOnClickEvent(ui.Button_bid, function()
-            local status = SL:GetValue("AUCTION_ITEM_STATE", data)
-            if status == 2 then
-                if data.sCurUser == mainPlayerID then
-                    SL:ShowSystemTips("无法连续出价")
-                else
-                    UIOperator:OpenAuctionBidUI(data)
-                end
-            elseif status == 1 then
-                SL:ShowSystemTips("还未到开拍时间")
-            else
-                SL:ShowSystemTips("无法竞价")
-            end
-        end)
     else
-        GUI:setVisible(ui.Button_bid, false)
         GUI:setPositionY(ui.Text_status, math.floor(AuctionBidding._itemSize.height / 2))
         GUI:Text_setTextColor(ui.Text_status, "#FFFFFF")
         GUI:Text_setString(ui.Text_status, "无法竞价")
@@ -150,48 +221,28 @@ function AuctionBidding.CreateItemCell(parent, data)
     if buyAble then
         GUI:removeAllChildren(ui.Node_price)
         AuctionBidding.CreatePriceCell(ui.Node_price, { id = data.btType, count = data.nLastPrice })
-
-        GUI:addOnClickEvent(ui.Button_buy, function()
-            local status = SL:GetValue("AUCTION_ITEM_STATE", data)
-            if status == 2 then
-                UIOperator:OpenAuctionBuyUI(data)
-            elseif status == 1 then
-                SL:ShowSystemTips("还未到开拍时间")
-            else
-                SL:ShowSystemTips("无法竞价")
-            end
-        end)
     end
-    GUI:setVisible(ui.Button_buy, buyAble)
     GUI:setVisible(ui.Text_unable_buy, not buyAble)
-
-    -- 领取
-    GUI:addOnClickEvent(ui.Button_acquire, function()
-        GUI:delayTouchEnabled(ui.Button_acquire)
-        if BagData.isToBeFull() then
-            SL:ShowSystemTips("背包空间不足！")
-            return
-        end
-        SL:RequestAcquireBidItem(data.item.MakeIndex)
-    end)
 
     -- 领取or拍卖
     if data.btFlag == 1 and data.sCurUser == mainPlayerID then
         GUI:setVisible(ui.Text_acquire, true)
-        GUI:setVisible(ui.Button_acquire, true)
-        GUI:setPositionX(ui.Node_bid_price, SL:GetValue("IS_PC_OPER_MODE") and 430 or 520)
-
         GUI:stopAllActions(ui.Text_remaining)
         GUI:Text_setString(ui.Text_remaining, "-")
         GUI:setVisible(ui.Text_unable_buy, false)
-        GUI:setVisible(ui.Button_buy, false)
         GUI:setVisible(ui.Node_price, false)
         GUI:setVisible(ui.Text_status, false)
         GUI:setVisible(ui.Button_bid, false)
     else
         GUI:setVisible(ui.Text_acquire, false)
-        GUI:setVisible(ui.Button_acquire, false)
     end
+
+    GUI:addOnClickEvent(cell, function()
+        AuctionBidding.ResetLastSelectShow()
+        AuctionBidding._selectItemMakeIdx = data.item.MakeIndex
+        GUI:setVisible(ui.Image_select, true)
+        AuctionBidding.RefreshBtnShow()
+    end)
 
     return cell
 end
@@ -294,7 +345,7 @@ function AuctionBidding.OnAuctionItemChange(data)
     local quickCell = AuctionBidding._quickCells[item.item.MakeIndex]
     local mainPlayerID = SL:GetValue("USER_ID")
     if (item.btFlag == 0 or (item.btFlag == 1 and item.sCurUser == mainPlayerID)) then
-        AuctionBidding._itemList[item.MakeIndex] = item
+        AuctionBidding._itemList[item.item.MakeIndex] = item
         GUI:QuickCell_Exit(quickCell)
         GUI:QuickCell_Refresh(quickCell)
     else

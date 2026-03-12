@@ -148,6 +148,8 @@ function MainProperty.main()
     MainProperty.InitQuickUseItems()
 
     MainProperty.RegisterEvent()
+
+    MainProperty.TargetData = nil --电脑PC端私聊数据
     
     GUI:RefPosByParent(MainProperty._root)
     SL:AttachTXTSUI({root = MainProperty._ui["Panel_chat_funcs"], index = SLDefine.SUIComponentTable.PCMainPropertyFuncs})
@@ -447,7 +449,11 @@ function MainProperty.InitActPanel()
         GUI:addOnClickEvent(MainProperty._ui["Button_heroinfo"], function()
             if SL:GetValue("HERO_IS_ALIVE") then
                 -- 打开英雄角色面板
-                UIOperator:OpenMyHeroUI()
+                if HeroFrame and GUI:GetWindow(nil, UIConst.LAYERID.HeroMainGUI) then
+                    UIOperator:CloseMyHeroUI()
+                else
+                    UIOperator:OpenMyHeroUI() 
+                end
             end
         end)
         GUI:addMouseOverTips(MainProperty._ui["Button_heroinfo"], "英雄状态", {x = 0, y = 0}, {x = 0.5, y = 0.5})
@@ -456,7 +462,11 @@ function MainProperty.InitActPanel()
         GUI:addOnClickEvent(MainProperty._ui["Button_herobag"], function()
             if SL:GetValue("HERO_IS_ALIVE") then
                 -- 打开英雄背包
-                UIOperator:OpenHeroBagUI()
+                if HeroBag and GUI:GetWindow(nil, UIConst.LAYERID.HeroBagLayerGUI) then
+                    UIOperator:CloseHeroBagUI()
+                else
+                    UIOperator:OpenHeroBagUI() 
+                end
             end
         end)
         GUI:addMouseOverTips(MainProperty._ui["Button_herobag"], "英雄包裹", {x = 20, y = 0}, {x = 0.5, y = 0.5})
@@ -1185,6 +1195,7 @@ function MainProperty.OnFillChatInput(str)
 end
 
 function MainProperty.OnPrivateChatWithTarget(data)
+    MainProperty.TargetData = data
     GUI:Text_setString(MainProperty._ui["TextField_input"], string.format("/%s ", data.name))
 end
 
@@ -2215,7 +2226,7 @@ function MainProperty.RegisterEvent()
     
     SL:RegisterLUAEvent(LUA_EVENT_WINDOW_CHANGE, "MainProperty", MainProperty.OnWindowChange)
     SL:RegisterLUAEvent(LUA_EVENT_MAIN_CLOSE_KEYBOARD, "MainProperty", MainProperty.OnCloseKeyBoard) 
-    SL:RegisterLUAEvent(LUA_EVENT_MAIN_PROPERTY_ON_KEY_ENTER, "MainProperty", MainProperty.handlePressedEnter)
+    SL:RegisterLUAEvent(LUA_EVENT_MAIN_PROPERTY_ON_KEY_ENTER , "MainProperty", MainProperty.handlePressedEnter)
 end
 ----------------------------------------------------------------------------------------------
 
