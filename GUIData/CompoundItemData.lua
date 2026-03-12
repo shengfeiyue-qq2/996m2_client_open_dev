@@ -573,5 +573,3 @@ function CompoundItemData.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_COMPOUND_ITEM_RESULT, "CompoundItemData", CompoundItemData.OnCompoundItemResult)
 end
 ----------------------------------------------------------
-
-CompoundItemData.Init()

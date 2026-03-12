@@ -239,6 +239,9 @@ function BagData.AmendHistoryPos(sort, data)
         local makeIndex = item.MakeIndex
         local newPos = BagData.GetEmptyPos()
         if newPos then
+            if BagData._bagNoPosItems[makeIndex] then
+                BagData._bagNoPosItems[makeIndex] = nil
+            end
             BagData.SetBagPosByMakeIndex(makeIndex, newPos)
         else
             BagData._bagNoPosItems[makeIndex] = item
