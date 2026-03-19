@@ -465,7 +465,7 @@ function MainSkill.CreateSelectSfx(parent, skillID)
     local sfx = GUI:Effect_Create(parent, "sfx", 0, 0, 0, 4005)
     GUI:Effect_setGlobalElapseEnable(sfx, true)
 
-    local key = SL:GetValue("SKILL_KEY", skillID)
+    local key = SL:GetValue("SKILL_DATA_BY_KEY", skillID)
     if key == 1 then
         GUI:setScale(sfx, 0.9)      -- 主技能特效缩放比例
     else

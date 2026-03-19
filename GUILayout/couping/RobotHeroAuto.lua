@@ -280,6 +280,7 @@ local function isInvalidEquip(item)
         return true
     end
 end
+local checkFixArticleType = {[GUIDefine.ItemArticleType.TYPE_FIX] = true}
 
 function RobotHeroAuto.AutoUseFIXItem(delta)
     if SL:GetValue("USER_IS_DIE") then

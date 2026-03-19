@@ -492,7 +492,7 @@ function ExchangeBuy.CreateItemCell(parent, item)
         if item.remainqty == 1 then
             local function callback(bType)
                 if bType == 1 then
-                    SL:RequestExchangeBuy({ guid = item.guid, qty = item.remainqty })
+                    SL:RequestExchangeBuyPanel({ guid = item.guid, qty = item.remainqty })
                 end
             end
             local data = {}

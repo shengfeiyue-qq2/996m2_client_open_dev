@@ -246,6 +246,8 @@ function ExchangeData.Operaback(data)
         SL:ShowSystemTips("有未提取道具不允许下架")
     elseif errorcode == -9 then
         SL:ShowSystemTips("不允许操作绑定物品")
+    elseif errorcode == -10 then
+        SL:ShowSystemTips("不允许上架")
     elseif errorcode == -11 then
         SL:ShowSystemTips("不允许购买")    
     end
