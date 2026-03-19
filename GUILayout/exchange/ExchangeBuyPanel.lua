@@ -200,7 +200,7 @@ function ExchangeBuyPanel.InitShow()
         end
         local reqNum = math.min(ExchangeBuyPanel._itemNum, item.remainqty)
         if item.guid then
-            SL:RequestExchangeBuyPanel({ guid = item.guid, qty = reqNum })
+            SL:RequestExchangeBuy({ guid = item.guid, qty = reqNum })
             GUI:delayTouchEnabled(sender)
         end
         UIOperator:CloseExchangeBuyPanelUI()

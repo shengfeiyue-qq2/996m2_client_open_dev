@@ -1,9 +1,20 @@
 LoginRolePanel = {}
 
+
 LoginRolePanel._animLightID = {4121, 4127, 4123, 4129, 4125, 4131}      -- 人物常亮动画id  顺序：男战士、女战士、男法师、女法师、男道士、女道士
 LoginRolePanel._animGToLID  = {4122, 4128, 4124, 4130, 4126, 4132}      -- 人物灰到亮动画id   
 LoginRolePanel._animPos     = {x = 0, y = 170}                          -- 人物特效位置    (基于 Node_anim_1/2)
 LoginRolePanel._animScale   = {1, 1}                                    -- 左右动画缩放
+
+local fashionStdMode = {[66] = true, [67] = true, [68] = true, [69] = true}
+local function isFashionEquip(item)
+    if item and item.StdMode then
+        if fashionStdMode[item.StdMode] then
+            return true
+        end
+    end
+    return false
+end
 
 LoginRolePanel._createJobPath = {         -- 创角页职业图标路径
     normal = {
@@ -346,7 +357,6 @@ function LoginRolePanel.OnSelectRole(index, isInit)
     if not isInit then
         SL:PlaySelectRoleAudio()
     end
-
     local animID = LoginRolePanel._animLightID
     local animGID = LoginRolePanel._animGToLID
     local position = LoginRolePanel._animPos
@@ -372,22 +382,42 @@ function LoginRolePanel.OnSelectRole(index, isInit)
                 if LoginRolePanel._index == i then
                     if isInit then
                         if _animLightID then
-                            local anim = GUI:Effect_Create(LoginRolePanel._ui["Node_anim_" .. i], "role_effect" .. i, position.x, position.y, 0, _animLightID)
-                            GUI:setScale(anim, scale)
+                            if SL:GetValue("GAME_DATA", "RoleModelShowSUI") == 1  then
+                                if roles[i].feature then
+                                    local jsonData = SL:JsonDecode(roles[i].feature)
+                                    local anim = LoginRolePanel.NewCreateRole(jsonData,LoginRolePanel._ui["Node_anim_" .. i], i)
+                                end
+                            else
+                                local anim = GUI:Effect_Create(LoginRolePanel._ui["Node_anim_" .. i], "role_effect" .. i, position.x, position.y, 0, _animLightID)
+                                GUI:setScale(anim, scale)
+                            end
                         end
                     else
                         if _animGToLID then
-                            local animG = GUI:Effect_Create(LoginRolePanel._ui["Node_anim_" .. i], "role_effect_G" .. i, position.x, position.y, 0, _animGToLID)
-                            GUI:setScale(animG, scale)
-                            GUI:Effect_addOnCompleteEvent(animG, function()
-                                GUI:removeFromParent(animG)
-                                if _animLightID then
-                                    local anim = GUI:Effect_Create(LoginRolePanel._ui["Node_anim_" .. i], "role_effect" .. i, position.x, position.y, 0, _animLightID)
-                                    GUI:setScale(anim, scale)
+                            if SL:GetValue("GAME_DATA", "RoleModelShowSUI") == 1  then 
+                                if roles[i].feature then
+                                    local jsonData = SL:JsonDecode(roles[i].feature)
+                                    local animG = LoginRolePanel.NewCreateRole(jsonData,LoginRolePanel._ui["Node_anim_" .. i], i)
+                                    GUI:addOnTouchEvent(animG, function()
+                                        GUI:removeFromParent(animG)
+                                        if _animLightID then
+                                            local animG = LoginRolePanel.NewCreateRole(jsonData,LoginRolePanel._ui["Node_anim_" .. i], i)
+                                        end
+                                    end)
                                 end
-                            end)
-                        end
+                            else
+                                local animG = GUI:Effect_Create(LoginRolePanel._ui["Node_anim_" .. i], "role_effect_G" .. i, position.x, position.y, 0, _animGToLID)
+                                GUI:setScale(animG, scale)
+                                GUI:Effect_addOnCompleteEvent(animG, function()
+                                    GUI:removeFromParent(animG)
+                                    if _animLightID then
+                                        local anim = GUI:Effect_Create(LoginRolePanel._ui["Node_anim_" .. i], "role_effect" .. i, position.x, position.y, 0, _animLightID)
+                                        GUI:setScale(anim, scale)
+                                    end
+                                end)
+                            end
 
+                        end
                         local sfx = GUI:Effect_Create(LoginRolePanel._ui["Node_anim_" .. i], "role_sfx" .. i, position.x, position.y, 0, 4114)
                         GUI:Effect_addOnCompleteEvent(sfx, function()
                             GUI:removeFromParent(sfx)
@@ -396,19 +426,35 @@ function LoginRolePanel.OnSelectRole(index, isInit)
                 else
                     if isInit then
                         if _animGToLID then
-                            local animG = GUI:Effect_Create(LoginRolePanel._ui["Node_anim_" .. i], "role_effect_G" .. i, position.x, position.y, 0, _animGToLID)
-                            GUI:setScale(animG, scale)
-                            GUI:Effect_play(animG, 0, 0, false, 1, false)
-                            GUI:Effect_stop(animG, 1)
+                            if SL:GetValue("GAME_DATA", "RoleModelShowSUI") == 1  then
+                                if roles[i].feature then
+                                    local jsonData = SL:JsonDecode(roles[i].feature)
+                                    local animG = LoginRolePanel.NewCreateRole(jsonData,LoginRolePanel._ui["Node_anim_" .. i], i)
+                                    LoginRolePanel.SetModelGrey(animG, true)
+                                end
+                            else
+                                local animG = GUI:Effect_Create(LoginRolePanel._ui["Node_anim_" .. i], "role_effect_G" .. i, position.x, position.y, 0, _animGToLID)
+                                GUI:setScale(animG, scale)
+                                GUI:Effect_play(animG, 0, 0, false, 1, false)
+                                GUI:Effect_stop(animG, 1)
+                            end
                         end
                     else
                         if _animGToLID then
-                            local animG = GUI:Effect_Create(LoginRolePanel._ui["Node_anim_" .. i], "role_effect_G" .. i, position.x, position.y, 0, _animGToLID)
-                            GUI:setScale(animG, scale)
-                            GUI:Effect_play(animG, 0, 0, false, 1, false)
-                            GUI:Effect_addOnCompleteEvent(animG, function()
-                                GUI:Effect_stop(animG, 1)
-                            end)
+                            if  SL:GetValue("GAME_DATA", "RoleModelShowSUI") == 1  then
+                                if roles[i].feature then
+                                    local jsonData = SL:JsonDecode(roles[i].feature)
+                                    local animG = LoginRolePanel.NewCreateRole(jsonData,LoginRolePanel._ui["Node_anim_" .. i], i)
+                                    LoginRolePanel.SetModelGrey(animG, true)
+                                end
+                            else
+                                local animG = GUI:Effect_Create(LoginRolePanel._ui["Node_anim_" .. i], "role_effect_G" .. i, position.x, position.y, 0, _animGToLID)
+                                GUI:setScale(animG, scale)
+                                GUI:Effect_play(animG, 0, 0, false, 1, false)
+                                GUI:Effect_addOnCompleteEvent(animG, function()
+                                    GUI:Effect_stop(animG, 1)
+                                end)
+                            end
                         end
                     end
                 end
@@ -416,6 +462,104 @@ function LoginRolePanel.OnSelectRole(index, isInit)
         end
     end
 
+end
+function LoginRolePanel.NewCreateRole(looks, node , index)
+    local LoginProxy = global.Facade:retrieveProxy(global.ProxyTable.LoginProxy)
+    local ItemConfigProxy = global.Facade:retrieveProxy(global.ProxyTable.ItemConfigProxy)
+    if looks then
+        local config = {}
+
+
+        local equipConfig = SL:RequireFile("game_config/cfg_equip", true)
+        for k,v in pairs(equipConfig) do
+            if not config[v.Index] then
+                config[v.Index] = v
+            end
+        end
+
+        local weaponIndex = (looks.weaponID and tonumber(looks.weaponID) > 0) and looks.weaponID or nil
+        local helmetIndex = (looks.Helmet and tonumber(looks.Helmet) > 0) and looks.Helmet or nil
+        local dressIndex = (looks.clothID and tonumber(looks.clothID) > 0) and looks.clothID or nil
+        local capsIndex = (looks.Cap and tonumber(looks.Cap) > 0) and looks.Cap or nil
+        local veilIndex = (looks.face and tonumber(looks.face) > 0) and looks.face or nil
+        local shieldIndex = (looks.Shield and tonumber(looks.Shield) > 0) and looks.Shield or nil
+        local weaponData = weaponIndex and config[tonumber(weaponIndex)] or nil
+        local helmetData = helmetIndex and config[tonumber(helmetIndex)] or nil
+        local dressData = dressIndex and config[tonumber(dressIndex)] or nil
+        local capData = capsIndex and config[tonumber(capsIndex)] or nil
+        local veilData = veilIndex and config[tonumber(veilIndex)] or nil
+        local shieldData = shieldIndex and config[tonumber(shieldIndex)] or nil
+        local sex = tonumber(looks.Sex)
+        local modelData = {}
+        if isFashionEquip(dressData) then
+            local fashionSwitch = SL:GetValue("GAME_DATA", "Fashionfx")
+            local noShowNakedModel = fashionSwitch and tonumber(fashionSwitch) or 0
+            modelData = {
+                clothID = dressData and dressData.Looks or nil,
+                clothEffectID = dressData and dressData.sEffect or nil,
+                weaponID = weaponData and weaponData.Looks or nil,
+                weaponEffectID = weaponData and weaponData.sEffect or nil,
+                showNodeModel = noShowNakedModel == 0,
+                showHair = noShowNakedModel == 0,
+            }
+        else
+            modelData = {
+                clothID = dressData and dressData.Looks or nil,
+                clothEffectID = dressData and dressData.sEffect or nil,
+                weaponID = weaponData and weaponData.Looks or nil,
+                weaponEffectID = weaponData and weaponData.sEffect or nil,
+                headID = helmetData and helmetData.Looks or nil,
+                headEffectID = helmetData and helmetData.sEffect or nil,
+                hairID = looks.Hair,
+                capID = capData and capData.Looks or nil,
+                capEffectID = capData and capData.sEffect or nil,
+                veilID = veilData and veilData.Looks or nil,
+                veilEffectID = veilData and veilData.sEffect or nil,
+                shieldID = shieldData and shieldData.Looks or nil,
+                shieldEffectID = shieldData and shieldData.sEffect or nil,
+                showNodeModel = true,
+                showHair = true
+            }
+            if dressData and dressData.zblmtkz and tonumber(dressData.zblmtkz) == 1 then
+                modelData.showNodeModel = false
+                modelData.showHair = false
+            end
+        end
+        -- 配置隐藏头盔斗笠显示
+        if SL:GetValue("GAME_DATA", "hideRankHeadCapShow") == 1 then
+            modelData.headID = nil
+            modelData.headEffectID = nil
+            modelData.capID = nil
+            modelData.capEffectID = nil
+        end
+        local widget = ccui.Widget:create()
+
+        local UIModel = GUI:UIModel_Create(node, "role_effect"..index, 0, 150, sex, modelData, 0.8, true, tonumber(looks.Job),{ext_node = widget})
+        return UIModel
+    end
+end
+
+function LoginRolePanel.SetModelGrey(model, isGrey)
+    if not model then
+        return
+    end
+    
+    local function setNodeGrey(node)
+        if not node then
+            return
+        end
+
+        GUI:setGrey(node, isGrey)
+        
+        local children = node:getChildren()
+        if children then
+            for i, child in ipairs(children) do
+                setNodeGrey(child)
+            end
+        end
+    end
+    
+    setNodeGrey(model)
 end
 
 function LoginRolePanel.OnCreateRole()

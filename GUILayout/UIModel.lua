@@ -16,7 +16,14 @@ local NGOrders = {
 	MODEL_LAYER_Z_SHIELD     = 16, -- 盾牌
 }
 
-local equipOffset = EquipData.GetEquipModelOffSet()
+local equipOffset 
+if equipOffset == nil then
+    if EquipData.Init then 
+        EquipData.Init()
+    end
+    equipOffset = EquipData.GetEquipModelOffSet()
+end
+
 local IsPcModel   = SL:GetValue("IS_PC_OPER_MODE")
 
 local calcFileInfoByLooksID = function (looks)
@@ -24,7 +31,7 @@ local calcFileInfoByLooksID = function (looks)
 end
 
 function UIModel.main(sex, feature, scale, params)
-    local parent = GUI:Attach_LeftBottom()
+    local parent = params.ext_node or GUI:Attach_LeftBottom()
     if not parent then
         return
     end
