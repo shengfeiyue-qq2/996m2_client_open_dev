@@ -17,6 +17,7 @@ local NGOrders = {
 }
 
 local equipOffset = EquipData.GetEquipModelOffSet()
+
 local IsPcModel   = SL:GetValue("IS_PC_OPER_MODE")
 
 local calcFileInfoByLooksID = function (looks)
@@ -24,7 +25,7 @@ local calcFileInfoByLooksID = function (looks)
 end
 
 function UIModel.main(sex, feature, scale, params)
-    local parent = GUI:Attach_LeftBottom()
+    local parent = params.ext_node or GUI:Attach_LeftBottom()
     if not parent then
         return
     end
