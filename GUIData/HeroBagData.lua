@@ -462,7 +462,7 @@ function HeroBagData.ClearItemData(isReconnect)
     HeroBagData._itemCountByIndex = {}
     HeroBagData._isInit = false
     if not isReconnect then 
-        self:CleanBagPosData()
+        HeroBagData.CleanBagPosData()
     end
 end
 
@@ -560,6 +560,7 @@ function HeroBagData.ResponseBagItemData(data)
     end
     local data = data.data
     -- 修正本地位置信息数据
+    HeroBagData._bagItemsCount = 0
     HeroBagData.AmendHistoryPos(false, data)
     
     local operator = {}
@@ -611,21 +612,21 @@ function HeroBagData.ResponseDelItem(data)
     local makeIndex = header.Guid
     local itemBelong = SL:GetValue("ITEM_BELONG_BY_MAKEINDEX", makeIndex) 
     if not itemBelong then
-        SL:Print("delete item error, can't find item belong")
+        SL:Print("delete hero item error, can't find item belong")
         return
     end
 
     if itemBelong == GUIDefine.ItemBelong.HEROBAG then
         local itemData = HeroBagData.GetItemDataByMakeIndex(makeIndex)
         if not itemData then
-            SL:Print("delete item error, can't find item")
+            SL:Print("delete hero item error, can't find item")
             return
         end
         HeroBagData.DelItemData(itemData, true)
     elseif itemBelong == GUIDefine.ItemBelong.HEROEQUIP then
         local itemData = HeroEquipData.GetEquipDataByMakeIndex(makeIndex)
         if not itemData then
-            SL:Print("delete item error, can't find item")
+            SL:Print("delete hero item error, can't find item")
             return
         end
         HeroEquipData.DelEquipData(itemData)

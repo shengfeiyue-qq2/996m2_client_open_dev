@@ -294,7 +294,7 @@ function AuctionBidding.OnAuctionItemChange(data)
     local quickCell = AuctionBidding._quickCells[item.item.MakeIndex]
     local mainPlayerID = SL:GetValue("USER_ID")
     if (item.btFlag == 0 or (item.btFlag == 1 and item.sCurUser == mainPlayerID)) then
-        AuctionBidding._itemList[item.MakeIndex] = item
+        AuctionBidding._itemList[item.item.MakeIndex] = item
         GUI:QuickCell_Exit(quickCell)
         GUI:QuickCell_Refresh(quickCell)
     else

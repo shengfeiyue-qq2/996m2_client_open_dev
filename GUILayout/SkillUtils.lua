@@ -1037,7 +1037,7 @@ SkillUtils.FindAutoLaunchSkill = function()
             isNeighbors = true
         end
 
-        skillID, destPosT1, destPosT2 = SkillUtils.CheckSkillLaunch(_skillID, targetID)
+        skillID, destPosT1, destPosT2 = SkillUtils.CheckAbleToAutoLaunch(_skillID, targetID)
         if skillID then
             destPosX = destPosT1
             destPosY = destPosT2
