@@ -40,7 +40,7 @@ end
 function PlayerBuff.OnClose()
     SL:UnRegisterLUAEvent(LUA_EVENT_MAINPLAYER_BUFF_UPDATE, "PlayerBuff")
     
-    SL:AttachTXTSUI({
+    SL:UnAttachTXTSUI({
         index = SLDefine.SUIComponentTable.PlayerBuff
     })
 end
