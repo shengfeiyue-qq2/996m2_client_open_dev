@@ -1917,7 +1917,7 @@ local function addActorMoveEffectToMap(effectID, mapX, mapY)
     local sceneRoot = GUI:Attach_SceneB()
     local moveEffectRoot = GUI:getChildByID(sceneRoot, "MAP_MOVE_EFFCT_ROOT")
     if not moveEffectRoot then
-        moveEffectRoot = GUI:Node_Create(-1, "MAP_MOVE_EFFCT_ROOT")
+        moveEffectRoot = GUI:Node_Create(-1, "MAP_MOVE_EFFCT_ROOT", 0, 0)
         GUI:addChild(sceneRoot, moveEffectRoot, 999)
     end
     local wX, wY = SL:ConvertMapPos2WorldPos(mapX, mapY)

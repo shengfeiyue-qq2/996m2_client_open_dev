@@ -8,6 +8,10 @@ function UIOperator:OpenMyPlayerUI(data)
 
     GUI:SetLayerOpenParam(data)
 
+    if PlayerFrame and PlayerFrame.OnClose then
+        PlayerFrame.OnClose()
+    end
+
     if GUIDefineEx.IsMergeMode then
         GUI:Win_Open(UIConst.LUAFile.LUA_FILE_MERGE_PLAYER_MAIN)
     else
