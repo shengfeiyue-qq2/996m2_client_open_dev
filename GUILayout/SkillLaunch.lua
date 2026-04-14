@@ -411,6 +411,7 @@ function SkillLaunch.CheckAttackRange(skillID, param)
             SharedInputMoveTab.targetID = targetID
             SharedInputMoveTab.x        = moveX
             SharedInputMoveTab.y        = moveY
+            SharedInputMoveTab.type     = GUIDefine.InputMoveType.LAUNCH
             SL:InputMove(SharedInputMoveTab)
             SL:ResetInputLaunchDirty()
 
