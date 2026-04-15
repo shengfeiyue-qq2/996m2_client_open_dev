@@ -2,8 +2,7 @@ local SkillLaunch = {}
 
 local SharedInputMoveTab = {}
 
-local checkOtherTargetPoints    = 30    -- 超出该路径限制查找其他可攻击目标
-local isFarMovePointsLimit      = 50    -- 远距离寻路路径点限制
+local isFarMovePointsLimit = 30    -- 远距离寻路路径点限制
 
 local mMax = math.max
 local mAbs = math.abs
@@ -445,16 +444,18 @@ function SkillLaunch.CheckAttackRange(skillID, param)
                 end
             end
 
-            -- 目标移动路径点超出限制, 查找其他可攻击目标, 有则忽略当前目标3秒; 无则判定是否远距离寻怪
-            if pathPoints > checkOtherTargetPoints then
+            -- 目标移动路径点超出限制, 标记远距离寻怪坐标
+            if pathPoints > isFarMovePointsLimit then
                 if targetID and SL:GetValue("ACTOR_IS_VALID", targetID) then
                     local autoTarget = SL:GetValue("AUTO_TARGET")
-                    local targetIndex = autoTarget.targetIndex
                     local targetType = autoTarget.targetType
                     if SL:GetValue("BATTLE_IS_AUTO_FIGHT_STATE") and targetType == GUIDefine.ActorType.MONSTER 
                       and not SL:GetValue("ACTOR_IS_PAUSE_IGNORED", targetID) and not SL:GetValue("ACTOR_IS_IGNORED", targetID) then
-                        local otherTargetID = GUIFunction:GetCurAutoFindTargetID(targetID)
-                        if otherTargetID then
+                        GUIFunction:SetInViewTargetCheckFlag(targetID)
+
+                        if SL:GetValue("LAST_LAUNCH_MOVE_FAR_POS") then
+                            -- 移动到上次远距离寻怪路径
+                            local lastPosX, lastPosY = SL:GetValue("LAST_LAUNCH_MOVE_FAR_POS")
                             SL:SetValue("ACTOR_IS_IGNORED", targetID, true)
 
                             -- clear launch data
@@ -463,11 +464,18 @@ function SkillLaunch.CheckAttackRange(skillID, param)
                             SL:ClearInputLaunch()
                             SL:SetValue("CLEAR_CUR_MOVE")
                             SL:SetValue("SELECT_TARGET_ID", nil)
-                        elseif pathPoints > isFarMovePointsLimit then
-                            SL:SetValue("IS_FAR_PATH_MOVE_FOR_TARGET", true)
+                            SharedInputMoveTab.skillID  = nil
+                            SharedInputMoveTab.targetID = nil
+                            SharedInputMoveTab.x        = lastPosX
+                            SharedInputMoveTab.y        = lastPosY
+                            SL:InputMove(SharedInputMoveTab)
+                        else
+                            SL:SetValue("LAST_LAUNCH_MOVE_FAR_POS", moveX, moveY)
                         end
                     end
                 end
+            else
+                SL:SetValue("LAST_LAUNCH_MOVE_FAR_POS", nil, nil)
             end
 
             return false
@@ -496,6 +504,8 @@ function SkillLaunch.CheckAttackRange(skillID, param)
             SL:SetValue("ACTOR_IS_PAUSE_IGNORED", targetID, false)
         end
     end
+
+    SL:SetValue("LAST_LAUNCH_MOVE_FAR_POS", nil, nil)
 
     return true
 end

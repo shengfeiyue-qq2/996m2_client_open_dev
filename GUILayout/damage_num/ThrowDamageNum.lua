@@ -18,8 +18,8 @@ local function unitFunc(num)
         return math.floor(num)
     end
     local iNum, fNum = math.modf(num)
-    local fDecimal = math.pow(10, tostring(pointBit))
-    local newFNum = math.floor(tostring(fNum * fDecimal))
+    local fDecimal = math.pow(10, pointBit)
+    local newFNum = math.floor(fNum * fDecimal)
     local newINum = iNum + (newFNum / fDecimal)
     return newINum
 end

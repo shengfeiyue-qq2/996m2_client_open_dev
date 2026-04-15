@@ -292,7 +292,7 @@ function AuctionTimeout.ShowCurrencyCells()
     GUI:setVisible(AuctionTimeout.Image_currency, true)
 
     for key, value in ipairs(AuctionTimeout._currcies) do
-        local cell = AuctionTimeout.CreateCurrencyCell(value)
+        local cell = AuctionTimeout.CreateCurrencyCell()
         GUI:setVisible(cell["Image_bg"], false)
         local goodsItem = GUI:ItemShow_Create(cell["Node_item"], "goodsItem", 0, 0,
             { index = value.item.Index, itemData = value.item })

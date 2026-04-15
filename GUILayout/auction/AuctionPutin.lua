@@ -333,7 +333,7 @@ function AuctionPutin.ShowCurrencyCells()
     GUI:setVisible(AuctionPutin.Image_currency, true)
 
     for key, value in ipairs(AuctionPutin._currcies) do
-        local cell = AuctionPutin.CreateCurrencyCell(value)
+        local cell = AuctionPutin.CreateCurrencyCell()
         GUI:setVisible(cell["Image_bg"], false)
         local goodsItem = GUI:ItemShow_Create(cell["Node_item"], "goodsItem", 0, 0, { index = value.item.Index, itemData = value.item })
         GUI:setAnchorPoint(goodsItem, 0.5, 0.5)

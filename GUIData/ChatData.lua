@@ -929,7 +929,7 @@ function ChatData.ParseMiniItem(data)
 
     local isOpen = tonumber(SL:GetValue("GAME_DATA", "PCSwitchChannelShow")) == 1
     if SL:GetValue("IS_PC_OPER_MODE") and isOpen then
-        ChatData.StoragePCItem(item, data.ChannelId, data.dropType)
+        ChatData.StoragePCItem(item, data.ChannelId)
     end
 end
 
@@ -945,7 +945,7 @@ function ChatData.ParsePCPItem(data)
         end
         SL:onLUAEvent(LUA_EVENT_CHAT_PCPRIVATE_ITEM_ADD, item)
 
-        ChatData.StoragePCPrivateItem(item, data.ChannelId)
+        ChatData.StoragePCPrivateItem(item)
     end
 end
 
@@ -960,7 +960,7 @@ function ChatData.ParsePCGuildItem(data)
     end
     SL:onLUAEvent(LUA_EVENT_CHAT_PCGUILD_ITEM_ADD, item)
 
-    ChatData.StoragePCGuildItem(item, data.ChannelId)
+    ChatData.StoragePCGuildItem(item)
 end
 
 ---------------------------------- cache end----------------------------------

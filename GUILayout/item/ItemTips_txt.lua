@@ -2075,13 +2075,13 @@ function ItemTips.CreateDiyAttrWidget(param)
 
                 if sizeW and sizeH then
                     local layout = GUI:Layout_Create(widget, "custom_panel_" .. type, 0, 0, sizeW, sizeH)
-                    for i = 2, #showList do
-                        if showList[i] and string.len(showList[i]) > 0 then
-                            local params = SL:Split(showList[i], ":")
+                    for j = 2, #showList do
+                        if showList[j] and string.len(showList[j]) > 0 then
+                            local params = SL:Split(showList[j], ":")
                             if params[1] == "IMG" then
                                 local path = params[2] and string.format("res/custom/tiptitle/%s.png", params[2])
                                 if path then
-                                    local img = GUI:Image_Create(layout, "img_" .. i, tonumber(params[3]) or 0, tonumber(params[4]) or 0, path)
+                                    local img = GUI:Image_Create(layout, "img_" .. j, tonumber(params[3]) or 0, tonumber(params[4]) or 0, path)
                                     if tonumber(params[5]) and tonumber(params[5]) > 0 then
                                         GUI:setScale(img, tonumber(params[5]))
                                     end
@@ -2090,7 +2090,7 @@ function ItemTips.CreateDiyAttrWidget(param)
                             elseif params[1] == "SFX" then
                                 local sfxID = tonumber(params[2])
                                 if sfxID then
-                                    local sfx = GUI:Effect_Create(layout, "sfx_" .. i, tonumber(params[3]) or 0, tonumber(params[4]) or 0, 0, sfxID)
+                                    local sfx = GUI:Effect_Create(layout, "sfx_" .. j, tonumber(params[3]) or 0, tonumber(params[4]) or 0, 0, sfxID)
                                     if tonumber(params[5]) and tonumber(params[5]) > 0 then
                                         GUI:setScale(sfx, tonumber(params[5]))
                                     end
@@ -2099,15 +2099,15 @@ function ItemTips.CreateDiyAttrWidget(param)
                                 local descId = tonumber(params[2])
                                 local config = descId and GUIDefineEx.ItemDescConfig[descId]
                                 if config and config.str then
-                                    local richText = GUI:RichText_Create(layout, "desc_" .. i, tonumber(params[3]) or 0, tonumber(params[4]) or 0, SL:ParseMetaValueStr(config.str), sizeW, SL:GetValue("GAME_DATA","DEFAULT_FONT_SIZE"), "#FFFFFF")
+                                    local richText = GUI:RichText_Create(layout, "desc_" .. j, tonumber(params[3]) or 0, tonumber(params[4]) or 0, SL:ParseMetaValueStr(config.str), sizeW, SL:GetValue("GAME_DATA","DEFAULT_FONT_SIZE"), "#FFFFFF")
                                     if tonumber(params[5]) and tonumber(params[5]) > 0 then
                                         GUI:setScale(richText, tonumber(params[5]))
                                     end
                                 end
                             elseif params[1] == "RTEXT" then
                                 local str = params[2]
-                                if str and string.len(str) then
-                                    local richText = GUI:RichTextFCOLOR_Create(layout, "richText_" .. i, tonumber(params[3]) or 0, tonumber(params[4]) or 0, str, sizeW, SL:GetValue("GAME_DATA","DEFAULT_FONT_SIZE"), "#FFFFFF")
+                                if str and string.len(str) > 0 then
+                                    local richText = GUI:RichTextFCOLOR_Create(layout, "richText_" .. j, tonumber(params[3]) or 0, tonumber(params[4]) or 0, str, sizeW, SL:GetValue("GAME_DATA","DEFAULT_FONT_SIZE"), "#FFFFFF")
                                     if tonumber(params[5]) and tonumber(params[5]) > 0 then
                                         GUI:setScale(richText, tonumber(params[5]))
                                     end

@@ -332,6 +332,7 @@ function ExchangePutin.InitCalculatorBtn( ... )
 
     local function MinNum()
         local config = getCurrentNumConfig()
+        local minValue = 0
         if ExchangePutin._numAble then
             minValue = ExchangePutin._limitMinBuyPrices[ExchangePutin._currencyIndex].minNum
         else
@@ -470,7 +471,7 @@ function ExchangePutin.ShowCurrencyCells()
     GUI:setVisible(ExchangePutin.Image_currency, true)
 
     for key, value in ipairs(ExchangePutin._currcies) do
-        local cell = ExchangePutin.CreateCurrencyCell(value)
+        local cell = ExchangePutin.CreateCurrencyCell()
         GUI:setVisible(cell["Image_bg"], false)
         local goodsItem = GUI:ItemShow_Create(cell["Node_item"], "goodsItem", 0, 0, { index = value.item.Index, itemData = value.item })
         GUI:setAnchorPoint(goodsItem, 0.5, 0.5)

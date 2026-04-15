@@ -3019,8 +3019,8 @@ function GUIFunction:OnAutoFindHumanoidFunc()
     end
 end
 
--- 获取当前挂机查找可攻击目标ID ignoreActorID: 忽略的actorID
-function GUIFunction:GetCurAutoFindTargetID(ignoreActorID)
+-- 标识视野内可攻击目标检查距离 ignoreActorID: 忽略的actorID
+function GUIFunction:SetInViewTargetCheckFlag(ignoreActorID)
     if not SL:GetValue("MAIN_PLAYER_IS_VALID") then
         return nil
     end
@@ -3041,50 +3041,50 @@ function GUIFunction:GetCurAutoFindTargetID(ignoreActorID)
             if not (aX == pMapX and aY == pMapY) and GUIFunction.CheckAutoTargetEnableByID(playerID) and playerID ~= ignoreActorID then
                 local len = squLen(aX - pMapX, aY - pMapY)
                 if len < cost then
-                    targetID = playerID
-                    cost = len
+                    SL:SetValue("ACTOR_NEED_CHECK_TO_AUTO_FIGHT", playerID, true)
+                end
+            end
+        end
+    end
+
+    local autoTarget = SL:GetValue("AUTO_TARGET")
+    local targetIndex = autoTarget.targetIndex
+    local targetType = autoTarget.targetType
+
+    local monsterVec  = {}
+    local monsterVecNum = 0
+    
+    if targetType ~= GUIDefine.ActorType.MONSTER or not targetIndex or GUIDefine.AUTO_FIND_TARGET_NONE == targetIndex or 0 == targetIndex then -- not target index,find nearst monster
+        local monsters, ncount = SL:GetValue("FIND_IN_VIEW_MONSTER_LIST", true, true)
+        monsterVec, monsterVecNum = GUIFunction:GetMonsterVec(monsters, ncount)
+    else
+        local monsters, ncount = SL:GetValue("FIND_IN_VIEW_MONSTER_LIST_BY_TYPEINDEX", targetIndex, true, true)
+        monsterVec, monsterVecNum = GUIFunction:GetMonsterVec(monsters, ncount)
+        
+        if monsterVecNum < 1 then
+            local monsters, ncount = SL:GetValue("FIND_IN_VIEW_MONSTER_LIST")
+            monsterVec, monsterVecNum = GUIFunction:GetMonsterVec(monsters, ncount)
+        end
+    end
+
+    if monsterVecNum < 1 then
+        return nil
+    end
+
+    for i = 1, monsterVecNum do
+        local monsterID = monsterVec[i]
+        if SL:GetValue("ACTOR_IS_VALID", monsterID) then
+            aX = SL:GetValue("ACTOR_MAP_X", monsterID)
+            aY = SL:GetValue("ACTOR_MAP_Y", monsterID)
+            if not (aX == pMapX and aY == pMapY) and GUIFunction.CheckAutoTargetEnableByID(monsterID) and monsterID ~= ignoreActorID then
+                local len = squLen(aX - pMapX, aY - pMapY)
+                if len < cost then
+                    SL:SetValue("ACTOR_NEED_CHECK_TO_AUTO_FIGHT", monsterID, true)
                 end
             end
         end
     end
     
-    if targetID and SL:GetValue("ACTOR_IS_VALID", targetID) then
-        return targetID
-    else
-        -- 没找到, 找其他怪
-
-        local autoTarget = SL:GetValue("AUTO_TARGET")
-        local targetIndex = autoTarget.targetIndex
-        local targetType = autoTarget.targetType
-
-        local monsterVec  = {}
-        local monsterVecNum = 0
-        
-        if targetType ~= GUIDefine.ActorType.MONSTER or not targetIndex or GUIDefine.AUTO_FIND_TARGET_NONE == targetIndex or 0 == targetIndex then -- not target index,find nearst monster
-            local monsters, ncount = SL:GetValue("FIND_IN_VIEW_MONSTER_LIST", true, true)
-            monsterVec, monsterVecNum = GUIFunction:GetMonsterVec(monsters, ncount)
-        else
-            local monsters, ncount = SL:GetValue("FIND_IN_VIEW_MONSTER_LIST_BY_TYPEINDEX", targetIndex, true, true)
-            monsterVec, monsterVecNum = GUIFunction:GetMonsterVec(monsters, ncount)
-            
-            if monsterVecNum < 1 then
-                local monsters, ncount = SL:GetValue("FIND_IN_VIEW_MONSTER_LIST")
-                monsterVec, monsterVecNum = GUIFunction:GetMonsterVec(monsters, ncount)
-            end
-        end
-
-        if monsterVecNum < 1 then
-            return nil
-        end
-        
-        -- find nearest monster
-        targetID = GUIFunction:FindNearestMonster(monsterVec, monsterVecNum, ignoreActorID)
-    end
-
-    if targetID and SL:GetValue("ACTOR_IS_VALID", targetID) then
-        return targetID
-    end
-    return nil
 end
 
 -- 受攻击后自动反击
@@ -3250,7 +3250,7 @@ end
 function GUIFunction:GenerateActorSayItem(data)
 
     local content = string.format("%s:%s", data.SendName, data.Msg)
-    local elements = createNormalElements(content, GUI.PATH_FONT2, 12, "#FFFFFF", "#000000", 1, true)
+    local elements = createNormalElements(content, "fonts/font2.ttf", 12, "#FFFFFF", "#000000", 1, true)
 
     local richText = GUI:RichTextCombine_Create(-1, "sayRichText", 0, 0, 200, 0)
     GUI:setAnchorPoint(richText, 0.5, 0)
@@ -4220,8 +4220,8 @@ local function unitFunc(num, pointBit)
         return math.floor(num)
     end
     local iNum, fNum = math.modf(num)
-    local fDecimal = math.pow(10, tostring(pointBit))
-    local newFNum = math.floor(tostring(fNum * fDecimal))
+    local fDecimal = math.pow(10, pointBit)
+    local newFNum = math.floor(fNum * fDecimal)
     local newINum = iNum + (newFNum / fDecimal)
     return newINum
 end

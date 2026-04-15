@@ -1962,3 +1962,133 @@ SL:RegisterLUAEvent(LUA_EVENT_NET_PLAYER_ACTION_COMPLETE, "GUIInit", function(da
     local actorID = data.actorID
     checkActorMoveEffEnable(act, actorID)
 end)
+
+-----------------------------------------------------------------------------
+-- 寻路箭头特效
+local pathFindEffects = {}
+
+local function getPathFindEffectKey(animID, mapX, mapY)
+    return animID * 1000 + mapX * 100 + mapY
+end
+
+local function addPathFindEffectToMap(animID, mapX, mapY, dir)
+    if not animID or not mapX or not mapY then
+        return
+    end
+
+    local sceneRoot = GUI:Attach_SceneB()
+    local pathFindEffectRoot = GUI:getChildByID(sceneRoot, "MAP_PATH_FIND_EFFCT_ROOT")
+    if not pathFindEffectRoot then
+        pathFindEffectRoot = GUI:Node_Create(-1, "MAP_PATH_FIND_EFFCT_ROOT", 0, 0)
+        GUI:addChild(sceneRoot, pathFindEffectRoot, 999)
+    end
+
+    local wX, wY = SL:ConvertMapPos2WorldPos(mapX, mapY)
+    local effect = GUI:Effect_Create(-1, string.format("pathFindEffect_%s_%s", mapX, mapY), wX, wY, 0, animID, 0, 0, dir or 0, 1, true)
+    if effect then
+        GUI:addChild(pathFindEffectRoot, effect)
+        local key = getPathFindEffectKey(animID, mapX, mapY)
+        pathFindEffects[key] = effect
+    end
+end
+
+local function removePathFindEffectByMapPos(animID, mapX, mapY)
+    local key = getPathFindEffectKey(animID, mapX, mapY)
+    if pathFindEffects[key] then
+        if not GUI:Widget_IsNull(pathFindEffects[key]) then
+            GUI:removeFromParent(pathFindEffects[key])
+        end
+        pathFindEffects[key] = nil
+    end
+end
+
+local function removeAllPathFindEffects()
+    if not next(pathFindEffects) then
+        return
+    end
+
+    for key, effect in pairs(pathFindEffects) do
+        if not GUI:Widget_IsNull(effect) then
+            GUI:removeFromParent(effect)
+        end
+        pathFindEffects[key] = nil
+    end
+    pathFindEffects = {}
+end
+
+SL:RegisterLUAEvent(LUA_EVENT_MINIMAP_FIND_PATH, "GUIInit", function()
+    local animID = tonumber(SL:GetMetaValue("GAME_DATA", "MapPathFindArrowEffectID"))
+    if not animID or animID <= 0 then
+       return 
+    end
+
+    removeAllPathFindEffects()
+
+    if not SL:GetMetaValue("BATTLE_IS_AUTO_MOVE") then 
+       return
+    end
+
+    local pathSize = SL:GetValue("MAP_PATH_SIZE")
+    if pathSize > 2 then
+        local pathPoints = SL:GetValue("MAP_PATH_POINTS") or {}
+        local lastPointX, lastPointY = SL:GetValue("X"), SL:GetValue("Y")
+        for i = #pathPoints, 1, -1 do
+            local pos = pathPoints[i]
+            if not pos or not pos.x or not pos.y then
+                break
+            end
+            if i % 2 ~= 0 then
+                local dir = GUIFunction:CalcMapDirection(pos.x, pos.y, lastPointX, lastPointY)
+                addPathFindEffectToMap(animID, pos.x, pos.y, dir)
+            end
+            lastPointX, lastPointY = pos.x, pos.y
+        end
+    end
+end)
+
+local moveStepPos = {
+    [SLDefine.Direction.UP]             = {0, 1},
+    [SLDefine.Direction.RIGHT_UP]       = {1, -1},
+    [SLDefine.Direction.RIGHT]          = {1, 0},
+    [SLDefine.Direction.RIGHT_BOTTOM]   = {1, 1},
+    [SLDefine.Direction.BOTTOM]         = {0, 1},
+    [SLDefine.Direction.LEFT_BOTTOM]    = {-1, 1},
+    [SLDefine.Direction.LEFT]           = {-1, 0},
+    [SLDefine.Direction.LEFT_UP]        = {-1, -1},
+}
+local emptyStepPos = {0, 0}
+local function checkActorRemoveFindPathEffect(act, actorID)
+    local animID = tonumber(SL:GetMetaValue("GAME_DATA", "MapPathFindArrowEffectID"))
+    if not animID or animID <= 0 then
+       return 
+    end
+
+    if not SL:GetMetaValue("BATTLE_IS_AUTO_MOVE") then
+       return
+    end
+
+    if act == GUIDefine.Action.WALK or act == GUIDefine.Action.RUN or act == GUIDefine.Action.RIDE_RUN then
+        local lastMapX = SL:GetValue("ACTOR_LAST_MAP_X", actorID)
+        local lastMapY = SL:GetValue("ACTOR_LAST_MAP_Y", actorID)
+        local dir = SL:GetValue("ACTOR_DIR", actorID)
+        if act == GUIDefine.Action.RUN then
+            local diff = moveStepPos[dir] or emptyStepPos
+            removePathFindEffectByMapPos(animID, lastMapX + diff[1], lastMapY + diff[2])
+        elseif act == GUIDefine.Action.RIDE_RUN then
+            local diff = moveStepPos[dir] or emptyStepPos
+            local nextPosX, nextPosY = lastMapX + diff[1], lastMapY + diff[2]
+            removePathFindEffectByMapPos(animID, nextPosX, nextPosY)
+            nextPosX, nextPosY = nextPosX + diff[1], nextPosY + diff[2]
+            removePathFindEffectByMapPos(animID, nextPosX, nextPosY)
+        end
+        removePathFindEffectByMapPos(animID, lastMapX, lastMapY)
+    end
+end
+
+-- 主玩家
+SL:RegisterLUAEvent(LUA_EVENT_PLAYER_ACTION_BEGIN, "GUIInit", function(data)
+    local act = data.act
+    local actorID = data.actorID
+    -- 检查移除寻路路径箭头特效
+    checkActorRemoveFindPathEffect(act, actorID)
+end)    

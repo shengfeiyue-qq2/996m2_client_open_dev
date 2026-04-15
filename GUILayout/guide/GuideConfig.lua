@@ -398,7 +398,7 @@ local config = {
         GUI:ListView_doLayout(listView)
 
         local taskID = tonumber(config.typeassist)
-        local cell = GUI:getChildByTag(listView, taskID)
+        local cell = taskID and GUI:getChildByTag(listView, taskID)
 
         -- 没找到任务的 找挂接按钮
         if not cell then

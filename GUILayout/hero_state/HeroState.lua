@@ -60,12 +60,12 @@ function HeroState.InitUI()
     -- 背包
     GUI:addOnClickEvent(HeroState._ui.Button_bag,function()
         if SL:GetValue("HERO_IS_ALIVE") then
-            UIOperator:OpenHeroBagUI()
+            SL:JumpTo(SLDefine.HyperLinkID.HeroBag)
         end
     end)
     -- 状态
     GUI:addOnClickEvent(HeroState._ui.Button_state,function()
-        UIOperator:OpenMyHeroUI({page = UIConst.LayerTable.PlayerEquip})
+        SL:JumpTo(SLDefine.HyperLinkID.HeroEquip)
     end)
     -- 召唤收回
     GUI:addOnClickEvent(HeroState._heroBtn, function()
@@ -301,7 +301,7 @@ function HeroState.InitUI()
     ---------------点头像------------------------------------
     GUI:setTouchEnabled(HeroState._ui.Image_head, true)
     GUI:addOnClickEvent(HeroState._ui.Image_head, function()
-        UIOperator:OpenMyHeroUI({page = UIConst.LayerTable.PlayerEquip})
+        SL:JumpTo(SLDefine.HyperLinkID.HeroEquip)
     end)
 
     local function addItemIntoBag()
