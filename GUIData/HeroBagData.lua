@@ -613,21 +613,21 @@ function HeroBagData.ResponseDelItem(data)
     local tag = header.p1    -- 1: 爆出时删除装备
     local itemBelong = SL:GetValue("ITEM_BELONG_BY_MAKEINDEX", makeIndex) 
     if not itemBelong then
-        SL:Print("delete hero item error, can't find item belong")
+        SL:Print("delete hero item error, can't find item belong", makeIndex)
         return
     end
 
     if itemBelong == GUIDefine.ItemBelong.HEROBAG then
         local itemData = HeroBagData.GetItemDataByMakeIndex(makeIndex)
         if not itemData then
-            SL:Print("delete hero item error, can't find item")
+            SL:Print("delete hero item error, can't find item", makeIndex)
             return
         end
         HeroBagData.DelItemData(itemData, true)
     elseif itemBelong == GUIDefine.ItemBelong.HEROEQUIP then
         local itemData = HeroEquipData.GetEquipDataByMakeIndex(makeIndex)
         if not itemData then
-            SL:Print("delete hero item error, can't find item")
+            SL:Print("delete hero item error, can't find item", makeIndex)
             return
         end
         HeroEquipData.DelEquipData(itemData, tag == 1)
@@ -754,6 +754,10 @@ function HeroBagData.ResponseItemToHumanBagFail(data)
     end
 end
 
+function HeroBagData.OnHeroLogout()
+    HeroBagData.ClearItemData(true)
+end
+
 ------------注册事件
 function HeroBagData.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_HERO_BAG_REQ_TWO_TO_ONE, "HeroBagData", HeroBagData.RequestItemTwoToOne)
@@ -770,4 +774,6 @@ function HeroBagData.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_HERO_DROP_ITEM_SUCCESS, "HeroBagData", HeroBagData.ResponseDropSuccess)
     SL:RegisterLUAEvent(LUA_EVENT_HERO_DROP_ITEM_FAIL, "HeroBagData", HeroBagData.ResponseDropFail)
     SL:RegisterLUAEvent(LUA_EVENT_HERO_BAG_TO_HUMAN_BAG_FAIL, "HeroBagData", HeroBagData.ResponseItemToHumanBagFail)
+
+    SL:RegisterLUAEvent(LUA_EVENT_HERO_LOGOUT, "HeroBagData", HeroBagData.OnHeroLogout)
 end

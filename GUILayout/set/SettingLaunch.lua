@@ -241,11 +241,13 @@ function SettingLaunch.InitHeroGroup()
         SettingLaunch._isHaveHero = true
         -- 计算大小
         local contentSize = GUI:getContentSize(scrollView2)
+        local innerHei = math.max(heroItemCount * cellH, contentSize.height)
+        GUI:ScrollView_setInnerContainerSize(scrollView2, contentSize.width, innerHei)
         for i, v in ipairs(heroConfigs) do
             local cell = SettingLaunch.CreateCell(scrollView2, v)
             if cell then 
-                GUI:setPosition(cell, 0, contentSize.height - i * cellH)
-            end 
+                GUI:setPosition(cell, 0, innerHei - i * cellH)
+            end
         end
     else
         GUI:setVisible(SettingLaunch._ui.ImageBG2, false)

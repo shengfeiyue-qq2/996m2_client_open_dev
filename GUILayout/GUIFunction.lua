@@ -3221,6 +3221,7 @@ function GUIFunction:OnShowNpcTalkTips(npcID)
 
     local size = GUI:getContentSize(imagePopBg)
     local npcName = SL:GetValue("ACTOR_NAME", npcID)
+    npcName = SL:GetValue("ACTOR_ONLY_SHOW_BUBBLE_NAME", npcID) or npcName
     if npcName then
         local _, _, showName = string.find(npcName, ".-%#(.-)%#")
         if showName then

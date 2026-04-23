@@ -274,6 +274,11 @@ function ActorHud.GetActorHUDLabelInfo(actorID, color, guildInfo)
     local showName = nameStr[1]
     table.remove(nameStr, 1)
     table.removebyvalue(nameStr, "", true)
+    if isNpc then
+        if SL:GetValue("ACTOR_ONLY_SHOW_BUBBLE_NAME", actorID) then
+            showName = ""
+        end
+    end
 
     -- check visible
     local labelNameVisible = SL:GetValue("ACTOR_HUD_NAME_SHOW", actorID) or SL:GetValue("ACTOR_HUD_PC_MOUSE_SHOW", actorID)
