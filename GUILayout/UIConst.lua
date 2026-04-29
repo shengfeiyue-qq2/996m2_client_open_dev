@@ -420,6 +420,7 @@ UIConst.LayerTable = {
     TradingBankSell         = 61,             -- 交易行寄售
     TradingBankGoods        = 62,             -- 交易行货架
     TradingBankMe           = 63,             -- 交易行我的
+    TradingBankSenkBuy      = 64,             -- 交易行求购
 
     PlayerEquip             = 101,            -- 装备
     PlayerBaseAtt           = 102,            -- 状态
