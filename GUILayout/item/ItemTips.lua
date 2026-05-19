@@ -968,23 +968,32 @@ function ItemTips.GetSuitStr(suit)
     -- 解析新的颜色规则  未获得颜色#获得颜色   无则使用第一个未获得颜色
     local function getNewColor(txtStr, colorIdx)
         txtStr = string.gsub(txtStr or "", "<br>", "\n")
+        colorIdx = colorIdx or 1
         local colorStr = ""
         local showStr = ""
         local txtArray = string.split(txtStr or "", "|")
         if #txtArray > 1 then
             colorStr = txtArray[1] or ""
             for i = 2, #txtArray do
-                showStr = showStr .. (txtArray[i] or "")
+                local transferStr = string.gsub(txtArray[i] or "", "<(.-)/C=(.-)>", function(text, color)
+                    if colorIdx == 2 then
+                        return string.format("<font color='%s'>%s</font>", SL:GetHexColorByStyleId(tonumber(color)), text)
+                    else
+                        return text
+                    end
+                end)
+
+                showStr = string.format("%s%s", showStr, transferStr)
             end
         else
             showStr = txtStr
         end
-        colorIdx = colorIdx or 1
-        local colorArry = string.split(colorStr or "", "/")
-        if #colorArry <= 1 then
-            table.insert(colorArry, 1, 249)
+
+        local colorArray = string.split(colorStr or "", "/")
+        if #colorArray <= 1 then
+            table.insert(colorArray, 1, 249)
         end
-        return tonumber(colorArry[colorIdx]) or tonumber(colorArry[1]), showStr
+        return tonumber(colorArray[colorIdx]) or tonumber(colorArray[1]), showStr
     end
 
     -- 检测部位是否存在相应的装备
@@ -1083,8 +1092,7 @@ function ItemTips.GetSuitStr(suit)
                             tempMeetEquipShowCount[meetKey] = tempMeetEquipShowCount[meetKey] - 1
                         end
 
-                        showStr = equipShowColorStr .. showStr
-                        local color, showShowStr = getNewColor(showStr, meet and 2 or 1)
+                        local color, showShowStr = getNewColor(equipShowColorStr .. showStr, meet and 2 or 1)
                         local size = fontSize
                         local colorHex = SL:GetHexColorByStyleId(color)
                         local showStrFormat = string.format("<font color='%s' size='%s'>%s</font><br>", colorHex, size, showShowStr)

@@ -96,7 +96,7 @@ function ChatData.Init()
     ChatData._autoShoutDelay = 20
 
     -- 是否关闭假掉落消息
-    ChatData._closeFakeDrop = false
+    ChatData._closeFakeDrop = false     -- 仅引擎下发开关 控制掉落分类勾选框的显示与否
     ChatData._fakeDropTimerID = nil
 
     ChatData._curFakeDropType = nil     -- 当前打开假掉落分类
@@ -118,6 +118,8 @@ function ChatData.Init()
 
     ChatData._parsePCGuildItems = SL:CreateQueue()
     ChatData._parsePCGuildEnable = true
+
+    ChatData._autoShoutSensitiveCheckScheduleID = nil
 
     ChatData.RegisterEvent()
 end
@@ -493,6 +495,13 @@ function ChatData.SetAutoShoutSwitch(value)
     local channel = tostring(GUIDefine.ChatChannel.SHOUT)
     ChatData._localChat.autoShout[channel] = value and 1 or 0
     ChatData.SetLocalChatData()
+
+    -- 开启时启动敏感词定时检测，关闭时停止
+    if value then
+        ChatData.StartAutoShoutSensitiveCheck()
+    else
+        ChatData.StopAutoShoutSensitiveCheck()
+    end
 end
 
 function ChatData.GetAutoShoutSwitch()
@@ -613,6 +622,77 @@ function ChatData.AddAutoReplyData(data)
     if data and next(data) then
         table.insert(ChatData._autoRelyList, data)
     end
+end
+
+-- 启动自动喊话敏感词定时检测（每20分钟检测一次）
+function ChatData.StartAutoShoutSensitiveCheck()
+    ChatData.StopAutoShoutSensitiveCheck()
+    local checkInterval = 1200
+    ChatData._autoShoutSensitiveCheckScheduleID = SL:Schedule(function()
+        ChatData.CheckAutoShoutSensitiveWord()
+    end, checkInterval)
+end
+
+-- 停止自动喊话敏感词定时检测
+function ChatData.StopAutoShoutSensitiveCheck()
+    if ChatData._autoShoutSensitiveCheckScheduleID then
+        SL:UnSchedule(ChatData._autoShoutSensitiveCheckScheduleID)
+        ChatData._autoShoutSensitiveCheckScheduleID = nil
+    end
+end
+
+-- 检测自动喊话内容是否包含敏感词
+function ChatData.CheckAutoShoutSensitiveWord()
+    if not ChatData.GetAutoShoutSwitch() then
+        return
+    end
+
+    local channel = tostring(GUIDefine.ChatChannel.SHOUT)
+    local shoutContent = ChatData.GetLocalChatDataByChannel(channel)
+    if not shoutContent or shoutContent == "" then
+        return
+    end
+
+    SL:RequestCheckChatIsHaveSensitive(shoutContent, function(state, str, risk_param, ex_param)
+        if not state then
+            ChatData.HandleAutoShoutSensitiveFound(channel)
+            return
+        end
+
+        if risk_param and risk_param ~= 0 then
+            ChatData.HandleAutoShoutSensitiveFound(channel)
+            return
+        end
+
+        if ex_param then
+            if ex_param.status and ex_param.status ~= 0 then
+                ChatData.HandleAutoShoutSensitiveFound(channel)
+                return
+            end
+        end
+    end)
+end
+
+-- 处理检测到敏感词后的逻辑
+function ChatData.HandleAutoShoutSensitiveFound(channel)
+    channel = channel or GUIDefine.ChatChannel.SHOUT
+    channel = tostring(channel)
+    ChatData._localChat.data[channel] = ""
+    ChatData._localChat.autoShout[channel] = 0
+    ChatData.SetLocalChatData()
+
+    ChatData.StopAutoShoutSensitiveCheck()
+
+    if SL:GetValue("IS_PC_OPER_MODE") then
+        SL:onLUAEvent(LUA_EVENT_CHAT_PC_AUTO_SHOUT)
+    else
+        SL:onLUAEvent(LUA_EVENT_CHAT_MOBILE_AUTO_SHOUT)
+    end
+
+    local data = {}
+    data.str = "您的自动喊话内容包含敏感词，已自动关闭并清空喊话内容！"
+    data.btnDesc = {"确认"}
+    UIOperator:OpenCommonTipsUI(data)
 end
 ---------------------------------- cache begin----------------------------------
 function ChatData.GetCache()

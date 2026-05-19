@@ -247,19 +247,10 @@ end
 
 -- 检查装备禁止装戴位置
 function GUIFunction:CheckEquipExcludePos(item)
-    if not item.Article or item.Article == "" then
-        return nil
+    local _, isMeetType = SL:GetValue("ITEM_IS_BIND", item, GUIDefine.ItemArticleType.TYPE_TAKE_ARMRINGL)
+    if isMeetType then
+        return GUIDefine.EquipPosUI.Equip_Type_ArmRingL
     end
-
-    local itemArticle = nil
-    local parseArticle = string.split(item.Article, "|")
-    for k, v in pairs(parseArticle) do
-        local articleV = tonumber(v)
-        if articleV == GUIDefine.ItemArticleType.TYPE_TAKE_ARMRINGL then
-            return GUIDefine.EquipPosUI.Equip_Type_ArmRingL
-        end
-    end
-
     return nil
 end
 

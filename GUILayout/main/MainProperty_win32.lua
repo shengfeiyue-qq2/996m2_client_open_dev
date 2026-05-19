@@ -9,6 +9,7 @@ local DZXY_SkillID         = 118
 local ON_OFF_zuijiu        = false
 
 local DROP_TOTAL_TYPE_ID   = 99
+local FAKE_DROP_TYPE_ID    = 77
 
 local PCShowSelectChannels =  SL:GetValue("GAME_DATA","PCShowSelectChannels")
 
@@ -161,6 +162,14 @@ function MainProperty.InitDropData()
         name = "全部",
     }
     table.insert(MainProperty._dropTypeList, dropTotalData)
+
+    local fakeDrop = SL:GetMetaValue("GAME_DATA", "ShowFakeDropType")
+    if fakeDrop and string.len(fakeDrop) > 0 then
+        local param = string.split(fakeDrop, "#")
+        if param[2] and tonumber(param[2]) == 1 and not ChatData.IsCloseFakeDrop() then
+            table.insert(MainProperty._dropTypeList, {id = FAKE_DROP_TYPE_ID, name = param[1]})
+        end
+    end
 
     local data = SL:GetValue("GAME_DATA", "DropTypeShow")
     if data and string.len(data) > 0 then
@@ -323,48 +332,8 @@ function MainProperty.InitAutoShout()
         return false
     end
 
-    local isAutoShout = ChatData.GetAutoShoutSwitch()
-
-    -- 自动喊话开关
-    local function sendAutoShoutMsg(input, channel)
-        if not channel or not GUIFunction:CheckAbleToSayByChannel(channel) then
-            return
-        end
-
-        local sendData = {textType = GUIDefine.ChatTextType.NORMAL, msg = input, channel = channel, risk = 0, oriMsg = input, status = 0}
-        GUIFunction:SendChatMsg(sendData)
-    end
-
-    local autoShoutCallback = function(shoutInput)
-        GUI:stopActionByTag(btnAutoShout, 888)
-
-        if not shoutInput or shoutInput == "" then
-            return false
-        end
-
-        if not ChatData.GetAutoShoutSwitch() then
-            return false
-        end
-
-        local action = SL:schedule(btnAutoShout, function()
-            -- 发送
-            sendAutoShoutMsg(shoutInput, CHANNEL.SHOUT)
-        end, ChatData.GetAutoShoutDelay())
-
-        GUI:setTag(action, 888)
-    end
-
-    local picPath = string.format("%s/%s", MainProperty._path, isAutoShout and "190001112.png" or "190001113.png") 
-    GUI:Button_loadTextureNormal(btnAutoShout, picPath)
-    GUI:Button_loadTexturePressed(btnAutoShout, picPath)
-
-    if isAutoShout then
-        local shoutInput = ChatData.GetLocalChatDataByChannel(CHANNEL.SHOUT)
-        autoShoutCallback(shoutInput)
-    end
-
     local function checkInputContent(inputStr)
-        local channel = CHANNEL.Shout
+        local channel = CHANNEL.SHOUT
         SL:RequestCheckSensitiveWord(inputStr, 2, function(state, str, risk_param, ex_param) 
             -- 检测，不通过
             if not state then
@@ -388,7 +357,6 @@ function MainProperty.InitAutoShout()
 
             -- 记录自动喊话内容
             ChatData.SetLocalChatDataByChannel(channel, inputStr or "")
-            autoShoutCallback(inputStr)
 
             -- 发送提示
             local isOpen = ChatData.GetAutoShoutSwitch()
@@ -396,15 +364,7 @@ function MainProperty.InitAutoShout()
             SL:ShowSystemChat(msg, 0, 255)
             SL:PlayBtnClickAudio()
 
-            local picPath = string.format("%s/%s", MainProperty._path, isOpen and "190001112.png" or "190001113.png") 
-            GUI:Button_loadTextureNormal(btnAutoShout, picPath)
-            GUI:Button_loadTexturePressed(btnAutoShout, picPath)
-            if isOpen then
-                if inputStr == "" then
-                    return
-                end
-                sendAutoShoutMsg(inputStr, CHANNEL.SHOUT)
-            end
+            MainProperty.OnRefreshAutoShout()
         end, {channel_id = channel})
     end
 
@@ -412,6 +372,61 @@ function MainProperty.InitAutoShout()
         local input = GUI:Text_getString(MainProperty._ui["TextField_input"])
         checkInputContent(input)
     end)
+
+    MainProperty.OnRefreshAutoShout()
+end
+
+function MainProperty.OnRefreshAutoShout()
+    local btnAutoShout = MainProperty._ui["Button_chat_7"]
+    if not btnAutoShout then
+        return false
+    end
+
+    local isAutoShout = ChatData.GetAutoShoutSwitch()
+    
+    local picPath = string.format("%s/%s", MainProperty._path, isAutoShout and "190001112.png" or "190001113.png") 
+    GUI:Button_loadTextureNormal(btnAutoShout, picPath)
+    GUI:Button_loadTexturePressed(btnAutoShout, picPath)
+
+    if not isAutoShout then
+        return GUI:stopActionByTag(btnAutoShout, 888)
+    end
+
+    local shoutInput = ChatData.GetLocalChatDataByChannel(CHANNEL.SHOUT)
+    if not shoutInput or shoutInput == "" then
+        return false
+    end
+
+    -- 自动喊话开关
+    local function sendAutoShoutMsg(input, channel)
+        if not channel or not GUIFunction:CheckAbleToSayByChannel(channel) then
+            return
+        end
+
+        local sendData = {textType = GUIDefine.ChatTextType.NORMAL, msg = input, channel = channel, risk = 0, oriMsg = input, status = 0}
+        GUIFunction:SendChatMsg(sendData)
+    end
+
+    local autoShoutCallback = function(shoutInput)
+        GUI:stopActionByTag(btnAutoShout, 888)
+        if not shoutInput or shoutInput == "" then
+            return false
+        end
+
+        if not ChatData.GetAutoShoutSwitch() then
+            return false
+        end
+
+        local action = SL:schedule(btnAutoShout, function()
+            -- 发送
+            sendAutoShoutMsg(shoutInput, CHANNEL.SHOUT)
+        end, ChatData.GetAutoShoutDelay())
+        GUI:setTag(action, 888)
+
+        sendAutoShoutMsg(shoutInput, CHANNEL.SHOUT)
+    end
+
+    autoShoutCallback(shoutInput)
 end
 
 function MainProperty.InitNGShow()
@@ -1842,7 +1857,11 @@ function MainProperty.ShowDropSwitchPanel()
     local cellHei = nil
     for _, data in ipairs(MainProperty._dropTypeList) do
         local id = data.id
-        local name = string.len(data.name) == 0 and ("分类" .. id) or data.name
+        local defaultName = nil
+        if string.len(data.name) == 0 then
+            defaultName = id == FAKE_DROP_TYPE_ID and "分类0" or ("分类" .. id)
+        end
+        local name = defaultName or data.name
         local cell = MainProperty.CreateDropSwitchCell(id)
         local isReceiving = ChatData.GetDropTypeSwitch(id)
         GUI:CheckBox_setSelected(cell.checkBox, isReceiving == true)
@@ -1894,6 +1913,36 @@ function MainProperty.HideDropSwitchPanel()
     GUI:setVisible(MainProperty._ui["Panel_drop"], false)
     GUI:setVisible(MainProperty._ui["Panel_hide_drop"], false)
     GUI:setTouchEnabled(MainProperty._ui["Panel_hide_drop"], false)
+end
+
+function MainProperty.RefreshFakeDropType()
+    local needRefresh = false
+    local hasFake = false
+    for i, v in ipairs(MainProperty._dropTypeList) do
+        if v.id == FAKE_DROP_TYPE_ID then
+            if ChatData.IsCloseFakeDrop() then
+                table.remove(MainProperty._dropTypeList, i)
+                needRefresh = true
+            end
+            hasFake = true
+            break
+        end
+    end
+
+    if not ChatData.IsCloseFakeDrop() and not hasFake then
+        local fakeDrop = SL:GetMetaValue("GAME_DATA", "ShowFakeDropType")
+        if fakeDrop and string.len(fakeDrop) > 0 then
+            local param = string.split(fakeDrop, "#")
+            if param[2] and tonumber(param[2]) == 1 then
+                table.insert(MainProperty._dropTypeList, 2, {id = FAKE_DROP_TYPE_ID, name = param[1]})
+                needRefresh = true
+            end
+        end
+    end
+
+    if needRefresh then
+        MainProperty.HideDropSwitchPanel()
+    end
 end
 ---------------------------------------------------------------------------------------------
 
@@ -2227,6 +2276,8 @@ function MainProperty.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_WINDOW_CHANGE, "MainProperty", MainProperty.OnWindowChange)
     SL:RegisterLUAEvent(LUA_EVENT_MAIN_CLOSE_KEYBOARD, "MainProperty", MainProperty.OnCloseKeyBoard) 
     SL:RegisterLUAEvent(LUA_EVENT_MAIN_PROPERTY_ON_KEY_ENTER , "MainProperty", MainProperty.handlePressedEnter)
+
+    SL:RegisterLUAEvent(LUA_EVENT_CHAT_PC_AUTO_SHOUT, "MainProperty", MainProperty.OnRefreshAutoShout)
 end
 ----------------------------------------------------------------------------------------------
 

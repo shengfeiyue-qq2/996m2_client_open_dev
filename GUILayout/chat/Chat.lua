@@ -368,16 +368,13 @@ function Chat.InitInput()
         end
     end)
 
+    ChatInfo._shoutCheckNormalPanel = nil
+    ChatInfo._shoutCheckSelectPanel = nil
     -- 自动喊话
     if ChatInfo._ui.Layout_check_auto_shout and GUI:getVisible(ChatInfo._ui.Layout_check_auto_shout) then
-        local normalPanel  = GUI:getChildByName(ChatInfo._ui.Layout_check_auto_shout, "Layout_nomal")
-        local selectPanel = GUI:getChildByName(ChatInfo._ui.Layout_check_auto_shout, "Layout_select")
-        -- 改变自动喊话按钮
-        local function changeAutoShoutButton()
-            local isOpen = ChatData.GetAutoShoutSwitch()
-            GUI:setVisible(normalPanel, not isOpen)
-            GUI:setVisible(selectPanel, isOpen)
-        end
+        ChatInfo._shoutCheckNormalPanel = GUI:getChildByName(ChatInfo._ui.Layout_check_auto_shout, "Layout_nomal")
+        ChatInfo._shoutCheckSelectPanel = GUI:getChildByName(ChatInfo._ui.Layout_check_auto_shout, "Layout_select")
+        Chat.ChangeAutoShoutCheckBox()
 
         local function checkInputContent(inputStr)
             local channel = Chat._CHANNEL.SHOUT
@@ -412,8 +409,6 @@ function Chat.InitInput()
                 SL:PlayBtnClickAudio()
                 SL:onLUAEvent(LUA_EVENT_CHAT_MOBILE_AUTO_SHOUT)
 
-                changeAutoShoutButton()
-
             end, {channel_id = channel})
         end
 
@@ -423,7 +418,6 @@ function Chat.InitInput()
             checkInputContent(input)
         end)
 
-        changeAutoShoutButton()
         SL:onLUAEvent(LUA_EVENT_CHAT_MOBILE_AUTO_SHOUT, {openChat = true})
     end
 
@@ -433,6 +427,16 @@ function Chat.InitInput()
         Chat.AddInput(inputStr)
     end
 
+end
+
+-- 改变自动喊话按钮
+function Chat.ChangeAutoShoutCheckBox()
+    if not ChatInfo._shoutCheckNormalPanel or not ChatInfo._shoutCheckSelectPanel then
+        return
+    end
+    local isOpen = ChatData.GetAutoShoutSwitch()
+    GUI:setVisible(ChatInfo._shoutCheckNormalPanel, not isOpen)
+    GUI:setVisible(ChatInfo._shoutCheckSelectPanel, isOpen)
 end
 
 -- 频道选择栏
@@ -1163,6 +1167,10 @@ function Chat.OnChatFakeDropChange()
     end
 end
 
+function Chat.OnRefreshAutoShoutShow()
+    Chat.ChangeAutoShoutCheckBox()
+end
+
 function Chat.OnClose()
     ChatData.SetInputDraft(GUI:TextInput_getString(ChatInfo._ui.TextField_input))
     GUI:Win_CloseByID(UIConst.LAYERID.ChatGUI)
@@ -1183,6 +1191,7 @@ function Chat.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_CHAT_EX_NOTICE_ADD, "Chat", Chat.AddChatExItemData, ChatInfo._layer)
     SL:RegisterLUAEvent(LUA_EVENT_RECONNECT, "Chat", Chat.OnClearExChat, ChatInfo._layer)
     SL:RegisterLUAEvent(LUA_EVENT_CHAT_FAKE_DROP_STATUS_CHANGE, "Chat", Chat.OnChatFakeDropChange, ChatInfo._layer)
+    SL:RegisterLUAEvent(LUA_EVENT_CHAT_MOBILE_AUTO_SHOUT, "Chat", Chat.OnRefreshAutoShoutShow, ChatInfo._layer)
     SL:RegisterLUAEvent(LUA_EVENT_CHAT_PANEL_CLOSE, "Chat", Chat.OnClose)
 end
 

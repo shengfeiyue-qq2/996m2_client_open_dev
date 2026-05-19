@@ -2,7 +2,7 @@ CommonDescTips = {}
 
 function CommonDescTips.main()
     local data = GUI:GetLayerOpenParam()
-    local parent = GUI:Win_Create(UIConst.LAYERID.CommonDescTipsGUI, 0, 0, 0, 0, false, false, true, true)
+    local parent = GUI:Win_Create(UIConst.LAYERID.CommonDescTipsGUI, 0, 0, 0, 0, false, false, true, true, nil, nil, GUIDefine.UIZ.NOTICE)
     GUI:LoadExport(parent, "common_tips/common_desc_tips")
 
     local screenW = SL:GetValue("SCREEN_WIDTH")
