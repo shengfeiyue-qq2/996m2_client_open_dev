@@ -220,7 +220,7 @@ function UIModel.CreateModel(node, id, effect, name, order)
     if effect and effect ~= "0" and effect ~= "" then
         local effectList = SL:ParseModelEffect(effect)
         for i, v in ipairs(effectList) do
-            local anim = GUI:Effect_Create(node, "Effect_" .. name, v.offX, - v.offY, 0, v.effectId)
+            local anim = GUI:Effect_Create(node, string.format("Effect_%s_%s", name, i), v.offX, - v.offY, 0, v.effectId)
             if anim then
                 local scale = v.scale or 1
                 GUI:setScale(anim,  GUI:getScale(anim) * scale)
