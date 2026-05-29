@@ -274,7 +274,7 @@ GUIDefineEx.TipsDiyAttrTypeTitle = GUIDefineEx.TipsDiyAttrTypeTitle or (
                     local type = TONUMBER(param[1])
                     if type then
                         arrays[type] = {}
-                        arrays[type].name = STR_LEN(param[2] or "") > 0 and param[2]
+                        arrays[type].name = STR_LEN(param[2] or "") > 0 and param[2] or nil
                         arrays[type].color = param[3] and TONUMBER(param[3])
                     end
                 end
@@ -303,7 +303,7 @@ GUIDefineEx.TipsTNCellGroupTitle = GUIDefineEx.TipsTNCellGroupTitle or (
                     end
                     if groupId and next(indexs) then
                         arrays[groupId] = {}
-                        arrays[groupId].name = STR_LEN(param[3] or "") > 0 and param[3]
+                        arrays[groupId].name = STR_LEN(param[3] or "") > 0 and param[3] or nil
                         arrays[groupId].color = param[4] and TONUMBER(param[4])
                         arrays[groupId].indexs = indexs
                     end
