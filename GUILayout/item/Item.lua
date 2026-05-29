@@ -510,7 +510,7 @@ function Item:SetItemLock()
         return false
     end
 
-    if __GD_ItemLock == 0 and self._from ~= ItemFrom.BAG then
+    if __GD_ItemLock == 0 and self._from ~= ItemFrom.BAG and self._from ~= ItemFrom.HERO_BAG then
         return false
     end
 
