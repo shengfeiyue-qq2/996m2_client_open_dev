@@ -1217,7 +1217,7 @@ local function parseDescEffect(value)
     local effectTab = {}
     effectTab.effectId = effectId
     effectTab.type = tonumber(params[2]) or 0  -- 0:顶部 1:底部
-    effectTab.mode = tonumber(params[3]) or 1  -- 1:前面 2:后面
+    effectTab.mode = tonumber(params[3]) or 1  -- 1:前面 2:后面 3:背景前文字后
     local pcParams = {}
     if SL:GetValue("IS_PC_OPER_MODE") and string.len(tParams[2] or "") > 0 then
         pcParams = SL:Split(tParams[2] or "", "#")

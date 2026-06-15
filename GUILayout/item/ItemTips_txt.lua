@@ -1499,8 +1499,12 @@ function ItemTips.AddFrameEffect(parent, effectList)
             
             local sfx = GUI:Effect_Create(parent, "frame_effect_" .. i, 0, 0, 0, effectId)
             if sfx then
-                if mode == 2 then
+                if mode == 1 then
+                    GUI:setLocalZOrder(sfx, 2)
+                elseif mode == 2 then
                     GUI:setLocalZOrder(sfx, -1)
+                elseif mode == 3 then
+                    GUI:setLocalZOrder(ItemTips._curCellView, 1)
                 end
 
                 if param.scaleX and param.scaleX > 0 then
