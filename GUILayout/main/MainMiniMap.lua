@@ -37,6 +37,7 @@ function MainMiniMap.main()
     local parent = GUI:Attach_Top()
     GUI:LoadExport(parent, "main/main_minimap")
     MainMiniMap._root = GUI:getChildByName(parent, "Main_Minimap")
+    GUI:addAllChildrenMouseRButtonSwallow(MainMiniMap._root)
 
     MainMiniMap._ui = GUI:ui_delegate(MainMiniMap._root)
     if not MainMiniMap._ui then

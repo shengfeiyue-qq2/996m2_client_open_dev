@@ -111,6 +111,7 @@ function MainProperty.main()
 
     MainProperty._root = GUI:getChildByName(parent, "Main_Property")
     MainProperty._ui = GUI:ui_delegate(MainProperty._root)
+    GUI:addAllChildrenMouseRButtonSwallow(MainProperty._root)
     if not MainProperty._ui then
         return false
     end
@@ -616,8 +617,8 @@ function MainProperty.InitActPanel()
         MainProperty._ui["LoadingBar_exp"],
         function()
             local curExp = SL:GetValue("EXP")
-            local maxExp = math.max(SL:GetValue("MAXEXP"), 1)
-            local per = math.min(curExp / maxExp * 100, 100)
+            local maxExp = SL:GetValue("MAXEXP")
+            local per = maxExp == 0 and 0 or curExp / maxExp * 100
             return string.format("当前经验：%.2f%%", per)
         end,
         {x = 0, y = 0},

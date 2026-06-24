@@ -442,7 +442,7 @@ function UIOperator:CloseHeroBagUI()
 end
 
 --打开交易行玩家面板
-function UIOperator:OpenTradePlyerUI(data)
+function UIOperator:OpenTradePlayerUI(data)
     if  SL:IsForbidOpenBagOrEquip() then 
         return
     end

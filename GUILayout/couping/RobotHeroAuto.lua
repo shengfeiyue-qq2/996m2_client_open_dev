@@ -97,6 +97,17 @@ function RobotHeroAuto.Tick(delta)
     RobotHeroAuto.AutoLogin(delta)
     --自动收回
     RobotHeroAuto.AutoLoginOut(delta)--改成被攻击触发
+
+    if SL:GetValue("USER_IS_DIE") then
+        return nil
+    end
+    if not SL:GetValue("HERO_IS_ACTIVE") then
+        return nil
+    end
+    if not SL:GetValue("HERO_IS_ALIVE") then
+        return nil
+    end
+
     -- 自动释放相关
     RobotHeroAuto.AutoLaunch(delta)
     -- 自动使用修复神水
@@ -282,15 +293,6 @@ local function isInvalidEquip(item)
 end
 
 function RobotHeroAuto.AutoUseFIXItem(delta)
-    if SL:GetValue("USER_IS_DIE") then
-        return nil
-    end
-    if not SL:GetValue("HERO_IS_ACTIVE") then
-        return
-    end
-    if  not SL:GetValue("HERO_IS_ALIVE") then
-        return
-    end
     -- cding
     RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR] = RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR] - delta
     if RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR] <= 0 then

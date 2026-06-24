@@ -148,7 +148,7 @@ function MiniMap.InitMiniMap()
 
                 -- 直接传送
                 if isTrans then 
-                    local msg = string.format("okmove %s %s", mapX, mapY)
+                    local msg = string.format("%s %s %s", SL:GetValue("GAME_DATA", "GM_fly_ring") or "okmove", mapX, mapY)
                     SL:RequestSendChatGMMsg(msg)
                     return
                 end
@@ -159,7 +159,7 @@ function MiniMap.InitMiniMap()
                 end 
                 -- 直接传送
                 if isTrans then 
-                    local msg = string.format("okmove %s %s", mapX, mapY)
+                    local msg = string.format("%s %s %s", SL:GetValue("GAME_DATA", "GM_fly_ring") or "okmove", mapX, mapY)
                     SL:RequestSendChatGMMsg(msg)
                     return
                 end
@@ -209,7 +209,7 @@ function MiniMap.InitMiniMap()
             if sliceRows and sliceCols then 
                 local mmapPosX  = math.ceil((nodePos.x / mmapSize.width) * sliceCols)
                 local mmapPosY  = math.ceil((1-(nodePos.y / mmapSize.height)) * sliceRows)
-                local msg = string.format("okmove %s %s", mmapPosX, mmapPosY)
+                local msg = string.format("%s %s %s", SL:GetValue("GAME_DATA", "GM_fly_ring") or "okmove", mmapPosX, mmapPosY)
                 SL:RequestSendChatGMMsg(msg)
             end
         end
@@ -576,7 +576,7 @@ function MiniMap.InitPortals()
                 elseif tonumber(v.xunlu) == 2 then 
                     local function moveTo(sender)
                         -- 直接传送
-                        local msg = string.format("okmove %s %s", mapX, mapY)
+                        local msg = string.format("%s %s %s", SL:GetValue("GAME_DATA", "GM_fly_ring") or "okmove", mapX, mapY)
                         SL:RequestSendChatGMMsg(msg)
                         GUI:delayTouchEnabled(sender)
                     end

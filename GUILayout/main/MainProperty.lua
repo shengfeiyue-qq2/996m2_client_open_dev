@@ -35,6 +35,7 @@ function MainProperty.main()
 
     MainProperty._root = GUI:getChildByName(parent, "Main_Property")
     MainProperty._ui = GUI:ui_delegate(MainProperty._root)
+    GUI:addAllChildrenMouseRButtonSwallow(MainProperty._root)
     if not MainProperty._ui then
         return false
     end

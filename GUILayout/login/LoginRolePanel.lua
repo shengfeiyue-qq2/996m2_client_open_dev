@@ -610,7 +610,6 @@ function LoginRolePanel.ShowCreateRole()
         GUI:delayTouchEnabled(ui.Button_rand)
         SL:RequestLoginRandRoleName(LoginRolePanel._createJob, LoginRolePanel._createSex)
     end)
-
     GUI:TextInput_addOnEvent(ui.TextInput_name, function(_, eventType)
         if eventType == 2 then
             if SL:GetValue("M2_FORBID_NAME", true) then
@@ -618,7 +617,7 @@ function LoginRolePanel.ShowCreateRole()
                 return
             end
             LoginRolePanel._isRandName = false
-
+        elseif eventType == 1 or eventType == 3 then
             local input = GUI:TextInput_getString(ui.TextInput_name)
             input = string.gsub(input, "\r\n", "")
             input = string.gsub(input, "\n", "")
@@ -627,7 +626,7 @@ function LoginRolePanel.ShowCreateRole()
             GUI:TextInput_setString(ui.TextInput_name, input)
         end
     end)
-
+    
     -- 提交
     GUI:addOnClickEvent(ui.Button_submit, function()
         GUI:delayTouchEnabled(ui.Button_submit, 0.5)
@@ -654,7 +653,6 @@ function LoginRolePanel.SubmitCreateNewRole()
             SL:ShowSystemTips("角色名不可为空")
             return
         end
-
         -- 屏蔽数字
         if string.match(input, "%d+") then
             SL:ShowSystemTips("禁止建立包含数字的人物名")

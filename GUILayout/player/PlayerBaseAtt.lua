@@ -76,6 +76,9 @@ function PlayerBaseAtt.UpdateBaseAttri()
 
     -- 红点变量 客户端game_data配置 m2需对应配置
     local redValue = SL:GetValue("GAME_DATA", "RedPointValue")
+    if not redValue then
+        return
+    end
     local data = string.split(redValue, "|")
     for _, v in ipairs(data) do 
         local temp = string.split(v, "#")

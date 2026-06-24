@@ -51,6 +51,7 @@ function MainAssist.main()
     local parent = GUI:Attach_LeftTop()
     GUI:LoadExport(parent, "main/assist/main_assist")
     MainAssist._root = GUI:getChildByName(parent, "Main_Assist")
+    GUI:addAllChildrenMouseRButtonSwallow(MainAssist._root)
 
     MainAssist._ui = GUI:ui_delegate(MainAssist._root)
     if not MainAssist._ui then

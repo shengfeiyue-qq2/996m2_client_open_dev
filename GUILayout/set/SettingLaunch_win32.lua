@@ -16,6 +16,7 @@ local commonGroup = {
         SLDefine.SETTINGID.SETTING_IDX_DU_FU_AUTOCHANGE, --毒符互换
         SLDefine.SETTINGID.SETTING_IDX_NOT_NEED_SHIFT, --免shift
         SLDefine.SETTINGID.SETTING_IDX_TELEPORT_KEEP_TARGET, -- 瞬移锁定原目标
+        SLDefine.SETTINGID.SETTING_IDX_MORE_FAST,   -- 更快的加速
     },
     {
         SLDefine.SETTINGID.SETTING_IDX_EXP_IGNORE,  --经验过滤
@@ -35,7 +36,6 @@ local heroGroup = {
     SLDefine.SETTINGID.SETTING_IDX_HERO_FOLLOW_ATTACK, -- 跟随主角攻击
     SLDefine.SETTINGID.SETTING_IDX_HERO_AUTO_LOGIN, -- 自动召唤英雄
     SLDefine.SETTINGID.SETTING_IDX_HERO_ATTACK_DODGE, -- 英雄打怪躲避
-    SLDefine.SETTINGID.SETTING_IDX_MORE_FAST,   -- 更快的加速
 }
 
 local skillsGroups = {
