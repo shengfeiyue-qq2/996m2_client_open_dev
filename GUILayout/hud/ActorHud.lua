@@ -22,11 +22,7 @@ function ActorHud.InitConfig()
     --使用bmp字体
     ActorHud._useBmpFont = false
     if ActorHud._isWin32 then
-        if global.WINIS4K then
-            ActorHud._useBmpFont = false
-        else
-            ActorHud._useBmpFont = SL:GetValue("GAME_DATA", "HudNotUseBmpFont") ~= 1
-        end
+        ActorHud._useBmpFont = SL:GetValue("GAME_DATA", "HudNotUseBmpFont") ~= 1
     else
         ActorHud._useBmpFont = SL:GetValue("GAME_DATA", "MobileHudUseBmpFont") == 1
     end
