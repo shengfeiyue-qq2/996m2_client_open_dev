@@ -17,7 +17,7 @@ function GoldBox.main()
     if GUI:GetWindow(nil, UIConst.LAYERID.GoldBoxGUI) then
         return
     end
-    GoldBox._parent = GUI:Win_Create(UIConst.LAYERID.GoldBoxGUI, 0, 0, 0, 0, false, false, true, true)
+    GoldBox._parent = GUI:Win_Create(UIConst.LAYERID.GoldBoxGUI, 0, 0, 0, 0, false, false, true)
     if GoldBox._isPC then
         GUI:LoadExport(GoldBox._parent, "treasure_box/gold_box_panel_win32")
     else

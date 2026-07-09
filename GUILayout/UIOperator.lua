@@ -68,6 +68,7 @@ function UIOperator:OpenRoleEquipUI(type, data)
 
     if type == GUIDefine.RoleUIType.PLAYER and tonumber(SL:GetValue("GAME_DATA", "UIOpenMethod")) == 1 then
         return SL:CheckOpenLayer(SLDefine.HyperLinkID.Equip, data, function ()
+            GUI:SetLayerOpenParam(data)
             GUI:Win_Open(UIConst.LUAFile.LUA_FILE_PLAYER_EQUIP)
         end)
     end
@@ -103,6 +104,7 @@ function UIOperator:OpenRoleBaseAttUI(type, data)
 
     if type == GUIDefine.RoleUIType.PLAYER and tonumber(SL:GetValue("GAME_DATA", "UIOpenMethod")) == 1 then
         return SL:CheckOpenLayer(SLDefine.HyperLinkID.State, data, function ()
+            GUI:SetLayerOpenParam(data)
             GUI:Win_Open(UIConst.LUAFile.LUA_FILE_PLAYER_BASE_ATT)
         end)
     end
@@ -134,6 +136,7 @@ function UIOperator:OpenRoleExtraAttUI(type, data)
 
     if type == GUIDefine.RoleUIType.PLAYER and tonumber(SL:GetValue("GAME_DATA", "UIOpenMethod")) == 1 then
         return SL:CheckOpenLayer(SLDefine.HyperLinkID.Attri, data, function ()
+            GUI:SetLayerOpenParam(data)
             GUI:Win_Open(UIConst.LUAFile.LUA_FILE_PLAYER_EXTRA_ATT)
         end)
     end
@@ -165,6 +168,7 @@ function UIOperator:OpenRoleSkillUI(type, data)
 
     if type == GUIDefine.RoleUIType.PLAYER and tonumber(SL:GetValue("GAME_DATA", "UIOpenMethod")) == 1 then
         return SL:CheckOpenLayer(SLDefine.HyperLinkID.Skill, data, function ()
+            GUI:SetLayerOpenParam(data)
             GUI:Win_Open(UIConst.LUAFile.LUA_FILE_PLAYER_SKILL)
         end)
     end
@@ -196,6 +200,7 @@ function UIOperator:OpenRoleTitleUI(type, data)
 
     if type == GUIDefine.RoleUIType.PLAYER and tonumber(SL:GetValue("GAME_DATA", "UIOpenMethod")) == 1 then
         return SL:CheckOpenLayer(SLDefine.HyperLinkID.Title, data, function ()
+            GUI:SetLayerOpenParam(data)
             GUI:Win_Open(UIConst.LUAFile.LUA_FILE_PLAYER_TITLE)
         end)
     end
@@ -231,6 +236,7 @@ function UIOperator:OpenRoleSuperEquipUI(type, data)
 
     if type == GUIDefine.RoleUIType.PLAYER and tonumber(SL:GetValue("GAME_DATA", "UIOpenMethod")) == 1 then
         return SL:CheckOpenLayer(SLDefine.HyperLinkID.SuperEquip, data, function ()
+            GUI:SetLayerOpenParam(data)
             GUI:Win_Open(UIConst.LUAFile.LUA_FILE_PLAYER_SUPER_EQUIP)
         end)
     end
@@ -266,6 +272,7 @@ function UIOperator:OpenRoleBuffUI(type, data)
 
     if type == GUIDefine.RoleUIType.PLAYER and tonumber(SL:GetValue("GAME_DATA", "UIOpenMethod")) == 1 then
         return SL:CheckOpenLayer(SLDefine.HyperLinkID.Buff, data, function ()
+            GUI:SetLayerOpenParam(data)
             GUI:Win_Open(UIConst.LUAFile.LUA_FILE_PLAYER_BUFF)
         end)
     end
@@ -580,7 +587,6 @@ function UIOperator:OpenFriendApplyUI()
 end
 
 function UIOperator:CloseFriendApplyUI()
-    SL:RequestClearFriendApplyList()
     GUI:Win_CloseByID(UIConst.LAYERID.FriendApplyGUI)
 end
 

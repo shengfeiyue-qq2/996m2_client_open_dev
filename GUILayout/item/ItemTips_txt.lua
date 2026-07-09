@@ -2111,7 +2111,7 @@ function ItemTips.CreateDiyAttrWidget(param)
                                 local descId = tonumber(params[2])
                                 local config = descId and GUIDefineEx.ItemDescConfig[descId]
                                 if config and config.str then
-                                    local richText = GUI:RichText_Create(layout, "desc_" .. j, tonumber(params[3]) or 0, tonumber(params[4]) or 0, SL:ParseMetaValueStr(config.str), sizeW, SL:GetValue("GAME_DATA","DEFAULT_FONT_SIZE"), "#FFFFFF")
+                                    local richText = GUI:RichText_Create(layout, "desc_" .. j, tonumber(params[3]) or 0, tonumber(params[4]) or 0, SL:ParseMetaValueStr(config.str), sizeW, fontSize, "#FFFFFF")
                                     if tonumber(params[5]) and tonumber(params[5]) > 0 then
                                         GUI:setScale(richText, tonumber(params[5]))
                                     end
@@ -2119,7 +2119,7 @@ function ItemTips.CreateDiyAttrWidget(param)
                             elseif params[1] == "RTEXT" then
                                 local str = params[2]
                                 if str and string.len(str) > 0 then
-                                    local richText = GUI:RichTextFCOLOR_Create(layout, "richText_" .. j, tonumber(params[3]) or 0, tonumber(params[4]) or 0, str, sizeW, SL:GetValue("GAME_DATA","DEFAULT_FONT_SIZE"), "#FFFFFF")
+                                    local richText = GUI:RichTextFCOLOR_Create(layout, "richText_" .. j, tonumber(params[3]) or 0, tonumber(params[4]) or 0, str, sizeW, fontSize, "#FFFFFF")
                                     if tonumber(params[5]) and tonumber(params[5]) > 0 then
                                         GUI:setScale(richText, tonumber(params[5]))
                                     end

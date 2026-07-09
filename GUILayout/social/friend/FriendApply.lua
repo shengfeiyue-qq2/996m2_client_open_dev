@@ -11,8 +11,6 @@ function FriendApply.main()
 
     -- 关闭
     GUI:addOnClickEvent(FriendApply._ui["Button_close"], function()
-        -- 移除主界面气泡 气泡id为5
-        SL:DelBubbleTips(5)
         UIOperator:CloseFriendApplyUI()
     end)
 

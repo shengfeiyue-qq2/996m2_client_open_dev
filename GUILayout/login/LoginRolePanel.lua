@@ -65,6 +65,8 @@ function LoginRolePanel.main()
     LoginRolePanel._needAutoIndex = nil
     LoginRolePanel._touchAutoPanel = nil
     LoginRolePanel._equipConfig = {}
+    LoginRolePanel._submitEnterState = false
+    LoginRolePanel._submitCreateRoleState = false
 
 
     local equipConfig = SL:RequireFile("game_config/cfg_equip", true)
@@ -647,6 +649,10 @@ end
 
 -- 创角提交
 function LoginRolePanel.SubmitCreateNewRole()
+    if LoginRolePanel._submitCreateRoleState then
+        return
+    end
+
     if LoginRolePanel._createUI then
         local input = GUI:TextInput_getString(LoginRolePanel._createUI.TextInput_name)
         if string.len(input) == 0 then
@@ -660,6 +666,7 @@ function LoginRolePanel.SubmitCreateNewRole()
         end
 
         UIOperator:OpenLoadingBarUI()
+        LoginRolePanel._submitCreateRoleState = true
 
         SL:RequestCheckSensitiveWord(input, 1, function(status)
             UIOperator:CloseLoadingBarUI()
@@ -667,6 +674,7 @@ function LoginRolePanel.SubmitCreateNewRole()
             -- 随机名字不检测敏感字
             if not status and not LoginRolePanel._isRandName then
                 SL:ShowSystemTips("请不要包含敏感字或者特殊字符！")
+                LoginRolePanel._submitCreateRoleState = false
                 return
             end
 
@@ -678,6 +686,10 @@ end
 
 -- 进入游戏
 function LoginRolePanel.SubmitEnterGame()
+    if LoginRolePanel._submitEnterState then
+        return
+    end
+
     if LoginRolePanel._reloginCD then
         return
     end
@@ -700,7 +712,10 @@ function LoginRolePanel.SubmitEnterGame()
 
     SL:SetValue("LOGIN_SELECT_ROLE_TRADE_PARAM")
     UIOperator:OpenLoadingBarUI()
-    SL:RequestLoginEnterGame()
+    local sent = SL:RequestLoginEnterGame()
+    if sent then
+        LoginRolePanel._submitEnterState = true
+    end
 
     SL:StopAudioBGM()
 end
@@ -1075,6 +1090,7 @@ end
 
 function LoginRolePanel.OnCreateRoleSuccess()
     UIOperator:CloseLoadingBarUI()
+    LoginRolePanel._submitCreateRoleState = false
 
     -- 创角成功直接进入游戏
     UIOperator:OpenLoadingBarUI()
@@ -1083,6 +1099,7 @@ end
 
 function LoginRolePanel.OnCreateRoleFail(errorCode)
     UIOperator:CloseLoadingBarUI()
+    LoginRolePanel._submitCreateRoleState = false
 
     if errorCode == 1 then
         SL:ShowSystemTips("创建失败：角色名重复！")

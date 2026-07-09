@@ -820,7 +820,7 @@ end
 
 function BagData.ResponseUseSuccess(data) 
     local header = data.header
-    local ItemIndex = header.recog
+    local itemMakeIndex = header.recog
 end
 
 -- 道具使用失败

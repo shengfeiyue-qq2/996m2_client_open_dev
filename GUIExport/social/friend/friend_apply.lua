@@ -66,7 +66,7 @@ function ui.init(parent)
 	GUI:setTag(ListView, 80)
 
 	-- Create Text_close_title
-	local Text_close_title = GUI:Text_Create(Panel_1, "Text_close_title", 445.00, 32.00, 16, "#28ef01", [[关闭后信息将被清空]])
+	local Text_close_title = GUI:Text_Create(Panel_1, "Text_close_title", 445.00, 32.00, 16, "#28ef01", [[]])
 	GUI:setChineseName(Text_close_title, "好友申请_关闭标题_文本")
 	GUI:setAnchorPoint(Text_close_title, 0.50, 0.50)
 	GUI:setTouchEnabled(Text_close_title, false)

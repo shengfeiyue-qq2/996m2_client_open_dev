@@ -312,18 +312,7 @@ function HeroBestRing.InitEquipLayerEvent()
                 end
             
                 UIOperator:CloseItemTips()
-                -- 开始
-                HeroBestRing.UpdateMoveState(widget, true, pos)
-                SL:onLUAEvent(LUA_EVENT_LAYER_MOVED_BEGIN, {
-                    from = GUIDefine.ItemFrom.HERO_BEST_RINGS,
-                    pos  = touchPos,
-                    itemData = itemData,
-                    cancelCallBack = function ()
-                        widget.__hasEventCallOnTouchBegin = false
-                        widget.__lastClickTime = false
-                        HeroBestRing.UpdateMoveState(widget, false, pos)
-                    end
-                })
+                SL:RequestHeroTakeOffEquip({itemData = itemData, pos = itemData.Where})
             end
             GUI:addMouseButtonEvent(widget, {onSpecialRFunc = addItemIntoEquip, onRightDownFunc = onRightDownFunc, checkIsVisible = true})
             GUIFunction:InitItemTipsScrollEvent(widget, "HeroBestRing")

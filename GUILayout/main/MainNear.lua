@@ -306,6 +306,10 @@ function MainNear.AddPlayer(data)
         return false
     end
 
+    if SL:GetValue("ACTOR_IS_HUMAN", actorID) then
+        return false
+    end
+
     if not GUIFunction:CheckLaunchEnableByID(actorID, true) then
         return false
     end
@@ -626,6 +630,8 @@ function MainNear.OnActorOutOfView(data)
     if SL:GetValue("ACTOR_IS_PLAYER", actorID) then
         if SL:GetValue("ACTOR_IS_HERO", actorID) then
             MainNear.RmvHero(data)
+        elseif SL:GetValue("ACTOR_IS_HUMAN", actorID) then
+            MainNear.RmvMonster(data)
         else
             MainNear.RmvPlayer(data)
         end
@@ -658,7 +664,7 @@ function MainNear.OnRefreshActorHP(data)
         return false
     end
 
-    if not ((MainNear._selectType == 1 and SL:GetValue("ACTOR_IS_MONSTER", actorID)) or (MainNear._selectType == 2 and SL:GetValue("ACTOR_IS_PLAYER", actorID)) or (MainNear._selectType == 3 and SL:GetValue("ACTOR_IS_HERO", actorID))) then
+    if not ((MainNear._selectType == 1 and (SL:GetValue("ACTOR_IS_MONSTER", actorID) or SL:GetValue("ACTOR_IS_HUMAN", actorID))) or (MainNear._selectType == 2 and SL:GetValue("ACTOR_IS_PLAYER", actorID)) or (MainNear._selectType == 3 and SL:GetValue("ACTOR_IS_HERO", actorID))) then
         return false
     end
 

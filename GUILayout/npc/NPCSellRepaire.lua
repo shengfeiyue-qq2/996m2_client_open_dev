@@ -31,10 +31,10 @@ function NPCSellRepaire.InitGUI(data)
     }
 
     NPCSellRepaire.fromType = {
-        [GUIDefine.NpcEventType.SELL] = GUIDefine.ItemGoTo.SELL,
-        [GUIDefine.NpcEventType.REPAIRE] = GUIDefine.ItemGoTo.REPAIRE,
-        [GUIDefine.NpcEventType.DOSOMETHING] = GUIDefine.ItemGoTo.NPC_DO_SOMETHING,
-        [GUIDefine.NpcEventType.NEWTYPE] = GUIDefine.ItemGoTo.NEWTYPE,
+        [GUIDefine.NpcEventType.SELL] = GUIDefine.ItemFrom.SELL,
+        [GUIDefine.NpcEventType.REPAIRE] = GUIDefine.ItemFrom.REPAIRE,
+        [GUIDefine.NpcEventType.DOSOMETHING] = GUIDefine.ItemFrom.NPC_DO_SOMETHING,
+        [GUIDefine.NpcEventType.NEWTYPE] = GUIDefine.ItemFrom.NEWTYPE,
     }
 
     NPCSellRepaire.InitUI(data)

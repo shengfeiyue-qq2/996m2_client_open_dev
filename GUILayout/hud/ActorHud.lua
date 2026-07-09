@@ -289,6 +289,13 @@ function ActorHud.GetActorHUDLabelInfo(actorID, color, guildInfo)
     if SL:GetValue("ACTOR_IS_HERO", actorID) then
         labelGuildVisible = false
     end
+
+    -- 副驾不显示
+    if SL:GetValue("ACTOR_IS_HORSE_COPILOT", actorID) then
+        labelNameVisible = false
+        labelGuildVisible = false
+        labelTitleVisible = false
+    end
     
     --前缀文本（称号文本）
     for i = 1, 12 do

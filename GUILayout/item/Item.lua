@@ -110,10 +110,12 @@ function Item:Cleanup()
         GUI:setPositionX(ui["Text_count"], size.width + 2)
         GUI:Text_setFontSize(ui["Text_count"], 13)
         GUI:setPositionY(ui["Text_star_lv"], size.height)
+        ui["Text_star_lv"].reloadedY = true
     else
         GUI:setPositionX(ui["Text_count"], size.width - 3)
         GUI:Text_setFontSize(ui["Text_count"], 15)
         GUI:setPositionY(ui["Text_star_lv"], size.height - 2)
+        ui["Text_star_lv"].reloadedY = true
     end
 
     GUI:setChildrenCascadeOpacityEnabled(self._parent, true)
@@ -352,6 +354,9 @@ function Item:SetStarLevel(star)
         Text_star.loaded = true
         local p = GUI:getPosition(Text_star)
         GUI:setPosition(Text_star, p.x + offX, p.y + offY)
+    elseif Text_star.reloadedY then
+        local p = GUI:getPosition(Text_star)
+        GUI:setPositionY(Text_star, p.y + offY)
     end
 end
 

@@ -4,6 +4,10 @@
 
 function GUIInitPre()
     SL:Print("Hello World, This is GUIInitPre!")
+    -- 加载GUIInitPreEx
+    if SL:IsFileExist("GUILayout/GUIInitPreEx.lua") then
+        SL:Require("GUILayout/GUIInitPreEx", true)
+    end
     -- 加载ShaderUtils.lua
     SL:Require("GUILayout/ShaderUtils", true)
 end
