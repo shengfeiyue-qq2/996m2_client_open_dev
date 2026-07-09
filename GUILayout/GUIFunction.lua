@@ -4244,3 +4244,9 @@ function GUIFunction:ConvertHPUnit(hp, pointBit, notCheckSet)
 end
 --------------------------------------------------------------------------
 
+-- 技能表现是否不播放音效
+-- param data: table: {data: 数据， presentType: 表现类型(1 抬手攻击、 2 飞行、 3 击中)}
+function GUIFunction:IsNoPlayAudioFromSkillPresent(data)
+    return false
+end
+
