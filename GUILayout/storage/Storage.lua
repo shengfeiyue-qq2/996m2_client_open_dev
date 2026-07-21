@@ -348,7 +348,7 @@ function Storage.UpdateStorageOpenNum()
 end
 
 function Storage.OnCloseLayer()
-    UIOperator:CloseNpcMakeDrugUI()
+    UIOperator:CloseNpcStorageUI()
 end
 
 function Storage.OnClose(UID)
