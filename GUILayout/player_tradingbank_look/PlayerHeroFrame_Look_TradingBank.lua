@@ -15,12 +15,14 @@ PlayerHeroFrame_Look_TradingBank.ChildsUICfgs = {
 PlayerHeroFrame_Look_TradingBank.OpenPlayerType = {
     Player = 1, --交易行人物
     Hero = 2, --交易行英雄
+    Money = 4, --交易行货币
 }
 
 PlayerHeroFrame_Look_TradingBank.OpenType = {
     Actor = 1, --角色/英雄信息
     Bag = 2, --背包
-    Storage = 3 --仓库
+    Storage = 3, --仓库
+    Money = 4 --货币
 }
 
 function PlayerHeroFrame_Look_TradingBank.main()
@@ -35,44 +37,83 @@ function PlayerHeroFrame_Look_TradingBank.main()
     PlayerHeroFrame_Look_TradingBank._openType = PlayerHeroFrame_Look_TradingBank.OpenType.Actor 
     PlayerHeroFrame_Look_TradingBank._ishero = false
     PlayerHeroFrame_Look_TradingBank.InitPageBtns()
-    for i = 1, 3 do--人物  英雄 关闭
+    for i = 1, 4 do--人物  英雄 关闭 货币
         local btn = PlayerHeroFrame_Look_TradingBank._ui["Button_"..i]
-        if i == PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Hero then 
-            if TradingBankLookPlayerData.GetHasHeroData() then--交易行查看他人是否有英雄数据 
-                GUI:Button_setTitleText(btn,"英雄")
-            else
-                GUI:setVisible(btn, false)
-            end
-        end
-        GUI:addOnClickEvent(btn,function()
-            if i == PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Player then
-                PlayerHeroFrame_Look_TradingBank.SetButton(PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Player)
-                PlayerHeroFrame_Look_TradingBank.ChangePlayerType(PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Player)
-            elseif i == PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Hero then 
-                PlayerHeroFrame_Look_TradingBank.SetButton(PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Hero)
-                PlayerHeroFrame_Look_TradingBank.ChangePlayerType(PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Hero)
-            else
-                UIOperator:CloseTradePlyerUI()
-                SL:CloseTradingBankLookInfoUI()
-                if  PlayerHeroFrame_Look_TradingBank._parent and not GUI:Widget_IsNull(PlayerHeroFrame_Look_TradingBank._parent) then
-                    GUI:removeAllChildren(PlayerHeroFrame_Look_TradingBank._parent)
+        if btn then 
+            if i == PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Hero then 
+                if TradingBankLookPlayerData.GetHasHeroData() then--交易行查看他人是否有英雄数据 
+                    GUI:Button_setTitleText(btn,"英雄")
+                else
+                    GUI:setVisible(btn, false)
                 end
-            end 
-        end)
+            end
+            GUI:addOnClickEvent(btn,function()
+                if i == PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Player then
+                    PlayerHeroFrame_Look_TradingBank.SetButton(PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Player)
+                    PlayerHeroFrame_Look_TradingBank.ChangePlayerType(PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Player)
+                elseif i == PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Hero then 
+                    PlayerHeroFrame_Look_TradingBank.SetButton(PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Hero)
+                    PlayerHeroFrame_Look_TradingBank.ChangePlayerType(PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Hero)
+                elseif i == PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Money then 
+                    PlayerHeroFrame_Look_TradingBank.SetButton(PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Money)
+                    PlayerHeroFrame_Look_TradingBank.ChangePlayerType(PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Money)
+                else
+                    UIOperator:CloseTradePlyerUI()
+                    SL:CloseTradingBankLookInfoUI()
+                    if  PlayerHeroFrame_Look_TradingBank._parent and not GUI:Widget_IsNull(PlayerHeroFrame_Look_TradingBank._parent) then
+                        GUI:removeAllChildren(PlayerHeroFrame_Look_TradingBank._parent)
+                    end
+                end 
+            end)
+        end
     end
 
     PlayerHeroFrame_Look_TradingBank.SetButton(PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Player)
     PlayerHeroFrame_Look_TradingBank.RefPanel()
     PlayerHeroFrame_Look_TradingBank.AddChildPanel(SLDefine.TradingBankPlayerPages.Equip)
-    if data.noClose then
-        GUI:setVisible(PlayerHeroFrame_Look_TradingBank._ui.Button_4, false)
-    end
 
     if data.position then
         GUI:setPosition(PlayerHeroFrame_Look_TradingBank._ui.Panel_1, data.position)
     end
 
     PlayerHeroFrame_Look_TradingBank.RegisterEvent()
+
+     --货币
+    PlayerHeroFrame_Look_TradingBank.listData = {}
+    PlayerHeroFrame_Look_TradingBank._index = 0--添加的属性条编号
+    local datalist = PlayerHeroFrame_Look_TradingBank.getAttSellShowMoneyList()
+    local tradingShowMoneyList = nil
+    if TradingBankLookPlayerData.getSellShowMoneyList then
+        tradingShowMoneyList = TradingBankLookPlayerData.getSellShowMoneyList()
+    end
+    if datalist and next(datalist) and tradingShowMoneyList and next(tradingShowMoneyList) then
+        for _, pair in ipairs(tradingShowMoneyList) do
+            local key = pair["ID"] or nil
+            local value = pair["Count"] or nil
+            if key and value then
+                for _, pair2 in ipairs(datalist) do
+                    local key2 = pair2["ID"] or nil
+                    local value2 = pair2["Count"] or nil
+                    if key2 and value2 then
+                        if key == key2 then
+                            if PlayerHeroFrame_Look_TradingBank._ui.Button_4 then
+                                GUI:setVisible(PlayerHeroFrame_Look_TradingBank._ui.Button_4, true)
+                                GUI:setTouchEnabled(PlayerHeroFrame_Look_TradingBank._ui.Button_4, true)
+                                GUI:Button_setTitleText(PlayerHeroFrame_Look_TradingBank._ui.Button_4, "货币")
+                                local data = {
+                                        str = value2,
+                                        strValue = value
+                                    }
+                                table.insert(PlayerHeroFrame_Look_TradingBank.listData, data)
+                                break
+                            end
+                            
+                        end
+                    end
+                end
+            end
+        end
+    end
 end
 
 function PlayerHeroFrame_Look_TradingBank.InitPageBtns()
@@ -113,12 +154,38 @@ function PlayerHeroFrame_Look_TradingBank.RefreshPlayerName()
     end
 end
 
--- 1角色 和英雄信息 2 背包  3仓库
+
+-- 1角色 和英雄信息 2 背包  3仓库 4货币
 function PlayerHeroFrame_Look_TradingBank:RefPanel()
     if PlayerHeroFrame_Look_TradingBank._openType == PlayerHeroFrame_Look_TradingBank.OpenType.Actor then 
         GUI:setVisible(PlayerHeroFrame_Look_TradingBank._ui.Image_bg2, false)
+        GUI:setVisible(PlayerHeroFrame_Look_TradingBank._ui.Panel_btnList, true)
+    elseif PlayerHeroFrame_Look_TradingBank._openType == PlayerHeroFrame_Look_TradingBank.OpenType.Money then
+        -- 货币页签
+        GUI:setVisible(PlayerHeroFrame_Look_TradingBank._ui.Image_bg2, true)
+        GUI:stopAllActions(PlayerHeroFrame_Look_TradingBank._ui.ListView_1)
+        GUI:ListView_removeAllItems(PlayerHeroFrame_Look_TradingBank._ui.ListView_1)
+        GUI:removeAllChildren(PlayerHeroFrame_Look_TradingBank._ui.Node_panel)
+
+        -- 隐藏左侧页签按钮
+        local btnList = PlayerHeroFrame_Look_TradingBank._ui.Panel_btnList
+        GUI:setVisible(btnList, false)
+
+        for _, moneyItem in ipairs(PlayerHeroFrame_Look_TradingBank.listData or {}) do
+            PlayerHeroFrame_Look_TradingBank._index = PlayerHeroFrame_Look_TradingBank._index + 1
+            local widget = GUI:Widget_Create(PlayerHeroFrame_Look_TradingBank._ui.ListView_1, "MoneyItem_"..PlayerHeroFrame_Look_TradingBank._index, 0, 0, 348, 27)
+            GUI:LoadExport(widget, "player_look_tradingbank/trading_money_show_list")
+            local itemUi = GUI:ui_delegate(widget)
+            if moneyItem.str then
+                GUI:Text_setString(itemUi.Text_attName, moneyItem.str .. "：")
+            end
+            if moneyItem.strValue then
+                GUI:Text_setString(itemUi.Text_attValue, tostring(moneyItem.strValue))
+            end
+        end
     else
         GUI:setVisible(PlayerHeroFrame_Look_TradingBank._ui.Image_bg2, true)
+        GUI:setVisible(PlayerHeroFrame_Look_TradingBank._ui.Panel_btnList, true)
         GUI:stopAllActions(PlayerHeroFrame_Look_TradingBank._ui.ListView_1)
         GUI:ListView_removeAllItems(PlayerHeroFrame_Look_TradingBank._ui.ListView_1)
 
@@ -162,13 +229,22 @@ function PlayerHeroFrame_Look_TradingBank:RefPanel()
 end
 
 function PlayerHeroFrame_Look_TradingBank.SetButton(index)
-    for i = 1, 3 do
+    for i = 1, 4 do
         local btn = PlayerHeroFrame_Look_TradingBank._ui["Button_"..i]
-        GUI:setEnabled(btn, index ~= i)
+        if btn then
+            GUI:setEnabled(btn, index ~= i)
+        end
     end
 end
 
 function PlayerHeroFrame_Look_TradingBank.ChangePlayerType(type)
+    if type == PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Money then
+        -- 货币页签：隐藏子页签面板，显示货币列表
+        PlayerHeroFrame_Look_TradingBank._openType = PlayerHeroFrame_Look_TradingBank.OpenType.Money
+        PlayerHeroFrame_Look_TradingBank.CloseChildPanel(PlayerHeroFrame_Look_TradingBank._page)
+        PlayerHeroFrame_Look_TradingBank.RefPanel()
+        return
+    end
     PlayerHeroFrame_Look_TradingBank._openType = PlayerHeroFrame_Look_TradingBank.OpenType.Actor
     PlayerHeroFrame_Look_TradingBank.CloseChildPanel(PlayerHeroFrame_Look_TradingBank._page)
     PlayerHeroFrame_Look_TradingBank._ishero = type == PlayerHeroFrame_Look_TradingBank.OpenPlayerType.Hero
@@ -213,10 +289,34 @@ end
 function PlayerHeroFrame_Look_TradingBank.CloseChildPanel(page)
     if page == SLDefine.TradingBankPlayerPages.Bag or page == SLDefine.TradingBankPlayerPages.Storage then 
         return 
+    end
+    if PlayerHeroFrame_Look_TradingBank._openType == PlayerHeroFrame_Look_TradingBank.OpenType.Money then
+        return
     end 
     GUI:removeAllChildren(PlayerHeroFrame_Look_TradingBank._ui.Node_panel)
     local type = PlayerHeroFrame_Look_TradingBank._ishero and GUIDefine.RoleUIType.TRADE_HERO or GUIDefine.RoleUIType.TRADE_PLAYER
     PlayerHeroFrame_Look_TradingBank.ChildsUICfgs[page].Close(type)
+end
+
+function PlayerHeroFrame_Look_TradingBank.getAttSellShowMoneyList()
+    local BoxSellShowMoneyList = {}
+    local showMoneyList = SL:GetMetaValue("GAME_DATA", "BoxSellShowMoney")
+    if showMoneyList then
+        local slices = string.split(showMoneyList, "|")
+        for i, slice in ipairs(slices) do
+            local slice2 = string.split(slice, "#")
+            if not BoxSellShowMoneyList[i] then
+                BoxSellShowMoneyList[i] = {}
+            end
+            local sl1 = slice2[1] or nil
+            local sl2 = slice2[2] or nil
+            local data = {}
+            data["ID"] = sl1
+            data["Count"] = sl2
+            BoxSellShowMoneyList[i] = data
+        end
+    end
+    return BoxSellShowMoneyList
 end
 
 -- 关闭外框

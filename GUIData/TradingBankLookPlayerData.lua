@@ -22,6 +22,7 @@ function TradingBankLookPlayerData.Init()
     TradingBankLookPlayerData._heroCurAtr = {}
     TradingBankLookPlayerData._heroMaxAtr = {}
     TradingBankLookPlayerData._hasHeroData = false
+    TradingBankLookPlayerData._MoneyList = nil
 end
 
 function TradingBankLookPlayerData.handle_MSG_SC_ROLE_INFO_RESPONSE(data)
@@ -52,6 +53,18 @@ function TradingBankLookPlayerData.handle_MSG_SC_ROLE_INFO_RESPONSE(data)
         TradingBankLookPlayerData.SetHeroData(data.HeroData)
         TradingBankLookPlayerData.SetHeroEquipsData(data.HeroData.equips)
     end
+    if data.MoneyList then
+        TradingBankLookPlayerData.setSellShowMoneyList(data.MoneyList)
+    end
+
+end
+
+function TradingBankLookPlayerData.setSellShowMoneyList(MoneyList)
+    TradingBankLookPlayerData._MoneyList = MoneyList
+end
+
+function TradingBankLookPlayerData.getSellShowMoneyList()
+    return TradingBankLookPlayerData._MoneyList
 end
 
 function TradingBankLookPlayerData.GetBagData()
