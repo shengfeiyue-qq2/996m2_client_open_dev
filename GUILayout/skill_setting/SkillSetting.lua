@@ -149,7 +149,7 @@ function SkillSetting.UpdateSkillChangeKey(data)
         return false
     end
 
-    if not SL:IsFileExist(path) then
+    if not SL:IsRemoteFileExist(path) then
         return false
     end
 

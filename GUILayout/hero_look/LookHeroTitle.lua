@@ -51,17 +51,11 @@ function LookHeroTitle.RefCurTitle(activeID)
         GUI:Text_setString(lblCurTitle, SL:GetValue("ITEM_NAME", activeID))
         GUI:Text_setTextColor(lblCurTitle, SL:GetHexColorByStyleId(SL:GetValue("ITEM_NAME_COLORID", activeID)))
         GUI:Text_setFontSize(lblCurTitle,  18)
-        local contentSize = GUI:getImageContentSize(res)
-        if contentSize.width > 0 then
-            GUI:setContentSize(btnCurTitle, contentSize.width, contentSize.height)
-        end
+        GUI:setContentSize(btnCurTitle, GUI:getRemoteResImageSize(res))
     else
         local res = LookHeroTitle._path .. "title_3.png"
         GUI:Button_loadTextureNormal(btnCurTitle, res)
-        local contentSize = GUI:getImageContentSize(res)
-        if contentSize.width > 0 then
-            GUI:setContentSize(btnCurTitle, contentSize.width, contentSize.height)
-        end
+        GUI:setContentSize(btnCurTitle, GUI:getRemoteResImageSize(res))
         GUI:Text_setString(lblCurTitle, "")
     end
     GUI:setIgnoreContentAdaptWithSize(btnCurTitle, false)
@@ -103,10 +97,7 @@ function LookHeroTitle.RefTitleList(activeID)
             GUI:Button_loadTextureNormal(buttonIcon, res)
             GUI:Text_setString(ui.Text_name, name)
 
-            local contentSize = GUI:getImageContentSize(res)
-            if contentSize.width > 0 then
-                GUI:setContentSize(buttonIcon, contentSize)
-            end
+            GUI:setContentSize(buttonIcon, GUI:getRemoteResImageSize(res))
 
             if titleId == activeID then
                 GUI:Button_setGrey(buttonIcon, true)
@@ -161,7 +152,7 @@ function LookHeroTitle.RefTitleList(activeID)
             GUI:Button_loadTextureNormal(buttonIcon, res)
             GUI:Text_setString(ui.Text_name, "")
 
-            GUI:setContentSize(buttonIcon, GUI:getImageContentSize(res))
+            GUI:setContentSize(buttonIcon, GUI:getRemoteResImageSize(res))
         end
 
         GUI:setIgnoreContentAdaptWithSize(buttonIcon, false)

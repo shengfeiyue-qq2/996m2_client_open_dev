@@ -19,6 +19,17 @@ function LoginServer.main()
     GUI:setContentSize(LoginServer._bg, screenW, screenH)
     GUI:setPosition(LoginServer._bg, screenW / 2, screenH / 2)
 
+    -- 先下载资源
+    local index = 0
+    while true do
+        index = index + 1
+        local textureFile = string.format("res/private/login/open_door/%02d.png", index)
+        if not SL:IsRemoteFileExist(textureFile) then
+            break
+        end
+        SL:LoadRemoteRes(textureFile)
+    end
+    
     LoginServer.RegisterEvent()
 end
 
@@ -35,7 +46,7 @@ function LoginServer.OnLoginServerSuccess()
             SL:RemoveTextureForKey(textureFile)
         end
         textureFile = string.format("res/private/login/open_door/%02d.png", index)
-        if SL:IsFileExist(textureFile) then
+        if SL:IsRemoteFileExist(textureFile) then
             GUI:Image_loadTexture(LoginServer._bg, textureFile)
         else
             GUI:stopAllActions(LoginServer._bg)

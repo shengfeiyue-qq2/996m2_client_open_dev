@@ -39,7 +39,7 @@ function HeroInternalCombo.InitSelectSkill()
         if skillID and skillID ~= 0 then
             HeroInternalCombo._setComboSkill[skillID] = i
             local iconPath = SL:GetValue("H.SKILL_RECT_ICON_PATH", skillID, true) 
-            if SL:IsFileExist(iconPath) then
+            if SL:IsRemoteFileExist(iconPath) then
                 GUI:Image_loadTexture(HeroInternalCombo._ui["skill_icon_" .. i], iconPath)
             end
         elseif i == 4 and i <= openNum then
@@ -75,7 +75,7 @@ function HeroInternalCombo.ShowSelectPanel(key, pos)
         else
             skillID = items[idx] and items[idx].MagicID
             local iconPath = SL:GetValue("H.SKILL_RECT_ICON_PATH", skillID, true) 
-            if SL:IsFileExist(iconPath) then
+            if SL:IsRemoteFileExist(iconPath) then
                 GUI:Image_loadTexture(HeroInternalCombo._ui["skill_icon_" .. key], iconPath)
             end
         end

@@ -675,7 +675,10 @@ local function GetAttScaleType(id)
     end
 
     -- 未开启属性万分比显示百分比
-    if (id == AttTypeTable.Anti_Posion or id == AttTypeTable.Posion_Recover) and not SL:GetValue("SERVER_OPTION", SW_KEY_ANTI_POISON_TYPE) then
+    if id == AttTypeTable.Anti_Posion and not SL:GetValue("SERVER_OPTION", SW_KEY_ANTI_POISON_TYPE) then
+        return 1
+    end
+    if id == AttTypeTable.Posion_Recover and not SL:GetValue("SERVER_OPTION", SW_KEY_POISON_RECOVER_TYPE) then
         return 1
     end
 
@@ -4056,8 +4059,8 @@ function GUIFunction:SetScrollViewVerticalBar(parent, param)
     local sliderBar = GUI:Slider_Create(barBg, "sliderBar", bgWidth / 2, bgHeight / 2, "res/public/0.png", "res/public/0.png", barPic)
     local btnArr1H = GUI:getContentSize(btnArr_1).height
     local btnArr2H = GUI:getContentSize(btnArr_2).height
-    local barImgSize = GUI:getImageContentSize(barPic)
-    GUI:setContentSize(sliderBar, bgHeight - btnArr1H - btnArr2H - barImgSize.height, barImgSize.width)
+    local barImgSizeW, barImgSizeH = GUI:getRemoteResImageSize(barPic)
+    GUI:setContentSize(sliderBar, bgHeight - btnArr1H - btnArr2H - barImgSizeH, barImgSizeW)
 
     GUI:setAnchorPoint(sliderBar, 0.5, 0.5)
     GUI:setRotation(sliderBar, 90)
@@ -4081,7 +4084,7 @@ function GUIFunction:SetScrollViewVerticalBar(parent, param)
             if offY > 0 then
                 percent = math.min(math.max(0, (offY + posY) / offY * 100), 100)
             end
-            sliderBar:setPercent(percent)    
+            GUI:Slider_setPercent(sliderBar, percent)    
         end, 0.01)
     end
 

@@ -8,9 +8,6 @@ function ui.init(parent)
 
 	-- Create PMainUI
 	local PMainUI = GUI:Layout_Create(Scene, "PMainUI", 641.00, 182.00, 256.00, 359.00, false)
-	GUI:Layout_setBackGroundColorType(PMainUI, 1)
-	GUI:Layout_setBackGroundColor(PMainUI, "#96c8ff")
-	GUI:Layout_setBackGroundColorOpacity(PMainUI, 102)
 	GUI:setChineseName(PMainUI, "商店购买操作组合")
 	GUI:setTouchEnabled(PMainUI, true)
 	GUI:setTag(PMainUI, 26)

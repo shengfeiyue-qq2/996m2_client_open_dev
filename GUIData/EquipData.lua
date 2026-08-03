@@ -15,7 +15,7 @@ function EquipData.Init()
     EquipData._bestRingsOpen = false
 
     EquipData.LoadHairOffset()
-    EquipData.LoadEquipOffset()
+    -- EquipData.LoadEquipOffset()
 end
 
 -- 加载头发偏移
@@ -59,12 +59,11 @@ end
 
 -- 加载装备偏移
 function EquipData.LoadEquipOffset()
-    local function loadEquipOffset(filename, index)
-        if not SL:IsFileExist(filename) then
-            return false
+    local function loadEquipOffset(filename, localPath, index)
+        if not localPath then
+            return
         end
-
-        local jsonStr  = SL:GetDataFromFileEx(filename)
+        local jsonStr = SL:GetDataFromFileEx(localPath)
         local jsonData = {}
         
         xpcall(
@@ -78,7 +77,7 @@ function EquipData.LoadEquipOffset()
                 end
             end
         )
-
+        
         for key, value in pairs(jsonData) do
             local offValue = {
                 x = value.x,
@@ -99,7 +98,13 @@ function EquipData.LoadEquipOffset()
 
     for i = 0, 10 do
         local filename = string.format("res/player_show/player_show_%s/equip_offest.txt", i)
-        loadEquipOffset(filename, i)
+        if SL:IsRemoteFileExist(filename) then
+            SL:LoadRemoteRes(filename, function(loadSuccess, localPath)
+                if loadSuccess then
+                    loadEquipOffset(filename, localPath, i)
+                end
+            end)
+        end
     end
 end
 

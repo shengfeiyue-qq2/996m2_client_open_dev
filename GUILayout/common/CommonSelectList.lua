@@ -104,7 +104,7 @@ function CommonSelectList.CreateItemCell(index, str)
     end
     GUI:setVisible(ui.Image_icon, false)
     local iconPath = CommonSelectList._iconPaths and CommonSelectList._iconPaths[index]
-    if iconPath and iconPath ~= "" and SL:IsFileExist(iconPath) then
+    if iconPath and iconPath ~= "" and SL:IsRemoteFileExist(iconPath) then
         GUI:Image_loadTexture(ui.Image_icon, iconPath)
         GUI:setVisible(ui.Image_icon, true)
     end

@@ -27,9 +27,9 @@ function CostItem:ctor(parent, data)
     self._parent = parent
 
     self._layoutBG  = self._ui.Panel_bg
-    self._nodeTitle = self._layoutBG:getChildByName("Node_title")
-    self._nodeIcon  = self._layoutBG:getChildByName("Node_icon")
-    self._nodeCount = self._layoutBG:getChildByName("Node_count")
+    self._nodeTitle = GUI:getChildByName(self._layoutBG, "Node_title")
+    self._nodeIcon  = GUI:getChildByName(self._layoutBG, "Node_icon")
+    self._nodeCount = GUI:getChildByName(self._layoutBG, "Node_count")
     self._goodsItem = nil
     self._title     = nil
 
@@ -230,7 +230,7 @@ function CostItem:OnUpdateShow()
         x = x + (itemWid / 2) * scale + 3 + dis
         GUI:setPositionX(self._nodeCount, x)
 
-        self._parent:setContentSize(content)
+        GUI:setContentSize(self._parent, content.width, content.height)
 
         GUI:setPosition(self._layoutBG, content.width / 2, content.height / 2)
     end

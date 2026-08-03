@@ -39,7 +39,7 @@ function PlayerInternalCombo.InitSelectSkill()
         if skillID and skillID ~= 0 then
             PlayerInternalCombo._setComboSkill[skillID] = i
             local iconPath = SL:GetValue("SKILL_RECT_ICON_PATH", skillID, true) 
-            if SL:IsFileExist(iconPath) then
+            if SL:IsRemoteFileExist(iconPath) then
                 GUI:Image_loadTexture(PlayerInternalCombo._ui["skill_icon_" .. i], iconPath)
             end
         elseif i == 4 and i <= openNum then
@@ -75,7 +75,7 @@ function PlayerInternalCombo.ShowSelectPanel(key, pos)
         else
             skillID = items[idx] and items[idx].MagicID
             local iconPath = SL:GetValue("SKILL_RECT_ICON_PATH", skillID, true) 
-            if SL:IsFileExist(iconPath) then
+            if SL:IsRemoteFileExist(iconPath) then
                 GUI:Image_loadTexture(PlayerInternalCombo._ui["skill_icon_" .. key], iconPath)
             end
         end
@@ -90,7 +90,7 @@ function PlayerInternalCombo.RefreshSetIconShow(key)
     local selectSkills = SL:GetValue("SET_COMBO_SKILLS")
     if selectSkills[key] and selectSkills[key] ~= 0 then
         local iconPath = SL:GetValue("SKILL_RECT_ICON_PATH", selectSkills[key], true) 
-        if SL:IsFileExist(iconPath) then
+        if SL:IsRemoteFileExist(iconPath) then
             GUI:Image_loadTexture(PlayerInternalCombo._ui["skill_icon_" .. key], iconPath)
         end
     else

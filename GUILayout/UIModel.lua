@@ -156,7 +156,7 @@ function UIModel.main(sex, feature, scale, params)
 
         if feature.showHair and hairFileName then
             local hairFilePath = "res/private/player_model/" .. hairFileName .. ".png"
-            if SL:IsFileExist(hairFilePath) then
+            if SL:IsRemoteFileExist(hairFilePath) then
                 local hairOffset = EquipData.GetModelHairOffSet()
                 local x = hairOffset[hairSetId] and hairOffset[hairSetId].x or 0
                 local y = hairOffset[hairSetId] and - hairOffset[hairSetId].y or 0

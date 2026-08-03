@@ -753,7 +753,7 @@ function MergeBag.ItemPosChange(data)
         local item = GUI:getChildByStrTag(MergeBagInfo._ui.Panel_items, MakeIndex)
         local reddot
         if item then
-            reddot = item:getChildByName("_RedDot_")
+            reddot = GUI:getChildByName(item, "_RedDot_")
             if reddot then
                 GUI:Retain(reddot)
                 GUI:removeFromParent(reddot)

@@ -886,6 +886,21 @@ local config = {
         local widget = getChildByKey(parent, tostring(config.typeassist))
         return widget, parent
     end,
+    -- 内挂- 保护 
+    [303] = function(config)
+        local layer = GUI:GetWindow(nil, UIConst.LAYERID.SettingFrameGUI)
+        if not layer then
+            return nil
+        end
+
+        local parent = SettingProtect and SettingProtect._parent
+        if not parent or GUI:Win_IsNull(parent) then
+            return nil
+        end
+       
+        local widget = getChildByKey(parent, tostring(config.typeassist))
+        return widget, parent
+    end
 }
 
 return config

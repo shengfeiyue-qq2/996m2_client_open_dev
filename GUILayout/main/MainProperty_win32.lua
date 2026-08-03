@@ -1626,45 +1626,23 @@ function MainProperty.OnPlayMagicBallEffect(data)
     local timeval = data.interval / 1000
     local prefix = MainProperty._mhpPrefixList[data.type + 1] or ""
 
-    local ani = GUI:Animation_Create()
-    local pSize = {width = 0, height = 0}
-    for i = data.beginNum, data.beginNum + data.count - 1 do
-        local path = string.format("res/private/mhp_ui_win32/%s%s.png", prefix, i)
-        if SL:IsFileExist(path) then
-            local sp = GUI:Sprite_Create(-1, "sp", 0, 0, path)
-            pSize = GUI:getContentSize(sp)
-            GUI:Animation_addSpriteFrame(ani, GUI:Sprite_getSpriteFrame(sp))
-        end
-    end
-    GUI:Animation_setDelayPerUnit(ani, timeval)
-    GUI:Animation_setLoops(ani, 1)
-    GUI:Animation_setRestoreOriginalFrame(ani, true)
-
-    pSize.width = pSize.width * scale
-    pSize.height = pSize.height * scale
     local tag = MainProperty._mhpTagList[data.type + 1]
     local widget = MainProperty._ui[string.format("Panel_%ssfx", prefix)]
-    local sprite
-    if tag and widget then
-        MainProperty._pSize[tag] = pSize
-        GUI:setContentSize(widget, pSize.width, pSize.height)
-        if not GUI:getChildByName(widget, tag) then
-            sprite = GUI:Sprite_Create(widget, tag, 0, 0)
-            GUI:setScale(sprite, scale)
-            GUI:runAction(sprite, GUI:ActionRepeatForever(GUI:ActionAnimate(ani)))
-        end
-    end
+    local frames = GUI:Frames_Create(widget, tag, 0, 0, "res/private/mhp_ui/" .. prefix, ".png", data.beginNum, nil, {
+        speed = timeval * 1000,
+        count = data.count - 1,
+        loop = -1,
+    })
+    GUI:setScale(frames, scale)
+    MainProperty._pSize[tag] = GUI:getContentSize(frames)
 
     if data.time ~= -1 and data.time > 0 then
-        SL:ScheduleOnce(
-            function()
-                if sprite and not GUI:Widget_IsNull(sprite) then
-                    GUI:stopAllActions(sprite)
-                    GUI:removeFromParent(sprite)
-                end
-            end,
-            data.time
-        )
+        SL:ScheduleOnce(function()
+            if frames and not GUI:Widget_IsNull(frames) then
+                GUI:stopAllActions(frames)
+                GUI:removeFromParent(frames)
+            end
+        end, data.time)
     end
 
     GUI:setVisible(MainProperty._ui["Panel_hp_sfx"], data.type ~= 2)
@@ -2256,8 +2234,6 @@ function MainProperty.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_SKILL_DEL, "MainProperty", MainProperty.OnRefreshDZShow)
     -- 设置连击技能刷新
     SL:RegisterLUAEvent(LUA_EVENT_PLAYER_SET_COMBO_REFRESH, "MainProperty", MainProperty.OnUpdateSetComboSkill)
-    -- 连击技能CD状态
-    SL:RegisterLUAEvent(LUA_EVENT_PLAYER_COMBO_SKILLCD_STATE, "MainProperty", MainProperty.OnActiveComboSkill)
 
     SL:RegisterLUAEvent(LUA_EVENT_COMBO_SKILL_CD_CHANGE, "MainProperty", MainProperty.OnComboSkillCDChange)
 

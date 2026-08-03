@@ -84,8 +84,12 @@ function AutoUsePop.GetItem(name)
     if item then
         return item
     end
-    
-    item = GUI:Clone(AutoUsePop._item)
+
+    local tempNode = GUI:Widget_Create(-1, "tempNode", 0, 0, 0, 0)
+    GUI:LoadExport(tempNode, "auto_use_pop")
+    item = GUI:getChildByName(tempNode, "Item")
+    GUI:removeFromParent(item)
+    -- item = GUI:Clone(AutoUsePop._item)
     GUI:addChild(AutoUsePop._node, item)
     GUI:setName(item, name)
 

@@ -41,20 +41,23 @@ function ui.init(parent)
 
 	-- Create MapBG
 	local MapBG = GUI:Image_Create(Node, "MapBG", -1.00, -30.00, "res/private/main/miniMap/1900012101.png")
+	GUI:Image_setScale9Slice(MapBG, 47, 46, 43, 42)
+	GUI:setContentSize(MapBG, 140, 130)
+	GUI:setIgnoreContentAdaptWithSize(MapBG, false)
 	GUI:setChineseName(MapBG, "小地图_背景图")
 	GUI:setAnchorPoint(MapBG, 1.00, 1.00)
 	GUI:setTouchEnabled(MapBG, false)
 	GUI:setTag(MapBG, -1)
 
 	-- Create Map
-	local Map = GUI:Layout_Create(Node, "Map", -5.00, -34.00, 133.00, 120.00, true)
+	local Map = GUI:Layout_Create(Node, "Map", -3.00, -33.00, 136.00, 124.00, true)
 	GUI:setChineseName(Map, "小地图组合")
 	GUI:setAnchorPoint(Map, 1.00, 1.00)
 	GUI:setTouchEnabled(Map, false)
 	GUI:setTag(Map, -1)
 
 	-- Create Panel_minimap
-	local Panel_minimap = GUI:Layout_Create(Map, "Panel_minimap", 67.00, 121.00, 133.00, 122.00, true)
+	local Panel_minimap = GUI:Layout_Create(Map, "Panel_minimap", 68.00, 124.00, 136.00, 124.00, true)
 	GUI:setChineseName(Panel_minimap, "小地图组合")
 	GUI:setAnchorPoint(Panel_minimap, 0.50, 1.00)
 	GUI:setTouchEnabled(Panel_minimap, true)
@@ -62,7 +65,7 @@ function ui.init(parent)
 
 	-- Create Image_minimap
 	local Image_minimap = GUI:Image_Create(Panel_minimap, "Image_minimap", 0.00, 0.00, "Default/ImageFile.png")
-	GUI:setContentSize(Image_minimap, 133, 122)
+	GUI:setContentSize(Image_minimap, 136, 124)
 	GUI:setIgnoreContentAdaptWithSize(Image_minimap, false)
 	GUI:setChineseName(Image_minimap, "小地图组合")
 	GUI:setTouchEnabled(Image_minimap, false)
@@ -87,8 +90,8 @@ function ui.init(parent)
 	GUI:setTag(Node_player, 23)
 
 	-- Create Image_empty
-	local Image_empty = GUI:Image_Create(Node, "Image_empty", -4.00, -33.00, "res/private/main/miniMap/1900012102.png")
-	GUI:setContentSize(Image_empty, 133.5, 122)
+	local Image_empty = GUI:Image_Create(Node, "Image_empty", -3.00, -33.00, "res/private/main/miniMap/1900012102.png")
+	GUI:setContentSize(Image_empty, 136, 124)
 	GUI:setIgnoreContentAdaptWithSize(Image_empty, false)
 	GUI:setChineseName(Image_empty, "无小地图时_图片")
 	GUI:setAnchorPoint(Image_empty, 1.00, 1.00)
@@ -111,7 +114,7 @@ function ui.init(parent)
 	GUI:Text_enableOutline(MapName, "#000000", 1)
 
 	-- Create MapStatusBG
-	local MapStatusBG = GUI:Layout_Create(Node, "MapStatusBG", -4.00, -146.00, 135.00, 17.00, false)
+	local MapStatusBG = GUI:Layout_Create(Node, "MapStatusBG", -3.00, -148.00, 136.00, 18.00, false)
 	GUI:Layout_setBackGroundColorType(MapStatusBG, 1)
 	GUI:Layout_setBackGroundColor(MapStatusBG, "#000000")
 	GUI:Layout_setBackGroundColorOpacity(MapStatusBG, 100)
@@ -121,7 +124,7 @@ function ui.init(parent)
 	GUI:setTag(MapStatusBG, -1)
 
 	-- Create MapStatus
-	local MapStatus = GUI:Text_Create(Node, "MapStatus", -137.00, -147.00, 14, "#ffffff", [[安全区域]])
+	local MapStatus = GUI:Text_Create(Node, "MapStatus", -137.00, -149.00, 14, "#ffffff", [[安全区域]])
 	GUI:setChineseName(MapStatus, "小地图_状态_文本")
 	GUI:setAnchorPoint(MapStatus, 0.00, 0.50)
 	GUI:setTouchEnabled(MapStatus, false)
@@ -129,7 +132,7 @@ function ui.init(parent)
 	GUI:Text_enableOutline(MapStatus, "#000000", 1)
 
 	-- Create PlayerPos
-	local PlayerPos = GUI:Text_Create(Node, "PlayerPos", -5.00, -147.00, 14, "#ffffff", [[0:0]])
+	local PlayerPos = GUI:Text_Create(Node, "PlayerPos", -5.00, -149.00, 14, "#ffffff", [[0:0]])
 	GUI:setChineseName(PlayerPos, "玩家_坐标_文本")
 	GUI:setAnchorPoint(PlayerPos, 1.00, 0.50)
 	GUI:setTouchEnabled(PlayerPos, false)

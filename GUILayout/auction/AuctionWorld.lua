@@ -440,7 +440,7 @@ function AuctionWorld.UpdateFilter2()
     local item = AuctionWorld.filter_price[AuctionWorld._filter[5]]
     GUI:Text_setString(AuctionWorld._filterPriceCell.Text_1, item and item.name)
     local path = AuctionWorld._filter[5] == 1 and AuctionWorld.FilterPriceArrowUp or AuctionWorld.FilterPriceArrowDown
-    AuctionWorld._filterPriceCell.Image_arrow:loadTexture(path)
+    GUI:Image_loadTexture(AuctionWorld._filterPriceCell.Image_arrow, path)
 end
 
 function AuctionWorld.OnClearItemList()
@@ -862,7 +862,7 @@ end
 
 function AuctionWorld.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_CLOSEWIN, "AuctionWorld", AuctionMain.OnClose)
-    SL:RegisterLUAEvent(LUA_EVENT_AUCTION_PUT_LIST, "AuctionWorld", AuctionWorld.OnAuctionItemListResp)
+    SL:RegisterLUAEvent(LUA_EVENT_AUCTION_ITEM_LIST, "AuctionWorld", AuctionWorld.OnAuctionItemListResp)
     SL:RegisterLUAEvent(LUA_EVENT_AUCTION_ITEM_LIST_CLEAR, "AuctionWorld", AuctionWorld.OnClearItemList)
     SL:RegisterLUAEvent(LUA_EVENT_AUCTION_WORLD_ITEM_DEL, "AuctionWorld", AuctionWorld.OnAuctionWorldItemDel)
     SL:RegisterLUAEvent(LUA_EVENT_AUCTION_WORLD_ITEM_CHANGE, "AuctionWorld", AuctionWorld.OnAuctionWorldItemChange)
@@ -871,7 +871,7 @@ end
 
 function AuctionWorld.UnRegisterEvent()
     SL:UnRegisterLUAEvent(LUA_EVENT_CLOSEWIN, "AuctionWorld")
-    SL:UnRegisterLUAEvent(LUA_EVENT_AUCTION_PUT_LIST, "AuctionWorld")
+    SL:UnRegisterLUAEvent(LUA_EVENT_AUCTION_ITEM_LIST, "AuctionWorld")
     SL:UnRegisterLUAEvent(LUA_EVENT_AUCTION_ITEM_LIST_CLEAR, "AuctionWorld")
     SL:UnRegisterLUAEvent(LUA_EVENT_AUCTION_WORLD_ITEM_DEL, "AuctionWorld")
     SL:UnRegisterLUAEvent(LUA_EVENT_AUCTION_WORLD_ITEM_CHANGE, "AuctionWorld")

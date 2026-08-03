@@ -138,6 +138,7 @@ UIConst.LUAFile =
     LUA_FILE_GUILD_APPLY_LIST                   = "guild/GuildApplyList",                                                   -- 行会申请列表
     LUA_FILE_GUILD_ALLY_APPLY                   = "guild/GuildAllyApply",                                                   -- 行会结盟申请列表
     LUA_FILE_GUILD_WAR_ALLY                     = "guild/GuildWarAlly",                                                     -- 宣战、结盟结盟
+    LUA_FILE_GUILD_INVITE_LIST                  = "guild/GuildInviteList",                                                  -- 行会邀请列表
 
     LUA_FILE_FUNC_DOCK                          = "func/FuncDock",                                                          -- 功能菜单
     
@@ -232,6 +233,7 @@ UIConst.LUAFile =
     LUA_FILE_LOGIN_SERVER                       = "login/LoginServer",                                                      -- 登录服务器 开门动画
     LUA_FILE_LOGIN_ACCOUNT                      = "login/LoginAccount",                                                     -- 登录账号 
     LUA_FILE_LOGINROLE          		        = "login/LoginRolePanel",
+    LUA_FILE_PRELOAD_PROGRESS                   = "login/PreloadProgress",                                                  -- 预加载进度条
 
     LUA_FILE_PROGRESS_BAR                       = "ProgressBar",                                                            -- 进度条 采集 
     LUA_FILE_PLAY_DICE                          = "PlayDice",                                                               -- 摇骰子
@@ -276,6 +278,7 @@ UIConst.LAYERID =
     LoginRoleGUI                = "LoginRoleGUI",                   -- 登录 选角
     LoginServerGUI              = "LoginServerGUI",                 -- 登录账号 开门动画
     LoginAccountGUI             = "LoginAccountGUI",                -- 登录账号
+    PreloadProgressGUI          = "PreloadProgressGUI",             -- 预加载进度条
 
     SettingFrameGUI             = "SettingFrameGUI",                -- 设置 外框
     SettingBossTipsGUI          = "SettingBossTipsGUI",             -- 设置 boss提醒
@@ -296,6 +299,7 @@ UIConst.LAYERID =
     GuildApplyListGUI           = "GuildApplyListGUI",              -- 行会申请列表
     GuildAllyApplyGUI           = "GuildAllyApplyGUI",              -- 行会结盟申请列表
     GuildWarAllyGUI             = "GuildWarAllyGUI",                -- 宣战/结盟申请
+    GuildInviteListGUI          = "GuildInviteListGUI",             -- 行会邀请列表
 
     PlayerMainGUI               = "PlayerMainGUI",                  -- 人物主界面
     PlayerBestRingGUI           = "PlayerBestRingGUI",              -- 生肖

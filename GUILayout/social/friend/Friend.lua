@@ -44,7 +44,7 @@ function Friend.InitUI()
         end
         FriendInfo._openPage = FriendInfo._openPageTypes.BlackList
         Friend.RefreshBtn()
-        Friend.RefreshList()
+        SL:RequestBlackList()
     end)
 
     -- 添加好友

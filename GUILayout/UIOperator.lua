@@ -590,6 +590,16 @@ function UIOperator:CloseFriendApplyUI()
     GUI:Win_CloseByID(UIConst.LAYERID.FriendApplyGUI)
 end
 
+-- 打开行会邀请列表
+function UIOperator:OpenGuildInviteListUI()
+    GUI:Win_Open(UIConst.LUAFile.LUA_FILE_GUILD_INVITE_LIST)
+end
+
+-- 关闭行会邀请列表
+function UIOperator:CloseGuildInviteListUI()
+    GUI:Win_CloseByID(UIConst.LAYERID.GuildInviteListGUI)
+end
+
 -- 打开邀请建立关系界面
 function UIOperator:OpenRelationInvite(data)
     GUI:SetLayerOpenParam(data)

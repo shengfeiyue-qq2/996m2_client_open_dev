@@ -72,7 +72,7 @@ function Item:Cleanup()
     GUI:setScale(ui["Button_icon"], 1)
     GUI:setTouchEnabled(ui["Button_icon"], false)
     GUI:setSwallowTouches(ui["Button_icon"], true)
-    GUI:Button_loadTextureNormal(ui["Button_icon"], "res/item/un_define.pvr.ccz")
+    GUI:Button_loadTextureNormal(ui["Button_icon"], "localres/alpha_1px.png")
     GUI:removeAllChildren(ui["Button_icon"])
     GUI:setVisible(ui["Button_icon"], true)
 
@@ -439,15 +439,13 @@ function Item:SetItemIcon()
     end
 
     local looks = self._looks
-    if (path == "" or not SL:IsFileExist(path)) and looks and looks >= 0 then
+    if (path == "" or not SL:IsRemoteFileExist(path)) and looks and looks >= 0 then
         path = getIconResPath(looks)
     end
 
-    if path ~= "" and SL:IsFileExist(path) then
+    if path ~= "" and SL:IsRemoteFileExist(path) then
         -- 延迟加载字段
         self._btnIcon_delay = true
-    else
-        path = "res/item/sun_define.pvr.ccz"
     end
 
     GUI:Button_loadTextureNormal(self._ui["Button_icon"], path)

@@ -67,7 +67,7 @@ function Storage.main()
     SL:SetValue("STORAGE_TOUCH_TYPE", STORE_MODE.normal)
 
     Storage._root = Storage._ui.Panel_1
-    Storage._panelItems = Storage._root:getChildByName("Panel_items")
+    Storage._panelItems = GUI:getChildByName(Storage._root, "Panel_items")
 
     -- 界面拖动
     GUI:Win_SetDrag(parent, Storage._ui["Panel_1"])

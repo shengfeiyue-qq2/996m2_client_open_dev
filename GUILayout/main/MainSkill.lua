@@ -815,8 +815,6 @@ function MainSkill.RegisterEvent( )
     SL:RegisterLUAEvent(LUA_EVENT_SKILLBUTTON_DISTANCE_CHANGE, "MainSkill", MainSkill.OnSkillButton_Distance_Change)
     -- 设置连击技能刷新
     SL:RegisterLUAEvent(LUA_EVENT_PLAYER_SET_COMBO_REFRESH, "MainSkill", MainSkill.OnRefreshComboSkillShow)
-    -- 连击技能CD状态
-    SL:RegisterLUAEvent(LUA_EVENT_PLAYER_COMBO_SKILLCD_STATE, "MainSkill", MainSkill.OnActiveComboSkill)
     -- 学习内功
     SL:RegisterLUAEvent(LUA_EVENT_PLAYER_LEARNED_INTERNAL, "MainSkill", MainSkill.OnRefreshNGShow)
 end

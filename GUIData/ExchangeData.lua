@@ -201,18 +201,18 @@ function ExchangeData.RespExchangeDataUpdate(data)
     }
     if action == 1 then -- 上架
         if isMy then
-            SLBridge:onLUAEvent(LUA_EVENT_EXCHANGE_PUT_LIST, {items = jsonData})
+            SL:onLUAEvent(LUA_EVENT_EXCHANGE_PUT_LIST, {items = jsonData})
         else
-            SLBridge:onLUAEvent(LUA_EVENT_EXCHANGE_WORLDITEM_UPDATE, {type = TYPE.ADD, item = jsonData})
+            SL:onLUAEvent(LUA_EVENT_EXCHANGE_WORLDITEM_UPDATE, {type = TYPE.ADD, item = jsonData})
         end
     elseif action == 2 then --购买更新
-            SLBridge:onLUAEvent(LUA_EVENT_EXCHANGE_WORLDITEM_UPDATE, { type = TYPE.UPDATE, item = jsonData})
-            SLBridge:onLUAEvent(LUA_EVENT_EXCHANGE_PUT_LIST, { type = TYPE.UPDATE, items = jsonData})
+            SL:onLUAEvent(LUA_EVENT_EXCHANGE_WORLDITEM_UPDATE, { type = TYPE.UPDATE, item = jsonData})
+            SL:onLUAEvent(LUA_EVENT_EXCHANGE_PUT_LIST, { type = TYPE.UPDATE, items = jsonData})
     elseif action == 3 then -- 下架 
         if isMy then
-            SLBridge:onLUAEvent(LUA_EVENT_EXCHANGE_PUT_OUT, { items = jsonData})
+            SL:onLUAEvent(LUA_EVENT_EXCHANGE_PUT_OUT, { items = jsonData})
         else
-            SLBridge:onLUAEvent(LUA_EVENT_EXCHANGE_WORLDITEM_UPDATE, {type = TYPE.REMOVE, item = jsonData})
+            SL:onLUAEvent(LUA_EVENT_EXCHANGE_WORLDITEM_UPDATE, {type = TYPE.REMOVE, item = jsonData})
         end
     end
 end
@@ -223,9 +223,9 @@ function ExchangeData.Operaback(data)
     if errorcode == 0 then
         SL:ShowSystemTips("成功")
         if  type == 1  then
-            SLBridge:onLUAEvent(LUA_EVENT_EXCHANGE_PUT_IN)
+            SL:onLUAEvent(LUA_EVENT_EXCHANGE_PUT_IN)
         elseif type == 4 then
-            SLBridge:onLUAEvent(LUA_EVENT_EXCHANGE_PUT_OUT)
+            SL:onLUAEvent(LUA_EVENT_EXCHANGE_PUT_OUT)
         end
 
     elseif errorcode == -1 then

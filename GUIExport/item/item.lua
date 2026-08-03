@@ -27,7 +27,7 @@ function ui.init(parent)
 	GUI:setTag(Node_sfx_under, 11)
 
 	-- Create Button_icon
-	local Button_icon = GUI:Button_Create(Panel_bg, "Button_icon", 30.00, 30.00, "res/private/gui_edit/Button_Normal.png")
+	local Button_icon = GUI:Button_Create(Panel_bg, "Button_icon", 30.00, 30.00, "localres/alpha_1px.png")
 	GUI:setContentSize(Button_icon, 50, 50)
 	GUI:setIgnoreContentAdaptWithSize(Button_icon, false)
 	GUI:Button_setTitleText(Button_icon, "")

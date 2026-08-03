@@ -149,6 +149,8 @@ SL:RegisterLUAEvent(LUA_EVENT_SOCIAL_TEAM_ERROR, "GUIInit", function(type)
         SL:ShowSystemTips("对方未在队伍内")
     elseif type == -9 then
         SL:ShowSystemTips("对方拒绝组队")
+    elseif type == -10 then
+        SL:ShowSystemTips("队伍人数已满！")
     end
 end)
 -- 队伍申请 气泡提醒
@@ -222,7 +224,7 @@ SL:RegisterLUAEvent(LUA_EVENT_SOCIAL_FRIEND_ERROR, "GUIInit", function(type)
     elseif type == -5 then
         SL:ShowSystemTips("对方在你好友列表中")
     elseif type == -6 then
-        SL:ShowSystemTips("对方不在线或不存在")
+        SL:ShowSystemTips("对方不存在")
     elseif type == -7 then
         SL:ShowSystemTips("加好友失败")
     elseif type == -8 then
@@ -328,6 +330,12 @@ SL:RegisterLUAEvent(LUA_EVENT_GUILD_OPERATE_ERROR, "GUIInit", function(errorCode
 
     elseif errorCode == -17 then
         SL:ShowSystemTips("货币不足")
+
+    elseif errorCode == -18 then
+        SL:ShowSystemTips("对方拒绝了你的邀请")
+
+    elseif errorCode == -19 then
+        SL:ShowSystemTips("当前玩家已有行会")
     end
 end)
 
@@ -427,24 +435,15 @@ end)
 
 -- 收到行会邀请加入
 SL:RegisterLUAEvent(LUA_EVENT_GUILD_JOIN_INVITE, "GUIInit", function(data)
-    local function callback()
-        SL:DelBubbleTips(GUIDefine.BubbleType.GUILD_INVITE)
-        
-        local function tipsCB(bType)
-            if bType == 1 then
-                SL:RequestGuildRejectUserInvite(data.guildID)
-            elseif bType == 2 then
-                SL:RequestGuildApproveUserInvite(data.guildID)
-            end
+    local inviteList = SL:GetValue("GUILD_INVITE_JOIN_LIST")
+
+    -- 列表数量大于0时添加气泡
+    if inviteList and #inviteList > 0 then
+        local function callback()
+            UIOperator:OpenGuildInviteListUI()
         end
-        local str = string.format("邀请你加入行会\n 行会名: %s\n 邀请者: %s", data.guildName, data.masterName)
-        local data = {}
-        data.str = str
-        data.btnDesc = {"拒绝", "同意"}
-        data.callback = tipsCB
-        UIOperator:OpenCommonTipsUI(data)
+        SL:AddBubbleTips(GUIDefine.BubbleType.GUILD_INVITE, "res/private/main/bubble_tips/1900012562_1.png", callback)
     end
-    SL:AddBubbleTips(GUIDefine.BubbleType.GUILD_INVITE, "res/private/main/bubble_tips/1900012562_1.png", callback)
 end)
 
 

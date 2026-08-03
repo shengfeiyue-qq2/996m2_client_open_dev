@@ -67,6 +67,7 @@ function LoginRolePanel.main()
     LoginRolePanel._equipConfig = {}
     LoginRolePanel._submitEnterState = false
     LoginRolePanel._submitCreateRoleState = false
+    LoginRolePanel._waitPrelodCompleteEnter = false
 
 
     local equipConfig = SL:RequireFile("game_config/cfg_equip", true)
@@ -686,6 +687,14 @@ end
 
 -- 进入游戏
 function LoginRolePanel.SubmitEnterGame()
+    if GUIPreload and not GUIPreload._loadCompleted then
+        if not LoginRolePanel._waitPrelodCompleteEnter then
+            UIOperator:OpenLoadingBarUI()
+            LoginRolePanel._waitPrelodCompleteEnter = true
+        end
+        return
+    end
+
     if LoginRolePanel._submitEnterState then
         return
     end
@@ -1213,6 +1222,18 @@ function LoginRolePanel.OnRestoreRoleFail(errorCode)
     end
 end
 
+function LoginRolePanel.OnGUIPreLoadCompleted(state)
+    if not state then
+        return
+    end
+
+    if LoginRolePanel._waitPrelodCompleteEnter then
+        LoginRolePanel._waitPrelodCompleteEnter = false
+        UIOperator:CloseLoadingBarUI()
+        LoginRolePanel.SubmitEnterGame()
+    end
+end
+
 function LoginRolePanel.OnCloseWin(id)
     if id == UIConst.LAYERID.LoginRoleGUI then
         SL:CloseLoginTradeLockUI()
@@ -1230,6 +1251,7 @@ function LoginRolePanel.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_LOGIN_ROLE_INFO_DATA, "LoginRolePanel", LoginRolePanel.OnLoginRoleInfo, LoginRolePanel._layer)
     SL:RegisterLUAEvent(LUA_EVENT_LOGIN_RESTORE_ROLE_SUCCESS, "LoginRolePanel", LoginRolePanel.OnRestoreRoleSuccess, LoginRolePanel._layer)
     SL:RegisterLUAEvent(LUA_EVENT_LOGIN_RESTORE_ROLE_FAIL, "LoginRolePanel", LoginRolePanel.OnRestoreRoleFail, LoginRolePanel._layer)
+    SL:RegisterLUAEvent(LUA_EVENT_GUI_PRELOAD_COMPLETED, "LoginRolePanel", LoginRolePanel.OnGUIPreLoadCompleted, LoginRolePanel._layer)
     SL:RegisterLUAEvent(LUA_EVENT_CLOSEWIN, "LoginRolePanel", LoginRolePanel.OnCloseWin)
 end
 

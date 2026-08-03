@@ -675,7 +675,7 @@ function MainAssist.AutoAddMonster()
         return false
     end
 
-    local actors, nActor = SL:GetValue("FIND_IN_VIEW_MONSTER_LIST", nil, false)
+    local actors, nActor = SL:GetValue("FIND_IN_VIEW_MONSTER_LIST", true)
     
     local playerVec, nPlayer = SL:GetValue("FIND_IN_VIEW_PLAYER_LIST")
     for i = 1, nPlayer do

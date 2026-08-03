@@ -11,6 +11,9 @@ function Team.main()
     Team.RefreshBtn()
     Team.Refresh()
     Team.RegisterEvent()
+    if SL:GetValue("TEAM_IS_MEMBER") then
+        SL:RequestTeamMemberData()
+    end
 end
 
 function Team.InitData()
@@ -188,7 +191,6 @@ function Team.RefreshNearList()
     for _, team in pairs(nearTeam) do
         local cell = Team.CreateNearMemberCell()
         GUI:ListView_pushBackCustomItem(ListView_near, cell)
-
 
         local guildName = "无"
         if team.GuildName and team.GuildName ~= "" then 
