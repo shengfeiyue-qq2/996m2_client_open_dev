@@ -126,6 +126,10 @@ function BagData.CheckNeedSpace(itemID, itemCount, tips)
     local needPos = itemCount
     if isLap then
         needPos = math.ceil(itemCount / itemData.OverLap)
+        local itemCountByIndex = BagData.GetItemCountByIndex(itemID)
+        if itemCountByIndex > 0 and (itemCountByIndex + itemCount) <= itemData.OverLap then -- 所有总数不超过叠加数量
+            needPos = 0
+        end
     end
     local bagItemNum = BagData.GetTotalItemCount()
     local maxBag = BagData.GetMaxBag()
@@ -292,7 +296,6 @@ end
 -- 通过itemIndex获取物品数量 famlilar是否包含绑定数量
 function BagData.GetItemCountByIndex(index, famlilar)
     index = index or 0
-    local count = 0
     local isBind, bindIndex = SL:CheckItemBind(index)
     local myCount = BagData._GetItemCountByIndex(index)
     local famlilarCount = 0
