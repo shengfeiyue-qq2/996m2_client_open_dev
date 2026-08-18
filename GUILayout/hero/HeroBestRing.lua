@@ -182,7 +182,7 @@ function HeroBestRing.RegisterMouseEvent()
         end
         
         local data = {}
-        data.target = GUIDefine.ItemGoTo.BEST_RINGS
+        data.target = GUIDefine.ItemGoTo.HERO_BEST_RINGS
         data.pos = touchPos
         data.equipPos = getItemBagEmptyPos(touchPos)
 
@@ -237,7 +237,7 @@ function HeroBestRing.OnDoubleEvent(pos)
     end
 
     -- 获取当前位置下卸下的装备数据
-    local itemData = GUIFunction:GetEquipDataByPos(pos)
+    local itemData = GUIFunction:GetEquipDataByPos(pos, nil, EDType)
     if not itemData then
         return false
     end

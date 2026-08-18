@@ -359,15 +359,36 @@ function ItemTips.GetAttStr(itemData, diff)
 
     -- 极品属性
     local qualityAttrs      = GUIFunction:GetItemQualityAttr(itemData)
+    -- 附加幸运/诅咒 加到极品上显示
+    local exLuckyValue = itemData.Lucky
+    if exLuckyValue and exLuckyValue ~= 0 then
+        local luckyId = GUIDefine.AttTypeTable.Lucky
+        local luckyExist = false
+        for idx = 1, #qualityAttrs do
+            local data = qualityAttrs[idx]
+            if data.id == luckyId then
+                luckyExist = true
+                data.value = data.value + exLuckyValue
+                if data.value == 0 then
+                    table.remove(qualityAttrs, idx)
+                end
+                break
+            end
+        end
+        if not luckyExist then
+            table.insert(qualityAttrs, {
+                id = luckyId,
+                value = exLuckyValue
+            })
+        end
+    end
+
     local exAttShow         = GUIFunction:GetAttDataShow(qualityAttrs, true, true)
     -- 合并极品属性
     if qualityAttrs and next(qualityAttrs) then
         attList             = GUIFunction:CombineAttList(attList, qualityAttrs)
     end
     ItemTips._baseAttList = attList
-
-    -- 附加幸运
-    local exLuckyValue = itemData.Lucky
 
     -- 属性提升
     local attUpList = {}  -- 属性提升标识的位置
@@ -446,25 +467,23 @@ function ItemTips.GetAttStr(itemData, diff)
         )
     end
 
-    local showExLucky = false
     for _, v in ipairs(basicAttrShow) do
         local oneStr = getAlignAttrStr(v)
         local color = v.color
+
         if exAttShow and exAttShow[v.id] and checkNeedQualityExAdd() then
-            oneStr = oneStr .. string.format("（%s）", exAttShow[v.id].value)
-            color = 1039
-        end
-        -- 幸运
-        if v.id == GUIDefine.AttTypeTable.Lucky and exLuckyValue then
-            if v.isCurse and exLuckyValue < 0 then -- 诅咒 附加诅咒
-                oneStr = oneStr .. string.format("（+%s）", math.abs(exLuckyValue))
-                color = 1039
-                showExLucky = true
-            elseif not v.isCurse and exLuckyValue > 0 then -- 幸运 附加幸运
-                oneStr = oneStr .. string.format("（+%s）", math.abs(exLuckyValue))
-                color = 1039
-                showExLucky = true
+            -- 幸运
+            if v.id == GUIDefine.AttTypeTable.Lucky then
+                local value = tonumber(exAttShow[v.id].value)
+                if v.isCurse ~= exAttShow[v.id].isCurse then -- 诅咒 附加幸运 / 幸运 附加诅咒 
+                    oneStr = oneStr .. string.format("（-%s）", math.abs(value))
+                else
+                    oneStr = oneStr .. string.format("（+%s）", math.abs(value))
+                end
+            else
+                oneStr = oneStr .. string.format("（%s）", exAttShow[v.id].value)
             end
+            color = 1039
         end
 
         if color and color > 0 then
@@ -497,20 +516,6 @@ function ItemTips.GetAttStr(itemData, diff)
         or itemData.StdMode == 84 or itemData.StdMode == 85 or itemData.StdMode == 86 or itemData.StdMode == 87) 
         and itemData.AniCount and itemData.AniCount > 0 then
         local oneStr = string.format("负重：+%s", itemData.AniCount)
-        oneStr = string.format("<font color='%s'>%s</font>", "#28EF01", oneStr)
-        table.insert(
-            strList,
-            {
-                str = oneStr
-            }
-        )
-    end
-
-    -- 附加幸运/诅咒
-    if not showExLucky and exLuckyValue and exLuckyValue ~= 0 then
-        local config = SL:GetValue("ATTR_CONFIG", GUIDefine.AttTypeTable.Lucky)
-        local showName = config and config.name or "幸运"
-        local oneStr = string.format("%s：+%s", exLuckyValue > 0 and showName or "诅咒", math.abs(exLuckyValue))
         oneStr = string.format("<font color='%s'>%s</font>", "#28EF01", oneStr)
         table.insert(
             strList,

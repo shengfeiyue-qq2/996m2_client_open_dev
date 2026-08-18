@@ -107,7 +107,10 @@ function Notice.close(isRemovedEvent)
     -- 飘字 物品拾取获得消耗
     Notice._itemTipsData = {}
     Notice._itemTipsCells = {}
-    Notice._itemTimer = nil
+    if Notice._itemTimer then
+        SL:UnSchedule(Notice._itemTimer)
+        Notice._itemTimer = nil
+    end
     Notice._itemIndex = 0
 
     -- 飘字 属性变化
