@@ -197,7 +197,7 @@ end
 
 function HeroEquipData.handle_MSG_SC_PLAYER_EQUIP_BEST_RINGS_STATE(state)
     local isOpen = false
-    if EquipData._bestRingsOpen and state then
+    if HeroEquipData._bestRingsOpen and state then
         isOpen = true
     end
     HeroEquipData.SetBestRingsOpenState(state)
