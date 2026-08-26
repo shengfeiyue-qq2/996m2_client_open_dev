@@ -109,7 +109,7 @@ local config = {
         end
         return widget, parent
     end,
-    -- 人物装备位
+    -- 人物装备位 [支持装备页挂接组件]
     [2] = function(config)
         local parent = GUI:GetWindow(nil, UIConst.LAYERID.PlayerMainGUI)
         if not parent then
@@ -121,12 +121,12 @@ local config = {
             return nil
         end
 
-        local widget = ui["PanelPos" .. tostring(config.typeassist)]
+        local widget = getChildByKey(ui, "Panel_pos" .. tostring(config.typeassist))
         if not widget then
-            return nil
+            widget = getChildByKey(ui, tostring(config.typeassist))
         end
 
-        return widget, PlayerEquip._parent
+        return widget, parent
     end,
     -- 英雄背包
     [3] = function(config)
