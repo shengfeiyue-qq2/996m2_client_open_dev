@@ -964,7 +964,18 @@ function MainProperty.SendChatMsg(msg, channelID)
     local channel, content, targetName = GUIFunction:GetChannelByChatMsg(msg)
     if channel then
         channelID = channel
-        msg = content 
+        msg = content
+
+        if channel == CHANNEL.PRIVATE and targetName and string.len(targetName) > 0 then
+            local matched = nil
+            for _, t in ipairs(ChatData.GetTargets()) do
+                if t.name == targetName then
+                    matched = t
+                    break
+                end
+            end
+            MainProperty.TargetData = matched or {name = targetName}
+        end
     end
 
     -- 敏感词
@@ -1005,10 +1016,10 @@ function MainProperty.SendChatMsg(msg, channelID)
 
         local data = {channel_id = channel}
         if channel == CHANNEL.PRIVATE then
-            local target = ChatData.GetTargets()[1]
+            local target = MainProperty.TargetData or ChatData.GetTargets()[1]
             if target then
                 local actorID       = target.uid
-                data.to_role_level  = SL:GetValue("ACTOR_LEVEL", actorID)
+                data.to_role_level  = actorID and SL:GetValue("ACTOR_LEVEL", actorID)
                 data.to_role_id     = actorID
                 data.to_role_name   = target.name
             end

@@ -189,31 +189,34 @@ function Team.RefreshNearList()
     local memberCount = SL:GetValue("TEAM_MEMBER_COUNT")
     local memberMax = SL:GetValue("TEAM_MEMBER_MAX_COUNT")
     for _, team in pairs(nearTeam) do
-        local cell = Team.CreateNearMemberCell()
-        GUI:ListView_pushBackCustomItem(ListView_near, cell)
+        -- 二次筛选附近队伍
+        if not SL:GetValue("TEAM_IS_MEMBER", team.MasterID) then
+            local cell = Team.CreateNearMemberCell()
+            GUI:ListView_pushBackCustomItem(ListView_near, cell)
 
-        local guildName = "无"
-        if team.GuildName and team.GuildName ~= "" then 
-            guildName = team.GuildName
-        end
-        local cellUI = GUI:ui_delegate(cell)
-        GUI:Text_setString(cellUI.Label_name, team.MasterName)
-        GUI:Text_setString(cellUI.Label_guild, guildName)
-        GUI:Text_setString(cellUI.Label_number, team.MemCount)
-        GUI:setVisible(cellUI.Button_operation, memberCount == 0)
-        GUI:setVisible(cellUI.Label_operation, false)
-
-        GUI:addOnClickEvent(cellUI.Button_operation, function(sender)
-            if team.MemCount >= memberMax then
-                SL:ShowSystemTips("队伍已满")
-                return
+            local guildName = "无"
+            if team.GuildName and team.GuildName ~= "" then 
+                guildName = team.GuildName
             end
+            local cellUI = GUI:ui_delegate(cell)
+            GUI:Text_setString(cellUI.Label_name, team.MasterName)
+            GUI:Text_setString(cellUI.Label_guild, guildName)
+            GUI:Text_setString(cellUI.Label_number, team.MemCount)
+            GUI:setVisible(cellUI.Button_operation, memberCount == 0)
+            GUI:setVisible(cellUI.Label_operation, false)
 
-            GUI:setVisible(cellUI.Button_operation, false)
-            GUI:setVisible(cellUI.Label_operation, true)
-            SL:RequestApplyJoinTeam(team.MasterID)
-            GUI:delayTouchEnabled(sender)
-        end)
+            GUI:addOnClickEvent(cellUI.Button_operation, function(sender)
+                if team.MemCount >= memberMax then
+                    SL:ShowSystemTips("队伍已满")
+                    return
+                end
+
+                GUI:setVisible(cellUI.Button_operation, false)
+                GUI:setVisible(cellUI.Label_operation, true)
+                SL:RequestApplyJoinTeam(team.MasterID)
+                GUI:delayTouchEnabled(sender)
+            end)
+        end
     end
 end
 

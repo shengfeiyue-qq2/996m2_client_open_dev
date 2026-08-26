@@ -215,6 +215,8 @@ end
 function MainMiniMap.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_MAP_STATE_CHANGE, "MainMiniMap", MainMiniMap.UpdateMapState)
     SL:RegisterLUAEvent(LUA_EVENT_MINIMAP_DOWNLOAD_SUCCESS, "MainMiniMap", MainMiniMap.OnDownLoadSuccess)
+    -- 地图数据加载成功
+    SL:RegisterLUAEvent(LUA_EVENT_MAPDATA_LOAD_SUCCESS, "MainMiniMap", MainMiniMap.OnMapDataLoadSuccess)
 
     SL:RegisterLUAEvent(LUA_EVENT_CHANGESCENE, "MainMiniMap", MainMiniMap.OnChangeScene)
     SL:RegisterLUAEvent(LUA_EVENT_PLAYER_IN_OF_VIEW, "MainMiniMap", MainMiniMap.OnActorInOfView)
@@ -245,6 +247,12 @@ end
 function MainMiniMap.OnDownLoadSuccess(miniMapID)
     if SL:GetValue("MINIMAP_ID") == miniMapID and SL:GetValue("MINIMAP_ABLE") then
         MainMiniMap.UpdateMiniMap()
+        MainMiniMap.UpdateMiniMapPos()
+    end
+end
+
+function MainMiniMap.OnMapDataLoadSuccess(mapID)
+    if SL:GetValue("MAP_ID") == mapID then
         MainMiniMap.UpdateMiniMapPos()
     end
 end
