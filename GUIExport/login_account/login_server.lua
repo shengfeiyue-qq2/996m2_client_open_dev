@@ -7,7 +7,7 @@ function ui.init(parent)
 	GUI:setTag(Scene, -1)
 
 	-- Create Image_login_bg
-	local Image_login_bg = GUI:Image_Create(Scene, "Image_login_bg", 568.00, 320.00, "Default/ImageFile.png")
+	local Image_login_bg = GUI:Image_Create(Scene, "Image_login_bg", 568.00, 320.00, "localres/alpha_1px.png")
 	GUI:setContentSize(Image_login_bg, 1136, 640)
 	GUI:setIgnoreContentAdaptWithSize(Image_login_bg, false)
 	GUI:setChineseName(Image_login_bg, "区服列表_背景图")

@@ -25,7 +25,7 @@ function RobotHeroAuto.main()
     RobotHeroAuto._cdingTime[SLDefine.SETTINGID.SETTING_IDX_AUTO_REPAIR] = 0
     
     SL:RegisterLUAEvent(LUA_EVENT_ROLE_PROPERTY_INITED, "RobotHeroAuto", RobotHeroAuto.Init)
-    SL:RegisterLUAEvent(LUA_EVENT_BAG_ITEM_CHANGE,      "RobotHeroAuto", RobotHeroAuto.OnBagOperData)
+    SL:RegisterLUAEvent(LUA_EVENT_HERO_BAG_ITEM_CHANGE, "RobotHeroAuto", RobotHeroAuto.OnBagOperData)
     SL:RegisterLUAEvent(LUA_EVENT_HERO_HPMP_CHANGE,     "RobotHeroAuto", RobotHeroAuto.OnHeroBeAttacked)
 end
 

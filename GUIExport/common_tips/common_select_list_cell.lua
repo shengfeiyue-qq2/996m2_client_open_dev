@@ -10,7 +10,7 @@ function ui.init(parent)
 	GUI:setTag(Image_cell, 443)
 
 	-- Create Image_icon
-	local Image_icon = GUI:Image_Create(Image_cell, "Image_icon", 14.00, 14.00, "Default/ImageFile.png")
+	local Image_icon = GUI:Image_Create(Image_cell, "Image_icon", 14.00, 14.00, "localres/alpha_1px.png")
 	GUI:setContentSize(Image_icon, 25, 25)
 	GUI:setIgnoreContentAdaptWithSize(Image_icon, false)
 	GUI:setChineseName(Image_icon, "通用列表_图标")

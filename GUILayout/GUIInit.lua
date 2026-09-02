@@ -1078,7 +1078,7 @@ SL:RegisterLUAEvent(LUA_EVENT_ENTER_WORLD, "GUIInit_KeyBoard", function()
     end
     GUI:addKeyboardEvent("KEY_F9", pressedCB)
 
-    -- F10 角色技能页
+    -- F10 角色装备页
     local function pressedCB()
         local isOpen = (PlayerFrame and PlayerFrame.IsReOpen) and PlayerFrame:IsReOpen(UIConst.LayerTable.PlayerEquip)
         if isOpen and GUI:GetWindow(nil, UIConst.LAYERID.PlayerMainGUI) then
@@ -2094,3 +2094,7 @@ SL:RegisterLUAEvent(LUA_EVENT_PLAYER_ACTION_BEGIN, "GUIInit", function(data)
     -- 检查移除寻路路径箭头特效
     checkActorRemoveFindPathEffect(act, actorID)
 end)    
+
+SL:RegisterLUAEvent(LUA_EVENT_AUTOMOVEEND, "GUIInit", function()
+    removeAllPathFindEffects()
+end)

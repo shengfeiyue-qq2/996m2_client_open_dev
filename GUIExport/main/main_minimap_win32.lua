@@ -13,7 +13,7 @@ function ui.init(parent)
 	GUI:setTag(Panel_minimap, 22)
 
 	-- Create Image_minimap
-	local Image_minimap = GUI:Image_Create(Panel_minimap, "Image_minimap", 0.00, 0.00, "Default/ImageFile.png")
+	local Image_minimap = GUI:Image_Create(Panel_minimap, "Image_minimap", 0.00, 0.00, "localres/alpha_1px.png")
 	GUI:setChineseName(Image_minimap, "小地图_图片")
 	GUI:setTouchEnabled(Image_minimap, false)
 	GUI:setTag(Image_minimap, 46)

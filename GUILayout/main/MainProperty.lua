@@ -377,7 +377,7 @@ function MainProperty.CreateBubbleTipsCell(data)
     GUI:setAnchorPoint(bubbleCell, 0.5, 0.5)
 
     -- 图标
-    local iconBtn = GUI:Button_Create(bubbleCell, "iconBtn", 25, 25, string.len(data.path or "") > 0 and data.path or "Default/Button_Normal.png")
+    local iconBtn = GUI:Button_Create(bubbleCell, "iconBtn", 25, 25, string.len(data.path or "") > 0 and data.path or "localres/alpha_1px.png")
     GUI:setAnchorPoint(iconBtn, 0.5, 0.5)
     GUI:setContentSize(iconBtn, 46, 46)
     GUI:setIgnoreContentAdaptWithSize(iconBtn, true)

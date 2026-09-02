@@ -495,7 +495,7 @@ function SettingLaunch.CreateSelectInputCell(parent, data)
 end
 
 function SettingLaunch.CreateSkillIcon(parent, skillID)
-    local icon = GUI:Image_Create(parent, "Image_icon", 30, 30, "Default/ImageFile.png")
+    local icon = GUI:Image_Create(parent, "Image_icon", 30, 30, "localres/alpha_1px.png")
     GUI:setContentSize(icon, 60, 60)
     GUI:setIgnoreContentAdaptWithSize(icon, false)
     GUI:setAnchorPoint(icon, 0.50, 0.50)
