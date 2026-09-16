@@ -43,6 +43,18 @@ function MiniMap.main()
 
     MiniMap.RegisterEvent()
 
+    MiniMap.UpdateMiniMap()
+end
+
+function MiniMap.UpdateMiniMap()
+    if not SL:GetValue("MINIMAP_ABLE") then
+        return
+    end
+
+    if MiniMap._initMap then
+        return
+    end
+
     MiniMap.InitMiniMap()
     MiniMap.InitPortals()
     MiniMap.InitTeamMember()
@@ -50,11 +62,14 @@ function MiniMap.main()
     MiniMap.InitMapLinks()
 
     MiniMap.BlinkPlayer()
+    
+    MiniMap._initMap = true
 end
 
 function MiniMap.Reset()
     MiniMap._imgPlayerBlink = nil
     MiniMap._pathCells      = {}
+    MiniMap._initMap        = false
 end
 
 function MiniMap.OnCloseWin(id)
@@ -695,6 +710,10 @@ function MiniMap.OnMapInfoChange()
     UIOperator:CloseMiniMap()
 end
 
+function MiniMap.OnUpdateMiniMap()
+    MiniMap.UpdateMiniMap()
+end
+
 -----------------------------------注册事件--------------------------------------
 function MiniMap.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_MINIMAP_FIND_PATH,   "MiniMap", MiniMap.UpdateFindPath)     -- 寻路路径
@@ -704,6 +723,7 @@ function MiniMap.RegisterEvent()
     SL:RegisterLUAEvent(LUA_EVENT_CLOSEWIN,            "MiniMap", MiniMap.OnCloseWin)
     SL:RegisterLUAEvent(LUA_EVENT_MAP_INFO_CHANGE,     "MiniMap", MiniMap.OnMapInfoChange)
     SL:RegisterLUAEvent(LUA_EVENT_CHANGESCENE,         "MiniMap", MiniMap.OnChangeScene)
+    SL:RegisterLUAEvent(LUA_EVENT_MINIMAP_DOWNLOAD_SUCCESS, "MiniMap", MiniMap.OnUpdateMiniMap)
     SL:RegisterLUAEvent(LUA_EVENT_GAME_MEMORY_RELEASE, "MiniMap", MiniMap.OnReleaseMemory)   -- 释放游戏内存
 end
 
@@ -715,6 +735,7 @@ function MiniMap.RemoveEvent()
     SL:UnRegisterLUAEvent(LUA_EVENT_CLOSEWIN,            "MiniMap")
     SL:UnRegisterLUAEvent(LUA_EVENT_MAP_INFO_CHANGE,     "MiniMap")
     SL:UnRegisterLUAEvent(LUA_EVENT_CHANGESCENE,         "MiniMap")
+    SL:UnRegisterLUAEvent(LUA_EVENT_MINIMAP_DOWNLOAD_SUCCESS, "MiniMap")
     SL:UnRegisterLUAEvent(LUA_EVENT_GAME_MEMORY_RELEASE, "MiniMap")
 end
 
