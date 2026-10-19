@@ -79,14 +79,14 @@ function MergeBag.InitUI(bagType)
 
     -- 右侧页签 主角
     local BtnPlayer = MergeBagInfo._ui.BtnPlayer
-    MergeBag._BtnPlayer = BtnPlayer
+    MergeBagInfo._BtnPlayer = BtnPlayer
     GUI:addOnClickEvent(GUI:getChildByName(BtnPlayer, "TouchSize"), function()
         MergeBag.OnSelType(GUIDefine.BagType.BAG)
     end)
 
     -- 右侧页签 英雄
     local BtnHero = MergeBagInfo._ui.BtnHero
-    MergeBag._BtnHero = BtnHero
+    MergeBagInfo._BtnHero = BtnHero
     GUI:addOnClickEvent(GUI:getChildByName(BtnHero, "TouchSize"), function()
         MergeBag.OnSelType(GUIDefine.BagType.HEROBAG)
     end)
@@ -195,7 +195,7 @@ function MergeBag.OnSelType(type, page, init)
     end
     MergeBagInfo._selType = type
     
-    local btns = {MergeBag._BtnPlayer, MergeBag._BtnHero}
+    local btns = {MergeBagInfo._BtnPlayer, MergeBagInfo._BtnHero}
     for i = 1, 2 do
         local isPress = i == MergeBagInfo._selType and true or false
         GUI:Button_setBright(btns[i], not isPress)
