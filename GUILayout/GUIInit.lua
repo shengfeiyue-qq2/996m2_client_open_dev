@@ -1850,12 +1850,15 @@ SL:RegisterLUAEvent(LUA_EVENT_USER_INPUT_LAUNCH_SKILL , "GUIInit", function(data
     -- 1.check launch
     if 1 == ret then 
         -- 打断动作, 立即施法
-        if skillID == SKILL_ID_YMChongZhuang then
-            -- 野蛮不需要结束就能进入
-            if SL:GetValue("MAIN_PLAYER_IS_VALID") and GUIFunction:CheckActionDashAble(SL:GetValue("ACTOR_ACTION", SL:GetValue("USER_ID"))) then
-                SL:RequestLaunchSkillImmediate(skillID)
+        if skillID == SKILL_ID_YMChongZhuang and SL:GetValue("MAIN_PLAYER_IS_VALID") then
+            -- 野蛮禁止移动状态立即施法
+            if not (SL:GetValue("MOVE_ACTION_FORBID_DASH") and SL:GetMetaValue("ACTOR_IS_MOVE", SL:GetMetaValue("USER_ID"))) then
+                -- 野蛮不需要结束就能进入
+                if  GUIFunction:CheckActionDashAble(SL:GetValue("ACTOR_ACTION", SL:GetValue("USER_ID"))) then
+                    SL:RequestLaunchSkillImmediate(skillID)
+                end
+                return
             end
-            return
         end
 
         -- launch

@@ -3270,6 +3270,7 @@ function GUIFunction:CheckSkillAbleToLaunch(skillID, isUserInput)
     -12: 内力值不够
     -13: 目标buff有禁止技能 launch
     -14: 目标buff有禁止技能 User Input
+    -15: 不可释放衔接技能
     ]]
     -- 挖矿使用普攻CD
     if skillID == SKILL_ID_DIG and not SL:GetValue("SKILL_IS_CDING", SKILL_ID_PuGong) then
@@ -3326,6 +3327,10 @@ function GUIFunction:CheckSkillAbleToLaunch(skillID, isUserInput)
 
     if SL:GetValue("SKILL_IS_DELAY_LAUNCH", skillID) then
         return -11
+    end
+
+    if not SL:GetValue("IS_LAUNCH_CONTINUE_SKILL", skillID) then
+        return -15
     end
 
     local targetID = SL:GetValue("SELECT_SHIFT_ATTACK_ID") or SL:GetValue("SELECT_TARGET_ID")
