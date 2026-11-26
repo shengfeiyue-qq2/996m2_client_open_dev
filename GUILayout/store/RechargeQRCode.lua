@@ -18,6 +18,8 @@ function RechargeQRCode.main()
     end)
 
     RechargeQRCode.ShowQRCode(data)
+
+    RechargeQRCode.RegisterEvent()
 end
 
 function RechargeQRCode.ShowQRCode(data)
