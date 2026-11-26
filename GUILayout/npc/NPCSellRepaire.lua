@@ -271,11 +271,22 @@ function NPCSellRepaire.OnBagDataChange(data)
         local itemList = data.operID or {}
         local makeIndex = BagData.GetOnSellOrRepaire()
         if makeIndex then
-            for k, v in pairs(itemList) do
+            for k, v in ipairs(itemList) do
                 if makeIndex == v.MakeIndex then
                     SL:ResetSellingState()
                     SL:ResetRepairingState()
                     SL:CleanOnDoData()
+                end
+            end
+        end
+    elseif data.opera == GUIDefine.OperateType.CHANGE then
+        local itemList = data.operID or {}
+        local makeIndex = BagData.GetOnSellOrRepaire()
+        if makeIndex then
+            for k, v in ipairs(itemList) do
+                if makeIndex == v.MakeIndex then
+                    NPCSellRepaire.UpdateItems(v.item)
+                    break
                 end
             end
         end
